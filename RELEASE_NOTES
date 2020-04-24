@@ -1,3 +1,4 @@
+5.0.0 (24-04-2020)
 - Refactor: Remove web files, spring controllers and bennu specific classes leaving domain classes
 
 4.6.1 (08-04-2020)
