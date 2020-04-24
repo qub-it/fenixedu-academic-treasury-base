@@ -10,11 +10,11 @@
 	</parent>
 
     <groupId>org.fenixedu</groupId>
-	<artifactId>fenixedu-academic-treasury</artifactId>
+	<artifactId>fenixedu-academic-treasury-base</artifactId>
 	<version>4.6.1</version>
 	<packaging>jar</packaging>
 
-	<name>Academic Treasury</name>
+	<name>Academic Treasury Base</name>
 
 	<properties>
 		<version.org.fenixedu.bennu>6.0.3-FORK</version.org.fenixedu.bennu>
@@ -61,8 +61,8 @@
 		</dependency>
 		<dependency>
 			<groupId>org.fenixedu</groupId>
-			<artifactId>fenixedu-treasury</artifactId>
-			<version>4.8.0</version>
+			<artifactId>fenixedu-treasury-base</artifactId>
+			<version>4.8.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.fenixedu</groupId>

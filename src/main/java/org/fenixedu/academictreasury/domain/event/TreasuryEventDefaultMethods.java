@@ -17,7 +17,6 @@ import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
 import org.fenixedu.treasury.domain.forwardpayments.ForwardPaymentConfiguration;
 import org.fenixedu.treasury.domain.paymentcodes.PaymentReferenceCode;
-import org.fenixedu.treasury.ui.accounting.managecustomer.DebtAccountController;
 import org.joda.time.LocalDate;
 
 import com.google.common.collect.Sets;
