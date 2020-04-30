@@ -161,31 +161,34 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
         this.aggregateAllOrNothing = true;
         this.eventDebitEntriesMustEqualRuleProducts = false;
 
-        toAggregateDebitEntries = type.strategyImplementation().isToAggregateDebitEntries();
-        toCloseDebitNote = type.strategyImplementation().isToCloseDebitNote();
-        toCreatePaymentReferenceCodes = type.strategyImplementation().isToCreatePaymentReferenceCodes();
-        toCreateDebitEntries = type.strategyImplementation().isToCreateDebitEntries();
-        toAlignAcademicTaxesDueDate = type.strategyImplementation().isToAlignAcademicTaxesDueDate();
+        this.toAggregateDebitEntries = type.strategyImplementation().isToAggregateDebitEntries();
+        this.toCloseDebitNote = type.strategyImplementation().isToCloseDebitNote();
+        this.toCreatePaymentReferenceCodes = type.strategyImplementation().isToCreatePaymentReferenceCodes();
+        this.toCreateDebitEntries = type.strategyImplementation().isToCreateDebitEntries();
+        this.toAlignAcademicTaxesDueDate = type.strategyImplementation().isToAlignAcademicTaxesDueDate();
 
-        debtGenerationRuleRestrictionDataSource =
+        this.debtGenerationRuleRestrictionDataSource =
                 DebtGenerationRuleRestriction.findAll().map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), l.getName()))
                         .sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT).collect(Collectors.toList());
 
-        debtGenerationRuleRestrictionDataSource.add(0, AcademicTreasuryConstants.SELECT_OPTION);
+        this.debtGenerationRuleRestrictionDataSource.add(0, AcademicTreasuryConstants.SELECT_OPTION);
 
         this.appliedMinimumAmountForPaymentCode = false;
         this.minimumAmountForPaymentCode = null;
+        
+        this.forceCreation = false;
+        this.limitToRegisteredOnExecutionYear = true;
     }
 
     public AcademicDebtGenerationRuleBean(final AcademicDebtGenerationRule rule) {
         this.type = rule.getAcademicDebtGenerationRuleType();
         this.executionYear = rule.getExecutionYear();
 
-        executionYearDataSource = ExecutionYear.readNotClosedExecutionYears().stream()
+        this.executionYearDataSource = ExecutionYear.readNotClosedExecutionYears().stream()
                 .sorted(Collections.reverseOrder(ExecutionYear.COMPARATOR_BY_BEGIN_DATE))
                 .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), l.getQualifiedName())).collect(Collectors.toList());
 
-        degreeTypeDataSource = DegreeType.all().map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), l.getName().getContent()))
+        this.degreeTypeDataSource = DegreeType.all().map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), l.getName().getContent()))
                 .sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT).collect(Collectors.toList());
 
         this.aggregateOnDebitNote = rule.isAggregateOnDebitNote();
@@ -239,7 +242,7 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
         this.product = null;
         this.createDebt = false;
         this.forceCreation = false;
-        this.limitToRegisteredOnExecutionYear = false;
+        this.limitToRegisteredOnExecutionYear = true;
     }
 
     public void removEntry(final int index) {

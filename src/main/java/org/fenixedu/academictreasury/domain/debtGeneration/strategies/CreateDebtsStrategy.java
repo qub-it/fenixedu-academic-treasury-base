@@ -138,7 +138,6 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                 return Lists.newArrayList();
             }
 
-            // TODO legidio, should the same try/catch as above be applied?
             processDebtsForRegistration(rule, registration);
             result.markProcessingEndDateTime();
         } catch (final AcademicTreasuryDomainException e) {
@@ -178,7 +177,7 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
         if (registration.getRegistrationDataByExecutionYearSet().stream().noneMatch(i -> i.getExecutionYear() == year)) {
 
             // only return is this rule has not entry that forces creation
-            if (!isRuleWithOnlyOneAcademicTaxEntryForcingCreation(rule)) {
+            if (!isRuleWithOneEntryForcingCreation(rule)) {
                 return true;
             }
         }
@@ -186,16 +185,8 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
         return false;
     }
 
-    static private boolean isRuleWithOnlyOneAcademicTaxEntryForcingCreation(final AcademicDebtGenerationRule rule) {
-        if (rule.getAcademicDebtGenerationRuleEntriesSet().size() != 1) {
-            return false;
-        }
-
-        if (!AcademicTax.findUnique(rule.getAcademicDebtGenerationRuleEntriesSet().iterator().next().getProduct()).isPresent()) {
-            return false;
-        }
-
-        return rule.getAcademicDebtGenerationRuleEntriesSet().iterator().next().isForceCreation();
+    static private boolean isRuleWithOneEntryForcingCreation(final AcademicDebtGenerationRule rule) {
+        return rule.isWithAtLeastOneForceCreationEntry();
     }
 
     @Atomic(mode = TxMode.WRITE)
@@ -302,9 +293,12 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                     return null;
                 }
 
-                /* HACK: For now limit forcing for first time students only */
                 boolean forceCreation =
-                        entry.isCreateDebt() && entry.isForceCreation() && registration.isFirstTime(rule.getExecutionYear());
+                        entry.isCreateDebt() 
+                        && entry.isForceCreation() 
+                        && registration.getLastRegistrationState(executionYear) != null
+                        && registration.getLastRegistrationState(executionYear).isActive()
+                        && (!entry.isLimitToRegisteredOnExecutionYear() || registration.isFirstTime(rule.getExecutionYear()));
 
                 AcademicTaxServices.createAcademicTaxForEnrolmentDateAndDefaultFinantialEntity(registration, executionYear, academicTax, forceCreation);
             }
@@ -341,6 +335,13 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                     return null;
                 }
 
+                boolean forceCreation =
+                        entry.isCreateDebt() 
+                        && entry.isForceCreation() 
+                        && registration.getLastRegistrationState(executionYear) != null
+                        && registration.getLastRegistrationState(executionYear).isActive()
+                        && (!entry.isLimitToRegisteredOnExecutionYear() || registration.isFirstTime(rule.getExecutionYear()));
+                
                 if (entry.isToCreateAfterLastRegistrationStateDate()) {
                     final LocalDate lastRegisteredStateDate = TuitionServices.lastRegisteredDate(registration, executionYear);
                     if (lastRegisteredStateDate == null) {
@@ -349,11 +350,11 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                         return null;
                     } else {
                         TuitionServices.createInferedTuitionForRegistration(registration, executionYear, lastRegisteredStateDate,
-                                false);
+                                forceCreation);
                     }
                 } else {
-                    final LocalDate enrolmentDate = TuitionServices.enrolmentDate(registration, executionYear, false);
-                    TuitionServices.createInferedTuitionForRegistration(registration, executionYear, enrolmentDate, false);
+                    final LocalDate enrolmentDate = TuitionServices.enrolmentDate(registration, executionYear, forceCreation);
+                    TuitionServices.createInferedTuitionForRegistration(registration, executionYear, enrolmentDate, forceCreation);
                 }
             }
         }

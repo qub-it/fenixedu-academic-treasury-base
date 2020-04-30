@@ -88,8 +88,11 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         }
 
         for (final ProductEntry productEntry : bean.getEntries()) {
-            AcademicDebtGenerationRuleEntry.create(this, productEntry.getProduct(), productEntry.isCreateDebt(),
-                    productEntry.isToCreateAfterLastRegistrationStateDate(), productEntry.isForceCreation(),
+            AcademicDebtGenerationRuleEntry.create(this, 
+                    productEntry.getProduct(), 
+                    productEntry.isCreateDebt(),
+                    productEntry.isToCreateAfterLastRegistrationStateDate(), 
+                    productEntry.isForceCreation(),
                     productEntry.isLimitToRegisteredOnExecutionYear());
         }
 
@@ -204,6 +207,10 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
 
     public boolean isAppliedMinimumAmountForPaymentCode() {
         return getMinimumAmountForPaymentCode() != null;
+    }
+    
+    public boolean isWithAtLeastOneForceCreationEntry() {
+        return getAcademicDebtGenerationRuleEntriesSet().stream().anyMatch(e -> e.isForceCreation());
     }
     
     private boolean isDeletable() {
