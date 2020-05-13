@@ -384,6 +384,12 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
 
         setDebtGenerationRuleRestriction(bean.getDebtGenerationRuleRestriction());
 
+        if(bean.isAppliedMinimumAmountForPaymentCode()) {
+            setMinimumAmountForPaymentCode(bean.getMinimumAmountForPaymentCode());
+        } else {
+            setMinimumAmountForPaymentCode(null);
+        }
+        
         checkRules();
     }
     

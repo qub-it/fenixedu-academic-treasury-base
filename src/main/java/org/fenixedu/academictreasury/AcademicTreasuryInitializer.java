@@ -9,6 +9,7 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.treasury.ITreasuryBridgeAPI;
 import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
 import org.fenixedu.academictreasury.domain.listeners.DebitEntryDeletionListener;
+import org.fenixedu.academictreasury.domain.listeners.FinantialEntityListener;
 import org.fenixedu.academictreasury.domain.listeners.ProductDeletionListener;
 import org.fenixedu.academictreasury.domain.treasury.AcademicTreasuryBridgeImpl;
 import org.fenixedu.academictreasury.services.EmolumentServices;
@@ -43,6 +44,7 @@ public class AcademicTreasuryInitializer implements ServletContextListener {
 
         DebitEntryDeletionListener.attach();
         ProductDeletionListener.attach();
+        FinantialEntityListener.attach();
 
         final AcademicTreasuryBridgeImpl impl = new AcademicTreasuryBridgeImpl();
 
