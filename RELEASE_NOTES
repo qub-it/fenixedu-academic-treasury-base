@@ -1,3 +1,4 @@
+5.0.3 (13-05-2020)
 - Bug Fix: Portuguese translation in labels
 - Refactor: Listener to detect when FinantialEntity is deleted in order to disconect relations
 - Bug Fix: Fix AcademicDebtGenerationRule edition in fields of minimum amount to generate payment reference code
