@@ -1,3 +1,5 @@
+- Refactor: Method to retrieve all academic debt generation rule entries of tuition type
+
 5.0.3 (13-05-2020)
 - Bug Fix: Portuguese translation in labels
 - Refactor: Listener to detect when FinantialEntity is deleted in order to disconect relations

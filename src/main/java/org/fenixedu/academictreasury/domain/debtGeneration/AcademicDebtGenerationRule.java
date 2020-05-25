@@ -18,6 +18,7 @@ import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
+import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.dto.debtGeneration.AcademicDebtGenerationRuleBean;
 import org.fenixedu.academictreasury.dto.debtGeneration.AcademicDebtGenerationRuleBean.ProductEntry;
 import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
@@ -207,6 +208,12 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
 
     public boolean isAppliedMinimumAmountForPaymentCode() {
         return getMinimumAmountForPaymentCode() != null;
+    }
+    
+    public Set<AcademicDebtGenerationRuleEntry> getTuitionProductGroupProductEntries() {
+        return getAcademicDebtGenerationRuleEntriesSet().stream()
+            .filter(e -> e.getProduct().getProductGroup() == AcademicTreasurySettings.getInstance().getTuitionProductGroup())
+            .collect(Collectors.toSet());
     }
     
     public boolean isWithAtLeastOneForceCreationEntry() {
