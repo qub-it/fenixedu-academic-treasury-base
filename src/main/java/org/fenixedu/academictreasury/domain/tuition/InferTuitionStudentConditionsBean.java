@@ -42,7 +42,7 @@ public class InferTuitionStudentConditionsBean {
         bean.setSemestersWithEnrolments(semestersWithEnrolments(registration, executionYear));
         bean.setCurricularYear(readByYear(TuitionPaymentPlan.curricularYear(registration, executionYear)));
         bean.setFirstTimeStudent(TuitionPaymentPlan.firstTimeStudent(registration, executionYear));
-        bean.setStatutes(academicTreasuryServices.statutesTypesValidOnAnyExecutionSemesterFor(registration.getStudent(), executionYear));
+        bean.setStatutes(academicTreasuryServices.statutesTypesValidOnAnyExecutionSemesterFor(registration, executionYear));
 
         return bean;
     }

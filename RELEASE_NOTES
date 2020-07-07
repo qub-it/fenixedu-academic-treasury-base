@@ -1,3 +1,7 @@
+- New Fixture: Copy academic debt generation rules between execution intervals
+- New Fixture: Copy tuition payment plans between execution intervals
+- Refactor: Retrieve student's statutes in execution year by his registration
+
 5.0.4 (25-05-2020)
 - Refactor: Method to retrieve all academic debt generation rule entries of tuition type
 

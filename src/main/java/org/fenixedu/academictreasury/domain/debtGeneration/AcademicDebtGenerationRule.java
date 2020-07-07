@@ -15,12 +15,16 @@ import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionDegree;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.student.StatuteType;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.dto.debtGeneration.AcademicDebtGenerationRuleBean;
 import org.fenixedu.academictreasury.dto.debtGeneration.AcademicDebtGenerationRuleBean.ProductEntry;
+import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
+import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.slf4j.Logger;
@@ -118,6 +122,56 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         checkRules();
     }
 
+    public AcademicDebtGenerationRule(AcademicDebtGenerationRule ruleToCopy, ExecutionYear executionYear) {
+        this();
+
+        setActive(ruleToCopy.isActive());
+        setBackgroundExecution(ruleToCopy.isBackgroundExecution());
+
+        setAcademicDebtGenerationRuleType(ruleToCopy.getAcademicDebtGenerationRuleType());
+        setExecutionYear(executionYear);
+        setAggregateOnDebitNote(ruleToCopy.isAggregateOnDebitNote());
+        setAggregateAllOrNothing(ruleToCopy.isAggregateAllOrNothing());
+        setEventDebitEntriesMustEqualRuleProducts(ruleToCopy.isEventDebitEntriesMustEqualRuleProducts());
+        setCloseDebitNote(ruleToCopy.isCloseDebitNote());
+        setAlignAllAcademicTaxesDebitToMaxDueDate(ruleToCopy.isAlignAllAcademicTaxesDebitToMaxDueDate());
+        setCreatePaymentReferenceCode(ruleToCopy.isCreatePaymentReferenceCode());
+        setPaymentCodePool(ruleToCopy.getPaymentCodePool());
+
+        setAcademicTaxDueDateAlignmentType(ruleToCopy.getAcademicTaxDueDateAlignmentType());
+
+        for (final AcademicDebtGenerationRuleEntry entry : ruleToCopy.getAcademicDebtGenerationRuleEntriesSet()) {
+            AcademicDebtGenerationRuleEntry.create(this, 
+                    entry.getProduct(), 
+                    entry.isCreateDebt(),
+                    entry.isToCreateAfterLastRegistrationStateDate(), 
+                    entry.isForceCreation(),
+                    entry.isLimitToRegisteredOnExecutionYear());
+        }
+
+        getDegreeCurricularPlansSet().addAll((ruleToCopy.getDegreeCurricularPlansSet()));
+
+        setOrderNumber(-1);
+        final Optional<AcademicDebtGenerationRule> max =
+                find(getAcademicDebtGenerationRuleType(), getExecutionYear()).max(COMPARE_BY_ORDER_NUMBER);
+
+        setOrderNumber(max.isPresent() ? max.get().getOrderNumber() + 1 : 1);
+
+        setDays(ruleToCopy.getDays());
+
+        setDebtGenerationRuleRestriction(ruleToCopy.getDebtGenerationRuleRestriction());
+
+        if(ruleToCopy.isAppliedMinimumAmountForPaymentCode()) {
+            setMinimumAmountForPaymentCode(ruleToCopy.getMinimumAmountForPaymentCode());
+        } else {
+            setMinimumAmountForPaymentCode(null);
+        }
+        
+        setCopyFromAcademicDebtGenerationRule(ruleToCopy);
+        
+        checkRules();
+    }
+
     private void checkRules() {
         if (getDomainRoot() == null) {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.bennu.required");
@@ -150,13 +204,6 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.degreeCurricularPlans.required");
         }
 
-        for (final DegreeCurricularPlan degreeCurricularPlan : getDegreeCurricularPlansSet()) {
-            if (ExecutionDegree.getByDegreeCurricularPlanAndExecutionYear(degreeCurricularPlan, getExecutionYear()) == null) {
-                throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.degreeCurricularPlan.not.active",
-                        degreeCurricularPlan.getName());
-            }
-        }
-        
         if(getMinimumAmountForPaymentCode() != null && !TreasuryConstants.isPositive(getMinimumAmountForPaymentCode())) {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.minimumAmountForPaymentCode.invalid",
                     getMinimumAmountForPaymentCode().toString());
@@ -223,7 +270,13 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     private boolean isDeletable() {
         return true;
     }
-
+    
+//    protected boolean isRegistrationOrStudentWithAnyOfAllowedStatuteTypes(final Registration registration) {
+//        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+//    	
+//        Set<StatuteType> studentStatutes = academicTreasuryServices.statutesTypesValidOnAnyExecutionSemesterFor(registration.getStudent(), getExecutionYear());
+//    }
+//
     @Override
     protected void checkForDeletionBlockers(Collection<String> blockers) {
         super.checkForDeletionBlockers(blockers);
@@ -246,6 +299,12 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         }
 
         setDebtGenerationRuleRestriction(null);
+        
+        setCopyFromAcademicDebtGenerationRule(null);
+        while(!getAcademicDebtGenerationRuleCopiesSet().isEmpty()) {
+            getAcademicDebtGenerationRuleCopiesSet().iterator().next().setCopyFromAcademicDebtGenerationRule(null);
+        }
+
         super.deleteDomainObject();
     }
 
@@ -322,6 +381,14 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
 
     public boolean isLast() {
         return find(this.getAcademicDebtGenerationRuleType(), this.getExecutionYear()).max(COMPARE_BY_ORDER_NUMBER).get() == this;
+    }
+    
+    public boolean isCopyFromOtherExistingAcademicDebtGenerationRule() {
+        return getCopyFromAcademicDebtGenerationRule() != null;
+    }
+    
+    public boolean hasCopiesInExecutionInterval(ExecutionInterval executionInterval) {
+        return getAcademicDebtGenerationRuleCopiesSet().stream().anyMatch(r -> r.getExecutionYear() == executionInterval);
     }
 
     @Atomic
@@ -433,6 +500,15 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         }
         
         return new AcademicDebtGenerationRule(bean);
+    }
+    
+    @Atomic
+    public static AcademicDebtGenerationRule copy(final AcademicDebtGenerationRule rule, ExecutionYear executionYear) {
+        if(executionYear == rule.getExecutionYear()) {
+            throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.copy.same.executionYear");
+        }
+        
+        return new AcademicDebtGenerationRule(rule, executionYear);
     }
 
     public static List<AcademicDebtGenerationProcessingResult> runAllActive(final boolean runOnlyWithBackgroundExecution) {

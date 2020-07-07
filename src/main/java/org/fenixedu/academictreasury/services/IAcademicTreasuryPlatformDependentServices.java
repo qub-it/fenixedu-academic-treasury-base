@@ -11,6 +11,7 @@ import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionDegree;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
@@ -129,7 +130,7 @@ public interface IAcademicTreasuryPlatformDependentServices {
     
     public RegistrationRegimeType registrationRegimeType(final Registration registration, final ExecutionYear executionYear);
 
-    public Set<StatuteType> statutesTypesValidOnAnyExecutionSemesterFor(final Student student, final ExecutionYear executionYear);
+    public Set<StatuteType> statutesTypesValidOnAnyExecutionSemesterFor(final Registration registration, final ExecutionInterval executionInterval);
     
     /* AdministrativeOffice */
     

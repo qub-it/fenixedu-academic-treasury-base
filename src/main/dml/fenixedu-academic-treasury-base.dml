@@ -412,6 +412,17 @@ class tuition.TuitionPaymentPlan {
 			multiplicity *;
 		}
 	}
+	
+	relation TuitionPaymentPlanCopy {
+		
+		tuition.TuitionPaymentPlan playsRole copyFromTuitionPaymentPlan {
+			multiplicity 0..1;
+		}
+		
+		tuition.TuitionPaymentPlan playsRole tuitionPaymentPlanCopies {
+			multiplicity *;
+		}
+	}
 
 class tuition.TuitionInstallmentTariff extends .org.fenixedu.treasury.domain.tariff.Tariff {
 	int installmentOrder;
@@ -656,6 +667,16 @@ class debtGeneration.AcademicDebtGenerationRule {
 		}
 		
 		debtGeneration.AcademicDebtGenerationRule playsRole academicDebtGenerationRules {
+			multiplicity *;
+		}
+	}
+	
+	relation AcademicDebtGenerationRuleCopy {
+		debtGeneration.AcademicDebtGenerationRule playsRole copyFromAcademicDebtGenerationRule {
+			multiplicity 0..1;
+		}
+		
+		debtGeneration.AcademicDebtGenerationRule playsRole academicDebtGenerationRuleCopies {
 			multiplicity *;
 		}
 	}

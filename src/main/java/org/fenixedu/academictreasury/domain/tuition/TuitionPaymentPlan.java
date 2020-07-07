@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.Enrolment;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
@@ -28,7 +29,6 @@ import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependent
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.academictreasury.util.LocalizedStringUtil;
-import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
@@ -51,12 +51,27 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     private static final String CONDITIONS_DESCRIPTION_SEPARATOR = ", ";
 
-    public static final Comparator<TuitionPaymentPlan> COMPARE_BY_PAYMENT_PLAN_ORDER =
-            (o1, o2) -> Integer.compare(o1.getPaymentPlanOrder(), o2.getPaymentPlanOrder());
+    public static final Comparator<TuitionPaymentPlan> COMPARE_BY_PAYMENT_PLAN_ORDER = (o1, o2) -> {
+        int c = Integer.compare(o1.getPaymentPlanOrder(), o2.getPaymentPlanOrder());
+        
+        return c != 0 ? c : o1.getExternalId().compareTo(o2.getExternalId());
+    };
+
+    public static final Comparator<TuitionPaymentPlan> COMPARE_BY_DCP_AND_PAYMENT_PLAN_ORDER = (o1, o2) -> {
+        int c = DegreeCurricularPlan.COMPARATOR_BY_PRESENTATION_NAME.compare(o1.getDegreeCurricularPlan(), o2.getDegreeCurricularPlan());
+        
+        if(c != 0) {
+            return c;
+        }
+        
+        c = Integer.compare(o1.getPaymentPlanOrder(), o2.getPaymentPlanOrder());
+        
+        return c != 0 ? c : o1.getExternalId().compareTo(o2.getExternalId());
+    };
 
     private static final int MAX_PAYMENT_PLANS_LIMIT = 50;
 
-    protected TuitionPaymentPlan() {
+    public TuitionPaymentPlan() {
         super();
         setDomainRoot(FenixFramework.getDomainRoot());
     }
@@ -82,12 +97,12 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                 .getChildOrder() : null);
         setFirstTimeStudent(tuitionPaymentPlanBean.isFirstTimeStudent());
         setCustomized(tuitionPaymentPlanBean.isCustomized());
-        
+
         LocalizedString mls = new LocalizedString();
         for (final Locale locale : TreasuryPlataformDependentServicesFactory.implementation().availableLocales()) {
             mls = mls.with(locale, tuitionPaymentPlanBean.getName());
         }
-        
+
         setCustomizedName(mls);
 
         setWithLaboratorialClasses(tuitionPaymentPlanBean.isWithLaboratorialClasses());
@@ -99,6 +114,39 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         checkRules();
     }
 
+    protected TuitionPaymentPlan(final TuitionPaymentPlan tuitionPaymentPlanToCopy, final ExecutionYear toExecutionYear) {
+        this();
+
+        setFinantialEntity(tuitionPaymentPlanToCopy.getFinantialEntity());
+        setTuitionPaymentPlanGroup(tuitionPaymentPlanToCopy.getTuitionPaymentPlanGroup());
+        setProduct(tuitionPaymentPlanToCopy.getTuitionPaymentPlanGroup().getCurrentProduct());
+        setExecutionYear(toExecutionYear);
+        setDegreeCurricularPlan(tuitionPaymentPlanToCopy.getDegreeCurricularPlan());
+
+        setDefaultPaymentPlan(tuitionPaymentPlanToCopy.isDefaultPaymentPlan());
+        setRegistrationRegimeType(tuitionPaymentPlanToCopy.getRegistrationRegimeType());
+        setRegistrationProtocol(tuitionPaymentPlanToCopy.getRegistrationProtocol());
+        setIngression(tuitionPaymentPlanToCopy.getIngression());
+        setCurricularYear(tuitionPaymentPlanToCopy.getCurricularYear());
+        setStatuteType(tuitionPaymentPlanToCopy.getStatuteType());
+        setPayorDebtAccount(tuitionPaymentPlanToCopy.getPayorDebtAccount());
+        setSemester(tuitionPaymentPlanToCopy.getSemester());
+        setFirstTimeStudent(tuitionPaymentPlanToCopy.isFirstTimeStudent());
+        setCustomized(tuitionPaymentPlanToCopy.isCustomized());
+
+        setCustomizedName(tuitionPaymentPlanToCopy.getCustomizedName());
+
+        setWithLaboratorialClasses(tuitionPaymentPlanToCopy.isWithLaboratorialClasses());
+        setPaymentPlanOrder((int) find(getTuitionPaymentPlanGroup(), getDegreeCurricularPlan(), getExecutionYear())
+                .max(COMPARE_BY_PAYMENT_PLAN_ORDER).map(TuitionPaymentPlan::getPaymentPlanOrder).orElse(0) + 1);
+
+        createInstallments(tuitionPaymentPlanToCopy);
+        
+        setCopyFromTuitionPaymentPlan(tuitionPaymentPlanToCopy);
+
+        checkRules();
+    }
+    
     private void checkRules() {
         if (getTuitionPaymentPlanGroup() == null) {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.tuitionPaymentPlanGroup.required");
@@ -192,6 +240,13 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         }
     }
 
+    private void createInstallments(final TuitionPaymentPlan tuitionPaymentPlanToCopy) {
+        tuitionPaymentPlanToCopy.getTuitionInstallmentTariffsSet()
+            .stream()
+            .sorted(TuitionInstallmentTariff.COMPARATOR_BY_INSTALLMENT_NUMBER)
+            .forEach(t -> TuitionInstallmentTariff.copy(t, this));
+    }
+
     public LocalizedString getName() {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
 
@@ -215,8 +270,9 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     public LocalizedString getConditionsDescription() {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
         LocalizedString result = new LocalizedString();
 
         for (final Locale locale : treasuryServices.availableLocales()) {
@@ -260,7 +316,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
             }
 
             if (getStatuteType() != null) {
-                description.append(academicTreasuryServices.localizedNameOfStatuteType(getStatuteType())).append(CONDITIONS_DESCRIPTION_SEPARATOR);
+                description.append(academicTreasuryServices.localizedNameOfStatuteType(getStatuteType()))
+                        .append(CONDITIONS_DESCRIPTION_SEPARATOR);
             }
 
             if (isFirstTimeStudent()) {
@@ -540,6 +597,11 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         this.setIngression(null);
         this.setStatuteType(null);
         this.setPayorDebtAccount(null);
+        
+        setCopyFromTuitionPaymentPlan(null);
+        while(!getTuitionPaymentPlanCopiesSet().isEmpty()) {
+            getTuitionPaymentPlanCopiesSet().iterator().next().setCopyFromTuitionPaymentPlan(null);
+        }
 
         super.deleteDomainObject();
     }
@@ -563,6 +625,14 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     public boolean isPayorDebtAccountDefined() {
         return getPayorDebtAccount() != null;
+    }
+    
+    public boolean isCopyFromOtherExistingTuitionPaymentPlan() {
+        return getCopyFromTuitionPaymentPlan() != null;
+    }
+    
+    public boolean hasCopiesInExecutionInterval(ExecutionInterval executionInterval) {
+        return getTuitionPaymentPlanCopiesSet().stream().anyMatch(p -> p.getExecutionYear() == executionInterval);
     }
 
     // @formatter:off
@@ -712,7 +782,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     public static TuitionPaymentPlan inferTuitionPaymentPlanForStandaloneEnrolment(final Registration registration,
             final ExecutionYear executionYear, final Enrolment enrolment) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
         if (!enrolment.isStandalone()) {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.enrolment.is.not.standalone");
@@ -722,8 +793,9 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         final RegistrationProtocol registrationProtocol = registration.getRegistrationProtocol();
         final IngressionType ingression = registration.getIngressionType();
         final boolean laboratorial = laboratorial(enrolment);
-        final Set<StatuteType> statutes = academicTreasuryServices.statutesTypesValidOnAnyExecutionSemesterFor(registration.getStudent(), executionYear);
-        
+        final Set<StatuteType> statutes =
+                academicTreasuryServices.statutesTypesValidOnAnyExecutionSemesterFor(registration, executionYear);
+
         final Stream<TuitionPaymentPlan> stream = TuitionPaymentPlan.findSortedByPaymentPlanOrder(
                 TuitionPaymentPlanGroup.findUniqueDefaultGroupForStandalone().get(), degreeCurricularPlan, executionYear);
 
@@ -734,7 +806,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                         && (t.getIngression() == null || t.getIngression() == ingression)
                         && (!t.isWithLaboratorialClasses() || t.isWithLaboratorialClasses() == laboratorial) && !t.isCustomized())
                 .collect(Collectors.toList());
-        
+
         final List<TuitionPaymentPlan> filtered = Lists.newArrayList();
         for (final TuitionPaymentPlan t : plans) {
             if (t.getStatuteType() != null && !statutes.contains(t.getStatuteType())) {
@@ -749,7 +821,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     public static TuitionPaymentPlan inferTuitionPaymentPlanForExtracurricularEnrolment(final Registration registration,
             final ExecutionYear executionYear, final Enrolment enrolment) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
         if (!enrolment.isExtraCurricular()) {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.enrolment.is.not.extracurricular");
@@ -759,7 +832,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         final RegistrationProtocol registrationProtocol = registration.getRegistrationProtocol();
         final IngressionType ingression = registration.getIngressionType();
         final boolean laboratorial = laboratorial(enrolment);
-        final Set<StatuteType> statutes = academicTreasuryServices.statutesTypesValidOnAnyExecutionSemesterFor(registration.getStudent(), executionYear);
+        final Set<StatuteType> statutes =
+                academicTreasuryServices.statutesTypesValidOnAnyExecutionSemesterFor(registration, executionYear);
 
         final Stream<TuitionPaymentPlan> stream = TuitionPaymentPlan.findSortedByPaymentPlanOrder(
                 TuitionPaymentPlanGroup.findUniqueDefaultGroupForExtracurricular().get(), degreeCurricularPlan, executionYear);
@@ -771,7 +845,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                         && (t.getIngression() == null || t.getIngression() == ingression)
                         && (!t.isWithLaboratorialClasses() || t.isWithLaboratorialClasses() == laboratorial) && !t.isCustomized())
                 .collect(Collectors.toList());
-        
+
         final List<TuitionPaymentPlan> filtered = Lists.newArrayList();
         for (final TuitionPaymentPlan t : plans) {
             if (t.getStatuteType() != null && !statutes.contains(t.getStatuteType())) {
@@ -831,6 +905,10 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         }
 
         return result;
+    }
+    
+    public static TuitionPaymentPlan copy(final TuitionPaymentPlan tuitionPaymentPlanToCopy, final ExecutionYear toExecutionYear) {
+        return new TuitionPaymentPlan(tuitionPaymentPlanToCopy, toExecutionYear);
     }
 
 }

@@ -526,7 +526,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     private String statutes(final Registration registration, final ExecutionYear executionYear) {
         final IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
         
-        return services.statutesTypesValidOnAnyExecutionSemesterFor(registration.getStudent(), executionYear).stream()
+        return services.statutesTypesValidOnAnyExecutionSemesterFor(registration, executionYear).stream()
                 .map(s -> s != null ? services.localizedNameOfStatuteType(s) : "").reduce((a, c) -> c + ", " + a).orElse(null);
     }
 

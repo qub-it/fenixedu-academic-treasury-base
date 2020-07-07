@@ -64,6 +64,13 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         this.init(finantialEntity, tuitionPaymentPlan, bean);
     }
 
+    public TuitionInstallmentTariff(TuitionInstallmentTariff t, TuitionPaymentPlan copyOfTuitionPaymentPlan) {
+        this();
+
+        setTuitionPaymentPlan(copyOfTuitionPaymentPlan);
+        this.init(t);
+    }
+
     @Override
     protected void init(final FinantialEntity finantialEntity, final Product product, final DateTime beginDate,
             final DateTime endDate, final DueDateCalculationType dueDateCalculationType, final LocalDate fixedDueDate,
@@ -108,6 +115,33 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         } else {
             this.setMaximumAmount(BigDecimal.ZERO);
         }
+
+        checkRules();
+    }
+
+    protected void init(TuitionInstallmentTariff tariff) {
+        FinantialEntity finantialEntity = tariff.getFinantialEntity();
+        Product product = tariff.getProduct();
+
+        super.init(finantialEntity, product, tariff.getBeginDate(),
+                tariff.getEndDate() != null ? tariff.getEndDate() : null, tariff.getDueDateCalculationType(),
+                tariff.getFixedDueDate(), tariff.getNumberOfDaysAfterCreationForDueDate(), tariff.isApplyInterests(),
+                tariff.getInterestRate() != null ? tariff.getInterestRate().getInterestType() : null, 
+                tariff.getInterestRate() != null ? tariff.getInterestRate().getNumberOfDaysAfterDueDate() : 0, 
+                tariff.getInterestRate() != null ? tariff.getInterestRate().isApplyInFirstWorkday() : false,
+                tariff.getInterestRate() != null ? tariff.getInterestRate().getMaximumDaysToApplyPenalty() : 0, 
+                tariff.getInterestRate() != null ? tariff.getInterestRate().getInterestFixedAmount() : null,
+                tariff.getInterestRate() != null ? tariff.getInterestRate().getRate() : null);
+
+        super.setInstallmentOrder(tariff.getInstallmentOrder());
+        super.setTuitionCalculationType(tariff.getTuitionCalculationType());
+        super.setFixedAmount(tariff.getFixedAmount());
+        super.setEctsCalculationType(tariff.getEctsCalculationType());
+        super.setFactor(tariff.getFactor());
+        super.setTotalEctsOrUnits(tariff.getTotalEctsOrUnits());
+        super.setAcademicalActBlockingOff(tariff.isAcademicalActBlockingOff());
+        super.setBlockAcademicActsOnDebt(tariff.isBlockAcademicActsOnDebt());
+        super.setMaximumAmount(tariff.getMaximumAmount());
 
         checkRules();
     }
@@ -176,13 +210,6 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
                 throw new AcademicTreasuryDomainException("error.TuitionInstallmentTariff.totalEctsOrUnits.must.be.positive",
                         getTuitionCalculationType().getDescriptionI18N().getContent());
             }
-/*
-if (!TuitionPaymentPlan.isDefaultPaymentPlanDefined(getTuitionPaymentPlan().getDegreeCurricularPlan(),
-        getTuitionPaymentPlan().getExecutionYear())) {
-    throw new AcademicTreasuryDomainException("error.TuitionInstallmentTariff.default.payment.plan.not.defined");
-}
-*/
-
         }
         
         if(isAcademicalActBlockingOff() && isBlockAcademicActsOnDebt()) {
@@ -734,6 +761,10 @@ if (!TuitionPaymentPlan.isDefaultPaymentPlanDefined(getTuitionPaymentPlan().getD
     public static TuitionInstallmentTariff create(final FinantialEntity finantialEntity,
             final TuitionPaymentPlan tuitionPaymentPlan, final AcademicTariffBean bean) {
         return new TuitionInstallmentTariff(finantialEntity, tuitionPaymentPlan, bean);
+    }
+
+    public static TuitionInstallmentTariff copy(TuitionInstallmentTariff tuitionInstallmentTariffToCopy, TuitionPaymentPlan copyOfTuitionPaymentPlan) {
+        return new TuitionInstallmentTariff(tuitionInstallmentTariffToCopy, copyOfTuitionPaymentPlan);
     }
 
 }
