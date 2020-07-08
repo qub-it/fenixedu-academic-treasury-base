@@ -122,10 +122,19 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
     protected void init(TuitionInstallmentTariff tariff) {
         FinantialEntity finantialEntity = tariff.getFinantialEntity();
         Product product = tariff.getProduct();
+        ExecutionYear executionYear = getTuitionPaymentPlan().getExecutionYear();
+        ExecutionYear copiedExecutionYear = tariff.getTuitionPaymentPlan().getExecutionYear();
 
-        super.init(finantialEntity, product, tariff.getBeginDate(),
-                tariff.getEndDate() != null ? tariff.getEndDate() : null, tariff.getDueDateCalculationType(),
-                tariff.getFixedDueDate(), tariff.getNumberOfDaysAfterCreationForDueDate(), tariff.isApplyInterests(),
+        int executionYearInterval = executionYear.getAcademicInterval().getStart().getYear()
+                - copiedExecutionYear.getAcademicInterval().getStart().getYear();
+        
+        super.init(finantialEntity, product, 
+                tariff.getBeginDate().plusYears(executionYearInterval),
+                tariff.getEndDate() != null ? tariff.getEndDate().plusYears(executionYearInterval) : null, 
+                        tariff.getDueDateCalculationType(),
+                tariff.getFixedDueDate().plusYears(executionYearInterval), 
+                tariff.getNumberOfDaysAfterCreationForDueDate(), 
+                tariff.isApplyInterests(),
                 tariff.getInterestRate() != null ? tariff.getInterestRate().getInterestType() : null, 
                 tariff.getInterestRate() != null ? tariff.getInterestRate().getNumberOfDaysAfterDueDate() : 0, 
                 tariff.getInterestRate() != null ? tariff.getInterestRate().isApplyInFirstWorkday() : false,

@@ -1,3 +1,5 @@
+- Bug Fix: On copy tuition payment plans, set correct dates in installments regarding the new execution interval
+
 5.1.0 (07-07-2020)
 - New Fixture: Copy academic debt generation rules between execution intervals
 - New Fixture: Copy tuition payment plans between execution intervals
