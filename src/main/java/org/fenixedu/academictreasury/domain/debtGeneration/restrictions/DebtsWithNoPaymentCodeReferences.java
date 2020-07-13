@@ -24,5 +24,5 @@ public class DebtsWithNoPaymentCodeReferences implements IDebtGenerationRuleRest
         
         return true;
     }
-
+    
 }

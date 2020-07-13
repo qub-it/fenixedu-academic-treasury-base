@@ -717,6 +717,39 @@ class debtGeneration.AcademicDebtGenerationRuleEntry {
 			multiplicity *;
 		}
 	}
+
+class debtGeneration.AcademicDebtGenerationRuleRestriction {
+	boolean excludeIfMatches;
+}
+
+	relation AcademicDebtGenerationRuleRestrictionDomainRoot {
+		.pt.ist.fenixframework.DomainRoot playsRole domainRoot {
+			multiplicity 1..1;
+		}
+	
+		debtGeneration.AcademicDebtGenerationRuleRestriction playsRole academicDebtGenerationRuleRestrictions {
+			multiplicity *;
+		}
+	}
+	
+	relation AcademicDebtGenerationRuleRestrictionAcademicDebtGenerationRule {
+		debtGeneration.AcademicDebtGenerationRule playsRole academicDebtGenerationRule {
+			multiplicity 1..1;
+		}
+	
+		debtGeneration.AcademicDebtGenerationRuleRestriction playsRole academicDebtGenerationRuleRestrictions {
+			multiplicity *;
+		}
+	}
+
+	class debtGeneration.EnrolmentRenewalRestriction extends debtGeneration.AcademicDebtGenerationRuleRestriction {
+	}
+	
+	class debtGeneration.DebtsWithNoPaymentCodeReferencesRestriction extends debtGeneration.AcademicDebtGenerationRuleRestriction {
+	}
+	
+	class debtGeneration.FirstTimeFirstYearRestriction extends debtGeneration.AcademicDebtGenerationRuleRestriction {
+	}
 	
 /* -----------------------------
  * AcademicActBlockingSuspension

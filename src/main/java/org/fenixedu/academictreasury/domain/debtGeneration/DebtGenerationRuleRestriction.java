@@ -1,10 +1,14 @@
 package org.fenixedu.academictreasury.domain.debtGeneration;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
+import org.fenixedu.commons.i18n.LocalizedString;
+
 import pt.ist.fenixframework.FenixFramework;
 
+@Deprecated
 public class DebtGenerationRuleRestriction extends DebtGenerationRuleRestriction_Base {
     
     public DebtGenerationRuleRestriction() {
@@ -59,5 +63,5 @@ public class DebtGenerationRuleRestriction extends DebtGenerationRuleRestriction
     public static DebtGenerationRuleRestriction create(final String name, final String strategyImplementation) {
         return new DebtGenerationRuleRestriction(name, strategyImplementation);
     }
-    
+
 }

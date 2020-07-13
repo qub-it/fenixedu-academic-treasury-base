@@ -48,7 +48,7 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
             this.createDebt = createDebt;
             this.toCreateAfterLastRegistrationStateDate = toCreateAfterLastRegistrationStateDate;
             this.forceCreation = forceCreation;
-            this.limitToRegisteredOnExecutionYear = limitToRegisteredOnExecutionYear;
+            this.limitToRegisteredOnExecutionYear = forceCreation && limitToRegisteredOnExecutionYear;
         }
 
         public Product getProduct() {

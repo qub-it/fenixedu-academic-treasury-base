@@ -17,9 +17,9 @@ public class AcademicDebtGenerationRuleEntry extends AcademicDebtGenerationRuleE
         setDomainRoot(FenixFramework.getDomainRoot());
     }
 
-    protected AcademicDebtGenerationRuleEntry(final AcademicDebtGenerationRule rule, final Product product,
-            final boolean createDebt, final boolean toCreateAfterLastRegistrationStateDate, final boolean forceCreation,
-            final boolean limitToRegisteredOnExecutionYear) {
+    protected AcademicDebtGenerationRuleEntry(AcademicDebtGenerationRule rule, Product product,
+            boolean createDebt, boolean toCreateAfterLastRegistrationStateDate, boolean forceCreation,
+            boolean limitToRegisteredOnExecutionYear) {
         this();
 
         setAcademicDebtGenerationRule(rule);
@@ -27,7 +27,7 @@ public class AcademicDebtGenerationRuleEntry extends AcademicDebtGenerationRuleE
         setCreateDebt(createDebt);
         setToCreateAfterLastRegistrationStateDate(toCreateAfterLastRegistrationStateDate);
         setForceCreation(forceCreation);
-        setLimitToRegisteredOnExecutionYear(limitToRegisteredOnExecutionYear);
+        setLimitToRegisteredOnExecutionYear(forceCreation && limitToRegisteredOnExecutionYear);
 
         checkRules();
     }

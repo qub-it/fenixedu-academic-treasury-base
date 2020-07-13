@@ -153,8 +153,7 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
 
         final AcademicDebtGenerationProcessingResult result = new AcademicDebtGenerationProcessingResult(rule, registration);
         try {
-            if (rule.getDebtGenerationRuleRestriction() != null
-                    && !rule.getDebtGenerationRuleRestriction().strategyImplementation().isToApply(rule, registration)) {
+            if (!rule.isRuleToApply(registration)) {
                 return Lists.newArrayList();
             }
 
@@ -188,8 +187,7 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
     @Atomic(mode = TxMode.WRITE)
     private void processDebtsForRegistration(final AcademicDebtGenerationRule rule, final Registration registration) {
 
-        if (rule.getDebtGenerationRuleRestriction() != null
-                && !rule.getDebtGenerationRuleRestriction().strategyImplementation().isToApply(rule, registration)) {
+        if (!rule.isRuleToApply(registration)) {
             return;
         }
 

@@ -19,6 +19,9 @@ import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.StatuteType;
+import org.fenixedu.academictreasury.domain.debtGeneration.restrictions.DebtsWithNoPaymentCodeReferences;
+import org.fenixedu.academictreasury.domain.debtGeneration.restrictions.EnrolmentRenewalRestriction;
+import org.fenixedu.academictreasury.domain.debtGeneration.restrictions.FirstTimeFirstYearRestriction;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.dto.debtGeneration.AcademicDebtGenerationRuleBean;
@@ -93,12 +96,9 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         }
 
         for (final ProductEntry productEntry : bean.getEntries()) {
-            AcademicDebtGenerationRuleEntry.create(this, 
-                    productEntry.getProduct(), 
-                    productEntry.isCreateDebt(),
-                    productEntry.isToCreateAfterLastRegistrationStateDate(), 
-                    productEntry.isForceCreation(),
-                    productEntry.isLimitToRegisteredOnExecutionYear());
+            AcademicDebtGenerationRuleEntry.create(this, productEntry.getProduct(), productEntry.isCreateDebt(),
+                    productEntry.isToCreateAfterLastRegistrationStateDate(), productEntry.isForceCreation(),
+                    productEntry.isForceCreation() && productEntry.isLimitToRegisteredOnExecutionYear());
         }
 
         getDegreeCurricularPlansSet().addAll((bean.getDegreeCurricularPlans()));
@@ -111,14 +111,12 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
 
         setDays(bean.getNumberOfDaysToDueDate());
 
-        setDebtGenerationRuleRestriction(bean.getDebtGenerationRuleRestriction());
-
-        if(bean.isAppliedMinimumAmountForPaymentCode()) {
+        if (bean.isAppliedMinimumAmountForPaymentCode()) {
             setMinimumAmountForPaymentCode(bean.getMinimumAmountForPaymentCode());
         } else {
             setMinimumAmountForPaymentCode(null);
         }
-        
+
         checkRules();
     }
 
@@ -140,14 +138,13 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
 
         setAcademicTaxDueDateAlignmentType(ruleToCopy.getAcademicTaxDueDateAlignmentType());
 
-        for (final AcademicDebtGenerationRuleEntry entry : ruleToCopy.getAcademicDebtGenerationRuleEntriesSet()) {
-            AcademicDebtGenerationRuleEntry.create(this, 
-                    entry.getProduct(), 
-                    entry.isCreateDebt(),
-                    entry.isToCreateAfterLastRegistrationStateDate(), 
-                    entry.isForceCreation(),
+        for (AcademicDebtGenerationRuleEntry entry : ruleToCopy.getAcademicDebtGenerationRuleEntriesSet()) {
+            AcademicDebtGenerationRuleEntry.create(this, entry.getProduct(), entry.isCreateDebt(),
+                    entry.isToCreateAfterLastRegistrationStateDate(), entry.isForceCreation(),
                     entry.isLimitToRegisteredOnExecutionYear());
         }
+        
+        ruleToCopy.getAcademicDebtGenerationRuleRestrictionsSet().stream().forEach(r -> r.makeCopy(this));
 
         getDegreeCurricularPlansSet().addAll((ruleToCopy.getDegreeCurricularPlansSet()));
 
@@ -161,14 +158,14 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
 
         setDebtGenerationRuleRestriction(ruleToCopy.getDebtGenerationRuleRestriction());
 
-        if(ruleToCopy.isAppliedMinimumAmountForPaymentCode()) {
+        if (ruleToCopy.isAppliedMinimumAmountForPaymentCode()) {
             setMinimumAmountForPaymentCode(ruleToCopy.getMinimumAmountForPaymentCode());
         } else {
             setMinimumAmountForPaymentCode(null);
         }
-        
+
         setCopyFromAcademicDebtGenerationRule(ruleToCopy);
-        
+
         checkRules();
     }
 
@@ -204,12 +201,12 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.degreeCurricularPlans.required");
         }
 
-        if(getMinimumAmountForPaymentCode() != null && !TreasuryConstants.isPositive(getMinimumAmountForPaymentCode())) {
+        if (getMinimumAmountForPaymentCode() != null && !TreasuryConstants.isPositive(getMinimumAmountForPaymentCode())) {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.minimumAmountForPaymentCode.invalid",
                     getMinimumAmountForPaymentCode().toString());
         }
-        
-        if(getMinimumAmountForPaymentCode() != null && getMinimumAmountForPaymentCode().scale() > 2) {
+
+        if (getMinimumAmountForPaymentCode() != null && getMinimumAmountForPaymentCode().scale() > 2) {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.minimumAmountForPaymentCode.invalid",
                     getMinimumAmountForPaymentCode().toString());
         }
@@ -256,27 +253,35 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     public boolean isAppliedMinimumAmountForPaymentCode() {
         return getMinimumAmountForPaymentCode() != null;
     }
-    
+
     public Set<AcademicDebtGenerationRuleEntry> getTuitionProductGroupProductEntries() {
         return getAcademicDebtGenerationRuleEntriesSet().stream()
-            .filter(e -> e.getProduct().getProductGroup() == AcademicTreasurySettings.getInstance().getTuitionProductGroup())
-            .collect(Collectors.toSet());
+                .filter(e -> e.getProduct().getProductGroup() == AcademicTreasurySettings.getInstance().getTuitionProductGroup())
+                .collect(Collectors.toSet());
     }
-    
+
     public boolean isWithAtLeastOneForceCreationEntry() {
         return getAcademicDebtGenerationRuleEntriesSet().stream().anyMatch(e -> e.isForceCreation());
     }
-    
+
     private boolean isDeletable() {
         return true;
     }
-    
-//    protected boolean isRegistrationOrStudentWithAnyOfAllowedStatuteTypes(final Registration registration) {
-//        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-//    	
-//        Set<StatuteType> studentStatutes = academicTreasuryServices.statutesTypesValidOnAnyExecutionSemesterFor(registration.getStudent(), getExecutionYear());
-//    }
-//
+
+    @Deprecated
+    @Override
+    /* Remove this when this restrictions has been migrated to AcademicDebtRuleRestriction */
+    public DebtGenerationRuleRestriction getDebtGenerationRuleRestriction() {
+        return super.getDebtGenerationRuleRestriction();
+    }
+
+    @Deprecated
+    @Override
+    /* Remove this when this restrictions has been migrated to AcademicDebtRuleRestriction */
+    public void setDebtGenerationRuleRestriction(DebtGenerationRuleRestriction debtGenerationRuleRestriction) {
+        super.setDebtGenerationRuleRestriction(debtGenerationRuleRestriction);
+    }
+
     @Override
     protected void checkForDeletionBlockers(Collection<String> blockers) {
         super.checkForDeletionBlockers(blockers);
@@ -297,11 +302,15 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         while (getAcademicDebtGenerationRuleEntriesSet().size() > 0) {
             getAcademicDebtGenerationRuleEntriesSet().iterator().next().delete();
         }
+        
 
         setDebtGenerationRuleRestriction(null);
-        
+        while(!getAcademicDebtGenerationRuleRestrictionsSet().isEmpty()) {
+            getAcademicDebtGenerationRuleRestrictionsSet().iterator().next().delete();
+        }
+
         setCopyFromAcademicDebtGenerationRule(null);
-        while(!getAcademicDebtGenerationRuleCopiesSet().isEmpty()) {
+        while (!getAcademicDebtGenerationRuleCopiesSet().isEmpty()) {
             getAcademicDebtGenerationRuleCopiesSet().iterator().next().setCopyFromAcademicDebtGenerationRule(null);
         }
 
@@ -382,11 +391,11 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     public boolean isLast() {
         return find(this.getAcademicDebtGenerationRuleType(), this.getExecutionYear()).max(COMPARE_BY_ORDER_NUMBER).get() == this;
     }
-    
+
     public boolean isCopyFromOtherExistingAcademicDebtGenerationRule() {
         return getCopyFromAcademicDebtGenerationRule() != null;
     }
-    
+
     public boolean hasCopiesInExecutionInterval(ExecutionInterval executionInterval) {
         return getAcademicDebtGenerationRuleCopiesSet().stream().anyMatch(r -> r.getExecutionYear() == executionInterval);
     }
@@ -424,15 +433,15 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         getDegreeCurricularPlansSet().clear();
         getDegreeCurricularPlansSet().addAll(degreeCurricularPlans);
     }
-    
+
     @Atomic
     public void edit(final AcademicDebtGenerationRuleBean bean) {
         getDegreeCurricularPlansSet().clear();
-        
-        while(!getAcademicDebtGenerationRuleEntriesSet().isEmpty()) {
+
+        while (!getAcademicDebtGenerationRuleEntriesSet().isEmpty()) {
             getAcademicDebtGenerationRuleEntriesSet().iterator().next().delete();
         }
-        
+
         List<DegreeCurricularPlan> degreeCurricularPlans = bean.getDegreeCurricularPlans();
         getDegreeCurricularPlansSet().addAll(degreeCurricularPlans);
 
@@ -451,22 +460,30 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         for (final ProductEntry productEntry : bean.getEntries()) {
             AcademicDebtGenerationRuleEntry.create(this, productEntry.getProduct(), productEntry.isCreateDebt(),
                     productEntry.isToCreateAfterLastRegistrationStateDate(), productEntry.isForceCreation(),
-                    productEntry.isLimitToRegisteredOnExecutionYear());
+                    productEntry.isForceCreation() && productEntry.isLimitToRegisteredOnExecutionYear());
         }
 
         setDays(bean.getNumberOfDaysToDueDate());
 
-        setDebtGenerationRuleRestriction(bean.getDebtGenerationRuleRestriction());
-
-        if(bean.isAppliedMinimumAmountForPaymentCode()) {
+        if (bean.isAppliedMinimumAmountForPaymentCode()) {
             setMinimumAmountForPaymentCode(bean.getMinimumAmountForPaymentCode());
         } else {
             setMinimumAmountForPaymentCode(null);
         }
-        
+
         checkRules();
     }
-    
+
+    public boolean isRuleToApply(Registration registration) {
+        if (getDebtGenerationRuleRestriction() != null
+                && !getDebtGenerationRuleRestriction().strategyImplementation().isToApply(this, registration)) {
+            return false;
+        }
+
+        return getAcademicDebtGenerationRuleRestrictionsSet().isEmpty()
+                || getAcademicDebtGenerationRuleRestrictionsSet().stream().allMatch(r -> r.test(registration));
+    }
+
     // @formatter: off
     /************
      * SERVICES *
@@ -493,27 +510,29 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
 
     @Atomic
     public static AcademicDebtGenerationRule create(final AcademicDebtGenerationRuleBean bean) {
-        if(bean.isAppliedMinimumAmountForPaymentCode()) {
-            if(bean.getMinimumAmountForPaymentCode() == null || !TreasuryConstants.isPositive(bean.getMinimumAmountForPaymentCode())) {
-                throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.create.appliedMinimumAmountForPaymentCode.but.minimumAmountForPaymentCode.not.valid");
+        if (bean.isAppliedMinimumAmountForPaymentCode()) {
+            if (bean.getMinimumAmountForPaymentCode() == null
+                    || !TreasuryConstants.isPositive(bean.getMinimumAmountForPaymentCode())) {
+                throw new AcademicTreasuryDomainException(
+                        "error.AcademicDebtGenerationRule.create.appliedMinimumAmountForPaymentCode.but.minimumAmountForPaymentCode.not.valid");
             }
         }
-        
+
         return new AcademicDebtGenerationRule(bean);
     }
-    
+
     @Atomic
     public static AcademicDebtGenerationRule copy(final AcademicDebtGenerationRule rule, ExecutionYear executionYear) {
-        if(executionYear == rule.getExecutionYear()) {
+        if (executionYear == rule.getExecutionYear()) {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.copy.same.executionYear");
         }
-        
+
         return new AcademicDebtGenerationRule(rule, executionYear);
     }
 
     public static List<AcademicDebtGenerationProcessingResult> runAllActive(final boolean runOnlyWithBackgroundExecution) {
         final List<Future<List<AcademicDebtGenerationProcessingResult>>> futureList = Lists.newArrayList();
-        
+
         final ExecutorService exService = Executors.newSingleThreadExecutor();
         for (final AcademicDebtGenerationRuleType type : AcademicDebtGenerationRuleType.findAll()
                 .sorted(AcademicDebtGenerationRuleType.COMPARE_BY_ORDER_NUMBER).collect(Collectors.toList())) {
@@ -528,9 +547,9 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
                 futureList.add(exService.submit(exec));
             }
         }
-        
+
         exService.shutdown();
-        
+
         final List<AcademicDebtGenerationProcessingResult> returnResult = Lists.newArrayList();
         for (Future<List<AcademicDebtGenerationProcessingResult>> future : futureList) {
             try {
@@ -538,14 +557,14 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
             } catch (InterruptedException | ExecutionException e) {
             }
         }
-        
+
         return returnResult;
     }
 
     public static List<AcademicDebtGenerationProcessingResult> runAllActiveForRegistration(final Registration registration,
             final boolean runOnlyWithBackgroundExecution) {
         final List<Future<List<AcademicDebtGenerationProcessingResult>>> futureList = Lists.newArrayList();
-        
+
         final ExecutorService exService = Executors.newSingleThreadExecutor();
         for (final AcademicDebtGenerationRuleType type : AcademicDebtGenerationRuleType.findAll()
                 .sorted(AcademicDebtGenerationRuleType.COMPARE_BY_ORDER_NUMBER).collect(Collectors.toList())) {
@@ -560,9 +579,9 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
                 futureList.add(exService.submit(exec));
             }
         }
-        
+
         exService.shutdown();
-        
+
         final List<AcademicDebtGenerationProcessingResult> returnResult = Lists.newArrayList();
         for (Future<List<AcademicDebtGenerationProcessingResult>> future : futureList) {
             try {
@@ -570,14 +589,14 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
             } catch (InterruptedException | ExecutionException e) {
             }
         }
-        
+
         return returnResult;
     }
 
-    public static List<AcademicDebtGenerationProcessingResult> runAllActiveForRegistrationAndExecutionYear(final Registration registration,
-            final ExecutionYear executionYear, final boolean runOnlyWithBackgroundExecution) {
+    public static List<AcademicDebtGenerationProcessingResult> runAllActiveForRegistrationAndExecutionYear(
+            final Registration registration, final ExecutionYear executionYear, final boolean runOnlyWithBackgroundExecution) {
         final List<Future<List<AcademicDebtGenerationProcessingResult>>> futureList = Lists.newArrayList();
-        
+
         final ExecutorService exService = Executors.newSingleThreadExecutor();
         for (final AcademicDebtGenerationRuleType type : AcademicDebtGenerationRuleType.findAll()
                 .sorted(AcademicDebtGenerationRuleType.COMPARE_BY_ORDER_NUMBER).collect(Collectors.toList())) {
@@ -596,9 +615,9 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
                 futureList.add(exService.submit(exec));
             }
         }
-        
+
         exService.shutdown();
-        
+
         final List<AcademicDebtGenerationProcessingResult> returnResult = Lists.newArrayList();
         for (Future<List<AcademicDebtGenerationProcessingResult>> future : futureList) {
             try {
@@ -606,11 +625,12 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
             } catch (InterruptedException | ExecutionException e) {
             }
         }
-        
+
         return returnResult;
     }
 
-    public static List<AcademicDebtGenerationProcessingResult> runAcademicDebtGenerationRule(final AcademicDebtGenerationRule rule) {
+    public static List<AcademicDebtGenerationProcessingResult> runAcademicDebtGenerationRule(
+            final AcademicDebtGenerationRule rule) {
 
         if (!rule.isActive()) {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.not.active");
@@ -623,7 +643,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
             return exService.submit(exec).get();
         } catch (InterruptedException | ExecutionException e) {
         }
-        
+
         return Lists.newArrayList();
     }
 
@@ -662,7 +682,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         @Atomic(mode = TxMode.READ)
         private List<AcademicDebtGenerationProcessingResult> executeRule() {
             final List<AcademicDebtGenerationProcessingResult> result = Lists.newArrayList();
-            
+
             final AcademicDebtGenerationRule rule = FenixFramework.getDomainObject(academicDebtGenerationRuleId);
             try {
                 if (!Strings.isNullOrEmpty(registrationId)) {
@@ -678,7 +698,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
             } catch (final Exception e) {
                 e.printStackTrace();
             }
-            
+
             return result;
         }
     }

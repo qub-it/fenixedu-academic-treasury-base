@@ -99,8 +99,7 @@ public class AggregateDebtsStrategy implements IAcademicDebtGenerationRuleStrate
         for (final DegreeCurricularPlan degreeCurricularPlan : rule.getDegreeCurricularPlansSet()) {
             for (final Registration registration : degreeCurricularPlan.getRegistrations()) {
 
-                if (rule.getDebtGenerationRuleRestriction() != null
-                        && !rule.getDebtGenerationRuleRestriction().strategyImplementation().isToApply(rule, registration)) {
+                if (!rule.isRuleToApply(registration)) {
                     continue;
                 }
 
@@ -145,8 +144,7 @@ public class AggregateDebtsStrategy implements IAcademicDebtGenerationRuleStrate
         final AcademicDebtGenerationProcessingResult result = new AcademicDebtGenerationProcessingResult(rule, registration);
         try {
 
-            if (rule.getDebtGenerationRuleRestriction() != null
-                    && !rule.getDebtGenerationRuleRestriction().strategyImplementation().isToApply(rule, registration)) {
+            if (!rule.isRuleToApply(registration)) {
                 return Lists.newArrayList();
             }
 

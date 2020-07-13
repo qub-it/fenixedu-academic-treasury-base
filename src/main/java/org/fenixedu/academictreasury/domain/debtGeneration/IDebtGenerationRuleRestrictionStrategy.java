@@ -2,8 +2,9 @@ package org.fenixedu.academictreasury.domain.debtGeneration;
 
 import org.fenixedu.academic.domain.student.Registration;
 
+@Deprecated
 public interface IDebtGenerationRuleRestrictionStrategy {
-    
-    public boolean isToApply(final AcademicDebtGenerationRule rule, final Registration registration);
-    
+
+    public boolean isToApply(AcademicDebtGenerationRule rule, Registration registration);
+
 }

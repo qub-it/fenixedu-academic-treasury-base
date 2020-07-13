@@ -95,8 +95,7 @@ public class CloseDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
         for (final DegreeCurricularPlan degreeCurricularPlan : rule.getDegreeCurricularPlansSet()) {
             for (final Registration registration : degreeCurricularPlan.getRegistrations()) {
 
-                if (rule.getDebtGenerationRuleRestriction() != null
-                        && !rule.getDebtGenerationRuleRestriction().strategyImplementation().isToApply(rule, registration)) {
+                if (!rule.isRuleToApply(registration)) {
                     continue;
                 }
 
@@ -126,15 +125,13 @@ public class CloseDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.not.active.to.process");
         }
 
-        if (rule.getDebtGenerationRuleRestriction() != null
-                && !rule.getDebtGenerationRuleRestriction().strategyImplementation().isToApply(rule, registration)) {
+        if (!rule.isRuleToApply(registration)) {
             return Lists.newArrayList();
         }
 
         final AcademicDebtGenerationProcessingResult result = new AcademicDebtGenerationProcessingResult(rule, registration);
         try {
-            if (rule.getDebtGenerationRuleRestriction() != null
-                    && !rule.getDebtGenerationRuleRestriction().strategyImplementation().isToApply(rule, registration)) {
+            if (!rule.isRuleToApply(registration)) {
                 return Lists.newArrayList();
             }
 

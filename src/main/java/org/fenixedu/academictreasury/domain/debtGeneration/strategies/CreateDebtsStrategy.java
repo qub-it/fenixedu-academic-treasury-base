@@ -154,8 +154,7 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
 
     static private boolean isToDiscard(final AcademicDebtGenerationRule rule, final Registration registration) {
 
-        if (rule.getDebtGenerationRuleRestriction() != null
-                && !rule.getDebtGenerationRuleRestriction().strategyImplementation().isToApply(rule, registration)) {
+        if (!rule.isRuleToApply(registration)) {
             return true;
         }
 
