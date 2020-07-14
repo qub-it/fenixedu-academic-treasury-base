@@ -46,13 +46,15 @@ public class DebtsWithNoPaymentCodeReferencesRestriction extends DebtsWithNoPaym
 
     @Override
     public boolean test(Registration registration) {
-        return isToInclude() ? evaluateResult(registration) : !evaluateResult(registration);
+        // TODO: Evaluate if excludeifMatches make sense
+//        return isToInclude() ? evaluateResult(registration) : !evaluateResult(registration);
+        return evaluateResult(registration);
     }
 
     @Override
     public DebtsWithNoPaymentCodeReferencesRestriction makeCopy(AcademicDebtGenerationRule ruleToCreate) {
         return create(ruleToCreate, getExcludeIfMatches());
-    }    
+    }
     
     /*
      * ********

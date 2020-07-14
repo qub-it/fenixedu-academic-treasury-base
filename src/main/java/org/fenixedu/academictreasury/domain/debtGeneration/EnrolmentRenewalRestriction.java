@@ -36,7 +36,9 @@ public class EnrolmentRenewalRestriction extends EnrolmentRenewalRestriction_Bas
 
     @Override
     public boolean test(Registration registration) {
-        return isToInclude() ? evaluateResult(registration) : !evaluateResult(registration);
+        // TODO: Evaluate excludeIfMatches make sense
+//        return isToInclude() ? evaluateResult(registration) : !evaluateResult(registration);
+        return evaluateResult(registration);
     }
 
     @Override

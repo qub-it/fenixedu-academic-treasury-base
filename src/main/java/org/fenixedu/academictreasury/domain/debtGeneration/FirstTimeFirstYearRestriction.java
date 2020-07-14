@@ -36,7 +36,9 @@ public class FirstTimeFirstYearRestriction extends FirstTimeFirstYearRestriction
     
     @Override
     public boolean test(Registration registration) {
-        return isToInclude() ? evaluateResult(registration) : !evaluateResult(registration);
+        // TODO: Evaluate if excludeIfMatches make sense
+//        return isToInclude() ? evaluateResult(registration) : !evaluateResult(registration);
+        return evaluateResult(registration);
     }
 
     @Override
