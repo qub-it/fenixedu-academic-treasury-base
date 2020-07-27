@@ -1,3 +1,5 @@
+- Bug Fix: Fix error of payment plan copies with no fixed due date set
+
 5.2.1 (14-07-2020)
 - Refactor: Disable excludeifMatches for now to evaluate if it is necessary
 

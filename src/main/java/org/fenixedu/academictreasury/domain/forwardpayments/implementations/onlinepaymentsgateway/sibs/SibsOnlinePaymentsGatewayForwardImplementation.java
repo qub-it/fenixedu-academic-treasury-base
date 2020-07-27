@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang.StringUtils;
+import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.onlinepaymentsgateway.api.CheckoutResultBean;
 import org.fenixedu.onlinepaymentsgateway.api.PaymentStateBean;
 import org.fenixedu.onlinepaymentsgateway.exceptions.OnlinePaymentsGatewayCommunicationException;
@@ -78,7 +79,7 @@ public class SibsOnlinePaymentsGatewayForwardImplementation implements IForwardP
 
         FenixFramework.atomic(() -> {
             if (!StringUtils.isEmpty(forwardPayment.getSibsMerchantTransactionId())) {
-                throw new RuntimeException(
+                throw new AcademicTreasuryDomainException(
                         "error.SibsOnlinePaymentsGatewayForwardImplementation.sibsMerchantTransactionId.already.filled");
             }
 
