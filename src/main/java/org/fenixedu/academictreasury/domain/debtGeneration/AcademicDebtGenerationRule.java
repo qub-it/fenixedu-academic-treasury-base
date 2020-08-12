@@ -298,7 +298,6 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         setAcademicDebtGenerationRuleType(null);
         getDegreeCurricularPlansSet().clear();
         setExecutionYear(null);
-        setPaymentCodePool(null);
         setDigitalPaymentPlatform(null);
         while (getAcademicDebtGenerationRuleEntriesSet().size() > 0) {
             getAcademicDebtGenerationRuleEntriesSet().iterator().next().delete();

@@ -7,7 +7,7 @@ import org.fenixedu.academictreasury.domain.debtGeneration.AcademicDebtGeneratio
 import org.fenixedu.academictreasury.domain.debtGeneration.IDebtGenerationRuleRestrictionStrategy;
 import org.fenixedu.academictreasury.domain.debtGeneration.strategies.CreatePaymentReferencesStrategy;
 import org.fenixedu.treasury.domain.document.DebitEntry;
-import org.fenixedu.treasury.domain.paymentcodes.MultipleEntriesPaymentCode;
+import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 
 public class DebtsWithNoPaymentCodeReferences implements IDebtGenerationRuleRestrictionStrategy {
 
