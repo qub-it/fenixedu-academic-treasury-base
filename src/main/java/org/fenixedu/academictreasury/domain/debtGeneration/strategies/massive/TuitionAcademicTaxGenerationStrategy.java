@@ -20,9 +20,7 @@ import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
 import org.fenixedu.academictreasury.services.AcademicTaxServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
-import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.academictreasury.util.ExcelUtils;
-import org.fenixedu.bennu.core.domain.exceptions.DomainException;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -94,7 +92,7 @@ public class TuitionAcademicTaxGenerationStrategy implements IMassiveDebtGenerat
                                 String.valueOf(registrationNumber), studentName);
                     }
                 }
-            } catch (final DomainException e) {
+            } catch (Exception e) {
                 throw new AcademicTreasuryDomainException("error.MassiveDebtGenerationRequestFile.debt.not.created",
                         String.valueOf(row.getRowNum()),
                         String.valueOf(row.getStudentCurricularPlan().getRegistration().getNumber()),

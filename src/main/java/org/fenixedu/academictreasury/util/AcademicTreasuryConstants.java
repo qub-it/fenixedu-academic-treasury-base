@@ -7,8 +7,7 @@ import java.util.Set;
 
 import org.fenixedu.academictreasury.domain.serviceRequests.ITreasuryServiceRequest;
 import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
-import org.fenixedu.bennu.core.i18n.BundleUtil;
-import org.fenixedu.bennu.core.util.CoreConfiguration;
+import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -110,19 +109,19 @@ public class AcademicTreasuryConstants {
     // @formatter: on
 
     public static String academicTreasuryBundle(final String key, final String... args) {
-        return BundleUtil.getString(AcademicTreasuryConstants.BUNDLE, key, args);
+        return TreasuryPlataformDependentServicesFactory.implementation().bundle(AcademicTreasuryConstants.BUNDLE, key, args);
     }
     
     public static String academicTreasuryBundle(final Locale locale, final String key, final String... args) {
-        return BundleUtil.getString(AcademicTreasuryConstants.BUNDLE, locale, key, args);
+        return TreasuryPlataformDependentServicesFactory.implementation().bundle(locale, AcademicTreasuryConstants.BUNDLE, key, args);
     }
 
     public static LocalizedString academicTreasuryBundleI18N(final String key, final String... args) {
-        return BundleUtil.getLocalizedString(AcademicTreasuryConstants.BUNDLE, key, args);
+        return TreasuryPlataformDependentServicesFactory.implementation().bundleI18N(AcademicTreasuryConstants.BUNDLE, key, args);
     }
     
     public static Set<Locale> supportedLocales() {
-        return CoreConfiguration.supportedLocales();
+        return TreasuryPlataformDependentServicesFactory.implementation().availableLocales();
     }
 
     // @formatter: off

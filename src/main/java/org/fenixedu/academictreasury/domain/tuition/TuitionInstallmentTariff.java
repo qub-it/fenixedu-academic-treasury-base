@@ -19,9 +19,6 @@ import org.fenixedu.academictreasury.dto.tariff.AcademicTariffBean;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
-import pt.ist.fenixframework.FenixFramework;
-import org.fenixedu.bennu.core.i18n.BundleUtil;
-import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
@@ -37,9 +34,9 @@ import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServ
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
-import pt.ist.fenixframework.Atomic;
-
 import com.google.common.collect.Maps;
+
+import pt.ist.fenixframework.Atomic;
 
 public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
@@ -619,7 +616,7 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         return propertiesMap;
     }
 
-    private Map<String, String> fillPricePropertiesForRegistration(final AcademicTreasuryEvent event,
+    public Map<String, String> fillPricePropertiesForRegistration(final AcademicTreasuryEvent event,
             final LocalDate dueDate, final LocalDate usedDate) {
 
         if (!getTuitionPaymentPlan().getTuitionPaymentPlanGroup().isForRegistration()) {

@@ -1,18 +1,20 @@
 package org.fenixedu.academictreasury.domain.customer;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
-import org.fenixedu.academic.dto.person.PersonBean;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
@@ -315,6 +317,29 @@ public class PersonCustomer extends PersonCustomer_Base {
         return physicalAddress.getCountryOfResidence().getCode();
     }
 
+    
+    public static String addressUiFiscalPresentationValue(PhysicalAddress pa) {
+        final List<String> compounds = new ArrayList<>();
+        
+        if(StringUtils.isNotEmpty(address(pa))) {
+            compounds.add(address(pa));
+        }
+        
+        if(StringUtils.isNotEmpty(zipCode(pa))) {
+            compounds.add(zipCode(pa));
+        }
+        
+        if(StringUtils.isNotEmpty(districtSubdivision(pa))) {
+            compounds.add(districtSubdivision(pa));
+        }
+        
+        if(pa.getCountryOfResidence() != null) {
+            compounds.add(pa.getCountryOfResidence().getLocalizedName().getContent());
+        }
+        
+        return String.join(" ", compounds);
+    }
+    
     /*
     @Deprecated
     public static String countryCode(final Person person) {
@@ -789,6 +814,14 @@ public class PersonCustomer extends PersonCustomer_Base {
         final Country countryOfResidence = person.getFiscalAddress().getCountryOfResidence();
 
         return create(person, countryOfResidence.getCode(), person.getSocialSecurityNumber());
+    }
+    
+    public static PersonCustomer activePersonCustomer(Person person) {
+        return person.getPersonCustomer();
+    }
+    
+    public static Set<PersonCustomer> inactivePersonCustomers(Person person) {
+        return person.getInactivePersonCustomersSet();
     }
 
     @Atomic

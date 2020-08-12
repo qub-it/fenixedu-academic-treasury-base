@@ -6,6 +6,7 @@ enum org.fenixedu.academictreasury.domain.tuition.TuitionCalculationType        
 enum org.fenixedu.academictreasury.domain.tuition.EctsCalculationType                                   as EctsCalculationType;
 enum org.fenixedu.academictreasury.domain.reports.DebtReportRequestType                                 as DebtReportRequestType;
 enum org.fenixedu.academictreasury.domain.debtGeneration.AcademicTaxDueDateAlignmentType                as AcademicTaxDueDateAlignmentType;
+enum org.fenixedu.academic.domain.degreeStructure.CycleType                                             as CycleTypeAT;
 
 valueType java.math.BigDecimal as BigDecimalAT
 {
@@ -13,6 +14,14 @@ valueType java.math.BigDecimal as BigDecimalAT
 		String toString();
 	}
 } 
+
+valueType org.fenixedu.commons.i18n.LocalizedString as LocalizedStringAT {
+	externalizeWith {
+		JsonElement json();
+	}
+	
+	internalizeWith fromJson();
+}
 
 external class .org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 external class .org.fenixedu.academic.domain.candidacy.IngressionType;
@@ -24,6 +33,7 @@ external class .org.fenixedu.academic.domain.Degree;
 external class .org.fenixedu.academic.domain.DegreeCurricularPlan;
 external class .org.fenixedu.academic.domain.degree.DegreeType;
 external class .org.fenixedu.academic.domain.EvaluationSeason;
+external class .org.fenixedu.academic.domain.ExecutionInterval;
 external class .org.fenixedu.academic.domain.ExecutionYear;
 external class .org.fenixedu.academic.domain.Person;
 external class .org.fenixedu.academic.domain.serviceRequests.AcademicServiceRequest;
@@ -107,7 +117,7 @@ class tariff.AcademicTariff extends .org.fenixedu.treasury.domain.tariff.Tariff 
 	BigDecimalAT maximumAmount;
 	BigDecimalAT urgencyRate;
 	BigDecimalAT languageTranslationRate;
-	CycleType cycleType;
+	CycleTypeAT cycleType;
 	boolean academicalActBlockingOff;
 	boolean blockAcademicActsOnDebt;
 }
@@ -238,7 +248,7 @@ class emoluments.AcademicTax {
 
 class tuition.TuitionPaymentPlanGroup {
 	String code;
-	LocalizedString name;
+	LocalizedStringAT name;
 	boolean forRegistration;
 	boolean forStandalone;
 	boolean forExtracurricular;
@@ -275,7 +285,7 @@ class tuition.TuitionPaymentPlan {
 	Integer semester;
 	boolean firstTimeStudent;
 	boolean customized;
-	LocalizedString customizedName;
+	LocalizedStringAT customizedName;
 	boolean withLaboratorialClasses;
 }
 	
@@ -618,7 +628,7 @@ class debtGeneration.AcademicDebtGenerationRule {
 	int days;
 	int orderNumber;
 	AcademicTaxDueDateAlignmentType academicTaxDueDateAlignmentType;
-	BigDecimal minimumAmountForPaymentCode;
+	BigDecimalAT minimumAmountForPaymentCode;
 }
 
 	relation AcademicDebtGenerationRuleGenerationRuleType {

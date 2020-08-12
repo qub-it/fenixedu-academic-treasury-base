@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
@@ -21,10 +20,6 @@ import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
 import org.fenixedu.academictreasury.util.ExcelUtils;
-
-import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.domain.User;
-import org.fenixedu.bennu.core.domain.exceptions.DomainException;
 import org.fenixedu.bennu.io.domain.IGenericFile;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.document.DebitEntry;
@@ -120,7 +115,7 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
                     TreasuryExemption.create(getTreasuryExemptionType(), row.getTreasuryEvent(), row.getReason(),
                             row.getDiscountAmount(), row.getDebitEntry());
                 }
-            } catch (final DomainException e) {
+            } catch (Exception e) {
                 throw new AcademicTreasuryDomainException("error.ExemptionsGenerationRequestFile.unable.to.create.exemption",
                         String.valueOf(row.getRowNum()), String.valueOf(row.getRegistration().getNumber()),
                         row.getRegistration().getStudent().getName(), e.getLocalizedMessage());

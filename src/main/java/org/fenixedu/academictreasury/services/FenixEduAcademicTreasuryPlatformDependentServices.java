@@ -19,6 +19,7 @@ import org.fenixedu.academic.domain.accessControl.academicAdministration.Academi
 import org.fenixedu.academic.domain.accessControl.academicAdministration.AcademicOperationType;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
+import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationRegimeType;
@@ -102,10 +103,20 @@ public class FenixEduAcademicTreasuryPlatformDependentServices implements IAcade
 		return degreeType.getName().getContent();
 	}
 
+    @Override
+    public String localizedNameOfDegreeType(DegreeType degreeType, Locale locale) {
+        return degreeType.getName().getContent(locale);
+    }
+
 	@Override
 	public String localizedNameOfStatuteType(StatuteType statuteType) {
 		return statuteType.getName().getContent();
 	}
+
+    @Override
+    public String localizedNameOfStatuteType(StatuteType statuteType, Locale locale) {
+        return statuteType.getName().getContent(locale);
+    }
 
     /* Student & Registration */
 	
@@ -129,6 +140,18 @@ public class FenixEduAcademicTreasuryPlatformDependentServices implements IAcade
         return enrolment.getName().getContent(locale);
     }
 
+    @Override
+    public String localizedNameOfAdministrativeOffice(AdministrativeOffice administrativeOffice) {
+        return administrativeOffice.getName().getContent();
+    }
+    
+    @Override
+    public String localizedNameOfAdministrativeOffice(AdministrativeOffice administrativeOffice, Locale locale) {
+        return administrativeOffice.getName().getContent(locale);
+    }
+    
+    /* Student & Registration */
+    
     @Override
     public RegistrationRegimeType registrationRegimeType(Registration registration, ExecutionYear executionYear) {
         return registration.getRegimeType(executionYear);
@@ -181,6 +204,11 @@ public class FenixEduAcademicTreasuryPlatformDependentServices implements IAcade
     static public Collection<StatuteType> findVisibleStatuteTypes(final Registration registration,
             final ExecutionInterval executionInterval) {
         return findStatuteTypes(registration, executionInterval).stream().filter(s -> s.getVisible()).collect(Collectors.toSet());
+    }
+    
+    /* Execution Intervals */
+    public Integer executionIntervalChildOrder(ExecutionInterval executionInterval) {
+        return executionInterval.getChildOrder();
     }
     
 }
