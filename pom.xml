@@ -4,159 +4,265 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.qubit.solution.fenixedu.build</groupId>
-		<artifactId>qub-fenixedu-project</artifactId>
-		<version>1.2.0</version>
+		<groupId>com.qubit.terra.build</groupId>
+		<artifactId>qub-maven-fullstack-build</artifactId>
+		<version>1.3.13</version>
 	</parent>
 
-    <groupId>org.fenixedu</groupId>
-	<artifactId>fenixedu-academic-treasury-base</artifactId>
+	<groupId>com.qubit.solution.qubEdu.module</groupId>
+	<artifactId>fenixedu-academic-treasury-base-iscte</artifactId>
 	<version>6.1.0</version>
 	<packaging>jar</packaging>
 
-	<name>Academic Treasury Base</name>
+	<name>Academic Treasury Base ISCTE</name>
 
 	<properties>
-		<version.org.fenixedu.bennu>6.0.3-FORK</version.org.fenixedu.bennu>
+		<fenix.framework.version>2.8.0</fenix.framework.version>
+		<qubEdu.framework.version>3.4.12-iscte-fork</qubEdu.framework.version>
+        <iscte.fenix-repo.url>file:///home/omnis-dev/development/workspaces/projects/iscte/fenix-iscte-iul-artifact-repository</iscte.fenix-repo.url>
+		<!-- 
 		<version.org.fenixedu.qubdocs.reports>2.0.0</version.org.fenixedu.qubdocs.reports>
+		 -->
 	</properties>
 
 	<dependencies>
-    
-        <dependency>
-            <groupId>org.fenixedu</groupId>
-            <artifactId>bennu-core</artifactId>
-            <version>${version.org.fenixedu.bennu}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.fenixedu</groupId>
-            <artifactId>bennu-scheduler</artifactId>
-            <version>${version.org.fenixedu.bennu}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.fenixedu</groupId>
-            <artifactId>bennu-portal</artifactId>
-            <version>${version.org.fenixedu.bennu}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.fenixedu</groupId>
-            <artifactId>bennu-io</artifactId>
-            <version>${version.org.fenixedu.bennu}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.fenixedu</groupId>
-            <artifactId>bennu-spring</artifactId>
-            <version>${version.org.fenixedu.bennu}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.fenixedu</groupId>
-            <artifactId>bennu-cas-client</artifactId>
-            <version>${version.org.fenixedu.bennu}</version>
-        </dependency>
-
 		<dependency>
-			<groupId>com.qubit.solution.fenixedu</groupId>
-			<artifactId>fenixedu-academic-core</artifactId>
-			<version>32.4.0</version>
+			<groupId>com.qubit.solution.qubEdu.framework</groupId>
+			<artifactId>qubEdu-framework</artifactId>
+			<version>${qubEdu.framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>pt.iscte</groupId>
+			<artifactId>fenix-web-framework</artifactId>
+			<version>3.0.2-iscte</version>
+		</dependency>
+	
+		<dependency>
+			<groupId>com.qubit.solution.qubEdu</groupId>
+			<artifactId>qubEdu-core</artifactId>
+			<version>1.0.0.2</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.qubit.solution.qubEdu</groupId>
+			<artifactId>qubEdu-core-dml</artifactId>
+			<version>1.0.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+	        <groupId>pt.iscte.fenix-custom</groupId>
+	        <artifactId>qubEdu-academic-office</artifactId>
+	        <version>3.0.2</version>
+		</dependency>
+         <dependency>
+                 <groupId>com.qubit.solution.qubEdu.module</groupId>
+                 <artifactId>qubEdu-base</artifactId>
+                 <version>2.6.0.2</version>
+         </dependency>
+		<dependency>
+	        <groupId>pt.iscte.fenix-custom</groupId>
+	        <artifactId>qubEdu-base-adapter</artifactId>
+	        <version>3.0.2</version>
+		</dependency>
+        <dependency>
+                <groupId>com.qubit.solution.qubEdu.module</groupId>
+                <artifactId>qubEdu-security</artifactId>
+                <version>2.1.13.1</version>
+        </dependency>
+        <dependency>
+                <groupId>pt.ist</groupId>
+                <artifactId>scheduler-plugin</artifactId>
+                <version>0.1.0</version>
+        </dependency>
+        <dependency>
+                <groupId>pt.iscte</groupId>
+                <artifactId>fenix-framework-file-plugin</artifactId>
+                <version>3.0.2-iscte</version>
+        </dependency>
+		<dependency>
+			<groupId>com.qubit.solution.qubEdu.module</groupId>
+			<artifactId>fenixedu-treasury-base-iscte</artifactId>
+			<version>6.1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.fenixedu</groupId>
-			<artifactId>fenixedu-treasury-base</artifactId>
-			<version>6.1.2</version>
+			<artifactId>fenixedu-academic-core</artifactId>
+			<version>1.0.0-MOCK</version>
 		</dependency>
+		<dependency>
+			<groupId>pt.iscte.fenix-custom</groupId>
+			<artifactId>qubEdu-treasury-api</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.qubit.terra</groupId>
+			<artifactId>qub-workflow</artifactId>
+			<version>4.2.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.qubit.terra</groupId>
+			<artifactId>qub-augmentation</artifactId>
+			<version>1.1.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.qubit.terra</groupId>
+			<artifactId>qub-surveys</artifactId>
+			<version>2.12.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.qubit.terra</groupId>
+			<artifactId>qub-domain-serializer</artifactId>
+			<version>1.0.2</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>pt.ist</groupId>
+			<artifactId>fenix-framework-core-consistency-predicates</artifactId>
+			<version>2.8.0</version>
+		</dependency>
+		<dependency>
+			<groupId>pt.ist</groupId>
+		    <artifactId>fenix-framework-core-api</artifactId>
+			<version>2.8.0</version>
+		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.9.9</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<!-- 
 		<dependency>
 			<groupId>org.fenixedu</groupId>
 			<artifactId>fenixedu-qubdocs-reports</artifactId>
 			<version>${version.org.fenixedu.qubdocs.reports}</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>bootbox</artifactId>
-			<version>4.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>select2</artifactId>
-			<version>4.0.0-rc.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>angularjs</artifactId>
-			<version>1.3.15</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>angular-sanitize</artifactId>
-			<version>1.3.11</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>angular-ui-select</artifactId>
-			<version>0.11.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>datatables</artifactId>
-			<version>1.10.7</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>datatables-tools</artifactId>
-			<version>2.2.4-1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.github.dandelion</groupId>
-			<artifactId>datatables-jsp</artifactId>
-			<version>0.10.1</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.github.dandelion</groupId>
-			<artifactId>datatables-servlet2</artifactId>
-			<version>0.8.11</version>
-		</dependency>
-		
+		 -->
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>3.11</version>
         </dependency>
-	
 	</dependencies>
 
 	 <pluginRepositories>
+		<pluginRepository>
+			<id>qubIT-repo</id>
+			<url>https://repository.qub-it.com/nexus/content/groups/qubITRepo</url>
+		</pluginRepository>
+	 	<!-- 
         <pluginRepository>
             <id>ulisboa-repo</id>
             <url>http://nexus.ulisboa.pt:8081/nexus/content/groups/public/</url>
         </pluginRepository>
+         -->
     </pluginRepositories>
     
     <repositories>
         <repository>
-            <id>ulisboa-repo</id>
-            <url>http://nexus.ulisboa.pt:8081/nexus/content/groups/public/</url>
+            <id>fenix-iscte-iul-artifact-repository</id>
+            <url>${iscte.fenix-repo.url}</url>
         </repository>
         <repository>
-            <id>fenixedu-maven-repository</id>
-            <url>https://repo.fenixedu.org/fenixedu-maven-repository</url>
+            <id>qubIT-repo-public</id>
+            <url>https://repository.qub-it.com/nexus/content/groups/public</url>
+        </repository>
+        <repository>
+            <id>qubIT-repo</id>
+            <url>https://repository.qub-it.com/nexus/content/groups/qubITRepo</url>
         </repository>
     </repositories>
-	 <distributionManagement>
-                <repository>
-                        <id>ulisboa-repo</id>
-                        <url>https://nexjen.ulisboa.pt/nexus/content/repositories/releases/</url>
-                </repository>
-                <snapshotRepository>
-                        <id>ulisboa-repo</id>
-                        <url>https://nexjen.ulisboa.pt/nexus/content/repositories/snapshots/</url>
-                </snapshotRepository>
-        </distributionManagement>
+    
+	<distributionManagement>
+		<repository>
+			<id>fenix-iscte-iul-artifact-repository</id>
+			<url>${iscte.fenix-repo.url}</url>
+		</repository>
+	</distributionManagement>
 	
 	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>3.2.0</version>
+					<configuration>
+						<archive>
+							<manifest>
+								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+								<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+							</manifest>
+							<manifestSections>
+								<manifestSection>
+									<name>qubJar</name>
+									<manifestEntries>
+										<artifact-name>
+											${project.artifactId}
+										</artifact-name>
+										<artifact-build-version>
+											${project.version}
+										</artifact-build-version>
+										<artifact-build-date>
+											${maven.build.timestamp}
+										</artifact-build-date>
+										<artifact-built-by>
+											${user.name}
+										</artifact-built-by>
+										<artifact-src-dir-path>
+											${project.basedir}/src/main/java/
+										</artifact-src-dir-path>
+										<artifact-base-dir-path>
+											${project.basedir}
+										</artifact-base-dir-path>
+										<artifact-bootstrap-class>
+											com.qubit.solution.qubEdu.module.academictreasury.QubEduAcademicTreasuryPlugin
+										</artifact-bootstrap-class>
+										<artifact-license>
+										</artifact-license>
+										<artifact-dependencies>
+											qubEdu-framework
+										</artifact-dependencies>
+										<artifact-repository>
+										</artifact-repository>
+									</manifestEntries>
+								</manifestSection>
+								<manifestSection>
+									<name>qubModule</name>
+									<manifestEntries>
+										<module-overrides-domain></module-overrides-domain>
+										<module-overrides-enum></module-overrides-enum>
+										<core-source-path></core-source-path>
+									</manifestEntries>
+								</manifestSection>
+								<manifestSection>
+									<name>qubExpandable</name>
+									<manifestEntries>
+										<static-resources-folders>META-INF/resources</static-resources-folders>
+										<jars-folders></jars-folders>
+									</manifestEntries>
+								</manifestSection>
+							</manifestSections>
+						</archive>
+						<excludes>
+							<exclude>**/domain/**/*_Base.class</exclude>
+							<exclude>**/domain/**/*_Base$*.class</exclude>
+							<exclude>**/**/domain/**/**MetaHolder.class</exclude>
+							<exclude>pt/ist/fenixframework/**/**_Base*.class</exclude>
+							<exclude>pt/ist/fenixframework/**/**_Base$*.class</exclude>
+							<exclude>pt/ist/fenixframework/**/**MetaHolder.class</exclude>
+							<exclude>**/pt/ist/fenixframework/ValueTypeSerializer*</exclude>
+							<exclude>**/pt/ist/fenixframework/backend/CurrentBackEndId*</exclude>
+							<exclude>**/git.properties</exclude>
+						</excludes>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
