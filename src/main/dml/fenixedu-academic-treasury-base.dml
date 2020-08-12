@@ -1537,7 +1537,7 @@ class paymentpenalty.PaymentPenaltySettings {
 		paymentpenalty.PaymentPenaltySettings playsRole paymentPenaltySettings {
 			multiplicity 0..1;
 		}
-		               
+
 		.org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform playsRole digitalPaymentPlatform {
 			multiplicity 0..1;
 		}

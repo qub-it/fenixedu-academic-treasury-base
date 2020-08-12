@@ -4,18 +4,14 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Optional;
 
-import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
-import org.fenixedu.academic.domain.treasury.ITreasuryBridgeAPI;
 import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.tariff.AcademicTariff;
 import org.fenixedu.treasury.domain.FinantialEntity;
-import org.fenixedu.treasury.domain.FinantialInstitution;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.Vat;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
@@ -24,7 +20,8 @@ import org.fenixedu.treasury.domain.document.DebitNote;
 import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
 import org.fenixedu.treasury.domain.paymentcodes.PaymentReferenceCode;
-import org.fenixedu.treasury.domain.paymentcodes.pool.PaymentCodePool;
+import org.fenixedu.treasury.domain.paymentcodes.integration.ISibsPaymentCodePoolService;
+import org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform;
 import org.fenixedu.treasury.dto.document.managepayments.PaymentReferenceCodeBean;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
@@ -38,7 +35,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
 
     private LocalDate when;
     private boolean createPaymentCode;
-    private PaymentCodePool paymentCodePool;
+    private ISibsPaymentCodePoolService paymentCodePool;
 
     public class DebtBuilderWithAmountAndDueDate {
         private BigDecimal amount;
@@ -64,7 +61,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             return this;
         }
 
-        public DebtBuilderWithAmountAndDueDate setPaymentCodePool(PaymentCodePool paymentCodePool) {
+        public DebtBuilderWithAmountAndDueDate setPaymentCodePool(ISibsPaymentCodePoolService paymentCodePool) {
             AcademicTreasuryTargetCreateDebtBuilder.this.paymentCodePool = paymentCodePool;
             return this;
         }
@@ -169,7 +166,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             return this;
         }
 
-        public DebtBuilderWithAcademicTariff setPaymentCodePool(PaymentCodePool paymentCodePool) {
+        public DebtBuilderWithAcademicTariff setPaymentCodePool(ISibsPaymentCodePoolService paymentCodePool) {
             AcademicTreasuryTargetCreateDebtBuilder.this.paymentCodePool = paymentCodePool;
             return this;
         }
@@ -292,9 +289,9 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
     private PaymentReferenceCode createPaymentReferenceCode(DebitEntry debitEntry, LocalDate dueDate) {
 
         final PaymentReferenceCodeBean referenceCodeBean =
-                new PaymentReferenceCodeBean(this.paymentCodePool, debitEntry.getDebtAccount());
-        referenceCodeBean.setBeginDate(when);
-        referenceCodeBean.setEndDate(dueDate);
+                new PaymentReferenceCodeBean((DigitalPaymentPlatform) this.paymentCodePool, debitEntry.getDebtAccount());
+        referenceCodeBean.setValidFrom(when);
+        referenceCodeBean.setValidTo(dueDate);
         referenceCodeBean.setSelectedDebitEntries(new ArrayList<DebitEntry>());
         referenceCodeBean.getSelectedDebitEntries().add(debitEntry);
 

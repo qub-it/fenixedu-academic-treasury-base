@@ -4,14 +4,12 @@ import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.acade
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.debtGeneration.strategies.CreatePaymentReferencesStrategy;
-import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.document.DebitEntry;
-import org.fenixedu.treasury.domain.paymentcodes.MultipleEntriesPaymentCode;
+import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 
 public class DebtsWithNoPaymentCodeReferencesRestriction extends DebtsWithNoPaymentCodeReferencesRestriction_Base {
     
@@ -36,7 +34,7 @@ public class DebtsWithNoPaymentCodeReferencesRestriction extends DebtsWithNoPaym
     
     private boolean evaluateResult(final Registration registration) {
         for (final DebitEntry debitEntry : CreatePaymentReferencesStrategy.grabDebitEntries(getAcademicDebtGenerationRule(), registration)) {
-            if(MultipleEntriesPaymentCode.find(debitEntry).filter(p -> !p.getPaymentReferenceCode().isAnnulled()).count() > 0) {
+            if(debitEntry.getSibsPaymentRequests().stream().filter(p -> !p.isInAnnuledState()).count() > 0) {
                 return false;
             }
         }
