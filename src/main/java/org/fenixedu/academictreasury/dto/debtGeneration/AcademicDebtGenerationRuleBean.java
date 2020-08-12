@@ -1,7 +1,9 @@
 package org.fenixedu.academictreasury.dto.debtGeneration;
 
+
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,7 +23,7 @@ import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependent
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.treasury.domain.Product;
-import org.fenixedu.treasury.domain.paymentcodes.pool.PaymentCodePool;
+import org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform;
 import org.fenixedu.treasury.domain.settings.TreasurySettings;
 import org.fenixedu.treasury.dto.ITreasuryBean;
 import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
@@ -82,30 +84,30 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
     private AcademicTaxDueDateAlignmentType academicTaxDueDateAlignmentType;
     private DebtGenerationRuleRestriction debtGenerationRuleRestriction;
 
-    private List<ProductEntry> entries = Lists.newArrayList();
+    private List<ProductEntry> entries = new ArrayList<>();
 
     private DegreeType degreeType;
 
-    private List<DegreeCurricularPlan> degreeCurricularPlans = Lists.newArrayList();
-    private List<DegreeCurricularPlan> degreeCurricularPlansToAdd = Lists.newArrayList();
+    private List<DegreeCurricularPlan> degreeCurricularPlans = new ArrayList<>();
+    private List<DegreeCurricularPlan> degreeCurricularPlansToAdd = new ArrayList<>();
 
     private Product product;
     private boolean createDebt;
     private boolean toCreateAfterLastRegistrationStateDate;
     private boolean forceCreation;
     private boolean limitToRegisteredOnExecutionYear;
-    private PaymentCodePool paymentCodePool;
+    private DigitalPaymentPlatform digitalPaymentPlatform;
 
     private int numberOfDaysToDueDate = 0;
 
-    private List<TreasuryTupleDataSourceBean> executionYearDataSource = Lists.newArrayList();
-    private List<TreasuryTupleDataSourceBean> productDataSource = Lists.newArrayList();
-    private List<TreasuryTupleDataSourceBean> paymentCodePoolDataSource = Lists.newArrayList();
+    private List<TreasuryTupleDataSourceBean> executionYearDataSource = new ArrayList<>();
+    private List<TreasuryTupleDataSourceBean> productDataSource = new ArrayList<>();
+    private List<TreasuryTupleDataSourceBean> digitalPaymentPlatformDataSource = new ArrayList<>();
 
-    private List<TreasuryTupleDataSourceBean> degreeTypeDataSource = Lists.newArrayList();
-    private List<TreasuryTupleDataSourceBean> degreeCurricularPlanDataSource = Lists.newArrayList();
-    private List<TreasuryTupleDataSourceBean> academicTaxDueDateAlignmentTypeDataSource = Lists.newArrayList();
-    private List<TreasuryTupleDataSourceBean> debtGenerationRuleRestrictionDataSource = Lists.newArrayList();
+    private List<TreasuryTupleDataSourceBean> degreeTypeDataSource = new ArrayList<>();
+    private List<TreasuryTupleDataSourceBean> degreeCurricularPlanDataSource = new ArrayList<>();
+    private List<TreasuryTupleDataSourceBean> academicTaxDueDateAlignmentTypeDataSource = new ArrayList<>();
+    private List<TreasuryTupleDataSourceBean> debtGenerationRuleRestrictionDataSource = new ArrayList<>();
 
     private boolean toAggregateDebitEntries;
     private boolean toCloseDebitNote;
@@ -124,7 +126,7 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
                 .sorted(Collections.reverseOrder(ExecutionYear.COMPARATOR_BY_BEGIN_DATE))
                 .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), l.getQualifiedName())).collect(Collectors.toList());
 
-        final List<Product> availableProducts = Lists.newArrayList();
+        final List<Product> availableProducts = new ArrayList<>();
 
         final IAcademicDebtGenerationRuleStrategy strategyImplementation = getType().strategyImplementation();
         if (strategyImplementation.isAppliedOnAcademicTaxDebitEntries()) {
@@ -142,20 +144,22 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
 
         IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
         
-        productDataSource = availableProducts.stream().sorted(Product.COMPARE_BY_NAME)
+        this.productDataSource = availableProducts.stream().sorted(Product.COMPARE_BY_NAME)
                 .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), String.format("%s [%s]", l.getName().getContent(), l.getCode()))).collect(Collectors.toList());
 
-        paymentCodePoolDataSource = PaymentCodePool.findAll().filter(PaymentCodePool::getActive)
-                .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), l.getName())).collect(Collectors.toList());
+        this.digitalPaymentPlatformDataSource = DigitalPaymentPlatform.findAll().filter(DigitalPaymentPlatform::isActive)
+                    .filter(DigitalPaymentPlatform::isSibsPaymentCodeServiceSupported)
+                    .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), l.getName()))
+                    .collect(Collectors.toList());
 
-        degreeTypeDataSource = DegreeType.all().map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), academicTreasuryServices.localizedNameOfDegreeType(l)))
+        this.degreeTypeDataSource = DegreeType.all().map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), academicTreasuryServices.localizedNameOfDegreeType(l)))
                 .sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT).collect(Collectors.toList());
 
-        academicTaxDueDateAlignmentTypeDataSource = Lists.newArrayList(AcademicTaxDueDateAlignmentType.values()).stream()
+        this.academicTaxDueDateAlignmentTypeDataSource = Lists.newArrayList(AcademicTaxDueDateAlignmentType.values()).stream()
                 .map(l -> new TreasuryTupleDataSourceBean(l.name(), l.getDescriptionI18N().getContent()))
                 .sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT).collect(Collectors.toList());
 
-        academicTaxDueDateAlignmentTypeDataSource.add(0, AcademicTreasuryConstants.SELECT_OPTION);
+        this.academicTaxDueDateAlignmentTypeDataSource.add(0, AcademicTreasuryConstants.SELECT_OPTION);
 
         this.aggregateOnDebitNote = true;
         this.aggregateAllOrNothing = true;
@@ -252,7 +256,7 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
     public void addDegreeCurricularPlans() {
         degreeCurricularPlans.addAll(degreeCurricularPlansToAdd);
 
-        degreeCurricularPlansToAdd = Lists.newArrayList();
+        degreeCurricularPlansToAdd = new ArrayList<>();
     }
 
     public void removeDegreeCurricularPlan(int entryIndex) {
@@ -363,12 +367,12 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
         this.eventDebitEntriesMustEqualRuleProducts = eventDebitEntriesMustEqualRuleProducts;
     }
 
-    public PaymentCodePool getPaymentCodePool() {
-        return paymentCodePool;
+    public DigitalPaymentPlatform getDigitalPaymentPlatform() {
+        return digitalPaymentPlatform;
     }
 
-    public void setPaymentCodePool(PaymentCodePool paymentCodePool) {
-        this.paymentCodePool = paymentCodePool;
+    public void setDigitalPaymentPlatform(DigitalPaymentPlatform digitalPaymentPlatform) {
+        this.digitalPaymentPlatform = digitalPaymentPlatform;
     }
 
     public List<DegreeCurricularPlan> getDegreeCurricularPlans() {
@@ -383,8 +387,8 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
         return productDataSource;
     }
 
-    public List<TreasuryTupleDataSourceBean> getPaymentCodePoolDataSource() {
-        return paymentCodePoolDataSource;
+    public List<TreasuryTupleDataSourceBean> getDigitalPaymentPlatformDataSource() {
+        return digitalPaymentPlatformDataSource;
     }
 
     public List<TreasuryTupleDataSourceBean> getDegreeTypeDataSource() {

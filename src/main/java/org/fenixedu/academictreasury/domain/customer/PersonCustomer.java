@@ -467,6 +467,11 @@ public class PersonCustomer extends PersonCustomer_Base {
 
         return true;
     }
+    
+    @Override
+    public String getUsername() {
+        return getAssociatedPerson().getUsername();
+    }
 
     @Override
     public BigDecimal getGlobalBalance() {

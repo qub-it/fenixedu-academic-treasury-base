@@ -1,6 +1,5 @@
 package org.fenixedu.academictreasury.services;
 
-
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
@@ -37,15 +36,12 @@ import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.DebitNote;
 import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
-import org.fenixedu.treasury.domain.paymentcodes.PaymentReferenceCode;
-import org.fenixedu.treasury.domain.paymentcodes.pool.PaymentCodePool;
-import org.fenixedu.treasury.dto.document.managepayments.PaymentReferenceCodeBean;
+import org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
 
 import pt.ist.fenixframework.Atomic;
@@ -94,11 +90,12 @@ public class EmolumentServices {
             return false;
         }
 
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
         final LocalDate when = possibleDebtDateOnAcademicService(iTreasuryServiceRequest);
-        final FinantialEntity finantialEntity = academicTreasuryServices.finantialEntityOfDegree(iTreasuryServiceRequest.getRegistration().getDegree(), 
-                when);
-        
+        final FinantialEntity finantialEntity =
+                academicTreasuryServices.finantialEntityOfDegree(iTreasuryServiceRequest.getRegistration().getDegree(), when);
+
         return createAcademicServiceRequestEmolument(finantialEntity, iTreasuryServiceRequest, when);
     }
 
@@ -107,39 +104,41 @@ public class EmolumentServices {
     }
 
     public static AcademicTariff findTariffForAcademicServiceRequestForDefaultFinantialEntity(
-            final ITreasuryServiceRequest iTreasuryServiceRequest,
-            final LocalDate when) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        
-        final FinantialEntity finantialEntity = academicTreasuryServices.finantialEntityOfDegree(iTreasuryServiceRequest.getRegistration().getDegree(), when);
+            final ITreasuryServiceRequest iTreasuryServiceRequest, final LocalDate when) {
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
+        final FinantialEntity finantialEntity =
+                academicTreasuryServices.finantialEntityOfDegree(iTreasuryServiceRequest.getRegistration().getDegree(), when);
         return findTariffForAcademicServiceRequest(finantialEntity, iTreasuryServiceRequest, when);
     }
-    
-    public static AcademicTariff findTariffForAcademicServiceRequest(
-            final FinantialEntity finantialEntity,
-            final ITreasuryServiceRequest iTreasuryServiceRequest,
-            final LocalDate when) {
+
+    public static AcademicTariff findTariffForAcademicServiceRequest(final FinantialEntity finantialEntity,
+            final ITreasuryServiceRequest iTreasuryServiceRequest, final LocalDate when) {
         final Degree degree = iTreasuryServiceRequest.getRegistration().getDegree();
         final CycleType cycleType = iTreasuryServiceRequest.getCycleType();
         final Product product = ServiceRequestMapEntry.findProduct(iTreasuryServiceRequest);
 
-        if(iTreasuryServiceRequest.hasCycleType()) {
+        if (iTreasuryServiceRequest.hasCycleType()) {
             AcademicTariff.findMatch(finantialEntity, product, degree, cycleType, when.toDateTimeAtStartOfDay());
         }
-        
+
         return AcademicTariff.findMatch(finantialEntity, product, degree, when.toDateTimeAtStartOfDay());
     }
-    
-    public static AcademicDebitEntryBean calculateForAcademicServiceRequestForDefaultFinantialEntity(final ITreasuryServiceRequest iTreasuryServiceRequest, final LocalDate debtDate) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        
-        final FinantialEntity finantialEntity = academicTreasuryServices.finantialEntityOfDegree(iTreasuryServiceRequest.getRegistration().getDegree(), debtDate);
-        
+
+    public static AcademicDebitEntryBean calculateForAcademicServiceRequestForDefaultFinantialEntity(
+            final ITreasuryServiceRequest iTreasuryServiceRequest, final LocalDate debtDate) {
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
+        final FinantialEntity finantialEntity =
+                academicTreasuryServices.finantialEntityOfDegree(iTreasuryServiceRequest.getRegistration().getDegree(), debtDate);
+
         return calculateForAcademicServiceRequest(finantialEntity, iTreasuryServiceRequest, debtDate);
     }
 
-    public static AcademicDebitEntryBean calculateForAcademicServiceRequest(
-            final FinantialEntity finantialEntity, final ITreasuryServiceRequest iTreasuryServiceRequest, final LocalDate debtDate) {
+    public static AcademicDebitEntryBean calculateForAcademicServiceRequest(final FinantialEntity finantialEntity,
+            final ITreasuryServiceRequest iTreasuryServiceRequest, final LocalDate debtDate) {
         if (!iTreasuryServiceRequest.getServiceRequestType().isPayable()) {
             return null;
         }
@@ -171,7 +170,8 @@ public class EmolumentServices {
 
         // Find tariff
 
-        final AcademicTariff academicTariff = findTariffForAcademicServiceRequest(finantialEntity, iTreasuryServiceRequest, debtDate);
+        final AcademicTariff academicTariff =
+                findTariffForAcademicServiceRequest(finantialEntity, iTreasuryServiceRequest, debtDate);
 
         if (academicTariff == null) {
             throw new AcademicTreasuryDomainException("error.EmolumentServices.tariff.not.found",
@@ -181,44 +181,48 @@ public class EmolumentServices {
         final LocalizedString debitEntryName = academicTariff.academicServiceRequestDebitEntryName(iTreasuryServiceRequest);
         final LocalDate dueDate = academicTariff.dueDate(debtDate);
         final Vat vat = academicTariff.vat(debtDate);
-        
+
         final int numberOfUnits = AcademicTreasuryEvent.numberOfUnits(iTreasuryServiceRequest);
-        final int numberOfPages = AcademicTreasuryEvent.numberOfPages(iTreasuryServiceRequest); 
+        final int numberOfPages = AcademicTreasuryEvent.numberOfPages(iTreasuryServiceRequest);
         final Locale language = AcademicTreasuryEvent.language(iTreasuryServiceRequest);
         final boolean urgentRequest = AcademicTreasuryEvent.urgentRequest(iTreasuryServiceRequest);
-        
+
         final BigDecimal amount = academicTariff.amountToPay(numberOfUnits, numberOfPages, language, urgentRequest);
 
         return new AcademicDebitEntryBean(debitEntryName, dueDate, vat.getTaxRate(), amount);
     }
 
     @Atomic
-    public static boolean createAcademicServiceRequestEmolumentForDefaultFinantialEntity(final ITreasuryServiceRequest iTreasuryServiceRequest) {
+    public static boolean createAcademicServiceRequestEmolumentForDefaultFinantialEntity(
+            final ITreasuryServiceRequest iTreasuryServiceRequest) {
         final LocalDate when = possibleDebtDateOnAcademicService(iTreasuryServiceRequest);
-        
+
         return createAcademicServiceRequestEmolumentForDefaultFinantialEntity(iTreasuryServiceRequest, when);
     }
 
     @Atomic
-    public static boolean createAcademicServiceRequestEmolumentForDefaultFinantialEntity(final ITreasuryServiceRequest iTreasuryServiceRequest,
-            final LocalDate when) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        
-        final FinantialEntity finantialEntity = academicTreasuryServices.finantialEntityOfDegree(iTreasuryServiceRequest.getRegistration().getDegree(), when);
-        
+    public static boolean createAcademicServiceRequestEmolumentForDefaultFinantialEntity(
+            final ITreasuryServiceRequest iTreasuryServiceRequest, final LocalDate when) {
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
+        final FinantialEntity finantialEntity =
+                academicTreasuryServices.finantialEntityOfDegree(iTreasuryServiceRequest.getRegistration().getDegree(), when);
+
         return createAcademicServiceRequestEmolument(finantialEntity, iTreasuryServiceRequest, when);
     }
-    
+
     @Atomic
-    public static boolean createAcademicServiceRequestEmolument(final FinantialEntity finantialEntity, final ITreasuryServiceRequest iTreasuryServiceRequest) {
+    public static boolean createAcademicServiceRequestEmolument(final FinantialEntity finantialEntity,
+            final ITreasuryServiceRequest iTreasuryServiceRequest) {
         final LocalDate when = possibleDebtDateOnAcademicService(iTreasuryServiceRequest);
 
         return createAcademicServiceRequestEmolument(finantialEntity, iTreasuryServiceRequest, when);
     }
 
     @Atomic
-    public static boolean createAcademicServiceRequestEmolument(final FinantialEntity finantialEntity, final ITreasuryServiceRequest iTreasuryServiceRequest,
-            final LocalDate when) {
+    public static boolean createAcademicServiceRequestEmolument(final FinantialEntity finantialEntity,
+            final ITreasuryServiceRequest iTreasuryServiceRequest, final LocalDate when) {
 
         if (!iTreasuryServiceRequest.getServiceRequestType().isPayable()) {
             return false;
@@ -309,23 +313,19 @@ public class EmolumentServices {
         }
 
         if (serviceRequestMapEntry.getGeneratePaymentCode()) {
-            PaymentCodePool pool = serviceRequestMapEntry.getPaymentCodePool();
-            if (pool == null) {
+            DigitalPaymentPlatform platform = serviceRequestMapEntry.getDigitalPaymentPlatform();
+            if (platform == null) {
                 throw new AcademicTreasuryDomainException(
                         "error.EmolumentServices.academicServiceRequest.paymentCodePool.is.required");
             }
 
-            final LocalDate dueDate = academicTresuryEvent.getDueDate();
-            final LocalDate now = new LocalDate();
+            if (!platform.isSibsPaymentCodeServiceSupported()) {
+                throw new AcademicTreasuryDomainException(
+                        "error.EmolumentServices.academicServiceRequest.digitalPaymentPlatform.does.not.support.sibs.payment.codes");
+            }
 
-            final PaymentReferenceCodeBean referenceCodeBean = new PaymentReferenceCodeBean(pool, debitEntry.getDebtAccount());
-            referenceCodeBean.setBeginDate(now);
-            referenceCodeBean.setEndDate(dueDate.compareTo(now) > 0 ? dueDate : now);
-            referenceCodeBean.setSelectedDebitEntries(new ArrayList<DebitEntry>());
-            referenceCodeBean.getSelectedDebitEntries().add(debitEntry);
-
-            final PaymentReferenceCode referenceCode =
-                    PaymentReferenceCode.createPaymentReferenceCodeForMultipleDebitEntries(debitEntry.getDebtAccount(), referenceCodeBean);
+            platform.getSibsPaymentCodePoolService().createSibsPaymentRequest(debitEntry.getDebtAccount(),
+                    Collections.singleton(debitEntry));
         }
 
         return true;
@@ -385,13 +385,11 @@ public class EmolumentServices {
         return false;
     }
 
-
     /* Custom Academic Debt */
-    
+
     public static AcademicDebitEntryBean calculateForCustomAcademicDebt(final FinantialEntity finantialEntity,
-            final Product product, final Registration registration, final ExecutionYear executionYear, 
-            final int numberOfUnits, final int numberOfPages, boolean urgentRequest,
-            final LocalDate debtDate) {
+            final Product product, final Registration registration, final ExecutionYear executionYear, final int numberOfUnits,
+            final int numberOfPages, boolean urgentRequest, final LocalDate debtDate) {
         // Find tariff
 
         final AcademicTariff academicTariff =
@@ -402,22 +400,23 @@ public class EmolumentServices {
                     debtDate.toString(TreasuryConstants.DATE_FORMAT));
         }
 
-        final LocalizedString debitEntryName = AcademicTreasuryEvent.nameForCustomAcademicDebt(product, registration, executionYear);
+        final LocalizedString debitEntryName =
+                AcademicTreasuryEvent.nameForCustomAcademicDebt(product, registration, executionYear);
         final LocalDate dueDate = academicTariff.dueDate(debtDate);
         final Vat vat = academicTariff.vat(debtDate);
         final BigDecimal amount = academicTariff.amountToPay(numberOfUnits, numberOfPages, null, urgentRequest);
 
         return new AcademicDebitEntryBean(debitEntryName, dueDate, vat.getTaxRate(), amount);
     }
-    
-    public static boolean createCustomAcademicDebt(final FinantialEntity finantialEntity, final Product product, 
-            final Registration registration, final ExecutionYear executionYear, final int numberOfUnits, 
-            final int numberOfPages, boolean urgentRequest, final LocalDate when) {
-        
+
+    public static boolean createCustomAcademicDebt(final FinantialEntity finantialEntity, final Product product,
+            final Registration registration, final ExecutionYear executionYear, final int numberOfUnits, final int numberOfPages,
+            boolean urgentRequest, final LocalDate when) {
+
         final Person person = registration.getPerson();
         final String addressFiscalCountryCode = PersonCustomer.addressCountryCode(person);
         final String fiscalNumber = PersonCustomer.fiscalNumber(person);
-        
+
         // Read person customer
         if (!PersonCustomer.findUnique(person, addressFiscalCountryCode, fiscalNumber).isPresent()) {
             PersonCustomer.create(person, addressFiscalCountryCode, fiscalNumber);
@@ -428,21 +427,21 @@ public class EmolumentServices {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active", addressFiscalCountryCode, fiscalNumber);
         }
 
-        final DebtAccount debtAccount =
-                DebtAccount.findUnique(finantialEntity.getFinantialInstitution(), personCustomer).get();
+        final DebtAccount debtAccount = DebtAccount.findUnique(finantialEntity.getFinantialInstitution(), personCustomer).get();
 
-        final AcademicTreasuryEvent academicTreasuryEvent = AcademicTreasuryEvent.createForCustomAcademicDebt(product, registration, executionYear, numberOfUnits, numberOfPages, urgentRequest, when);
-        
+        final AcademicTreasuryEvent academicTreasuryEvent = AcademicTreasuryEvent.createForCustomAcademicDebt(product,
+                registration, executionYear, numberOfUnits, numberOfPages, urgentRequest, when);
+
         final AcademicTariff academicTariff =
                 AcademicTariff.findMatch(finantialEntity, product, registration.getDegree(), when.toDateTimeAtStartOfDay());
-        
+
         if (academicTariff == null) {
             return false;
         }
 
         academicTariff.createDebitEntryForCustomAcademicDebt(debtAccount, academicTreasuryEvent, when);
-        
+
         return true;
     }
-    
+
 }
