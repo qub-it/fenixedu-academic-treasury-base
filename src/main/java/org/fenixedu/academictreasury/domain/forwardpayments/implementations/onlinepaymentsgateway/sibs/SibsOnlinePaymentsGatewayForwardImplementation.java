@@ -35,7 +35,8 @@ public class SibsOnlinePaymentsGatewayForwardImplementation implements IForwardP
 
     @Override
     public IForwardPaymentController getForwardPaymentController(final ForwardPayment forwardPayment) {
-        return IForwardPaymentController.getForwardPaymentController(forwardPayment);
+        //return IForwardPaymentController.getForwardPaymentController(forwardPayment);
+        return null;
     }
 
     @Override

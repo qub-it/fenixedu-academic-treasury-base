@@ -9,12 +9,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.reports.DebtReportRequest;
 import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
-import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Currency;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
-import org.fenixedu.treasury.domain.paymentcodes.FinantialDocumentPaymentCode;
-import org.fenixedu.treasury.domain.paymentcodes.MultipleEntriesPaymentCode;
-import org.fenixedu.treasury.domain.paymentcodes.PaymentReferenceCode;
+import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
@@ -69,119 +66,92 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
     private String targetType;
     private String state;
 
-    private PaymentReferenceCode paymentReferenceCode;
+    private SibsPaymentRequest sibsPaymentRequest;
 
     boolean completed = false;
 
     private String decimalSeparator;
 
-    public PaymentReferenceCodeEntryBean(final PaymentReferenceCode paymentReferenceCode, final DebtReportRequest request,
-            final ErrorsLog errorsLog) {
+    public PaymentReferenceCodeEntryBean(SibsPaymentRequest sibsPaymentRequest, DebtReportRequest request,
+            ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
         
         this.decimalSeparator = request != null ? request.getDecimalSeparator() : DebtReportRequest.DOT;
-        final Currency currency = paymentReferenceCode.getPaymentCodePool().getFinantialInstitution().getCurrency();
 
         try {
-            this.paymentReferenceCode = paymentReferenceCode;
+            this.sibsPaymentRequest = sibsPaymentRequest;
 
-            this.identification = paymentReferenceCode.getExternalId();
-            this.versioningCreator = treasuryServices.versioningCreatorUsername(paymentReferenceCode);
-            this.creationDate = treasuryServices.versioningCreationDate(paymentReferenceCode);
+            this.identification = sibsPaymentRequest.getExternalId();
+            this.versioningCreator = treasuryServices.versioningCreatorUsername(sibsPaymentRequest);
+            this.creationDate = treasuryServices.versioningCreationDate(sibsPaymentRequest);
 
-            if (paymentReferenceCode.getTargetPayment() != null) {
-                DebtAccount referenceDebtAccount = paymentReferenceCode.getTargetPayment().getDebtAccount();
-                this.customerId = referenceDebtAccount.getCustomer().getExternalId();
-                this.debtAccountId = referenceDebtAccount.getExternalId();
-                this.name = referenceDebtAccount.getCustomer().getName();
+            DebtAccount referenceDebtAccount = sibsPaymentRequest.getDebtAccount();
+            this.customerId = referenceDebtAccount.getCustomer().getExternalId();
+            this.debtAccountId = referenceDebtAccount.getExternalId();
+            this.name = referenceDebtAccount.getCustomer().getName();
 
-                if (referenceDebtAccount.getCustomer().isPersonCustomer()
-                        && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson() != null
-                        && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson().getIdDocumentType() != null) {
-                    this.identificationType = ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson()
-                            .getIdDocumentType().getLocalizedName();
-                } else if (referenceDebtAccount.getCustomer().isPersonCustomer()
-                        && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null
-                        && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer()
-                                .getIdDocumentType() != null) {
-                    this.identificationType = ((PersonCustomer) referenceDebtAccount.getCustomer())
-                            .getPersonForInactivePersonCustomer().getIdDocumentType().getLocalizedName();
-                }
-
-                this.identificationNumber = referenceDebtAccount.getCustomer().getIdentificationNumber();
-                this.vatNumber = referenceDebtAccount.getCustomer().getUiFiscalNumber();
-
-                if (referenceDebtAccount.getCustomer().isPersonCustomer()
-                        && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson() != null) {
-                    this.email = ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson()
-                            .getInstitutionalOrDefaultEmailAddressValue();
-                } else if (referenceDebtAccount.getCustomer().isPersonCustomer()
-                        && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null) {
-                    this.email = ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer()
-                            .getInstitutionalOrDefaultEmailAddressValue();
-                }
-
-                this.address = referenceDebtAccount.getCustomer().getAddress();
-                this.addressCountryCode = referenceDebtAccount.getCustomer().getAddressCountryCode();
-
-                if (referenceDebtAccount.getCustomer().isPersonCustomer()
-                        && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson() != null
-                        && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson().getStudent() != null) {
-                    this.studentNumber =
-                            ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson().getStudent().getNumber();
-                } else if (referenceDebtAccount.getCustomer().isPersonCustomer()
-                        && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null
-                        && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer()
-                                .getStudent() != null) {
-                    this.studentNumber = ((PersonCustomer) referenceDebtAccount.getCustomer())
-                            .getPersonForInactivePersonCustomer().getStudent().getNumber();
-                }
+            if (referenceDebtAccount.getCustomer().isPersonCustomer()
+                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson() != null
+                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson().getIdDocumentType() != null) {
+                this.identificationType = ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson()
+                        .getIdDocumentType().getLocalizedName();
+            } else if (referenceDebtAccount.getCustomer().isPersonCustomer()
+                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null
+                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer()
+                            .getIdDocumentType() != null) {
+                this.identificationType = ((PersonCustomer) referenceDebtAccount.getCustomer())
+                        .getPersonForInactivePersonCustomer().getIdDocumentType().getLocalizedName();
             }
 
-            this.entityCode = paymentReferenceCode.getPaymentCodePool().getEntityReferenceCode();
-            this.referenceCode = paymentReferenceCode.getReferenceCode();
+            this.identificationNumber = referenceDebtAccount.getCustomer().getIdentificationNumber();
+            this.vatNumber = referenceDebtAccount.getCustomer().getUiFiscalNumber();
 
-            if (paymentReferenceCode.getTargetPayment() != null
-                    && paymentReferenceCode.getTargetPayment().isFinantialDocumentPaymentCode()) {
-                this.finantialDocumentNumber = ((FinantialDocumentPaymentCode) paymentReferenceCode.getTargetPayment())
-                        .getFinantialDocument().getUiDocumentNumber();
-            } else if (paymentReferenceCode.getTargetPayment() != null
-                    && paymentReferenceCode.getTargetPayment().isMultipleEntriesPaymentCode()) {
-                final MultipleEntriesPaymentCode multipleEntriesPaymentCode =
-                        (MultipleEntriesPaymentCode) paymentReferenceCode.getTargetPayment();
+            if (referenceDebtAccount.getCustomer().isPersonCustomer()
+                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson() != null) {
+                this.email = ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson()
+                        .getInstitutionalOrDefaultEmailAddressValue();
+            } else if (referenceDebtAccount.getCustomer().isPersonCustomer()
+                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null) {
+                this.email = ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer()
+                        .getInstitutionalOrDefaultEmailAddressValue();
+            }
+
+            this.address = referenceDebtAccount.getCustomer().getAddress();
+            this.addressCountryCode = referenceDebtAccount.getCustomer().getAddressCountryCode();
+
+            if (referenceDebtAccount.getCustomer().isPersonCustomer()
+                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson() != null
+                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson().getStudent() != null) {
+                this.studentNumber =
+                        ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson().getStudent().getNumber();
+            } else if (referenceDebtAccount.getCustomer().isPersonCustomer()
+                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null
+                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer()
+                            .getStudent() != null) {
+                this.studentNumber = ((PersonCustomer) referenceDebtAccount.getCustomer())
+                        .getPersonForInactivePersonCustomer().getStudent().getNumber();
+            }
+
+            this.entityCode = sibsPaymentRequest.getDigitalPaymentPlatform().getSibsPaymentCodePoolService().getEntityReferenceCode();
+            this.referenceCode = sibsPaymentRequest.getReferenceCode();
+
                 this.finantialDocumentNumber =
                         String.join(", ",
-                                multipleEntriesPaymentCode.getInvoiceEntriesSet().stream()
+                                sibsPaymentRequest.getDebitEntriesSet().stream()
                                         .filter(i -> i.getFinantialDocument() != null)
-                                        .map(i -> i.getFinantialDocument().getUiDocumentNumber()).collect(Collectors.toList()));
-            }
+                                        .map(i -> i.getFinantialDocument().getUiDocumentNumber())
+                                        .collect(Collectors.toList()));
 
-            if (paymentReferenceCode.getPayableAmount() != null) {
-                this.payableAmount = currency.getValueWithScale(paymentReferenceCode.getPayableAmount());
-            }
+            this.payableAmount = Currency.getValueWithScale(sibsPaymentRequest.getPayableAmount());
+            this.description = sibsPaymentRequest.getDescription();
+            this.targetType = TARGET_TYPE_MULTIPLE_ENTRIES;
 
-            if (paymentReferenceCode.getTargetPayment() != null) {
-                this.description = paymentReferenceCode.getTargetPayment().getDescription();
-            }
-
-            if (paymentReferenceCode.getTargetPayment() != null
-                    && paymentReferenceCode.getTargetPayment().isFinantialDocumentPaymentCode()) {
-                this.targetType = TARGET_TYPE_FINANTIAL_DOCUMENT;
-            } else if (paymentReferenceCode.getTargetPayment() != null
-                    && paymentReferenceCode.getTargetPayment().isMultipleEntriesPaymentCode()) {
-                this.targetType = TARGET_TYPE_MULTIPLE_ENTRIES;
-            } else if (paymentReferenceCode.getTargetPayment() == null) {
-                this.targetType = TARGET_TYPE_NOT_DEFINED;
-            }
-
-            if (paymentReferenceCode.getState() != null) {
-                this.state = paymentReferenceCode.getState().getDescriptionI18N().getContent();
-            }
+            this.state = sibsPaymentRequest.getState().getDescriptionI18N().getContent();
 
             completed = true;
         } catch (final Exception e) {
             e.printStackTrace();
-            errorsLog.addError(paymentReferenceCode, e);
+            errorsLog.addError(sibsPaymentRequest, e);
         }
     }
 
@@ -231,7 +201,7 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
 
         } catch (final Exception e) {
             e.printStackTrace();
-            errorsLog.addError(paymentReferenceCode, e);
+            errorsLog.addError(sibsPaymentRequest, e);
         }
     }
 
@@ -402,12 +372,12 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
         this.state = state;
     }
 
-    public PaymentReferenceCode getPaymentReferenceCode() {
-        return paymentReferenceCode;
+    public SibsPaymentRequest getSibsPaymentRequest() {
+        return sibsPaymentRequest;
     }
 
-    public void setPaymentReferenceCode(PaymentReferenceCode paymentReferenceCode) {
-        this.paymentReferenceCode = paymentReferenceCode;
+    public void setSibsPaymentRequest(SibsPaymentRequest sibsPaymentRequest) {
+        this.sibsPaymentRequest = sibsPaymentRequest;
     }
 
     public boolean isCompleted() {

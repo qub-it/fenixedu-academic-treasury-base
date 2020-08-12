@@ -27,7 +27,8 @@ import org.fenixedu.treasury.domain.document.PaymentEntry;
 import org.fenixedu.treasury.domain.document.ReimbursementEntry;
 import org.fenixedu.treasury.domain.document.SettlementEntry;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
-import org.fenixedu.treasury.domain.paymentcodes.PaymentReferenceCode;
+import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentCodeTransaction;
+import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.domain.paymentcodes.SibsTransactionDetail;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 
@@ -83,20 +84,19 @@ public class DebtReportService {
         return AcademicActBlockingSuspension.findAll().map(i -> new AcademicActBlockingSuspensionReportEntryBean(i, log));
     }
 
-    public static Stream<PaymentReferenceCodeEntryBean> paymentReferenceCodeReport(final DebtReportRequest request,
-            final ErrorsLog log) {
-        return PaymentReferenceCode.findAll()
-                .filter(i -> request.isIncludeAnnuledEntries() || !i.isAnnulled())
+    public static Stream<PaymentReferenceCodeEntryBean> paymentReferenceCodeReport(DebtReportRequest request, ErrorsLog log) {
+        return SibsPaymentRequest.findAll()
+                .filter(i -> request.isIncludeAnnuledEntries() || !i.isInAnnuledState())
                 .map(i -> new PaymentReferenceCodeEntryBean(i, request, log));
     }
 
     public static Stream<SibsTransactionDetailEntryBean> sibsTransactionDetailReport(final DebtReportRequest request,
             final ErrorsLog log) {
-        return SibsTransactionDetail.findAll()
-                .filter(i -> request.getBeginDate() == null || (i.getWhenRegistered() != null && 
-                    !request.getBeginDate().toDateTimeAtStartOfDay().isAfter(i.getWhenRegistered())))
-                .filter(i -> request.getEndDate() == null || (i.getWhenRegistered() != null && 
-                    !request.getEndDate().toDateTimeAtStartOfDay().plusDays(1).minusSeconds(1).isBefore(i.getWhenRegistered())))
+        return SibsPaymentCodeTransaction.findAll()
+                .filter(i -> request.getBeginDate() == null || (i.getPaymentDate() != null && 
+                    !request.getBeginDate().toDateTimeAtStartOfDay().isAfter(i.getPaymentDate())))
+                .filter(i -> request.getEndDate() == null || (i.getPaymentDate() != null && 
+                    !request.getEndDate().toDateTimeAtStartOfDay().plusDays(1).minusSeconds(1).isBefore(i.getPaymentDate())))
                 .map(i -> new SibsTransactionDetailEntryBean(i, request, log));
     }
 
