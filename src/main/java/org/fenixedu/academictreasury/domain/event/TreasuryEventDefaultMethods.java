@@ -15,8 +15,9 @@ import org.fenixedu.treasury.domain.FinantialInstitution;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
-import org.fenixedu.treasury.domain.forwardpayments.ForwardPaymentConfiguration;
-import org.fenixedu.treasury.domain.paymentcodes.PaymentReferenceCode;
+import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
+import org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform;
+import org.fenixedu.treasury.domain.settings.TreasurySettings;
 import org.joda.time.LocalDate;
 
 import com.google.common.collect.Sets;
@@ -25,21 +26,21 @@ public class TreasuryEventDefaultMethods {
 
     private static class PaymentReferenceCodeImpl implements IPaymentReferenceCode {
 
-        private final PaymentReferenceCode paymentReferenceCode;
+        private final SibsPaymentRequest paymentReferenceCode;
 
-        private PaymentReferenceCodeImpl(final PaymentReferenceCode referenceCode) {
+        private PaymentReferenceCodeImpl(final SibsPaymentRequest referenceCode) {
             this.paymentReferenceCode = referenceCode;
 
         }
 
         @Override
         public LocalDate getEndDate() {
-            return paymentReferenceCode.getEndDate();
+            return paymentReferenceCode.getDueDate();
         }
 
         @Override
         public String getEntityCode() {
-            return paymentReferenceCode.getPaymentCodePool().getEntityReferenceCode();
+            return paymentReferenceCode.getDigitalPaymentPlatform().getSibsPaymentCodePoolService().getEntityReferenceCode();
         }
 
         @Override
@@ -101,8 +102,10 @@ public class TreasuryEventDefaultMethods {
     }
 
     public static List<IPaymentReferenceCode> getPaymentReferenceCodesList(final TreasuryEvent treasuryEvent) {
-        return DebitEntry.findActive(treasuryEvent).flatMap(d -> d.getPaymentCodesSet().stream())
-                .map(t -> t.getPaymentReferenceCode()).map(p -> new PaymentReferenceCodeImpl(p)).collect(Collectors.toList());
+        return DebitEntry.findActive(treasuryEvent)
+                .flatMap(d -> d.getSibsPaymentRequestsSet().stream())
+                .map(r -> new PaymentReferenceCodeImpl(r))
+                .collect(Collectors.toList());
     }
 
     public static List<IAcademicTreasuryEventPayment> getPaymentsList(final TreasuryEvent event) {
@@ -140,7 +143,8 @@ public class TreasuryEventDefaultMethods {
         final FinantialInstitution finantialInstitution =
                 DebitEntry.findActive(treasuryEvent).iterator().next().getDebtAccount().getFinantialInstitution();
 
-        return ForwardPaymentConfiguration.isActive(finantialInstitution);
+        return DigitalPaymentPlatform.find(finantialInstitution, TreasurySettings.getInstance().getCreditCardPaymentMethod(), true)
+                .findFirst().isPresent();
     }
 
 }
