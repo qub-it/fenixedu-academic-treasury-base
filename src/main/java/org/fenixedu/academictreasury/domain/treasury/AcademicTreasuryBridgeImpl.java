@@ -1,7 +1,7 @@
 package org.fenixedu.academictreasury.domain.treasury;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -54,9 +54,8 @@ import org.fenixedu.treasury.domain.document.FinantialDocumentType;
 import org.fenixedu.treasury.domain.document.InvoiceEntry;
 import org.fenixedu.treasury.domain.document.SettlementEntry;
 import org.fenixedu.treasury.domain.document.SettlementNote;
-import org.fenixedu.treasury.domain.paymentcodes.PaymentReferenceCode;
-import org.fenixedu.treasury.domain.paymentcodes.pool.PaymentCodePool;
-import org.fenixedu.treasury.dto.document.managepayments.PaymentReferenceCodeBean;
+import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
+import org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform;
 import org.fenixedu.treasury.util.FiscalCodeValidation;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
@@ -133,35 +132,35 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
     private static class PaymentCodePoolImpl implements IPaymentCodePool {
 
-        private PaymentCodePool paymentCodePool;
+        private DigitalPaymentPlatform digitalPaymentPlatform;
 
-        public PaymentCodePoolImpl(final PaymentCodePool paymentCodePool) {
-            this.paymentCodePool = paymentCodePool;
+        public PaymentCodePoolImpl(final DigitalPaymentPlatform digitalPaymentPlatform) {
+            this.digitalPaymentPlatform = digitalPaymentPlatform;
         }
 
         @Override
         public String getCode() {
-            return paymentCodePool.getExternalId();
+            return this.digitalPaymentPlatform.getExternalId();
         }
 
         @Override
         public String getName() {
-            return paymentCodePool.getName();
+            return this.digitalPaymentPlatform.getName();
         }
 
         public boolean isActive() {
-            return paymentCodePool.getActive() != null && paymentCodePool.getActive();
+            return this.digitalPaymentPlatform.isActive();
         }
 
         @Override
         public int hashCode() {
-            return paymentCodePool.hashCode();
+            return this.digitalPaymentPlatform.hashCode();
         }
 
         @Override
         public boolean equals(Object obj) {
             return obj != null && obj instanceof PaymentCodePoolImpl
-                    && ((PaymentCodePoolImpl) obj).paymentCodePool == this.paymentCodePool;
+                    && ((PaymentCodePoolImpl) obj).digitalPaymentPlatform == this.digitalPaymentPlatform;
         }
     }
 
@@ -248,8 +247,8 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         final FinantialInstitution finantialInstitution =
                 ((TreasuryEntity) treasuryEntity).finantialEntity.getFinantialInstitution();
 
-        return finantialInstitution.getPaymentCodePoolsSet().stream().map(p -> new PaymentCodePoolImpl(p))
-                .collect(Collectors.toList());
+        return DigitalPaymentPlatform.findForSibsPaymentCodeServiceByActive(finantialInstitution, true)
+                .map(p -> new PaymentCodePoolImpl(p)).collect(Collectors.toList());
     }
 
     public IPaymentCodePool getPaymentCodePoolByCode(final String code) {
@@ -257,7 +256,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
             throw new AcademicTreasuryDomainException("error.ITreasuryBridgeAPI.paymentCodePool.not.found");
         }
 
-        return new PaymentCodePoolImpl((PaymentCodePool) FenixFramework.getDomainObject(code));
+        return new PaymentCodePoolImpl((DigitalPaymentPlatform) FenixFramework.getDomainObject(code));
     }
 
     /* ------------------------ 
@@ -374,14 +373,14 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
         final FinantialEntity finantialEntity = ((TreasuryEntity) treasuryEntity).finantialEntity;
         final Product product = ((AcademicProduct) treasuryProduct).product;
-        final PaymentCodePool pool = ((PaymentCodePoolImpl) paymentCodePool).paymentCodePool;
+        final DigitalPaymentPlatform platform = ((PaymentCodePoolImpl) paymentCodePool).digitalPaymentPlatform;
 
-        return createDebt(finantialEntity, product, target, when, createPaymentCode, pool, numberOfUnits, numberOfPages);
+        return createDebt(finantialEntity, product, target, when, createPaymentCode, platform, numberOfUnits, numberOfPages);
     }
 
     public IAcademicTreasuryEvent createDebt(final FinantialEntity finantialEntity, final Product product,
             final IAcademicTreasuryTarget target, final LocalDate when, final boolean createPaymentCode,
-            final PaymentCodePool pool, final int numberOfUnits, final int numberOfPages) {
+            final DigitalPaymentPlatform platform, final int numberOfUnits, final int numberOfPages) {
 
         final FinantialInstitution finantialInstitution = finantialEntity.getFinantialInstitution();
         final DocumentNumberSeries documentNumberSeries =
@@ -436,7 +435,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
                 academicTariff.getInterestRate(), when.toDateTimeAtStartOfDay());
 
         if (createPaymentCode) {
-            createPaymentReferenceCode(pool, debitEntry, when, dueDate);
+            createPaymentReferenceCode(platform, debitEntry, when);
         }
 
         return treasuryEvent;
@@ -455,7 +454,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         final Product product = ((AcademicProduct) treasuryProduct).product;
         final Vat vat =
                 Vat.findActiveUnique(((Product) product).getVatType(), finantialInstitution, when.toDateTimeAtStartOfDay()).get();
-        final PaymentCodePool pool = ((PaymentCodePoolImpl) paymentCodePool).paymentCodePool;
+        final DigitalPaymentPlatform platform = ((PaymentCodePoolImpl) paymentCodePool).digitalPaymentPlatform;
         final Person person = target.getAcademicTreasuryTargetPerson();
 
         PersonCustomer personCustomer = person.getPersonCustomer();
@@ -481,7 +480,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
                 null, when.toDateTimeAtStartOfDay());
 
         if (createPaymentCode) {
-            createPaymentReferenceCode(pool, debitEntry, when, dueDate);
+            createPaymentReferenceCode(platform, debitEntry, when);
         }
 
         return treasuryEvent;
@@ -489,8 +488,8 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
     public IAcademicTreasuryEvent createDebt(final FinantialEntity finantialEntity, final Product product,
             final IAcademicTreasuryTarget target, final BigDecimal amount, final LocalDate when, final LocalDate dueDate,
-            final boolean createPaymentCode, final PaymentCodePool pool) {
-        
+            final boolean createPaymentCode, final DigitalPaymentPlatform platform) {
+
         final FinantialInstitution finantialInstitution = finantialEntity.getFinantialInstitution();
         final DocumentNumberSeries documentNumberSeries =
                 DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
@@ -522,26 +521,16 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
                 null, when.toDateTimeAtStartOfDay());
 
         if (createPaymentCode) {
-            createPaymentReferenceCode(pool, debitEntry, when, dueDate);
+            createPaymentReferenceCode(platform, debitEntry, when);
         }
 
         return treasuryEvent;
     }
 
-    private PaymentReferenceCode createPaymentReferenceCode(final PaymentCodePool paymentCodePool,
-            final DebitEntry debitEntry, final LocalDate when, final LocalDate dueDate) {
-
-        final PaymentReferenceCodeBean referenceCodeBean =
-                new PaymentReferenceCodeBean(paymentCodePool, debitEntry.getDebtAccount());
-        referenceCodeBean.setBeginDate(when);
-        referenceCodeBean.setEndDate(dueDate);
-        referenceCodeBean.setSelectedDebitEntries(new ArrayList<DebitEntry>());
-        referenceCodeBean.getSelectedDebitEntries().add(debitEntry);
-
-        final PaymentReferenceCode paymentReferenceCode = PaymentReferenceCode
-                .createPaymentReferenceCodeForMultipleDebitEntries(debitEntry.getDebtAccount(), referenceCodeBean);
-
-        return paymentReferenceCode;
+    private SibsPaymentRequest createPaymentReferenceCode(final DigitalPaymentPlatform platform, DebitEntry debitEntry,
+            LocalDate when) {
+        return platform.getSibsPaymentCodePoolService().createSibsPaymentRequest(debitEntry.getDebtAccount(),
+                Collections.singleton(debitEntry));
     }
 
     /* --------------

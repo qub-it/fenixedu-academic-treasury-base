@@ -4,11 +4,13 @@ package org.fenixedu.academictreasury.dto.reports;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
+import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academictreasury.domain.reports.DebtReportRequest;
 import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
+import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentCodeTransaction;
 import org.fenixedu.treasury.domain.paymentcodes.SibsTransactionDetail;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
@@ -53,11 +55,11 @@ public class SibsTransactionDetailEntryBean extends AbstractReportEntryBean {
     private String settlementDocumentNumber;
     private String comments;
     
-    private SibsTransactionDetail sibsTransactionDetail;
+    private SibsPaymentCodeTransaction sibsTransactionDetail;
     
     boolean completed = false;
 
-    public SibsTransactionDetailEntryBean(final SibsTransactionDetail detail, final DebtReportRequest request, final ErrorsLog errorsLog) {
+    public SibsTransactionDetailEntryBean(SibsPaymentCodeTransaction detail, DebtReportRequest request, ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
 
         final String decimalSeparator = request.getDecimalSeparator();
@@ -68,18 +70,18 @@ public class SibsTransactionDetailEntryBean extends AbstractReportEntryBean {
             this.identification = detail.getExternalId();
             this.versioningCreator = treasuryServices.versioningCreatorUsername(detail);
             this.creationDate = treasuryServices.versioningCreationDate(detail);
-            this.whenProcessed = detail.getWhenProcessed();
-            this.whenRegistered = detail.getWhenRegistered();
-            this.amountPayed = detail.getAmountPayed() != null ? detail.getAmountPayed().toString() : "";
+            this.whenProcessed = detail.getSibsProcessingDate();
+            this.whenRegistered = detail.getPaymentDate();
+            this.amountPayed = detail.getPaidAmount() != null ? detail.getPaidAmount().toString() : "";
             this.sibsEntityReferenceCode = detail.getSibsEntityReferenceCode();
             this.sibsPaymentReferenceCode = detail.getSibsPaymentReferenceCode();
             this.sibsTransactionId = detail.getSibsTransactionId();
-            this.debtAccountId = detail.getDebtAccountId();
-            this.customerId = detail.getCustomerId();
-            this.businessIdentification = detail.getBusinessIdentification();
-            this.fiscalNumber = detail.getFiscalNumber();
-            this.customerName = detail.getCustomerName();
-            this.settlementDocumentNumber = detail.getSettlementDocumentNumber();
+            this.debtAccountId = detail.getPaymentRequest().getDebtAccount().getExternalId();
+            this.customerId = detail.getPaymentRequest().getDebtAccount().getCustomer().getExternalId();
+            this.businessIdentification = detail.getPaymentRequest().getDebtAccount().getCustomer().getBusinessIdentification();
+            this.fiscalNumber = detail.getPaymentRequest().getDebtAccount().getCustomer().getUiFiscalNumber();
+            this.customerName = detail.getPaymentRequest().getDebtAccount().getCustomer().getName();
+            this.settlementDocumentNumber = String.join(",", detail.getSettlementNotesSet().stream().map(s -> s.getUiDocumentNumber()).collect(Collectors.toSet()));
             this.comments = detail.getComments();
             
             if(DebtReportRequest.COMMA.equals(decimalSeparator)) {
@@ -89,7 +91,7 @@ public class SibsTransactionDetailEntryBean extends AbstractReportEntryBean {
             this.completed = true;
         } catch(final Exception e) {
             e.printStackTrace();
-            errorsLog.addError(sibsTransactionDetail, e);            
+            errorsLog.addError(sibsTransactionDetail, e);
         }
         
     }

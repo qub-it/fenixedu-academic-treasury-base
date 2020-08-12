@@ -373,8 +373,7 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
 
         final List<ERPTuitionInfoCalculationReportEntry> reportEntries = Collections.synchronizedList(Lists.newArrayList());
         for (final ExecutionYear executionYear : ERPTuitionInfoSettings.getInstance().getActiveExecutionYearsSet()) {
-            for (final ERPTuitionInfoType type : ERPTuitionInfoType.findActiveForExecutionYear(executionYear)
-                    .collect(Collectors.toSet())) {
+            for (final ERPTuitionInfoType type : ERPTuitionInfoType.findActiveForExecutionYear(executionYear).collect(Collectors.toSet())) {
                 
                 if(!erpTuitionInfoTypeFilterPredicate.test(type)) {
                     continue;
@@ -522,27 +521,7 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
             throw new ERPTuitionInfoPendingException("error.ERPTuitionInfo.pending.to.export", pendingErpTuitionInfo.getUiDocumentNumber());
         }
         
-//        if (findUniquePendingToExport(customer, type).isPresent()) {
-//            final ERPTuitionInfo pendingErpTuitionInfo = findUniquePendingToExport(customer, type).get();
-//
-//            if (Constants.isZero(deltaAmount)) {
-//                pendingErpTuitionInfo.cancelExportation(Constants.bundle("label.ERPTuitionInfo.cancelExportation.delta.zero"));
-//                return pendingErpTuitionInfo;
-//            } else {
-//                if(Constants.isPositive(deltaAmount) && Constants.isNegative(pendingErpTuitionInfo.getTuitionDeltaAmount())) {
-//                    pendingErpTuitionInfo.cancelExportation(Constants.bundle("label.ERPTuitionInfo.cancelExportation.delta.positive.but.pending.exportation.negative"));
-//                } else if(Constants.isNegative(deltaAmount) && Constants.isPositive(pendingErpTuitionInfo.getTuitionDeltaAmount())) {
-//                    pendingErpTuitionInfo.cancelExportation(Constants.bundle("label.ERPTuitionInfo.cancelExportation.delta.negative.but.pending.exportation.positive"));
-//                } else {
-//                    pendingErpTuitionInfo.editPendingToExport(totalAmount, deltaAmount, executionYear.getBeginLocalDate(),
-//                            executionYear.getEndLocalDate());
-//                    return pendingErpTuitionInfo;
-//                }
-//            }
-//
-//        }
-
-        if (org.fenixedu.academictreasury.util.AcademicTreasuryConstants.isZero(deltaAmount)) {
+        if (AcademicTreasuryConstants.isZero(deltaAmount)) {
             throw new ERPTuitionInfoNoDifferencesException("error.ErpTuitionInfo.no.differences.from.last.successul.exportation");
         }
 

@@ -1,5 +1,6 @@
 package org.fenixedu.academictreasury.domain.reports;
 
+
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.fenixedu.academictreasury.domain.academicalAct.AcademicActBlockingSuspension;
 import org.fenixedu.treasury.domain.Product;
@@ -9,8 +10,8 @@ import org.fenixedu.treasury.domain.document.PaymentEntry;
 import org.fenixedu.treasury.domain.document.ReimbursementEntry;
 import org.fenixedu.treasury.domain.document.SettlementEntry;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
-import org.fenixedu.treasury.domain.paymentcodes.PaymentReferenceCode;
-import org.fenixedu.treasury.domain.paymentcodes.SibsTransactionDetail;
+import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentCodeTransaction;
+import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
 
 public class ErrorsLog implements IErrorsLog {
@@ -84,17 +85,17 @@ public class ErrorsLog implements IErrorsLog {
         }        
     }
     
-    public void addError(final PaymentReferenceCode paymentReferenceCode, final Exception e) {
+    public void addError(SibsPaymentRequest paymentRequest, Exception e) {
         synchronized (this) {
-            final String oid = paymentReferenceCode.getExternalId();
-            final String referenceCode = paymentReferenceCode.getReferenceCode();
+            final String oid = paymentRequest.getExternalId();
+            final String referenceCode = paymentRequest.getReferenceCode();
 
             sb.append(String.format("[%s] - %s\n", oid, referenceCode));
             sb.append(ExceptionUtils.getFullStackTrace(e)).append("\n\n");
         }
     }
     
-    public void addError(SibsTransactionDetail sibsTransactionDetail, Exception e) {
+    public void addError(SibsPaymentCodeTransaction sibsTransactionDetail, Exception e) {
         synchronized (this) {
             final String oid = sibsTransactionDetail.getExternalId();
             final String referenceCode = sibsTransactionDetail.getSibsPaymentReferenceCode();
