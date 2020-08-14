@@ -652,7 +652,9 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     public static Stream<TuitionPaymentPlan> find(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
             final FinantialEntity finantialEntity, final ExecutionYear executionYear) {
-        return find(tuitionPaymentPlanGroup).filter(t -> t.finantialEntity() == finantialEntity);
+        return find(tuitionPaymentPlanGroup)
+                .filter(t -> t.finantialEntity() == finantialEntity)
+                .filter(t -> t.getExecutionYear() == executionYear);
     }
 
     public static Stream<TuitionPaymentPlan> find(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,

@@ -1,3 +1,5 @@
+- Bug Fix: Filter correctly tuition payment plans
+
 5.2.2 (27-07-2020)
 - Bug Fix: Fix error of payment plan copies with no fixed due date set
 
