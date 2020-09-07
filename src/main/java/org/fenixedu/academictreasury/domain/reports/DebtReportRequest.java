@@ -4,6 +4,9 @@ import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.acade
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -26,6 +29,8 @@ import org.fenixedu.bennu.scheduler.domain.SchedulerSystem;
 import org.fenixedu.treasury.util.streaming.spreadsheet.ExcelSheet;
 import org.fenixedu.treasury.util.streaming.spreadsheet.Spreadsheet;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
@@ -35,6 +40,8 @@ import pt.ist.fenixframework.FenixFramework;
 
 public class DebtReportRequest extends DebtReportRequest_Base {
 
+    private static Logger logger = LoggerFactory.getLogger(DebtReportRequest.class);
+    
     public static final String DOT = ".";
     public static final String COMMA = ",";
 
@@ -60,7 +67,7 @@ public class DebtReportRequest extends DebtReportRequest_Base {
 
         this.setDegreeType(bean.getDegreeType());
         this.setExecutionYear(bean.getExecutionYear());
-        
+
         checkRules();
     }
 
@@ -92,19 +99,19 @@ public class DebtReportRequest extends DebtReportRequest_Base {
     public boolean isIncludeAnnuledEntries() {
         return super.getIncludeAnnuledEntries();
     }
-    
+
     public boolean isIncludeExtraAcademicInfo() {
         return getIncludeExtraAcademicInfo();
     }
-    
+
     public boolean isIncludeErpIntegrationInfo() {
         return getIncludeErpIntegrationInfo();
     }
-    
+
     public boolean isIncludeSibsInfo() {
         return getIncludeSibsInfo();
     }
-    
+
     public boolean isIncludeProductsInfo() {
         return getIncludeProductsInfo();
     }
@@ -112,45 +119,75 @@ public class DebtReportRequest extends DebtReportRequest_Base {
     @Atomic(mode = TxMode.READ)
     public void processRequest() {
 
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        
         if (getType().isRequestForInvoiceEntries()) {
 
+            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ZipOutputStream zos = new ZipOutputStream(baos);
+
             final ErrorsLog errorsLog = new ErrorsLog();
-            final byte[] debitCreditsContent = extractInformationForDebitAndCredits(errorsLog);
-            final byte[] settlementsContent = extractInformationForSettlements(errorsLog);
-            final byte[] paymentCodesContent = extractInformationForPaymentCodes(errorsLog);
-            final byte[] othersContent = extractOtherTreasuryData(errorsLog);
 
+            executorService.submit(() -> {
+                try {
+                    extractInformationForDebitAndCredits(errorsLog, zos);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            });
+            
+            executorService.submit(() -> {
+                try {
+                    extractInformationForSettlements(errorsLog, zos);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            });
+            
+            executorService.submit(() -> {
+                try {
+                    extractInformationForPaymentCodes(errorsLog, zos);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            });
+            
+            executorService.submit(() -> {
+                try {
+                    extractOtherTreasuryData(errorsLog, zos);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            });
+
+            executorService.submit(() -> {
+                logger.info("writeReportResultFile");
+
+                try {
+                    zos.close();
+                    baos.close();
+
+                    byte[] contents = baos.toByteArray();
+                    writeReportResultFile(errorsLog, contents);
+                } catch (final IOException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                }
+            });
+
+            executorService.shutdown();
             try {
-                final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ZipOutputStream zos = new ZipOutputStream(baos);
-
-                zos.putNextEntry(new ZipEntry(academicTreasuryBundle("label.DebtReportRequestResultFile.INVOICE_ENTRIES.filename", new DateTime().toString("YYYYMMddHHmmss"))));
-                zos.write(debitCreditsContent);
-                zos.closeEntry();
-
-                zos.putNextEntry(new ZipEntry(academicTreasuryBundle("label.DebtReportRequestResultFile.SETTLEMENT_ENTRIES.filename", new DateTime().toString("YYYYMMddHHmmss"))));
-                zos.write(settlementsContent);
-                zos.closeEntry();
+                logger.info("awaitTermination");
                 
-                zos.putNextEntry(new ZipEntry(academicTreasuryBundle("label.DebtReportRequestResultFile.PAYMENT_CODES.filename", new DateTime().toString("YYYYMMddHHmmss"))));
-                zos.write(paymentCodesContent);
-                zos.closeEntry();
-                
-                zos.putNextEntry(new ZipEntry(academicTreasuryBundle("label.DebtReportRequestResultFile.OTHER.filename", new DateTime().toString("YYYYMMddHHmmss"))));
-                zos.write(othersContent);
-                zos.closeEntry();
-
-                zos.close();
-                baos.close();
-
-                final byte[] contents = baos.toByteArray();
-                
-                
-                writeReportResultFile(errorsLog, contents);
-            } catch (final IOException e) {
+                // TODO: This should be configured because the timeout depends in the size of data
+                executorService.awaitTermination(1, TimeUnit.DAYS);
+            } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            
             
         }
     }
@@ -161,46 +198,78 @@ public class DebtReportRequest extends DebtReportRequest_Base {
         DebtReportRequestResultErrorsFile.create(this, errorsLog.getLog().getBytes());
         setDomainRootForPendingReportRequests(null);
     }
-    
-    private byte[] extractInformationForSettlements(final ErrorsLog errorsLog) {
-        return Spreadsheet.buildSpreadsheetContent(new Spreadsheet() {
 
-            @Override
-            public ExcelSheet[] getSheets() {
-                return new ExcelSheet[] {
+    
+    @Atomic(mode = TxMode.READ)
+    private void extractInformationForSettlements(final ErrorsLog errorsLog, ZipOutputStream zos) throws IOException {
+        logger.info("START extractInformationForSettlements");
+        zos.putNextEntry(
+                new ZipEntry(academicTreasuryBundle("label.DebtReportRequestResultFile.SETTLEMENT_ENTRIES.filename",
+                        new DateTime().toString("YYYYMMddHHmmss"))));
+        logger.info("CREATED extractInformationForSettlements");
+        
+        try {
+            
+            Spreadsheet.buildSpreadsheetContent(new Spreadsheet() {
+    
+                @Override
+                public ExcelSheet[] getSheets() {
+                    return new ExcelSheet[] {
                         ExcelSheet.create(settlementEntriesSheetName(), SettlementReportEntryBean.SPREADSHEET_HEADERS,
                                 DebtReportService.settlementEntriesReport(DebtReportRequest.this, errorsLog)),
-
+        
                         ExcelSheet.create(paymentEntriesSheetName(), PaymentReportEntryBean.SPREADSHEET_HEADERS,
                                 DebtReportService.paymentEntriesReport(DebtReportRequest.this, errorsLog)),
-
+        
                         ExcelSheet.create(reimbursementEntriesSheetName(), PaymentReportEntryBean.SPREADSHEET_HEADERS,
-                                DebtReportService.reimbursementEntriesReport(DebtReportRequest.this, errorsLog)),
-
-                };
-            }
-        }, errorsLog);
-    }
+                                DebtReportService.reimbursementEntriesReport(DebtReportRequest.this, errorsLog))
+                    };
+                }
     
-    private byte[] extractInformationForPaymentCodes(final ErrorsLog errorsLog) {
-        return Spreadsheet.buildSpreadsheetContent(new Spreadsheet() {
+            }, errorsLog, zos);
+        } catch(Throwable e) {
+            e.printStackTrace();
+            
+            throw new RuntimeException(e);
+        }
+        
+        zos.closeEntry();
+        logger.info("END extractInformationForSettlements");
+    }
+
+    @Atomic(mode = TxMode.READ)
+    private void extractInformationForPaymentCodes(final ErrorsLog errorsLog, ZipOutputStream zos) throws IOException {
+        logger.info("START extractInformationForPaymentCodes");
+        
+        zos.putNextEntry(new ZipEntry(academicTreasuryBundle("label.DebtReportRequestResultFile.PAYMENT_CODES.filename",
+                new DateTime().toString("YYYYMMddHHmmss"))));
+        
+        Spreadsheet.buildSpreadsheetContent(new Spreadsheet() {
 
             @Override
             public ExcelSheet[] getSheets() {
                 return new ExcelSheet[] {
-                    ExcelSheet.create(paymentReferenceCodeSheetName(), PaymentReferenceCodeEntryBean.SPREADSHEET_HEADERS,
-                            DebtReportService.paymentReferenceCodeReport(DebtReportRequest.this, errorsLog)),
+                        ExcelSheet.create(paymentReferenceCodeSheetName(), PaymentReferenceCodeEntryBean.SPREADSHEET_HEADERS,
+                                DebtReportService.paymentReferenceCodeReport(DebtReportRequest.this, errorsLog)),
 
-                    ExcelSheet.create(sibsTransactionDetailSheetName(),
-                            SibsTransactionDetailEntryBean.SPREADSHEET_HEADERS,
-                            DebtReportService.sibsTransactionDetailReport(DebtReportRequest.this, errorsLog)),
-                };
+                        ExcelSheet.create(sibsTransactionDetailSheetName(), SibsTransactionDetailEntryBean.SPREADSHEET_HEADERS,
+                                DebtReportService.sibsTransactionDetailReport(DebtReportRequest.this, errorsLog)), 
+                        };
             }
-        }, errorsLog);
+        }, errorsLog, zos);
+        
+        zos.closeEntry();
+        logger.info("END extractInformationForPaymentCodes");
     }
-    
-    private byte[] extractOtherTreasuryData(final ErrorsLog errorsLog) {
-        return Spreadsheet.buildSpreadsheetContent(new Spreadsheet() {
+
+    @Atomic(mode = TxMode.READ)
+    private void extractOtherTreasuryData(final ErrorsLog errorsLog, ZipOutputStream zos) throws IOException {
+        logger.info("START extractOtherTreasuryData");
+        
+        zos.putNextEntry(new ZipEntry(academicTreasuryBundle("label.DebtReportRequestResultFile.OTHER.filename",
+                new DateTime().toString("YYYYMMddHHmmss"))));
+        
+        Spreadsheet.buildSpreadsheetContent(new Spreadsheet() {
 
             @Override
             public ExcelSheet[] getSheets() {
@@ -216,14 +285,23 @@ public class DebtReportRequest extends DebtReportRequest_Base {
                                 DebtReportService.treasuryExemptionReport(DebtReportRequest.this, errorsLog)),
 
                         ExcelSheet.create(productSheetName(), ProductReportEntryBean.SPREADSHEET_HEADERS,
-                                DebtReportService.productReport(DebtReportRequest.this, errorsLog)) 
-                        };
-                };
-        }, errorsLog);
+                                DebtReportService.productReport(DebtReportRequest.this, errorsLog)) };
+            };
+        }, errorsLog, zos);
+        
+        zos.closeEntry();
+        logger.info("END extractOtherTreasuryData");
     }
 
-    private byte[] extractInformationForDebitAndCredits(final ErrorsLog errorsLog) {
-        return Spreadsheet.buildSpreadsheetContent(new Spreadsheet() {
+    @Atomic(mode = TxMode.READ)
+    private void extractInformationForDebitAndCredits(final ErrorsLog errorsLog, ZipOutputStream zos) throws IOException {
+        logger.info("START extractInformationForDebitAndCredits");
+
+        zos.putNextEntry(new ZipEntry(academicTreasuryBundle("label.DebtReportRequestResultFile.INVOICE_ENTRIES.filename",
+                new DateTime().toString("YYYYMMddHHmmss"))));
+        logger.info("CREATED extractInformationForDebitAndCredits");
+
+        Spreadsheet.buildSpreadsheetContent(new Spreadsheet() {
 
             @Override
             public ExcelSheet[] getSheets() {
@@ -233,8 +311,8 @@ public class DebtReportRequest extends DebtReportRequest_Base {
                                 DebtReportService.debitEntriesReport(DebtReportRequest.this, errorsLog)),
 
                         ExcelSheet.create(creditEntriesSheetName(), DebtReportEntryBean.SPREADSHEET_CREDIT_HEADERS,
-                                DebtReportService.creditEntriesReport(DebtReportRequest.this, errorsLog))
-                };
+                                DebtReportService.creditEntriesReport(DebtReportRequest.this, errorsLog)) 
+                        };
             }
 
             private String decimalSeparator() {
@@ -245,7 +323,11 @@ public class DebtReportRequest extends DebtReportRequest_Base {
                 return getDecimalSeparator();
             }
 
-        }, errorsLog);
+        }, errorsLog, zos);
+        
+        logger.info("CLOSE extractInformationForDebitAndCredits");
+        zos.closeEntry();
+        logger.info("END extractInformationForDebitAndCredits");
     }
 
     @Atomic

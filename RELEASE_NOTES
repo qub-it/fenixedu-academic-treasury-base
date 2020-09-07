@@ -1,3 +1,5 @@
+- Bug fix: Improve debt report request processing, to improve memory usage
+
 5.2.3 (14-08-2020)
 - Bug Fix: Filter correctly tuition payment plans
 
