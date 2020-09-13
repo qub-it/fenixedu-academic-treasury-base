@@ -1,4 +1,5 @@
-5.2.4.20200907_1603 (07-09-2020)
+- Bug fix: Prevent exception in generating tuition when zip code does not exist
+
 5.2.4 (07-09-2020)
 - Bug fix: Improve debt report request processing, to improve memory usage
 
