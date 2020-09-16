@@ -1,3 +1,5 @@
+- Bug Fix: If there are not debit entries to process in creation debt generation rule, throw exception to abort transaction and prevent tuitions being created
+
 5.3.0 (13-09-2020)
 - Bug fix: Prevent exception in generating tuition when zip code does not exist
 

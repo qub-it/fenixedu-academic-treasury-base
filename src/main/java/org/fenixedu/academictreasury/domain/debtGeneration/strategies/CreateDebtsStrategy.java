@@ -212,7 +212,7 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
         }
 
         if (debitEntries.isEmpty()) {
-            return;
+            throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.empty.debitEntries.to.process");
         }
 
         if (!rule.isAggregateOnDebitNote()) {
