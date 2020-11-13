@@ -210,7 +210,7 @@ public class ERPTuitionInfoTypeBean implements ITreasuryBean, Serializable {
                 .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), format("%s [%s]", l.getName().getContent(), l.getCode()))).collect(Collectors.toList());
 
         this.degreeTypeDataSource = DegreeType.all()
-                .filter(dt -> dt.getDegreeSet().stream().flatMap(d -> d.getExecutionDegrees(executionYear.getAcademicInterval()).stream()).count() > 0)
+                .filter(dt -> dt.getDegreeSet().stream().flatMap(d -> d.getExecutionDegreesForExecutionYear(executionYear).stream()).count() > 0)
                 .filter(d -> !degreeTypes.contains(d))
                 .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), l.getName().getContent()))
                 .sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT).collect(Collectors.toList());
@@ -220,7 +220,7 @@ public class ERPTuitionInfoTypeBean implements ITreasuryBean, Serializable {
                 this.degreeDataSource = this.selectedDegreeType.getDegreeSet().stream()
                         .filter(d -> !this.degrees.contains(d))
                         .filter(d -> !this.degreeTypes.contains(d.getDegreeType()))
-                        .filter(d -> !d.getExecutionDegrees(executionYear.getAcademicInterval()).isEmpty())
+                        .filter(d -> !d.getExecutionDegreesForExecutionYear(executionYear).isEmpty())
                         .map(d -> new TreasuryTupleDataSourceBean(d.getExternalId(), degreeDescription(d)))
                         .sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT)
                         .collect(Collectors.toList());

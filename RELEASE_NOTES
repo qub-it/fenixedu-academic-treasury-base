@@ -1,3 +1,5 @@
+- Refactor: Replace usage of deprecated method Degree.getExecutionDegrees(AcademicInterval)
+
 5.3.1 (16-09-2020)
 - Bug Fix: If there are not debit entries to process in creation debt generation rule, throw exception to abort transaction and prevent tuitions being created
 
