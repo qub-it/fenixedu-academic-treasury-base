@@ -40,9 +40,11 @@ import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.acade
 import java.math.BigDecimal;
 
 import org.apache.poi.ss.usermodel.Row;
+import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
+import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
 import org.fenixedu.academic.domain.student.RegistrationRegimeType;
@@ -384,12 +386,13 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     }
 
     static EmailAddress personalEmail(final Person person) {
-        return person.getPendingOrValidPartyContacts(EmailAddress.class).stream().map(EmailAddress.class::cast).filter(EmailAddress::isPersonalType).sorted((e1, e2) ->  {
-            if(e1.isValid() && !e2.isValid()) {
+    	IAcademicTreasuryPlatformDependentServices implementation = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        return implementation.pendingOrValidPartyContacts(person, EmailAddress.class).stream().map(EmailAddress.class::cast).filter(e -> e.getType() == PartyContactType.PERSONAL).sorted((e1, e2) ->  {
+            if(Boolean.TRUE.equals(e1.getIsValidated()) && Boolean.FALSE.equals(e2.getIsValidated())) {
                 return -1;
             }
             
-            if(!e1.isValid() && e2.isValid()) {
+            if(Boolean.FALSE.equals(e1.getIsValidated()) && Boolean.TRUE.equals(e2.getIsValidated())) {
                 return 1;
             }
             
@@ -431,7 +434,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     }
 
                     if (debitEntry.getExecutionSemester() != null) {
-                        this.executionYear = debitEntry.getExecutionSemester().getExecutionYear().getQualifiedName();
+                        this.executionYear = ((ExecutionSemester)debitEntry.getExecutionSemester()).getExecutionYear().getQualifiedName();
                         this.executionSemester = debitEntry.getExecutionSemester().getQualifiedName();
                     }
                     
@@ -454,7 +457,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     }
 
                     if (debitEntry.getExecutionSemester() != null) {
-                        this.executionYear = debitEntry.getExecutionSemester().getExecutionYear().getQualifiedName();
+                        this.executionYear = ((ExecutionSemester)debitEntry.getExecutionSemester()).getExecutionYear().getQualifiedName();
                         this.executionSemester = debitEntry.getExecutionSemester().getQualifiedName();
                     }
 
@@ -550,7 +553,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
         this.firstTimeStudent = registration.isFirstTime(executionYear);
         this.partialRegime =  academicServices.registrationRegimeType(registration, executionYear) == RegistrationRegimeType.PARTIAL_TIME;
         this.statutes = statutes(registration, executionYear);
-        this.agreement = registration.getRegistrationProtocol().getDescription();
+        this.agreement = academicServices.registrationProtocol(registration).getDescription();
         this.ingression = academicServices.ingression(registration).getDescription();
 
         this.numberOfNormalEnrolments = TuitionServices.normalEnrolmentsIncludingAnnuled(registration, executionYear).size();

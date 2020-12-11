@@ -57,6 +57,8 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOfficeType;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
+import org.fenixedu.academic.domain.contacts.EmailAddress;
+import org.fenixedu.academic.domain.contacts.PartyContact;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
@@ -150,7 +152,9 @@ public interface IAcademicTreasuryPlatformDependentServices {
 	String defaultMobilePhoneNumber(Person person);
 	
 	List<PhysicalAddress> pendingOrValidPhysicalAddresses(Person person);
-	
+
+	List<? extends PartyContact> pendingOrValidPartyContacts(Person person, Class<? extends PartyContact> partyContactType);
+
 	void editSocialSecurityNumber(Person person, String fiscalNumber, PhysicalAddress fiscalAddress);
 	
 	void setFiscalAddress(PhysicalAddress physicalAddress, boolean fiscalAddress);

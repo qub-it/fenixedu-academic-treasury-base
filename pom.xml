@@ -19,7 +19,7 @@
 	<properties>
 		<fenix.framework.version>2.8.0</fenix.framework.version>
 		<qubEdu.framework.version>3.4.11-iscte-fork</qubEdu.framework.version>
-		<iscte.fenix-repo.url>file:///home/ajsco/work/projects/fenix-iscte-iul-artifact-repository</iscte.fenix-repo.url>
+        <iscte.fenix-repo.url>file:///home/omnis-dev/development/workspaces/projects/iscte/fenix-iscte-iul-artifact-repository</iscte.fenix-repo.url>
 		<!-- 
 		<version.org.fenixedu.qubdocs.reports>2.0.0</version.org.fenixedu.qubdocs.reports>
 		 -->
@@ -158,15 +158,20 @@
     </pluginRepositories>
     
     <repositories>
-		<repository>
-			<id>qubIT-repo-public</id>
-			<url>https://repository.qub-it.com/nexus/content/groups/public</url>
-		</repository>
-		<repository>
-			<id>qubIT-repo</id>
-			<url>https://repository.qub-it.com/nexus/content/groups/qubITRepo</url>
-		</repository>
+        <repository>
+            <id>fenix-iscte-iul-artifact-repository</id>
+            <url>${iscte.fenix-repo.url}</url>
+        </repository>
+        <repository>
+            <id>qubIT-repo-public</id>
+            <url>https://repository.qub-it.com/nexus/content/groups/public</url>
+        </repository>
+        <repository>
+            <id>qubIT-repo</id>
+            <url>https://repository.qub-it.com/nexus/content/groups/qubITRepo</url>
+        </repository>
     </repositories>
+    
 	<distributionManagement>
 		<repository>
 			<id>fenix-iscte-iul-artifact-repository</id>

@@ -48,6 +48,7 @@ import java.util.stream.Collectors;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.ExecutionInterval;
+import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
@@ -90,7 +91,10 @@ public class TuitionServices {
     }
     
     public static boolean isToPayRegistrationTuition(final Registration registration, final ExecutionYear executionYear) {
-        return registration.getRegistrationProtocol().isToPayGratuity();
+        final IAcademicTreasuryPlatformDependentServices academicServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        //TODO: how to check if needs to pay
+//        return academicServices.registrationProtocol(registration).isToPayGratuity();
+        return true;
     }
 
     public static AcademicTreasuryEvent findAcademicTreasuryEventTuitionForRegistration(final Registration registration,
@@ -925,7 +929,7 @@ public class TuitionServices {
         }
 
         for (final ExecutionInterval executionSemester : executionYear.getExecutionPeriodsSet()) {
-            result.addAll(studentCurricularPlan.getEnroledImprovements(executionSemester));
+            result.addAll(studentCurricularPlan.getEnroledImprovements((ExecutionSemester)executionSemester));
         }
 
         return result;
