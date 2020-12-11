@@ -301,7 +301,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
     @Override
     public IAcademicServiceRequestAndAcademicTaxTreasuryEvent academicTreasuryEventForAcademicServiceRequest(
             final AcademicServiceRequest academicServiceRequest) {
-        return academicServiceRequest.getAcademicTreasuryEvent();
+        return AcademicTreasuryEvent.findAll().filter(e -> e.getAcademicServiceRequest() == academicServiceRequest).findFirst().orElse(null);
     }
 
     /* ----------
@@ -416,6 +416,8 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
             final IAcademicTreasuryTarget target, final LocalDate when, final boolean createPaymentCode,
             final DigitalPaymentPlatform platform, final int numberOfUnits, final int numberOfPages) {
 
+        IAcademicTreasuryPlatformDependentServices implementation = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        
         final FinantialInstitution finantialInstitution = finantialEntity.getFinantialInstitution();
         final DocumentNumberSeries documentNumberSeries =
                 DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
@@ -425,7 +427,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         final AdministrativeOffice administrativeOffice = finantialEntity.getAdministrativeOffice();
         final Person person = target.getAcademicTreasuryTargetPerson();
 
-        PersonCustomer personCustomer = person.getPersonCustomer();
+        PersonCustomer personCustomer = implementation.personCustomer(person);
         if (personCustomer == null) {
             personCustomer = PersonCustomer.createWithCurrentFiscalInformation(person);
         }
@@ -479,6 +481,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
     public IAcademicTreasuryEvent createDebt(final ITreasuryEntity treasuryEntity, final ITreasuryProduct treasuryProduct,
             final IAcademicTreasuryTarget target, final BigDecimal amount, final LocalDate when, final LocalDate dueDate,
             final boolean createPaymentCode, final IPaymentCodePool paymentCodePool) {
+        IAcademicTreasuryPlatformDependentServices implementation = AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
         final FinantialInstitution finantialInstitution =
                 ((TreasuryEntity) treasuryEntity).finantialEntity.getFinantialInstitution();
@@ -491,7 +494,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         final DigitalPaymentPlatform platform = ((PaymentCodePoolImpl) paymentCodePool).digitalPaymentPlatform;
         final Person person = target.getAcademicTreasuryTargetPerson();
 
-        PersonCustomer personCustomer = person.getPersonCustomer();
+        PersonCustomer personCustomer = implementation.personCustomer(person);
         if (personCustomer == null) {
             personCustomer = PersonCustomer.createWithCurrentFiscalInformation(person);
         }
@@ -523,6 +526,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
     public IAcademicTreasuryEvent createDebt(final FinantialEntity finantialEntity, final Product product,
             final IAcademicTreasuryTarget target, final BigDecimal amount, final LocalDate when, final LocalDate dueDate,
             final boolean createPaymentCode, final DigitalPaymentPlatform platform) {
+        IAcademicTreasuryPlatformDependentServices implementation = AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
         final FinantialInstitution finantialInstitution = finantialEntity.getFinantialInstitution();
         final DocumentNumberSeries documentNumberSeries =
@@ -532,7 +536,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
                 Vat.findActiveUnique(((Product) product).getVatType(), finantialInstitution, when.toDateTimeAtStartOfDay()).get();
         final Person person = target.getAcademicTreasuryTargetPerson();
 
-        PersonCustomer personCustomer = person.getPersonCustomer();
+        PersonCustomer personCustomer = implementation.personCustomer(person);
         if (personCustomer == null) {
             personCustomer = PersonCustomer.createWithCurrentFiscalInformation(person);
         }
@@ -700,16 +704,20 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
     @Override
     public void saveFiscalAddressFieldsFromPersonInActiveCustomer(final Person person) {
-        if (person.getPersonCustomer() == null) {
+        IAcademicTreasuryPlatformDependentServices implementation = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        
+        if (implementation.personCustomer(person) == null) {
             return;
         }
 
-        person.getPersonCustomer().saveFiscalAddressFieldsFromPersonInCustomer();
+        implementation.personCustomer(person).saveFiscalAddressFieldsFromPersonInCustomer();
     }
 
     @Override
     public PhysicalAddress createSaftDefaultPhysicalAddress(final Person person) {
-
+        IAcademicTreasuryPlatformDependentServices implementation = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        
+        
         PhysicalAddressData data = new PhysicalAddressData();
 
         data.setAddress("Desconhecido");
@@ -718,11 +726,14 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         data.setDistrictSubdivisionOfResidence("Desconhecido");
         data.setAreaCode("0000-000");
 
-        final PhysicalAddress physicalAddress =
-                PhysicalAddress.createPhysicalAddress(person, data, PartyContactType.PERSONAL, false);
-        physicalAddress.setValid();
+//        final PhysicalAddress physicalAddress =
+//                PhysicalAddress.createPhysicalAddress(person, data, PartyContactType.PERSONAL, false);
+        
+        PhysicalAddress result = implementation.createPhysicalAddress(person, Country.readDefault(), "Desconhecido", 
+                "Desconhecido", "0000-000", "Desconhecido");
+        result.setValid();
 
-        return physicalAddress;
+        return result;
 
     }
 

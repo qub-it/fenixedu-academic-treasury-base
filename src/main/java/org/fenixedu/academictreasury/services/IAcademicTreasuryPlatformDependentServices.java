@@ -45,6 +45,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
@@ -153,6 +154,8 @@ public interface IAcademicTreasuryPlatformDependentServices {
 	void editSocialSecurityNumber(Person person, String fiscalNumber, PhysicalAddress fiscalAddress);
 	
 	void setFiscalAddress(PhysicalAddress physicalAddress, boolean fiscalAddress);
+	
+	PhysicalAddress createPhysicalAddress(Person person, Country countryOfResidence, String districtOfResidence, String districtSubdivisionOfResidence, String areaCode, String address);
 	
 	/* Fiscal Information */
 	

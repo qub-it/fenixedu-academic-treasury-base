@@ -148,7 +148,7 @@ public class AcademicActBlockingSuspension extends AcademicActBlockingSuspension
     }
     
     public static Stream<AcademicActBlockingSuspension> find(final Person person) {
-         return person.getAcademicActBlockingSuspensionsSet().stream();
+         return findAll().filter(f -> f.getPerson() == person);
     }
     
     public static Stream<AcademicActBlockingSuspension> find(final Person person, final LocalDate when) {

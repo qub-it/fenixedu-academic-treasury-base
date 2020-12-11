@@ -211,27 +211,27 @@ public class ERPTuitionInfoType extends ERPTuitionInfoType_Base {
      */
     // @formatter:on
 
-    public static Stream<ERPTuitionInfoType> findAll() {
+    public static Stream<? extends ERPTuitionInfoType> findAll() {
         return ERPTuitionInfoSettings.getInstance().getErpTuitionInfoTypesSet().stream();
     }
 
-    public static Stream<ERPTuitionInfoType> findActive() {
+    public static Stream<? extends ERPTuitionInfoType> findActive() {
         return findAll().filter(e -> e.isActive());
     }
     
-    public static Stream<? extends ERPTuitionInfoType> findForExecutionYear(final ExecutionYear executionYear) {
-        return executionYear.getErpTuitionInfoTypesSet().stream();
+    public static Stream<? extends ERPTuitionInfoType> findForExecutionYear(ExecutionYear executionYear) {
+        return findAll().filter(e -> e.getExecutionYear() == executionYear);
     }
 
-    public static Stream<ERPTuitionInfoType> findActiveForExecutionYear(final ExecutionYear executionYear) {
-        return executionYear.getErpTuitionInfoTypesSet().stream().filter(e -> e.isActive());
+    public static Stream<? extends ERPTuitionInfoType> findActiveForExecutionYear(ExecutionYear executionYear) {
+        return findForExecutionYear(executionYear).filter(e -> e.isActive());
     }
 
-    public static Stream<ERPTuitionInfoType> findByCode(final String code) {
+    public static Stream<? extends ERPTuitionInfoType> findByCode(final String code) {
         return findAll().filter(e -> e.getErpTuitionInfoProduct().getCode().equals(code));
     }
 
-    public static Optional<ERPTuitionInfoType> findUniqueByCode(final String code) {
+    public static Optional<? extends ERPTuitionInfoType> findUniqueByCode(final String code) {
         return findAll().filter(e -> e.getErpTuitionInfoProduct().getCode().equals(code)).findFirst();
     }
 

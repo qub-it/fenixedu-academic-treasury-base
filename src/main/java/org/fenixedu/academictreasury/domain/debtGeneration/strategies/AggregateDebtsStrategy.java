@@ -54,6 +54,8 @@ import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.services.AcademicTaxServices;
+import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
+import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.document.DebitEntry;
@@ -279,11 +281,13 @@ public class AggregateDebtsStrategy implements IAcademicDebtGenerationRuleStrate
 
     private DebitEntry grabDebitEntryForAcademicTax(final AcademicDebtGenerationRule rule, final Registration registration,
             final AcademicDebtGenerationRuleEntry entry) {
-        if (registration.getPerson().getPersonCustomer() == null) {
+        IAcademicTreasuryPlatformDependentServices implementation =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        PersonCustomer personCustomer = implementation.personCustomer(registration.getPerson());
+        if (personCustomer == null) {
             return null;
         }
 
-        final PersonCustomer personCustomer = registration.getPerson().getPersonCustomer();
         final Product product = entry.getProduct();
         final ExecutionYear executionYear = rule.getExecutionYear();
         final AcademicTax academicTax = AcademicTax.findUnique(product).get();
@@ -302,7 +306,10 @@ public class AggregateDebtsStrategy implements IAcademicDebtGenerationRuleStrate
 
     private DebitEntry grabDebitEntryForTuition(final AcademicDebtGenerationRule rule, final Registration registration,
             final AcademicDebtGenerationRuleEntry entry) {
-        if (registration.getPerson().getPersonCustomer() == null) {
+        IAcademicTreasuryPlatformDependentServices implementation =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        PersonCustomer personCustomer = implementation.personCustomer(registration.getPerson());
+        if (personCustomer == null) {
             return null;
         }
 
@@ -321,8 +328,7 @@ public class AggregateDebtsStrategy implements IAcademicDebtGenerationRuleStrate
             return null;
         }
 
-        return findActiveDebitEntries(registration.getPerson().getPersonCustomer(), t, product).filter(d -> d.isInDebt())
-                .findFirst().orElse(null);
+        return findActiveDebitEntries(personCustomer, t, product).filter(d -> d.isInDebt()).findFirst().orElse(null);
     }
 
     private DebitNote grabPreparingOrCreateDebitNote(final Set<DebitEntry> debitEntries) {

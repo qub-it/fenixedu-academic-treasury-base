@@ -55,6 +55,8 @@ import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.settings.TreasurySettings;
+import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
+import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 
 import com.google.common.collect.Sets;
 
@@ -167,7 +169,7 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
         final ExecutionYear executionYear = academicEntry.getErpTuitionInfoType().getExecutionYear();
 
         final Set<ERPTuitionInfoTypeAcademicEntry> allAcademicEntries =
-                executionYear.getErpTuitionInfoTypesSet().stream()
+                ERPTuitionInfoType.findForExecutionYear(executionYear)
                         .filter(t -> !Sets.intersection(academicEntry.getErpTuitionInfoType().getTuitionProductsSet(), t.getTuitionProductsSet()).isEmpty())
                         .flatMap(t -> t.getErpTuitionInfoTypeAcademicEntriesSet().stream())
                         .collect(Collectors.toSet());
@@ -202,7 +204,7 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
 
                     if (academicEntry.getDegree() == otherEntry.getDegree()) {
                         throw new AcademicTreasuryDomainException("error.ERPTuitionInfoTypeAcademicEntry.entry.duplicated.for.degree",
-                                otherEntry.getDegree().getPresentationNameI18N().getContent());
+                                otherEntry.getDegree().getPresentationName());
                     }
 
                 }
@@ -210,7 +212,7 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
                 if (otherEntry.isDefinedForDegreeType() && academicEntry.getDegreeType() == otherEntry.getDegreeType()) {
                     throw new AcademicTreasuryDomainException(
                             "error.ERPTuitionInfoTypeAcademicEntry.entry.degreeType.of.degree.defined",
-                            academicEntry.getDegree().getPresentationNameI18N().getContent(),
+                            academicEntry.getDegree().getPresentationName(),
                             otherEntry.getDegreeType().getName().getContent());
                 }
             }
@@ -232,7 +234,7 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
                     throw new AcademicTreasuryDomainException(
                             "error.ERPTuitionInfoTypeAcademicEntry.entry.degree.of.degreeCurricularPlan.defined",
                             academicEntry.getDegreeCurricularPlan().getName(),
-                            otherEntry.getDegree().getPresentationNameI18N().getContent());
+                            otherEntry.getDegree().getPresentationName());
                 }
 
                 if (otherEntry.isDefinedForDegreeType() && academicEntry.getDegreeType() == otherEntry.getDegreeType()) {
@@ -348,14 +350,19 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
     }
 
     public LocalizedString getDescription() {
+        ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
         if (isDefinedForDegreeType()) {
-            return getDegreeType().getName();
+            LocalizedString result = new LocalizedString();
+            for (Locale locale : services.availableLocales()) {
+                result = result.with(locale, getDegreeType().getLocalizedName(locale));
+            }
+            return result;
         }
 
         if (isDefinedForDegree()) {
             LocalizedString result = new LocalizedString();
             for (Locale locale : AcademicTreasuryConstants.supportedLocales()) {
-                result = result.with(locale, format("[%s] %s", getDegree().getCode(), getDegree().getPresentationNameI18N().getContent(locale)));
+                result = result.with(locale, format("[%s] %s", getDegree().getCode(), getDegree().getPresentationName()));
             }
 
             return result;
@@ -365,7 +372,7 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
             LocalizedString result = new LocalizedString();
             for (Locale locale : AcademicTreasuryConstants.supportedLocales()) {
                 result = result.with(locale, String.format("[%s] %s - %s", getDegree().getCode(),
-                        getDegree().getPresentationNameI18N().getContent(locale), getDegreeCurricularPlan().getName()));
+                        getDegree().getPresentationName(), getDegreeCurricularPlan().getName()));
 
             }
             return result;

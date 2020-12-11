@@ -530,9 +530,10 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         return FenixFramework.getDomainRoot().getAcademicDebtGenerationRuleSet().stream();
     }
 
-    public static Stream<AcademicDebtGenerationRule> find(final AcademicDebtGenerationRuleType type,
-            final ExecutionYear executionYear) {
-        return executionYear.getAcademicDebtGenerationRulesSet().stream()
+    public static Stream<AcademicDebtGenerationRule> find(AcademicDebtGenerationRuleType type,
+            ExecutionYear executionYear) {
+        return findAll()
+                .filter(r -> r.getExecutionYear() == executionYear)
                 .filter(r -> r.getAcademicDebtGenerationRuleType() == type);
     }
 

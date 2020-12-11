@@ -54,6 +54,8 @@ import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.services.AcademicTaxServices;
+import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
+import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.treasury.domain.Product;
@@ -229,7 +231,8 @@ public class CloseDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
 
     private Set<DebitEntry> grabDebitEntryForTuitions(final AcademicDebtGenerationRule rule, final Registration registration,
             final AcademicDebtGenerationRuleEntry entry) {
-        final PersonCustomer customer = registration.getPerson().getPersonCustomer();
+        IAcademicTreasuryPlatformDependentServices implementation = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        final PersonCustomer customer = implementation.personCustomer(registration.getPerson());
         if (customer == null) {
             return Sets.newHashSet();
         }
@@ -249,7 +252,8 @@ public class CloseDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
 
     private Set<DebitEntry> grabDebitEntryForAcademicTax(final AcademicDebtGenerationRule rule, final Registration registration,
             final AcademicDebtGenerationRuleEntry entry) {
-        final PersonCustomer customer = registration.getPerson().getPersonCustomer();
+        IAcademicTreasuryPlatformDependentServices implementation = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        final PersonCustomer customer = implementation.personCustomer(registration.getPerson());
         if (customer == null) {
             return Sets.newHashSet();
         }

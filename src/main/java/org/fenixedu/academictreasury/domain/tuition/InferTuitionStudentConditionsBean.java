@@ -72,7 +72,7 @@ public class InferTuitionStudentConditionsBean {
         final InferTuitionStudentConditionsBean bean = new InferTuitionStudentConditionsBean();
 
         bean.setRegimeType(academicTreasuryServices.registrationRegimeType(registration, executionYear));
-        bean.setRegistrationProtocol(registration.getRegistrationProtocol());
+        bean.setRegistrationProtocol(academicTreasuryServices.registrationProtocol(registration));
         bean.setIngression(academicTreasuryServices.ingression(registration));
         bean.setSemestersWithEnrolments(semestersWithEnrolments(registration, executionYear));
         bean.setCurricularYear(readByYear(TuitionPaymentPlan.curricularYear(registration, executionYear)));
