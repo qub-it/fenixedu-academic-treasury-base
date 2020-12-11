@@ -80,62 +80,74 @@ public interface IAcademicTreasuryPlatformDependentServices {
 	
     /* Read data sets */
     
-    default Set<DegreeType> readAllDegreeTypes() {
-        return DegreeType.all().collect(Collectors.toSet());
-    }
-    
-	default Set<DegreeCurricularPlan> readAllDegreeCurricularPlansSet() {
-    	return Degree.readAllMatching((dt) -> true).stream().flatMap(d -> d.getDegreeCurricularPlansSet().stream())
-    			.collect(Collectors.toSet());
-    }
-    
-	default Set<DegreeCurricularPlan> readDegreeCurricularPlansWithExecutionDegree(final ExecutionYear executionYear, final DegreeType degreeType) {
-    	return ExecutionDegree.getAllByExecutionYearAndDegreeType(executionYear, degreeType).stream()
-    				.map(e -> e.getDegreeCurricularPlan())
-    				.collect(Collectors.toSet());
-    }
-    
-	default Set<CurricularYear> readAllCurricularYearsSet() {
-    	final Set<CurricularYear> result = Sets.newHashSet();
-    	
-    	for(int i = 1; i <= 10; i++) {
-    		if(CurricularYear.readByYear(i) == null) {
-    			return result;
-    		}
-    		
-    		result.add(CurricularYear.readByYear(i));
-    	}
-    	
-    	return result;
-    }
-    
-	default Set<IngressionType> readAllIngressionTypesSet() {
-    	return IngressionType.findAllByPredicate((i) -> true).collect(Collectors.toSet());
-    }
-    
-	default Set<RegistrationProtocol> readAllRegistrationProtocol() {
-    	return RegistrationProtocol.findByPredicate((p) -> true).collect(Collectors.toSet());
-    }
-    
-	default Set<StatuteType> readAllStatuteTypesSet() {
-    	return StatuteType.readAll((s) -> true).collect(Collectors.toSet());
-    }
+//    default Set<DegreeType> readAllDegreeTypes() {
+//        return DegreeType.all().collect(Collectors.toSet());
+//    }
+	Set<DegreeType> readAllDegreeTypes();
 	
-    default Set<StatuteType> readAllStatuteTypesSet(boolean active) {
-        return StatuteType.readAll((s) -> s.isActive() == active).collect(Collectors.toSet());
-    }
+//	default Set<DegreeCurricularPlan> readAllDegreeCurricularPlansSet() {
+//    	return Degree.readAllDegrees().stream().filter((dt) -> true).flatMap(d -> d.getDegreeCurricularPlansSet().stream())
+//    			.collect(Collectors.toSet());
+//    }
+    Set<DegreeCurricularPlan> readAllDegreeCurricularPlansSet();
     
-	default Set<Person> readAllPersonsSet() { 
-    	return Party.readAllPersons();
-    }
+//	default Set<DegreeCurricularPlan> readDegreeCurricularPlansWithExecutionDegree(final ExecutionYear executionYear, final DegreeType degreeType) {
+//    	return ExecutionDegree.getAllByExecutionYearAndDegreeType(executionYear, degreeType).stream()
+//    				.map(e -> e.getDegreeCurricularPlan())
+//    				.collect(Collectors.toSet());
+//    }
+	Set<DegreeCurricularPlan> readDegreeCurricularPlansWithExecutionDegree(final ExecutionYear executionYear, final DegreeType degreeType) ;
 	
-	default Set<Registration> readAllRegistrations(RegistrationProtocol registrationProtocol) {
-	    return registrationProtocol.getRegistrationsSet();
-	}
+//	default Set<CurricularYear> readAllCurricularYearsSet() {
+//    	final Set<CurricularYear> result = Sets.newHashSet();
+//    	
+//    	for(int i = 1; i <= 10; i++) {
+//    		if(CurricularYear.readByYear(i) == null) {
+//    			return result;
+//    		}
+//    		
+//    		result.add(CurricularYear.readByYear(i));
+//    	}
+//    	
+//    	return result;
+//    }
+	 Set<CurricularYear> readAllCurricularYearsSet();
+    
+//	default Set<IngressionType> readAllIngressionTypesSet() {
+//    	return IngressionType.findAllByPredicate((i) -> true).collect(Collectors.toSet());
+//    }
+	Set<IngressionType> readAllIngressionTypesSet();
 	
-	default Set<Registration> readAllRegistrations(IngressionType ingressionType) {
-	    return ingressionType.getRegistrationSet();
-	}
+	
+//	default Set<RegistrationProtocol> readAllRegistrationProtocol() {
+//    	return RegistrationProtocol.findByPredicate((p) -> true).collect(Collectors.toSet());
+//    }
+	Set<RegistrationProtocol> readAllRegistrationProtocol();
+	
+//	default Set<StatuteType> readAllStatuteTypesSet() {
+//    	return StatuteType.readAll((s) -> true).collect(Collectors.toSet());
+//    }
+	Set<StatuteType> readAllStatuteTypesSet();
+	
+//    default Set<StatuteType> readAllStatuteTypesSet(boolean active) {
+//        return StatuteType.readAll((s) -> s.isActive() == active).collect(Collectors.toSet());
+//    }
+	Set<StatuteType> readAllStatuteTypesSet(boolean active);
+	
+//	default Set<Person> readAllPersonsSet() { 
+//    	return Party.readAllPersons();
+//    }
+	Set<Person> readAllPersonsSet();
+	
+//	default Set<Registration> readAllRegistrations(RegistrationProtocol registrationProtocol) {
+//	    return registrationProtocol.getRegistrationsSet();
+//	}
+	Set<Registration> readAllRegistrations(RegistrationProtocol registrationProtocol);
+	
+//	default Set<Registration> readAllRegistrations(IngressionType ingressionType) {
+//	    return ingressionType.getRegistrationSet();
+//	}
+	Set<Registration> readAllRegistrations(IngressionType ingressionType);
 	
 	PersonCustomer personCustomer(Person person);
 	
@@ -181,15 +193,15 @@ public interface IAcademicTreasuryPlatformDependentServices {
     
     FinantialEntity finantialEntityOfDegree(final Degree degree, final LocalDate when);
     
-    // TODO: Should not be default
-    default Optional<FinantialEntity> finantialEntity(AdministrativeOffice administrativeOffice) {
-        return Optional.ofNullable(administrativeOffice.getFinantialEntity());
-    }
+//    default Optional<FinantialEntity> finantialEntity(AdministrativeOffice administrativeOffice) {
+//        return Optional.ofNullable(administrativeOffice.getFinantialEntity());
+//    }
+    Optional<FinantialEntity> finantialEntity(AdministrativeOffice administrativeOffice);
     
-    // TODO: Should not be default
-    default Optional<FinantialEntity> finantialEntity(Unit unit) {
-        return Optional.ofNullable(unit.getFinantialEntity());
-    }
+//    default Optional<FinantialEntity> finantialEntity(Unit unit) {
+//        return Optional.ofNullable(unit.getFinantialEntity());
+//    }
+    Optional<FinantialEntity> finantialEntity(Unit unit);
     
     Set<String> getFrontOfficeMemberUsernames(final FinantialEntity finantialEntity);
 
@@ -215,37 +227,36 @@ public interface IAcademicTreasuryPlatformDependentServices {
     
     /* Student & Registration */
     
-    // TODO: Should not be default
-    default RegistrationDataByExecutionYear findRegistrationDataByExecutionYear(Registration registration, ExecutionYear executionYear) {
-        if(registration == null || executionYear == null) {
-            return null;
-        }
-        
-        return registration.getRegistrationDataByExecutionYearSet().stream()
-                .filter(r -> r.getExecutionYear() == executionYear).findFirst().orElse(null);
-    }
-    
+//    default RegistrationDataByExecutionYear findRegistrationDataByExecutionYear(Registration registration, ExecutionYear executionYear) {
+//        if(registration == null || executionYear == null) {
+//            return null;
+//        }
+//        
+//        return registration.getRegistrationDataByExecutionYearSet().stream()
+//                .filter(r -> r.getExecutionYear() == executionYear).findFirst().orElse(null);
+//    }
+    RegistrationDataByExecutionYear findRegistrationDataByExecutionYear(Registration registration, ExecutionYear executionYear);
     
     IngressionType ingression(Registration registration);
     
-    // TODO: Should not be default
-    default RegistrationProtocol registrationProtocol(Registration registration) {
-        return registration.getRegistrationProtocol();
-    }
+//    default RegistrationProtocol registrationProtocol(Registration registration) {
+//        return registration.getRegistrationProtocol();
+//    }
+    RegistrationProtocol registrationProtocol(Registration registration);
     
     RegistrationRegimeType registrationRegimeType(Registration registration, ExecutionYear executionYear);
 
     Set<StatuteType> statutesTypesValidOnAnyExecutionSemesterFor(Registration registration, ExecutionInterval executionInterval);
     
     /* AdministrativeOffice */
-    // TODO: Should not be default
-    default Stream<AdministrativeOffice> findAdministrativeOfficesByPredicate(Predicate<AdministrativeOffice> predicate) {
-        Set<AdministrativeOffice> allSet = new HashSet<AdministrativeOffice>();
-        allSet.add(AdministrativeOffice.readByAdministrativeOfficeType(AdministrativeOfficeType.DEGREE));
-        allSet.add(AdministrativeOffice.readByAdministrativeOfficeType(AdministrativeOfficeType.MASTER_DEGREE));
-        
-        return allSet.stream().filter(predicate);
-    }
+//    default Stream<AdministrativeOffice> findAdministrativeOfficesByPredicate(Predicate<AdministrativeOffice> predicate) {
+//        Set<AdministrativeOffice> allSet = new HashSet<AdministrativeOffice>();
+//        allSet.add(AdministrativeOffice.readByAdministrativeOfficeType(AdministrativeOfficeType.DEGREE));
+//        allSet.add(AdministrativeOffice.readByAdministrativeOfficeType(AdministrativeOfficeType.MASTER_DEGREE));
+//        
+//        return allSet.stream().filter(predicate);
+//    }
+    Stream<AdministrativeOffice> findAdministrativeOfficesByPredicate(Predicate<AdministrativeOffice> predicate);
     
     /* Execution Intervals */
     Integer executionIntervalChildOrder(ExecutionInterval executionInterval);

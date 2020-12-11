@@ -485,7 +485,7 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
 
         final byte[] spreadsheetContent = Spreadsheet.buildSpreadsheetContent(spreadsheet, null);
         
-        final DateTime now = DateTime.now();
+        final DateTime now = new DateTime();
         final String filename = academicTreasuryBundle("label.ERPTuitionInfoCreationReportFile.filename", now.toString("yyyyMMddHHmmss"));
         ERPTuitionInfoCreationReportFile.create(filename, filename, spreadsheetContent);
         
@@ -585,7 +585,7 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
                     final PersonCustomer c = FenixFramework.getDomainObject(customerId);
                     final ERPTuitionInfoType t = FenixFramework.getDomainObject(erpTuitionInfoTypeId);
 
-                    reportEntry.executionDate = DateTime.now().toString(AcademicTreasuryConstants.DATE_TIME_FORMAT_YYYY_MM_DD);
+                    reportEntry.executionDate = new DateTime().toString(AcademicTreasuryConstants.DATE_TIME_FORMAT_YYYY_MM_DD);
 
                     reportEntry.studentNumber = c.getAssociatedPerson().getStudent().getNumber().toString();
                     reportEntry.studentName = c.getName();
