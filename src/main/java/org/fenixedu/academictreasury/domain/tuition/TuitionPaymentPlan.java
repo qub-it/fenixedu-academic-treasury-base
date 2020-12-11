@@ -827,8 +827,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         }
 
         final DegreeCurricularPlan degreeCurricularPlan = enrolment.getCurricularCourse().getDegreeCurricularPlan();
-        final RegistrationProtocol registrationProtocol = registration.getRegistrationProtocol();
-        final IngressionType ingression = registration.getIngressionType();
+        final RegistrationProtocol registrationProtocol = academicTreasuryServices.registrationProtocol(registration);
+        final IngressionType ingression = academicTreasuryServices.ingression(registration);
         final boolean laboratorial = laboratorial(enrolment);
         final Set<StatuteType> statutes =
                 academicTreasuryServices.statutesTypesValidOnAnyExecutionSemesterFor(registration, executionYear);

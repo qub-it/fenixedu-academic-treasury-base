@@ -566,7 +566,7 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
                 AcademicTreasuryEvent.AcademicTreasuryEventKeys.DEGREE_CURRICULAR_PLAN.getDescriptionI18N().getContent(),
                 enrolment.getCurricularCourse().getDegreeCurricularPlan().getName());
         propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.DEGREE.getDescriptionI18N().getContent(),
-                enrolment.getCurricularCourse().getDegree().getPresentationNameI18N().getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE));
+                enrolment.getCurricularCourse().getDegree().getPresentationName());
         propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.DEGREE_CODE.getDescriptionI18N().getContent(),
                 enrolment.getCurricularCourse().getDegree().getCode());
 
@@ -714,7 +714,7 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         propertiesMap.put(AcademicTreasuryEventKeys.DEGREE_CODE.getDescriptionI18N().getContent(),
                 event.getRegistration().getDegree().getCode());
         propertiesMap.put(AcademicTreasuryEventKeys.DEGREE.getDescriptionI18N().getContent(), event
-                .getRegistration().getDegree().getPresentationNameI18N(event.getExecutionYear()).getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE));
+                .getRegistration().getDegree().getPresentationName(event.getExecutionYear()));
         propertiesMap.put(AcademicTreasuryEventKeys.DEGREE_CURRICULAR_PLAN.getDescriptionI18N().getContent(),
                 event.getRegistration().getDegreeCurricularPlanName());
 

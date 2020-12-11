@@ -643,7 +643,7 @@ public class PersonCustomer extends PersonCustomer_Base {
             setAddressCountryCode(addressCountryCode);
             setFiscalNumber(fiscalNumber);
             if(services.fiscalAddress(getPerson()) != null) {
-                services.fiscalAddress(getPerson()).setFiscalAddress(false);
+                services.setFiscalAddress(services.fiscalAddress(getPerson()), false);
             }
             
             services.editSocialSecurityNumber(getPerson(), fiscalNumber, fiscalAddress);

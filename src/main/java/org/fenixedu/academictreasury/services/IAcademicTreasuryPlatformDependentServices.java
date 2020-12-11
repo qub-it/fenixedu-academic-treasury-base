@@ -152,6 +152,8 @@ public interface IAcademicTreasuryPlatformDependentServices {
 	
 	void editSocialSecurityNumber(Person person, String fiscalNumber, PhysicalAddress fiscalAddress);
 	
+	void setFiscalAddress(PhysicalAddress physicalAddress, boolean fiscalAddress);
+	
 	/* Fiscal Information */
 	
 	String fiscalCountry(final Person person);

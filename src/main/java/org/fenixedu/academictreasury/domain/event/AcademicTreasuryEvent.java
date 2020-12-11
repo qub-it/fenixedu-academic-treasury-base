@@ -603,7 +603,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         }
 
         debitEntry.setCurricularCourse(enrolment.getCurricularCourse());
-        debitEntry.setExecutionSemester(enrolment.getExecutionInterval());
+        debitEntry.setExecutionSemester(enrolment.getExecutionPeriod());
     }
 
     public void associateEnrolmentEvaluation(final DebitEntry debitEntry, final EnrolmentEvaluation enrolmentEvaluation) {
@@ -616,10 +616,10 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         }
 
         debitEntry.setCurricularCourse(enrolmentEvaluation.getEnrolment().getCurricularCourse());
-        debitEntry.setExecutionSemester(enrolmentEvaluation.getEnrolment().getExecutionInterval());
+        debitEntry.setExecutionSemester(enrolmentEvaluation.getEnrolment().getExecutionPeriod());
 
         if (enrolmentEvaluation.getExecutionPeriod() != null) {
-            debitEntry.setExecutionSemester(enrolmentEvaluation.getExecutionInterval());
+            debitEntry.setExecutionSemester(enrolmentEvaluation.getExecutionPeriod());
         }
 
         debitEntry.setEvaluationSeason(enrolmentEvaluation.getEvaluationSeason());
@@ -831,17 +831,18 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         return TreasuryEvent.findAll().filter(e -> e instanceof AcademicTreasuryEvent).map(AcademicTreasuryEvent.class::cast);
     }
 
-    public static Stream<? extends AcademicTreasuryEvent> find(final Person person) {
-        return person.getAcademicTreasuryEventSet().stream();
+    public static Stream<? extends AcademicTreasuryEvent> find(Person person) {
+        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        return findAll().filter(e -> e.getPerson() == person).stream();
     }
     
     public static Stream<? extends AcademicTreasuryEvent> find(ExecutionYear executionYear) {
-        return executionYear.getAcademicTreasuryEventSet().stream();
+        return findAll().filter(e -> e.getExecutionYear());
     }
 
     public static Stream<? extends AcademicTreasuryEvent> find(Registration registration,
             ExecutionYear executionYear) {
-        return registration.getAcademicTreasuryEventSet().stream().filter(l -> l.getExecutionYear() == executionYear);
+        return findAll().filter(e -> e.getRegistration() == registration).filter(l -> l.getExecutionYear() == executionYear);
     }
 
     /* --- Academic Service Requests --- */
@@ -959,7 +960,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
     public static Stream<? extends AcademicTreasuryEvent> findForAcademicTax(final Registration registration,
             final ExecutionYear executionYear, final AcademicTax academicTax) {
-        return registration.getPerson().getAcademicTreasuryEventSet().stream()
+        return find(registration.getPerson()).stream()
                 .filter(e -> e.isForAcademicTax() && e.getAcademicTax() == academicTax && e.getExecutionYear() == executionYear
                         && (!e.getAcademicTax().isAppliedOnRegistration() && e.getPerson() == registration.getPerson()
                                 || e.getRegistration() == registration));
