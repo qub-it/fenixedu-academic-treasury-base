@@ -833,11 +833,11 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
     public static Stream<? extends AcademicTreasuryEvent> find(Person person) {
         IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        return findAll().filter(e -> e.getPerson() == person).stream();
+        return findAll().filter(e -> e.getPerson() == person);
     }
     
     public static Stream<? extends AcademicTreasuryEvent> find(ExecutionYear executionYear) {
-        return findAll().filter(e -> e.getExecutionYear());
+        return findAll().filter(e -> e.getExecutionYear() == executionYear);
     }
 
     public static Stream<? extends AcademicTreasuryEvent> find(Registration registration,
@@ -960,7 +960,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
     public static Stream<? extends AcademicTreasuryEvent> findForAcademicTax(final Registration registration,
             final ExecutionYear executionYear, final AcademicTax academicTax) {
-        return find(registration.getPerson()).stream()
+        return find(registration.getPerson())
                 .filter(e -> e.isForAcademicTax() && e.getAcademicTax() == academicTax && e.getExecutionYear() == executionYear
                         && (!e.getAcademicTax().isAppliedOnRegistration() && e.getPerson() == registration.getPerson()
                                 || e.getRegistration() == registration));

@@ -131,7 +131,7 @@ public class TuitionAcademicTaxGenerationStrategy implements IMassiveDebtGenerat
                 throw new AcademicTreasuryDomainException("error.MassiveDebtGenerationRequestFile.debt.not.created",
                         String.valueOf(row.getRowNum()),
                         String.valueOf(row.getStudentCurricularPlan().getRegistration().getNumber()),
-                        row.getStudentCurricularPlan().getRegistration().getName(), e.getLocalizedMessage());
+                        row.getStudentCurricularPlan().getRegistration().getPerson().getName(), e.getLocalizedMessage());
             }
         }
 

@@ -41,6 +41,8 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
+import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
+import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.treasury.domain.FinantialInstitution;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.services.reports.dataproviders.CustomerDataProvider;
@@ -52,6 +54,7 @@ import org.fenixedu.treasury.services.reports.helpers.LanguageHelper;
 import org.fenixedu.treasury.services.reports.helpers.MoneyHelper;
 import org.fenixedu.treasury.services.reports.helpers.NumbersHelper;
 import org.fenixedu.treasury.services.reports.helpers.StringsHelper;
+import org.joda.time.LocalDate;
 
 import com.google.common.base.Strings;
 import com.qubit.terra.docs.core.DocumentGenerator;
@@ -84,6 +87,8 @@ public class DocumentPrinter {
 
     //https://github.com/qub-it/fenixedu-qubdocs-reports/blob/master/src/main/java/org/fenixedu/academic/util/report/DocumentPrinter.java
     public static byte[] printRegistrationTuititionPaymentPlan(Registration registration, String outputMimeType) {
+        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        
         final Person p = registration.getStudent().getPerson();
         final String addressFiscalCountryCode = PersonCustomer.addressCountryCode(p);
         final String fiscalNumber = PersonCustomer.fiscalNumber(p);
@@ -93,7 +98,8 @@ public class DocumentPrinter {
 
         final PersonCustomer customer = PersonCustomer.findUnique(p, addressFiscalCountryCode, fiscalNumber).orElse(null);
         final FinantialInstitution finst =
-                registration.getDegree().getAdministrativeOffice().getFinantialEntity().getFinantialInstitution();
+                services.finantialEntityOfDegree(
+                        registration.getDegree(), new LocalDate()).getFinantialInstitution();
         final DebtAccount account = DebtAccount.findUnique(finst, customer).orElse(null);
 
         return printRegistrationTuititionPaymentPlan(account, outputMimeType);

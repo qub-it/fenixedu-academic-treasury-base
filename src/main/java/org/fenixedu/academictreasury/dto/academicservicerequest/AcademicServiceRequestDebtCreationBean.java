@@ -45,7 +45,9 @@ import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.serviceRequests.ITreasuryServiceRequest;
+import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.EmolumentServices;
+import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.treasury.dto.ITreasuryBean;
 import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
@@ -102,14 +104,16 @@ public class AcademicServiceRequestDebtCreationBean implements Serializable, ITr
             return registrationDataSource;
         }
 
+        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        
         registrationDataSource = ((PersonCustomer) debtAccount.getCustomer()).getPerson().getStudent().getRegistrationsSet()
                 .stream()
                 .map(r -> { 
                   
                     final String degreeCode = r.getDegree().getCode();
-                    final String degreePresentationName = r.getDegree().getPresentationNameI18N().getContent();
+                    final String degreePresentationName = r.getDegree().getPresentationName();
                     final String registrationDate = r.getStartDate() != null ? r.getStartDate().toString("yyyy-MM-dd") : "";
-                    final String agreement = r.getRegistrationProtocol() != null ? r.getRegistrationProtocol().getDescription().getContent() : "";
+                    final String agreement = services.registrationProtocol(r) != null ? services.registrationProtocol(r).getDescription().getContent() : "";
 
                     final TreasuryTupleDataSourceBean t = new TreasuryTupleDataSourceBean(r.getExternalId(),
                         String.format("[%s] %s (%s %s)", degreeCode, degreePresentationName, registrationDate, agreement));

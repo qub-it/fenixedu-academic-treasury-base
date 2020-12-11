@@ -51,6 +51,8 @@ import org.fenixedu.academictreasury.domain.emoluments.AcademicTax;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
+import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
+import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.dto.ITreasuryBean;
@@ -159,6 +161,8 @@ public class TuitionDebtCreationBean implements Serializable, ITreasuryBean {
             registrationDataSource = Lists.newArrayList();
             return registrationDataSource;
         }
+        
+        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
         registrationDataSource =
                 ((PersonCustomer) debtAccount.getCustomer()).getPerson().getStudent().getRegistrationsSet().stream()
@@ -166,7 +170,7 @@ public class TuitionDebtCreationBean implements Serializable, ITreasuryBean {
                             final String degreeCode = r.getDegree().getCode();
                             final String degreePresentationName = r.getDegree().getPresentationName(getExecutionYear());
                             final String registrationDate = r.getStartDate() != null ? r.getStartDate().toString("yyyy-MM-dd") : "";
-                            final String agreement = r.getRegistrationProtocol() != null ? r.getRegistrationProtocol().getDescription().getContent() : "";
+                            final String agreement = services.registrationProtocol(r) != null ? services.registrationProtocol(r).getDescription().getContent() : "";
 
                             final TreasuryTupleDataSourceBean t = new TreasuryTupleDataSourceBean(r.getExternalId(),
                                 String.format("[%s] %s (%s %s)", degreeCode, degreePresentationName, registrationDate, agreement));
@@ -229,7 +233,8 @@ public class TuitionDebtCreationBean implements Serializable, ITreasuryBean {
         }
 
         standaloneEnrolmentsDataSource = TuitionServices.standaloneEnrolmentsIncludingAnnuled(getRegistration(), getExecutionYear()).stream()
-                .sorted(Enrolment.COMPARATOR_BY_NAME_AND_ID).collect(Collectors.toList()).stream()
+                // TODO Sort
+                // .sorted(Enrolment.COMPARATOR_BY_NAME_AND_ID()).collect(Collectors.toList()).stream()
                 .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), l.getName().getContent())).collect(Collectors.toList());
 
         return standaloneEnrolmentsDataSource;
@@ -246,8 +251,9 @@ public class TuitionDebtCreationBean implements Serializable, ITreasuryBean {
             return extracurricularEnrolmentsDataSource;
         }
 
-        extracurricularEnrolmentsDataSource = TuitionServices.extracurricularEnrolmentsIncludingAnnuled(getRegistration(), getExecutionYear())
-                .stream().sorted(Enrolment.COMPARATOR_BY_NAME_AND_ID).collect(Collectors.toList()).stream()
+        extracurricularEnrolmentsDataSource = TuitionServices.extracurricularEnrolmentsIncludingAnnuled(getRegistration(), getExecutionYear()).stream()
+                // TODO: Sort
+                // .stream().sorted(Enrolment.COMPARATOR_BY_NAME_AND_ID).collect(Collectors.toList()).stream()
                 .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), l.getName().getContent())).collect(Collectors.toList());
 
         return extracurricularEnrolmentsDataSource;

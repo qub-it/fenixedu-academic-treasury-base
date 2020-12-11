@@ -58,6 +58,8 @@ import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.services.AcademicTaxServices;
+import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
+import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.treasury.domain.Currency;
 import org.fenixedu.treasury.domain.FinantialEntity;
@@ -296,7 +298,8 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
 
     private static DebitEntry grabDebitEntryForAcademicTax(final AcademicDebtGenerationRule rule, final Registration registration,
             final AcademicDebtGenerationRuleEntry entry) {
-        final PersonCustomer customer = registration.getPerson().getPersonCustomer();
+        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        PersonCustomer customer = services.personCustomer(registration.getPerson());
 
         if (customer == null) {
             return null;
@@ -317,7 +320,8 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
 
     private static DebitEntry grabDebitEntryForTuition(final AcademicDebtGenerationRule rule, final Registration registration,
             final AcademicDebtGenerationRuleEntry entry) {
-        final PersonCustomer customer = registration.getPerson().getPersonCustomer();
+        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        PersonCustomer customer = services.personCustomer(registration.getPerson());
 
         if (customer == null) {
             return null;
@@ -351,17 +355,18 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.entry.is.academicTax");
         }
 
-        final FinantialEntity finantialEntity = registration.getDegree().getAdministrativeOffice().getFinantialEntity();
+        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        final FinantialEntity finantialEntity = services.finantialEntityOfDegree(registration.getDegree(), new LocalDate());
 
         if (finantialEntity == null) {
             return Collections.emptySet();
         }
 
-        if (registration.getPerson().getPersonCustomer() == null) {
+        PersonCustomer personCustomer = services.personCustomer(registration.getPerson());
+
+        if (personCustomer == null) {
             return Collections.emptySet();
         }
-
-        final PersonCustomer personCustomer = registration.getPerson().getPersonCustomer();
 
         if (!DebtAccount.findUnique(finantialEntity.getFinantialInstitution(), personCustomer).isPresent()) {
             return Collections.emptySet();

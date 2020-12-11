@@ -38,6 +38,7 @@ package org.fenixedu.academictreasury.domain.tuition;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -128,8 +129,11 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         setCurricularYear(tuitionPaymentPlanBean.getCurricularYear());
         setStatuteType(tuitionPaymentPlanBean.getStatuteType());
         setPayorDebtAccount(tuitionPaymentPlanBean.getPayorDebtAccount());
-        setSemester(tuitionPaymentPlanBean.getExecutionSemester() != null ? tuitionPaymentPlanBean.getExecutionSemester()
-                .getChildOrder() : null);
+        
+        // TODO check how to reference semester
+//        setSemester(tuitionPaymentPlanBean.getExecutionSemester() != null ? tuitionPaymentPlanBean.getExecutionSemester()
+//                .getChildOrder() : null);
+        
         setFirstTimeStudent(tuitionPaymentPlanBean.isFirstTimeStudent());
         setCustomized(tuitionPaymentPlanBean.isCustomized());
 
@@ -294,7 +298,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
             result = result.with(locale,
                     AcademicTreasuryConstants.academicTreasuryBundle(locale, paymentPlanLabel,
                             "[" + getDegreeCurricularPlan().getDegree().getCode() + "] "
-                                    + getDegreeCurricularPlan().getDegree().getPresentationNameI18N().getContent(locale) + " - "
+                                    + getDegreeCurricularPlan().getDegree().getPresentationName() + " - "
                                     + getDegreeCurricularPlan().getName(),
                             getExecutionYear().getQualifiedName(),
                             isCustomized() ? getCustomizedName().getContent(locale) : null));
@@ -866,8 +870,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         }
 
         final DegreeCurricularPlan degreeCurricularPlan = enrolment.getCurricularCourse().getDegreeCurricularPlan();
-        final RegistrationProtocol registrationProtocol = registration.getRegistrationProtocol();
-        final IngressionType ingression = registration.getIngressionType();
+        final RegistrationProtocol registrationProtocol = academicTreasuryServices.registrationProtocol(registration);
+        final IngressionType ingression = academicTreasuryServices.ingression(registration);
         final boolean laboratorial = laboratorial(enrolment);
         final Set<StatuteType> statutes =
                 academicTreasuryServices.statutesTypesValidOnAnyExecutionSemesterFor(registration, executionYear);
@@ -897,7 +901,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     private static boolean laboratorial(final Enrolment enrolment) {
         return AcademicTreasuryConstants.isPositive(new BigDecimal(
-                enrolment.getCurricularCourse().getCompetenceCourse().getLaboratorialHours(enrolment.getExecutionInterval())));
+                enrolment.getCurricularCourse().getCompetenceCourse().getLaboratorialHours(enrolment.getExecutionPeriod())));
     }
 
     public static boolean firstTimeStudent(final Registration registration, final ExecutionYear executionYear) {
@@ -909,8 +913,10 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
     }
 
     public static Set<Integer> semestersWithEnrolments(final Registration registration, final ExecutionYear executionYear) {
-        return registration.getEnrolments(executionYear).stream().map(e -> (Integer) e.getExecutionInterval().getChildOrder())
-                .collect(Collectors.toSet());
+        // TODO: Check how in ISCTE childOrder is obtained
+        return Collections.emptySet();
+//        return registration.getEnrolments(executionYear).stream().map(e -> (Integer) e.getExecutionInterval().getChildOrder())
+//                .collect(Collectors.toSet());
     }
 
     private TuitionPaymentPlan getPreviousTuitionPaymentPlan() {

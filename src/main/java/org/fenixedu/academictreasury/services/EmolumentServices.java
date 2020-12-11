@@ -60,7 +60,6 @@ import org.fenixedu.academictreasury.domain.serviceRequests.ITreasuryServiceRequ
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.domain.tariff.AcademicTariff;
 import org.fenixedu.academictreasury.dto.academictax.AcademicDebitEntryBean;
-import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.FinantialInstitution;
@@ -92,10 +91,11 @@ public class EmolumentServices {
                 .filter(l -> l.getFinantialInstitutionsSet().contains(finantialEntity.getFinantialInstitution()));
     }
 
-    @Subscribe
-    public void newAcademicServiceRequestSituationEvent(final DomainObjectEvent<AcademicServiceRequest> event) {
-        newAcademicServiceRequestSituationEvent(event.getInstance());
-    }
+    // TODO
+//    @Subscribe
+//    public void newAcademicServiceRequestSituationEvent(final DomainObjectEvent<AcademicServiceRequest> event) {
+//        newAcademicServiceRequestSituationEvent(event.getInstance());
+//    }
 
     public boolean newAcademicServiceRequestSituationEvent(final AcademicServiceRequest academicServiceRequest) {
         // ITreasuryServiceRequest have always a registration which has a degree
@@ -105,9 +105,10 @@ public class EmolumentServices {
 
         ITreasuryServiceRequest iTreasuryServiceRequest = (ITreasuryServiceRequest) academicServiceRequest;
 
-        if (!iTreasuryServiceRequest.getServiceRequestType().isPayable()) {
-            return false;
-        }
+        // TODO
+//        if (!iTreasuryServiceRequest.getServiceRequestType().isPayable()) {
+//            return false;
+//        }
 
         // Find configured map entry for service request type
         final ServiceRequestMapEntry serviceRequestMapEntry = ServiceRequestMapEntry.findMatch(iTreasuryServiceRequest);
@@ -174,9 +175,11 @@ public class EmolumentServices {
 
     public static AcademicDebitEntryBean calculateForAcademicServiceRequest(final FinantialEntity finantialEntity,
             final ITreasuryServiceRequest iTreasuryServiceRequest, final LocalDate debtDate) {
-        if (!iTreasuryServiceRequest.getServiceRequestType().isPayable()) {
-            return null;
-        }
+
+        // TODO
+//        if (!iTreasuryServiceRequest.getServiceRequestType().isPayable()) {
+//            return null;
+//        }
 
         // Find configured map entry for service request type
         final ServiceRequestMapEntry serviceRequestMapEntry = ServiceRequestMapEntry.findMatch(iTreasuryServiceRequest);
@@ -259,9 +262,10 @@ public class EmolumentServices {
     public static boolean createAcademicServiceRequestEmolument(final FinantialEntity finantialEntity,
             final ITreasuryServiceRequest iTreasuryServiceRequest, final LocalDate when) {
 
-        if (!iTreasuryServiceRequest.getServiceRequestType().isPayable()) {
-            return false;
-        }
+        // TODO
+//        if (!iTreasuryServiceRequest.getServiceRequestType().isPayable()) {
+//            return false;
+//        }
 
         // Find configured map entry for service request type
         final ServiceRequestMapEntry serviceRequestMapEntry = ServiceRequestMapEntry.findMatch(iTreasuryServiceRequest);
@@ -369,9 +373,10 @@ public class EmolumentServices {
     public static LocalDate possibleDebtDateOnAcademicService(final ITreasuryServiceRequest iTreasuryServiceRequest) {
         // Find the configured state to create debt on academic service request
 
-        if (!iTreasuryServiceRequest.getServiceRequestType().isPayable()) {
-            return null;
-        }
+        // TODO
+//        if (!iTreasuryServiceRequest.getServiceRequestType().isPayable()) {
+//            return null;
+//        }
 
         // Find configured map entry for service request type
         final ServiceRequestMapEntry serviceRequestMapEntry = ServiceRequestMapEntry.findMatch(iTreasuryServiceRequest);
@@ -386,7 +391,7 @@ public class EmolumentServices {
             return iTreasuryServiceRequest.getRequestDate().toLocalDate();
         }
 
-        return iTreasuryServiceRequest.getSituationByType(createEventOnSituation).getSituationDate().toLocalDate();
+        return iTreasuryServiceRequest.getSituationByType(createEventOnSituation).getCreationDate().toLocalDate();
     }
 
     public static boolean removeDebitEntryForAcademicService(final ITreasuryServiceRequest iTreasuryServiceRequest) {
