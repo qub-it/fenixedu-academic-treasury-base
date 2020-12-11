@@ -55,6 +55,8 @@ import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.services.AcademicTaxServices;
+import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
+import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.document.DebitEntry;
@@ -338,7 +340,8 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
             }
         }
 
-        final PersonCustomer customer = registration.getPerson().getPersonCustomer();
+        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        PersonCustomer customer = services.personCustomer(registration.getPerson());
 
         if (customer == null) {
             return null;
@@ -405,7 +408,9 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
             return null;
         }
 
-        final PersonCustomer customer = registration.getPerson().getPersonCustomer();
+        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        
+        final PersonCustomer customer = services.personCustomer(registration.getPerson());
         if (customer == null) {
             return null;
         }

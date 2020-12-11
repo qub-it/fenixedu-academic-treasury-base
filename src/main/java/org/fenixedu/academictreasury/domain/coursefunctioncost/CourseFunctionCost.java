@@ -109,7 +109,7 @@ public class CourseFunctionCost extends CourseFunctionCost_Base {
 
     public static Stream<CourseFunctionCost> find(final DegreeCurricularPlan degreeCurricularPlan,
             final CompetenceCourse competenceCourse, final ExecutionYear executionYear) {
-        return competenceCourse.getCourseFunctionCostsSet().stream()
+        return findAll().filter(c -> c.getCompetenceCourses() == competenceCourse)
                 .filter(l -> l.getExecutionYear() == executionYear && l.getDegreeCurricularPlan() == degreeCurricularPlan);
     }
 

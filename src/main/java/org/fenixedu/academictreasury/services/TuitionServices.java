@@ -888,7 +888,7 @@ public class TuitionServices {
             return Sets.newHashSet();
         }
 
-        return studentCurricularPlan.getStandaloneCurriculumLines().stream()
+        return studentCurricularPlan.getExtraCurricularEnrolments().stream().filter(e -> e.isStandalone())
                 .filter(l -> l.getExecutionYear() == executionYear && l.isEnrolment()).map(l -> (Enrolment) l)
                 .collect(Collectors.<Enrolment> toSet());
     }
@@ -929,7 +929,8 @@ public class TuitionServices {
         }
 
         for (final ExecutionInterval executionSemester : executionYear.getExecutionPeriodsSet()) {
-            result.addAll(studentCurricularPlan.getEnroledImprovements((ExecutionSemester)executionSemester));
+            // TODO: check out to grab improved enrolment evaluations by execution semester
+//            result.addAll(studentCurricularPlan.getEnroledImprovements().stream().filter(e -> e.getExecutionPeriod() == executionSemester).collect(Collectors.toList()));
         }
 
         return result;
