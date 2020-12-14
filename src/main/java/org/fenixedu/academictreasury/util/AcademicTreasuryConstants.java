@@ -49,6 +49,7 @@ import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
 import com.google.common.base.Strings;
+import com.qubit.solution.qubEdu.module.academictreasury.QubEduAcademicTreasuryPlugin;
 
 public class AcademicTreasuryConstants {
 

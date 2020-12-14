@@ -35,7 +35,6 @@
  */
 package org.fenixedu.academictreasury.services;
 
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -77,187 +76,116 @@ import com.google.common.collect.Sets;
 
 public interface IAcademicTreasuryPlatformDependentServices {
 
-	
     /* Read data sets */
-    
-//    default Set<DegreeType> readAllDegreeTypes() {
-//        return DegreeType.all().collect(Collectors.toSet());
-//    }
-	Set<DegreeType> readAllDegreeTypes();
-	
-//	default Set<DegreeCurricularPlan> readAllDegreeCurricularPlansSet() {
-//    	return Degree.readAllDegrees().stream().filter((dt) -> true).flatMap(d -> d.getDegreeCurricularPlansSet().stream())
-//    			.collect(Collectors.toSet());
-//    }
+
+    Set<DegreeType> readAllDegreeTypes();
+
     Set<DegreeCurricularPlan> readAllDegreeCurricularPlansSet();
-    
-//	default Set<DegreeCurricularPlan> readDegreeCurricularPlansWithExecutionDegree(final ExecutionYear executionYear, final DegreeType degreeType) {
-//    	return ExecutionDegree.getAllByExecutionYearAndDegreeType(executionYear, degreeType).stream()
-//    				.map(e -> e.getDegreeCurricularPlan())
-//    				.collect(Collectors.toSet());
-//    }
-	Set<DegreeCurricularPlan> readDegreeCurricularPlansWithExecutionDegree(final ExecutionYear executionYear, final DegreeType degreeType) ;
-	
-//	default Set<CurricularYear> readAllCurricularYearsSet() {
-//    	final Set<CurricularYear> result = Sets.newHashSet();
-//    	
-//    	for(int i = 1; i <= 10; i++) {
-//    		if(CurricularYear.readByYear(i) == null) {
-//    			return result;
-//    		}
-//    		
-//    		result.add(CurricularYear.readByYear(i));
-//    	}
-//    	
-//    	return result;
-//    }
-	 Set<CurricularYear> readAllCurricularYearsSet();
-    
-//	default Set<IngressionType> readAllIngressionTypesSet() {
-//    	return IngressionType.findAllByPredicate((i) -> true).collect(Collectors.toSet());
-//    }
-	Set<IngressionType> readAllIngressionTypesSet();
-	
-	
-//	default Set<RegistrationProtocol> readAllRegistrationProtocol() {
-//    	return RegistrationProtocol.findByPredicate((p) -> true).collect(Collectors.toSet());
-//    }
-	Set<RegistrationProtocol> readAllRegistrationProtocol();
-	
-//	default Set<StatuteType> readAllStatuteTypesSet() {
-//    	return StatuteType.readAll((s) -> true).collect(Collectors.toSet());
-//    }
-	Set<StatuteType> readAllStatuteTypesSet();
-	
-//    default Set<StatuteType> readAllStatuteTypesSet(boolean active) {
-//        return StatuteType.readAll((s) -> s.isActive() == active).collect(Collectors.toSet());
-//    }
-	Set<StatuteType> readAllStatuteTypesSet(boolean active);
-	
-//	default Set<Person> readAllPersonsSet() { 
-//    	return Party.readAllPersons();
-//    }
-	Set<Person> readAllPersonsSet();
-	
-//	default Set<Registration> readAllRegistrations(RegistrationProtocol registrationProtocol) {
-//	    return registrationProtocol.getRegistrationsSet();
-//	}
-	Set<Registration> readAllRegistrations(RegistrationProtocol registrationProtocol);
-	
-//	default Set<Registration> readAllRegistrations(IngressionType ingressionType) {
-//	    return ingressionType.getRegistrationSet();
-//	}
-	Set<Registration> readAllRegistrations(IngressionType ingressionType);
-	
-	PersonCustomer personCustomer(Person person);
-	
-	Set<PersonCustomer> inactivePersonCustomers(Person person);
-	
-	PhysicalAddress fiscalAddress(Person person);
-	
-	String iban(Person person);
-	
-	Set<AcademicTreasuryEvent> academicTreasuryEventsSet(Person person);
-	
-	String defaultPhoneNumber(Person person);
-	
-	String defaultMobilePhoneNumber(Person person);
-	
-	List<PhysicalAddress> pendingOrValidPhysicalAddresses(Person person);
 
-	List<? extends PartyContact> pendingOrValidPartyContacts(Person person, Class<? extends PartyContact> partyContactType);
+    Set<DegreeCurricularPlan> readDegreeCurricularPlansWithExecutionDegree(final ExecutionYear executionYear,
+            final DegreeType degreeType);
 
-	void editSocialSecurityNumber(Person person, String fiscalNumber, PhysicalAddress fiscalAddress);
-	
-	void setFiscalAddress(PhysicalAddress physicalAddress, boolean fiscalAddress);
-	
-	PhysicalAddress createPhysicalAddress(Person person, Country countryOfResidence, String districtOfResidence, String districtSubdivisionOfResidence, String areaCode, String address);
-	
-	/* Fiscal Information */
-	
-	String fiscalCountry(final Person person);
-	
-	String fiscalNumber(final Person person);
-	
-	/* Permissions */
-	
+    Set<CurricularYear> readAllCurricularYearsSet();
+
+    Set<IngressionType> readAllIngressionTypesSet();
+
+    Set<RegistrationProtocol> readAllRegistrationProtocol();
+
+    Set<StatuteType> readAllStatuteTypesSet();
+
+    Set<StatuteType> readAllStatuteTypesSet(boolean active);
+
+    Set<Person> readAllPersonsSet();
+
+    Set<Registration> readAllRegistrations(RegistrationProtocol registrationProtocol);
+
+    Set<Registration> readAllRegistrations(IngressionType ingressionType);
+
+    PersonCustomer personCustomer(Person person);
+
+    Set<PersonCustomer> inactivePersonCustomers(Person person);
+
+    PhysicalAddress fiscalAddress(Person person);
+
+    String iban(Person person);
+
+    Set<AcademicTreasuryEvent> academicTreasuryEventsSet(Person person);
+
+    String defaultPhoneNumber(Person person);
+
+    String defaultMobilePhoneNumber(Person person);
+
+    List<PhysicalAddress> pendingOrValidPhysicalAddresses(Person person);
+
+    List<? extends PartyContact> pendingOrValidPartyContacts(Person person, Class<? extends PartyContact> partyContactType);
+
+    void editSocialSecurityNumber(Person person, String fiscalNumber, PhysicalAddress fiscalAddress);
+
+    void setFiscalAddress(PhysicalAddress physicalAddress, boolean fiscalAddress);
+
+    PhysicalAddress createPhysicalAddress(Person person, Country countryOfResidence, String districtOfResidence,
+            String districtSubdivisionOfResidence, String areaCode, String address);
+
+    /* Fiscal Information */
+
+    String fiscalCountry(final Person person);
+
+    String fiscalNumber(final Person person);
+
+    /* Permissions */
+
     boolean isFrontOfficeMember(final String username, final FinantialEntity finantialEntity);
-    
-    boolean isBackOfficeMember(final String username, final FinantialEntity finantialEntity); 
-    
+
+    boolean isBackOfficeMember(final String username, final FinantialEntity finantialEntity);
+
     boolean isAllowToModifySettlements(final String username, final FinantialEntity finantialEntity);
 
     boolean isAllowToModifyInvoices(final String username, final FinantialEntity finantialEntity);
 
     Set<Degree> readDegrees(final FinantialEntity finantialEntity);
-    
+
     FinantialEntity finantialEntityOfDegree(final Degree degree, final LocalDate when);
-    
-//    default Optional<FinantialEntity> finantialEntity(AdministrativeOffice administrativeOffice) {
-//        return Optional.ofNullable(administrativeOffice.getFinantialEntity());
-//    }
+
     Optional<FinantialEntity> finantialEntity(AdministrativeOffice administrativeOffice);
-    
-//    default Optional<FinantialEntity> finantialEntity(Unit unit) {
-//        return Optional.ofNullable(unit.getFinantialEntity());
-//    }
+
     Optional<FinantialEntity> finantialEntity(Unit unit);
-    
+
     Set<String> getFrontOfficeMemberUsernames(final FinantialEntity finantialEntity);
 
     Set<String> getBackOfficeMemberUsernames(final FinantialEntity finantialEntity);
 
     /* Localized names */
-    
+
     String localizedNameOfDegreeType(DegreeType degreeType);
-    
+
     String localizedNameOfDegreeType(DegreeType degreeType, Locale locale);
-    
+
     String localizedNameOfStatuteType(StatuteType statuteType);
-    
+
     String localizedNameOfStatuteType(StatuteType statuteType, Locale locale);
-    
+
     String localizedNameOfEnrolment(Enrolment enrolment);
 
     String localizedNameOfEnrolment(Enrolment enrolment, Locale locale);
-    
+
     String localizedNameOfAdministrativeOffice(AdministrativeOffice administrativeOffice);
-    
+
     String localizedNameOfAdministrativeOffice(AdministrativeOffice administrativeOffice, Locale locale);
-    
+
     /* Student & Registration */
-    
-//    default RegistrationDataByExecutionYear findRegistrationDataByExecutionYear(Registration registration, ExecutionYear executionYear) {
-//        if(registration == null || executionYear == null) {
-//            return null;
-//        }
-//        
-//        return registration.getRegistrationDataByExecutionYearSet().stream()
-//                .filter(r -> r.getExecutionYear() == executionYear).findFirst().orElse(null);
-//    }
+
     RegistrationDataByExecutionYear findRegistrationDataByExecutionYear(Registration registration, ExecutionYear executionYear);
-    
+
     IngressionType ingression(Registration registration);
-    
-//    default RegistrationProtocol registrationProtocol(Registration registration) {
-//        return registration.getRegistrationProtocol();
-//    }
+
     RegistrationProtocol registrationProtocol(Registration registration);
-    
+
     RegistrationRegimeType registrationRegimeType(Registration registration, ExecutionYear executionYear);
 
     Set<StatuteType> statutesTypesValidOnAnyExecutionSemesterFor(Registration registration, ExecutionInterval executionInterval);
-    
-    /* AdministrativeOffice */
-//    default Stream<AdministrativeOffice> findAdministrativeOfficesByPredicate(Predicate<AdministrativeOffice> predicate) {
-//        Set<AdministrativeOffice> allSet = new HashSet<AdministrativeOffice>();
-//        allSet.add(AdministrativeOffice.readByAdministrativeOfficeType(AdministrativeOfficeType.DEGREE));
-//        allSet.add(AdministrativeOffice.readByAdministrativeOfficeType(AdministrativeOfficeType.MASTER_DEGREE));
-//        
-//        return allSet.stream().filter(predicate);
-//    }
+
     Stream<AdministrativeOffice> findAdministrativeOfficesByPredicate(Predicate<AdministrativeOffice> predicate);
-    
+
     /* Execution Intervals */
     Integer executionIntervalChildOrder(ExecutionInterval executionInterval);
 

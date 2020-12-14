@@ -105,19 +105,19 @@ public class AcademicTreasuryDomainException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
     public AcademicTreasuryDomainException(String key, String... args) {
-        this(AcademicTreasuryConstants.BUNDLE.replace('.', '/'), key, args);
+        this(AcademicTreasuryConstants.BUNDLE, key, args);
     }
 
     public AcademicTreasuryDomainException(Status status, String key, String... args) {
-        this(status, AcademicTreasuryConstants.BUNDLE.replace('.', '/'), key, args);
+        this(status, AcademicTreasuryConstants.BUNDLE, key, args);
     }
 
     public AcademicTreasuryDomainException(Throwable cause, String key, String... args) {
-        this(cause, AcademicTreasuryConstants.BUNDLE.replace('.', '/'), key, args);
+        this(cause, AcademicTreasuryConstants.BUNDLE, key, args);
     }
 
     public AcademicTreasuryDomainException(Throwable cause, Status status, String key, String... args) {
-        this(cause, status, AcademicTreasuryConstants.BUNDLE.replace('.', '/'), key, args);
+        this(cause, status, AcademicTreasuryConstants.BUNDLE, key, args);
     }
     
 }
