@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>pt.iscte</groupId>
 			<artifactId>fenix-web-framework</artifactId>
-			<version>3.0.0-iscte</version>
+			<version>3.0.1-iscte</version>
 		</dependency>
 	
 		<dependency>
