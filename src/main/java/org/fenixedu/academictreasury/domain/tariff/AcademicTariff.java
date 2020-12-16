@@ -915,7 +915,11 @@ public class AcademicTariff extends AcademicTariff_Base {
             }
         }
         
-        return findMatch(finantialEntity, product, administrativeOffice, when);
+        if(administrativeOffice != null) {
+            return findMatch(finantialEntity, product, administrativeOffice, when);
+        }
+
+        return findMatch(finantialEntity, product, when);
     }
 
     public static AcademicTariff findMatch(final FinantialEntity finantialEntity, final Product product, final Degree degree, final DateTime when) {
@@ -938,7 +942,11 @@ public class AcademicTariff extends AcademicTariff_Base {
             }
         }
         
-        return findMatch(finantialEntity, product, administrativeOffice, degreeType, when);
+        if(administrativeOffice != null && degreeType != null) {
+            return findMatch(finantialEntity, product, administrativeOffice, degreeType, when);
+        }
+        
+        return findMatch(finantialEntity, product, when);
     }
 
     public static AcademicTariff findMatch(final FinantialEntity finantialEntity, final Product product, final Degree degree, final CycleType cycleType,
