@@ -18,7 +18,7 @@
 
 	<properties>
 		<fenix.framework.version>2.8.0</fenix.framework.version>
-		<qubEdu.framework.version>3.4.11-iscte-fork</qubEdu.framework.version>
+		<qubEdu.framework.version>3.4.12-iscte-fork</qubEdu.framework.version>
         <iscte.fenix-repo.url>file:///home/omnis-dev/development/workspaces/projects/iscte/fenix-iscte-iul-artifact-repository</iscte.fenix-repo.url>
 		<!-- 
 		<version.org.fenixedu.qubdocs.reports>2.0.0</version.org.fenixedu.qubdocs.reports>
@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>pt.iscte</groupId>
 			<artifactId>fenix-web-framework</artifactId>
-			<version>3.0.1-iscte</version>
+			<version>3.0.2-iscte</version>
 		</dependency>
 	
 		<dependency>
@@ -52,7 +52,7 @@
 		<dependency>
 	        <groupId>pt.iscte.fenix-custom</groupId>
 	        <artifactId>qubEdu-academic-office</artifactId>
-	        <version>3.0.1</version>
+	        <version>3.0.2</version>
 		</dependency>
          <dependency>
                  <groupId>com.qubit.solution.qubEdu.module</groupId>
@@ -62,7 +62,7 @@
 		<dependency>
 	        <groupId>pt.iscte.fenix-custom</groupId>
 	        <artifactId>qubEdu-base-adapter</artifactId>
-	        <version>3.0.1</version>
+	        <version>3.0.2</version>
 		</dependency>
         <dependency>
                 <groupId>com.qubit.solution.qubEdu.module</groupId>
@@ -77,7 +77,7 @@
         <dependency>
                 <groupId>pt.iscte</groupId>
                 <artifactId>fenix-framework-file-plugin</artifactId>
-                <version>3.0.1-iscte</version>
+                <version>3.0.2-iscte</version>
         </dependency>
 		<dependency>
 			<groupId>com.qubit.solution.qubEdu.module</groupId>
