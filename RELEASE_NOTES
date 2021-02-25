@@ -1,3 +1,5 @@
+- New Fixture: Payment plans for debit entries
+
 5.3.3 (31-01-2021)
 - Refactor: Added messages translation used by 3D Secure address select page (jsp) 
 
