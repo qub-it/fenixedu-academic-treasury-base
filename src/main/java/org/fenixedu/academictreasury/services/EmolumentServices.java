@@ -3,7 +3,6 @@ package org.fenixedu.academictreasury.services;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -325,7 +324,7 @@ public class EmolumentServices {
             }
 
             platform.getSibsPaymentCodePoolService().createSibsPaymentRequest(debitEntry.getDebtAccount(),
-                    Collections.singleton(debitEntry));
+                    Collections.singleton(debitEntry), Collections.emptySet());
         }
 
         return true;

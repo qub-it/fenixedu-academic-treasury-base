@@ -3,7 +3,6 @@ package org.fenixedu.academictreasury.domain.debtGeneration.strategies;
 import static org.fenixedu.academictreasury.domain.debtGeneration.IAcademicDebtGenerationRuleStrategy.findActiveDebitEntries;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -24,7 +23,6 @@ import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainExc
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.services.AcademicTaxServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
-import org.fenixedu.treasury.domain.Currency;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
@@ -32,9 +30,7 @@ import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.domain.settings.TreasurySettings;
-import org.fenixedu.treasury.dto.document.managepayments.PaymentReferenceCodeBean;
 import org.fenixedu.treasury.util.TreasuryConstants;
-import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,6 +139,7 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
         return resultList;
     }
 
+    @Override
     @Atomic(mode = TxMode.READ)
     public List<AcademicDebtGenerationProcessingResult> process(final AcademicDebtGenerationRule rule,
             final Registration registration) {
@@ -219,12 +216,15 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
         final BigDecimal amount =
                 debitEntries.stream().map(d -> d.getOpenAmount()).reduce((a, c) -> a.add(c)).orElse(BigDecimal.ZERO);
 
-        if(rule.isAppliedMinimumAmountForPaymentCode() && TreasuryConstants.isLessThan(amount, rule.getMinimumAmountForPaymentCode())) {
-            throw new AcademicTreasuryDomainException("error.CreatePaymentReferencesStrategy.amount.is.less.than.minimumAmountForPaymentCode");
+        if (rule.isAppliedMinimumAmountForPaymentCode()
+                && TreasuryConstants.isLessThan(amount, rule.getMinimumAmountForPaymentCode())) {
+            throw new AcademicTreasuryDomainException(
+                    "error.CreatePaymentReferencesStrategy.amount.is.less.than.minimumAmountForPaymentCode");
         }
-        
+
         DebtAccount debtAccount = debitEntries.iterator().next().getDebtAccount();
-        rule.getDigitalPaymentPlatform().getSibsPaymentCodePoolService().createSibsPaymentRequest(debtAccount, debitEntries);
+        rule.getDigitalPaymentPlatform().getSibsPaymentCodePoolService().createSibsPaymentRequest(debtAccount, debitEntries,
+                Collections.emptySet());
 
         if (rule.getAcademicTaxDueDateAlignmentType() != null) {
             FenixFramework.atomic(() -> rule.getAcademicTaxDueDateAlignmentType().applyDueDate(rule, debitEntries));
@@ -241,17 +241,17 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
             if (AcademicTreasurySettings.getInstance().getTuitionProductGroup() == product.getProductGroup()) {
                 DebitEntry grabbedDebitEntry = grabDebitEntryForTuition(rule, registration, entry);
 
-                if(grabbedDebitEntry != null) {
+                if (grabbedDebitEntry != null) {
                     debitEntries.add(grabbedDebitEntry);
                 }
             } else if (AcademicTax.findUnique(product).isPresent()) {
                 // Check if the product is an academic tax
                 DebitEntry grabbedDebitEntry = grabDebitEntryForAcademicTax(rule, registration, entry);
 
-                if(grabbedDebitEntry != null) {
+                if (grabbedDebitEntry != null) {
                     debitEntries.add(grabbedDebitEntry);
                 }
-            } else if(entry.getProduct() == TreasurySettings.getInstance().getInterestProduct()) {
+            } else if (entry.getProduct() == TreasurySettings.getInstance().getInterestProduct()) {
                 debitEntries.addAll(grabInterestDebitEntries(rule, registration, entry));
             }
         }
@@ -306,8 +306,8 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
         return findActiveDebitEntries(customer, t, product).filter(d -> d.isInDebt()).findFirst().orElse(null);
     }
 
-    private static Set<DebitEntry> grabInterestDebitEntries(final AcademicDebtGenerationRule rule, final Registration registration,
-            final AcademicDebtGenerationRuleEntry entry) {
+    private static Set<DebitEntry> grabInterestDebitEntries(final AcademicDebtGenerationRule rule,
+            final Registration registration, final AcademicDebtGenerationRuleEntry entry) {
         if (AcademicTreasurySettings.getInstance().getTuitionProductGroup() == entry.getProduct().getProductGroup()) {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.entry.is.tuition");
         }
@@ -345,12 +345,12 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
             if (debitEntry.isAnnulled()) {
                 continue;
             }
-            
-            if(SibsPaymentRequest.findRequestedByDebitEntry(debitEntry).count() > 0) {
+
+            if (SibsPaymentRequest.findRequestedByDebitEntry(debitEntry).count() > 0) {
                 continue;
             }
 
-            if(SibsPaymentRequest.findCreatedByDebitEntry(debitEntry).count() > 0) {
+            if (SibsPaymentRequest.findCreatedByDebitEntry(debitEntry).count() > 0) {
                 continue;
             }
 

@@ -103,7 +103,7 @@ public class TreasuryEventDefaultMethods {
 
     public static List<IPaymentReferenceCode> getPaymentReferenceCodesList(final TreasuryEvent treasuryEvent) {
         return DebitEntry.findActive(treasuryEvent)
-                .flatMap(d -> d.getSibsPaymentRequestsSet().stream())
+                .flatMap(d -> d.getSibsPaymentRequests().stream())
                 .map(r -> new PaymentReferenceCodeImpl(r))
                 .collect(Collectors.toList());
     }

@@ -34,7 +34,7 @@ public class DebtsWithNoPaymentCodeReferencesRestriction extends DebtsWithNoPaym
     
     private boolean evaluateResult(final Registration registration) {
         for (final DebitEntry debitEntry : CreatePaymentReferencesStrategy.grabDebitEntries(getAcademicDebtGenerationRule(), registration)) {
-            if(debitEntry.getSibsPaymentRequestsSet().stream().filter(p -> !p.isInAnnuledState()).count() > 0) {
+            if(debitEntry.getSibsPaymentRequests().stream().filter(p -> !p.isInAnnuledState()).count() > 0) {
                 return false;
             }
         }

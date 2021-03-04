@@ -148,6 +148,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
             return this.digitalPaymentPlatform.getName();
         }
 
+        @Override
         public boolean isActive() {
             return this.digitalPaymentPlatform.isActive();
         }
@@ -243,6 +244,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         return Product.findUniqueByCode(code).map(p -> new AcademicProduct(p)).orElse(null);
     }
 
+    @Override
     public List<IPaymentCodePool> getPaymentCodePools(final ITreasuryEntity treasuryEntity) {
         final FinantialInstitution finantialInstitution =
                 ((TreasuryEntity) treasuryEntity).finantialEntity.getFinantialInstitution();
@@ -251,6 +253,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
                 .map(p -> new PaymentCodePoolImpl(p)).collect(Collectors.toList());
     }
 
+    @Override
     public IPaymentCodePool getPaymentCodePoolByCode(final String code) {
         if (FenixFramework.getDomainObject(code) == null) {
             throw new AcademicTreasuryDomainException("error.ITreasuryBridgeAPI.paymentCodePool.not.found");
@@ -259,9 +262,9 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         return new PaymentCodePoolImpl((DigitalPaymentPlatform) FenixFramework.getDomainObject(code));
     }
 
-    /* ------------------------ 
+    /* ------------------------
      * ACADEMIC SERVICE REQUEST
-     * ------------------------ 
+     * ------------------------
      */
 
     @Override
@@ -389,8 +392,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         final DocumentNumberSeries documentNumberSeries =
                 DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
         final DateTime now = new DateTime();
-        final Vat vat =
-                Vat.findActiveUnique(((Product) product).getVatType(), finantialInstitution, when.toDateTimeAtStartOfDay()).get();
+        final Vat vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, when.toDateTimeAtStartOfDay()).get();
         final AdministrativeOffice administrativeOffice = finantialEntity.getAdministrativeOffice();
         final Person person = target.getAcademicTreasuryTargetPerson();
 
@@ -457,8 +459,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
                 DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
         final DateTime now = new DateTime();
         final Product product = ((AcademicProduct) treasuryProduct).product;
-        final Vat vat =
-                Vat.findActiveUnique(((Product) product).getVatType(), finantialInstitution, when.toDateTimeAtStartOfDay()).get();
+        final Vat vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, when.toDateTimeAtStartOfDay()).get();
         final DigitalPaymentPlatform platform = ((PaymentCodePoolImpl) paymentCodePool).digitalPaymentPlatform;
         final Person person = target.getAcademicTreasuryTargetPerson();
 
@@ -501,8 +502,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         final DocumentNumberSeries documentNumberSeries =
                 DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
         final DateTime now = new DateTime();
-        final Vat vat =
-                Vat.findActiveUnique(((Product) product).getVatType(), finantialInstitution, when.toDateTimeAtStartOfDay()).get();
+        final Vat vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, when.toDateTimeAtStartOfDay()).get();
         final Person person = target.getAcademicTreasuryTargetPerson();
 
         PersonCustomer personCustomer = person.getPersonCustomer();
@@ -537,7 +537,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
     private SibsPaymentRequest createPaymentReferenceCode(final DigitalPaymentPlatform platform, DebitEntry debitEntry,
             LocalDate when) {
         return platform.getSibsPaymentCodePoolService().createSibsPaymentRequest(debitEntry.getDebtAccount(),
-                Collections.singleton(debitEntry));
+                Collections.singleton(debitEntry), Collections.emptySet());
     }
 
     /* --------------
@@ -594,7 +594,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         final SettlementNote settlementNote = settlementNoteEvent.getInstance();
 
         // @formatter:off
-        /* 
+        /*
          * Check if settlementNote was deleted to avoid process of deleted objects in erp integration.
          * Unfortunately FenixFramework.isDomainObjectValid is throwing the same ClassCastException
          * over settlementNote so is wrapped in try-catch
@@ -707,6 +707,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
     // TODO DECLARE IN INTERFACE ITreasuryBridgeAPI
     // @Override
+    @Override
     public ITreasuryCustomer getActiveCustomer(final Person person) {
         PersonCustomer customer = PersonCustomer
                 .findUnique(person, PersonCustomer.addressCountryCode(person), PersonCustomer.fiscalNumber(person)).orElse(null);
@@ -720,6 +721,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
     // TODO DECLARE IN INTERFACE ITreasuryBridgeAPI
     // @Override
+    @Override
     public List<ITreasuryCustomer> getCustomersForFiscalNumber(final Person person, final String fiscalCountry,
             final String fiscalNumber) {
         return PersonCustomer.find(person, fiscalCountry, fiscalNumber).map(pc -> new TreasuryCustomer(pc))
@@ -728,6 +730,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
     // TODO DECLARE IN INTERFACE ITreasuryBridgeAPI
     // @Override
+    @Override
     public ITreasuryDebtAccount getActiveDebtAccountForRegistration(final Registration registration) {
         final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();

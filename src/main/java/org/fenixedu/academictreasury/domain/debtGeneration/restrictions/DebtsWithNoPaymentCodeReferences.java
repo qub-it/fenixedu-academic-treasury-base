@@ -17,7 +17,7 @@ public class DebtsWithNoPaymentCodeReferences implements IDebtGenerationRuleRest
         final Set<DebitEntry> debitEntries = CreatePaymentReferencesStrategy.grabDebitEntries(rule, registration);
 
         for (final DebitEntry debitEntry : debitEntries) {
-            if(debitEntry.getSibsPaymentRequestsSet().stream().filter(p -> !p.isInAnnuledState()).count() > 0) {
+            if(debitEntry.getSibsPaymentRequests().stream().filter(p -> !p.isInAnnuledState()).count() > 0) {
                 return false;
             }
         }
