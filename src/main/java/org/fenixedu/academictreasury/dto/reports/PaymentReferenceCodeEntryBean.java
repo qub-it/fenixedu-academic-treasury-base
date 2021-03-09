@@ -132,7 +132,7 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
                         .getPersonForInactivePersonCustomer().getStudent().getNumber();
             }
 
-            this.entityCode = sibsPaymentRequest.getDigitalPaymentPlatform().getSibsPaymentCodePoolService().getEntityReferenceCode();
+            this.entityCode = sibsPaymentRequest.getDigitalPaymentPlatform().castToSibsPaymentCodePoolService().getEntityReferenceCode();
             this.referenceCode = sibsPaymentRequest.getReferenceCode();
 
                 this.finantialDocumentNumber =

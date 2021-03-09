@@ -323,7 +323,7 @@ public class EmolumentServices {
                         "error.EmolumentServices.academicServiceRequest.digitalPaymentPlatform.does.not.support.sibs.payment.codes");
             }
 
-            platform.getSibsPaymentCodePoolService().createSibsPaymentRequest(debitEntry.getDebtAccount(),
+            platform.castToSibsPaymentCodePoolService().createSibsPaymentRequest(debitEntry.getDebtAccount(),
                     Collections.singleton(debitEntry), Collections.emptySet());
         }
 

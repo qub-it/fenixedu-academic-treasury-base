@@ -40,7 +40,7 @@ public class TreasuryEventDefaultMethods {
 
         @Override
         public String getEntityCode() {
-            return paymentReferenceCode.getDigitalPaymentPlatform().getSibsPaymentCodePoolService().getEntityReferenceCode();
+            return paymentReferenceCode.getDigitalPaymentPlatform().castToSibsPaymentCodePoolService().getEntityReferenceCode();
         }
 
         @Override

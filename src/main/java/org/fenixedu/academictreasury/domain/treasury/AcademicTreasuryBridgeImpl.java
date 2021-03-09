@@ -536,7 +536,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
     private SibsPaymentRequest createPaymentReferenceCode(final DigitalPaymentPlatform platform, DebitEntry debitEntry,
             LocalDate when) {
-        return platform.getSibsPaymentCodePoolService().createSibsPaymentRequest(debitEntry.getDebtAccount(),
+        return platform.castToSibsPaymentCodePoolService().createSibsPaymentRequest(debitEntry.getDebtAccount(),
                 Collections.singleton(debitEntry), Collections.emptySet());
     }
 
