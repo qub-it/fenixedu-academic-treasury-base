@@ -274,6 +274,16 @@ public class AcademicTariff extends AcademicTariff_Base {
         return amountToPay(numberOfUnits, numberOfPages, language, urgentRequest);
     }
 
+    public BigDecimal amountToPay(int numberOfUnits, int numberOfPages, boolean applyLanguageRate, boolean urgentRequest) {
+        BigDecimal amount = amountWithLanguageRate(numberOfUnits, numberOfPages, applyLanguageRate);
+
+        if (isApplyUrgencyRate() && urgentRequest) {
+            amount = amount.add(amountForUrgencyRate(numberOfUnits, numberOfPages, applyLanguageRate));
+        }
+
+        return amount;
+    }
+    
     public BigDecimal amountToPay(final int numberOfUnits, final int numberOfPages, final Locale language, boolean urgentRequest) {
         BigDecimal amount = amountWithLanguageRate(numberOfUnits, numberOfPages, language);
 
@@ -282,6 +292,13 @@ public class AcademicTariff extends AcademicTariff_Base {
         }
 
         return amount;
+    }
+
+    public BigDecimal amountForUrgencyRate(int numberOfUnits, int numberOfPages, boolean applyLanguageRate) {
+        BigDecimal amount = amountWithLanguageRate(numberOfUnits, numberOfPages, applyLanguageRate);
+
+        return amount.multiply(getUrgencyRate().setScale(20, RoundingMode.HALF_EVEN).divide(AcademicTreasuryConstants.HUNDRED_PERCENT).setScale(2,
+                RoundingMode.HALF_EVEN));
     }
 
     public BigDecimal amountForUrgencyRate(final int numberOfUnits, final int numberOfPages, final Locale language) {
@@ -664,6 +681,16 @@ public class AcademicTariff extends AcademicTariff_Base {
                 improvementEnrolmentEvaluation.getEvaluationSeason().getName().getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE));
 
         return propertiesMap;
+    }
+    
+    private BigDecimal amountWithLanguageRate(int numberOfUnits, int numberOfPages, boolean applyLanguageRate) {
+        BigDecimal amount = amountToPayWithoutRates(numberOfUnits, numberOfPages);
+
+        if (isApplyLanguageTranslationRate() && applyLanguageRate) {
+            amount = amount.add(amountForLanguageTranslationRate(numberOfUnits, numberOfPages));
+        }
+
+        return amount;
     }
 
     private BigDecimal amountWithLanguageRate(final int numberOfUnits, final int numberOfPages, final Locale language) {

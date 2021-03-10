@@ -367,7 +367,8 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
     }
 
     @Override
-    //TODO: Anil passar número de unidades e utilizar o academictariff para calcular o valor final em conjunto com o ciclo e o curso
+    // TODO: Use AcademicTreasuryTargetCreateDebtBuilder class
+    @Deprecated
     public IAcademicTreasuryEvent createDebt(final ITreasuryEntity treasuryEntity, final ITreasuryProduct treasuryProduct,
             final IAcademicTreasuryTarget target, final LocalDate when, final boolean createPaymentCode,
             final IPaymentCodePool paymentCodePool, final int numberOfUnits, final int numberOfPages) {
@@ -378,7 +379,9 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
         return createDebt(finantialEntity, product, target, when, createPaymentCode, pool, numberOfUnits, numberOfPages);
     }
-
+    
+    // TODO: Use AcademicTreasuryTargetCreateDebtBuilder class
+    @Deprecated
     public IAcademicTreasuryEvent createDebt(final FinantialEntity finantialEntity, final Product product,
             final IAcademicTreasuryTarget target, final LocalDate when, final boolean createPaymentCode,
             final PaymentCodePool pool, final int numberOfUnits, final int numberOfPages) {
@@ -443,6 +446,8 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
     }
 
     @Override
+    // TODO: Use AcademicTreasuryTargetCreateDebtBuilder class
+    @Deprecated
     public IAcademicTreasuryEvent createDebt(final ITreasuryEntity treasuryEntity, final ITreasuryProduct treasuryProduct,
             final IAcademicTreasuryTarget target, final BigDecimal amount, final LocalDate when, final LocalDate dueDate,
             final boolean createPaymentCode, final IPaymentCodePool paymentCodePool) {
@@ -487,9 +492,11 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         return treasuryEvent;
     }
 
-    public IAcademicTreasuryEvent createDebt(final FinantialEntity finantialEntity, final Product product,
-            final IAcademicTreasuryTarget target, final BigDecimal amount, final LocalDate when, final LocalDate dueDate,
-            final boolean createPaymentCode, final PaymentCodePool pool) {
+    // TODO: Use AcademicTreasuryTargetCreateDebtBuilder class
+    @Deprecated
+    public IAcademicTreasuryEvent createDebt(FinantialEntity finantialEntity, Product product,
+            IAcademicTreasuryTarget target, BigDecimal amount, LocalDate when, LocalDate dueDate,
+            boolean createPaymentCode, PaymentCodePool pool) {
         
         final FinantialInstitution finantialInstitution = finantialEntity.getFinantialInstitution();
         final DocumentNumberSeries documentNumberSeries =
