@@ -1,4 +1,4 @@
-- Refactor: Upgrade fenixedu-treasury-base version
+- New Fixture: Payment penalty taxes
 
 6.1.0 (10-03-2021)
 - Refactor: Builder class to create academic treasury target debts
