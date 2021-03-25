@@ -27,18 +27,22 @@
 		
 package org.fenixedu.academictreasury.dto.reports;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academictreasury.domain.reports.DebtReportRequestType;
 import org.fenixedu.treasury.dto.ITreasuryBean;
+import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
 import org.joda.time.LocalDate;
 
 
 public class DebtReportRequestBean implements ITreasuryBean {
 	
 	private DebtReportRequestType type;
-	private org.joda.time.LocalDate beginDate;
-	private org.joda.time.LocalDate endDate;
+	private LocalDate beginDate;
+	private LocalDate endDate;
 	private String decimalSeparator;
 	private boolean includeAnnuledEntries;
 
@@ -50,6 +54,8 @@ public class DebtReportRequestBean implements ITreasuryBean {
     private DegreeType degreeType;
     private ExecutionYear executionYear;
 	
+    private List<TreasuryTupleDataSourceBean> debtReportRequestTypeDataSource;
+    
 	public DebtReportRequestBean(){
 	    this.type = DebtReportRequestType.INVOICE_ENTRIES;
 	    this.beginDate = new LocalDate();
@@ -64,7 +70,23 @@ public class DebtReportRequestBean implements ITreasuryBean {
         
         this.degreeType = null;
         this.executionYear = null;
+        
+        setDebtReportRequestTypeDataSource();
 	}
+	
+	public List<TreasuryTupleDataSourceBean> getDebtReportRequestTypeDataSource() {
+	    return this.debtReportRequestTypeDataSource;
+	}
+
+    public void setDebtReportRequestTypeDataSource() {
+        this.debtReportRequestTypeDataSource = new ArrayList<>();
+        for (DebtReportRequestType debtReportRequestType : DebtReportRequestType.values()) {
+            TreasuryTupleDataSourceBean tuple = new TreasuryTupleDataSourceBean();
+            tuple.setId(debtReportRequestType.name());
+            tuple.setText(debtReportRequestType.getDescriptionI18N().getContent());
+            this.debtReportRequestTypeDataSource.add(tuple);
+        }
+    }
 
     /* GETTERS & SETTERS */
     

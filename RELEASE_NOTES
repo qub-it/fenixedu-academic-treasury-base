@@ -1,3 +1,5 @@
+- Improvement: Segregate information included in debt report request, based in type chosen by user
+
 6.2.0 (23-03-2021)
 - New Fixture: Payment penalty taxes
 

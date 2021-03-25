@@ -120,14 +120,13 @@ public class DebtReportRequest extends DebtReportRequest_Base {
     public void processRequest() {
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        
+
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipOutputStream zos = new ZipOutputStream(baos);
+
+        final ErrorsLog errorsLog = new ErrorsLog();
+
         if (getType().isRequestForInvoiceEntries()) {
-
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ZipOutputStream zos = new ZipOutputStream(baos);
-
-            final ErrorsLog errorsLog = new ErrorsLog();
-
             executorService.submit(() -> {
                 try {
                     extractInformationForDebitAndCredits(errorsLog, zos);
@@ -136,7 +135,7 @@ public class DebtReportRequest extends DebtReportRequest_Base {
                     throw new RuntimeException(e);
                 }
             });
-            
+
             executorService.submit(() -> {
                 try {
                     extractInformationForSettlements(errorsLog, zos);
@@ -145,16 +144,27 @@ public class DebtReportRequest extends DebtReportRequest_Base {
                     throw new RuntimeException(e);
                 }
             });
-            
+
             executorService.submit(() -> {
                 try {
-                    extractInformationForPaymentCodes(errorsLog, zos);
+                    extractInformationForPaymentCodesTransactions(errorsLog, zos);
                 } catch (IOException e) {
                     e.printStackTrace();
                     throw new RuntimeException(e);
                 }
             });
-            
+
+        } else if (getType().isRequestForPaymentReferenceCodes()) {
+            executorService.submit(() -> {
+                try {
+                    extractInformationForPaymentCodes(errorsLog, zos);
+                    extractInformationForPaymentCodesTransactions(errorsLog, zos);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            });
+        } else if(getType().isRequestForOtherData()) {
             executorService.submit(() -> {
                 try {
                     extractOtherTreasuryData(errorsLog, zos);
@@ -163,33 +173,33 @@ public class DebtReportRequest extends DebtReportRequest_Base {
                     throw new RuntimeException(e);
                 }
             });
-
-            executorService.submit(() -> {
-                logger.info("writeReportResultFile");
-
-                try {
-                    zos.close();
-                    baos.close();
-
-                    byte[] contents = baos.toByteArray();
-                    writeReportResultFile(errorsLog, contents);
-                } catch (final IOException e) {
-                    throw new RuntimeException(e);
-                } finally {
-                }
-            });
-
-            executorService.shutdown();
-            try {
-                logger.info("awaitTermination");
-                
-                // TODO: This should be configured because the timeout depends in the size of data
-                executorService.awaitTermination(1, TimeUnit.DAYS);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            
         }
+
+        executorService.submit(() -> {
+            logger.info("writeReportResultFile");
+
+            try {
+                zos.close();
+                baos.close();
+
+                byte[] contents = baos.toByteArray();
+                writeReportResultFile(errorsLog, contents);
+            } catch (final IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+            }
+        });
+
+        executorService.shutdown();
+        try {
+            logger.info("awaitTermination");
+
+            // TODO: This should be configured because the timeout depends in the size of data
+            executorService.awaitTermination(1, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @Atomic(mode = TxMode.WRITE)
@@ -199,65 +209,80 @@ public class DebtReportRequest extends DebtReportRequest_Base {
         setDomainRootForPendingReportRequests(null);
     }
 
-    
     @Atomic(mode = TxMode.READ)
     private void extractInformationForSettlements(final ErrorsLog errorsLog, ZipOutputStream zos) throws IOException {
         logger.info("START extractInformationForSettlements");
-        zos.putNextEntry(
-                new ZipEntry(academicTreasuryBundle("label.DebtReportRequestResultFile.SETTLEMENT_ENTRIES.filename",
-                        new DateTime().toString("YYYYMMddHHmmss"))));
+        zos.putNextEntry(new ZipEntry(academicTreasuryBundle("label.DebtReportRequestResultFile.SETTLEMENT_ENTRIES.filename",
+                new DateTime().toString("YYYYMMddHHmmss"))));
         logger.info("CREATED extractInformationForSettlements");
-        
+
         try {
-            
+
             Spreadsheet.buildSpreadsheetContent(new Spreadsheet() {
-    
+
                 @Override
                 public ExcelSheet[] getSheets() {
                     return new ExcelSheet[] {
-                        ExcelSheet.create(settlementEntriesSheetName(), SettlementReportEntryBean.SPREADSHEET_HEADERS,
-                                DebtReportService.settlementEntriesReport(DebtReportRequest.this, errorsLog)),
-        
-                        ExcelSheet.create(paymentEntriesSheetName(), PaymentReportEntryBean.SPREADSHEET_HEADERS,
-                                DebtReportService.paymentEntriesReport(DebtReportRequest.this, errorsLog)),
-        
-                        ExcelSheet.create(reimbursementEntriesSheetName(), PaymentReportEntryBean.SPREADSHEET_HEADERS,
-                                DebtReportService.reimbursementEntriesReport(DebtReportRequest.this, errorsLog))
-                    };
+                            ExcelSheet.create(settlementEntriesSheetName(), SettlementReportEntryBean.SPREADSHEET_HEADERS,
+                                    DebtReportService.settlementEntriesReport(DebtReportRequest.this, errorsLog)),
+
+                            ExcelSheet.create(paymentEntriesSheetName(), PaymentReportEntryBean.SPREADSHEET_HEADERS,
+                                    DebtReportService.paymentEntriesReport(DebtReportRequest.this, errorsLog)),
+
+                            ExcelSheet.create(reimbursementEntriesSheetName(), PaymentReportEntryBean.SPREADSHEET_HEADERS,
+                                    DebtReportService.reimbursementEntriesReport(DebtReportRequest.this, errorsLog)) };
                 }
-    
+
             }, errorsLog, zos);
-        } catch(Throwable e) {
+        } catch (Throwable e) {
             e.printStackTrace();
-            
+
             throw new RuntimeException(e);
         }
-        
+
         zos.closeEntry();
         logger.info("END extractInformationForSettlements");
     }
 
     @Atomic(mode = TxMode.READ)
-    private void extractInformationForPaymentCodes(final ErrorsLog errorsLog, ZipOutputStream zos) throws IOException {
-        logger.info("START extractInformationForPaymentCodes");
-        
+    private void extractInformationForPaymentCodesTransactions(final ErrorsLog errorsLog, ZipOutputStream zos)
+            throws IOException {
+        logger.info("START extractInformationForPaymentCodeTransactions");
+
         zos.putNextEntry(new ZipEntry(academicTreasuryBundle("label.DebtReportRequestResultFile.PAYMENT_CODES.filename",
                 new DateTime().toString("YYYYMMddHHmmss"))));
-        
+
+        Spreadsheet.buildSpreadsheetContent(new Spreadsheet() {
+
+            @Override
+            public ExcelSheet[] getSheets() {
+                return new ExcelSheet[] {
+                        ExcelSheet.create(sibsTransactionDetailSheetName(), SibsTransactionDetailEntryBean.SPREADSHEET_HEADERS,
+                                DebtReportService.sibsTransactionDetailReport(DebtReportRequest.this, errorsLog)), };
+            }
+        }, errorsLog, zos);
+
+        zos.closeEntry();
+        logger.info("END extractInformationForPaymentCodeTransactions");
+    }
+
+    @Atomic(mode = TxMode.READ)
+    private void extractInformationForPaymentCodes(final ErrorsLog errorsLog, ZipOutputStream zos) throws IOException {
+        logger.info("START extractInformationForPaymentCodes");
+
+        zos.putNextEntry(new ZipEntry(academicTreasuryBundle("label.DebtReportRequestResultFile.PAYMENT_CODES.filename",
+                new DateTime().toString("YYYYMMddHHmmss"))));
+
         Spreadsheet.buildSpreadsheetContent(new Spreadsheet() {
 
             @Override
             public ExcelSheet[] getSheets() {
                 return new ExcelSheet[] {
                         ExcelSheet.create(paymentReferenceCodeSheetName(), PaymentReferenceCodeEntryBean.SPREADSHEET_HEADERS,
-                                DebtReportService.paymentReferenceCodeReport(DebtReportRequest.this, errorsLog)),
-
-                        ExcelSheet.create(sibsTransactionDetailSheetName(), SibsTransactionDetailEntryBean.SPREADSHEET_HEADERS,
-                                DebtReportService.sibsTransactionDetailReport(DebtReportRequest.this, errorsLog)), 
-                        };
+                                DebtReportService.paymentReferenceCodeReport(DebtReportRequest.this, errorsLog)), };
             }
         }, errorsLog, zos);
-        
+
         zos.closeEntry();
         logger.info("END extractInformationForPaymentCodes");
     }
@@ -265,10 +290,10 @@ public class DebtReportRequest extends DebtReportRequest_Base {
     @Atomic(mode = TxMode.READ)
     private void extractOtherTreasuryData(final ErrorsLog errorsLog, ZipOutputStream zos) throws IOException {
         logger.info("START extractOtherTreasuryData");
-        
+
         zos.putNextEntry(new ZipEntry(academicTreasuryBundle("label.DebtReportRequestResultFile.OTHER.filename",
                 new DateTime().toString("YYYYMMddHHmmss"))));
-        
+
         Spreadsheet.buildSpreadsheetContent(new Spreadsheet() {
 
             @Override
@@ -288,7 +313,7 @@ public class DebtReportRequest extends DebtReportRequest_Base {
                                 DebtReportService.productReport(DebtReportRequest.this, errorsLog)) };
             };
         }, errorsLog, zos);
-        
+
         zos.closeEntry();
         logger.info("END extractOtherTreasuryData");
     }
@@ -311,8 +336,7 @@ public class DebtReportRequest extends DebtReportRequest_Base {
                                 DebtReportService.debitEntriesReport(DebtReportRequest.this, errorsLog)),
 
                         ExcelSheet.create(creditEntriesSheetName(), DebtReportEntryBean.SPREADSHEET_CREDIT_HEADERS,
-                                DebtReportService.creditEntriesReport(DebtReportRequest.this, errorsLog)) 
-                        };
+                                DebtReportService.creditEntriesReport(DebtReportRequest.this, errorsLog)) };
             }
 
             private String decimalSeparator() {
@@ -324,7 +348,7 @@ public class DebtReportRequest extends DebtReportRequest_Base {
             }
 
         }, errorsLog, zos);
-        
+
         logger.info("CLOSE extractInformationForDebitAndCredits");
         zos.closeEntry();
         logger.info("END extractInformationForDebitAndCredits");
