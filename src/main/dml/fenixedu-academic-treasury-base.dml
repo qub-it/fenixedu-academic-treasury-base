@@ -193,7 +193,17 @@ class emoluments.ServiceRequestMapEntry {
         emoluments.ServiceRequestMapEntry playsRole serviceRequestMapEntries {
             multiplicity *;
         }
-    }	
+    }
+    
+    relation ServiceRequestMapEntryDigitalPaymentPlatform {
+		.org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform playsRole digitalPaymentPlatform {
+			multiplicity 0..1;
+		}
+        
+        emoluments.ServiceRequestMapEntry playsRole serviceRequestMapEntries {
+            multiplicity *;
+        }
+    }
 	
 class emoluments.AcademicTax {
 	boolean appliedOnRegistration;
@@ -633,6 +643,16 @@ class debtGeneration.AcademicDebtGenerationRule {
 	
 	relation AcademicDebtGenerationRulePaymentCodePool {
 		.org.fenixedu.treasury.domain.paymentcodes.pool.PaymentCodePool playsRole paymentCodePool {
+			multiplicity 0..1;
+		}
+		
+		debtGeneration.AcademicDebtGenerationRule playsRole academicDebtGenerationRules {
+			multiplicity *;
+		}
+	}
+	
+	relation AcademicDebtGenerationRuleDigitalPaymentsPlatform {
+		.org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform playsRole digitalPaymentPlatform {
 			multiplicity 0..1;
 		}
 		
@@ -1509,6 +1529,16 @@ class paymentpenalty.PaymentPenaltySettings {
 		}
 		
 		.org.fenixedu.treasury.domain.paymentcodes.pool.PaymentCodePool playsRole paymentCodePool {
+			multiplicity 0..1;
+		}
+	}
+
+	relation PaymentPenaltySettingsDigitalPaymentPlatform {
+		paymentpenalty.PaymentPenaltySettings playsRole paymentPenaltySettings {
+			multiplicity 0..1;
+		}
+		               
+		.org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform playsRole digitalPaymentPlatform {
 			multiplicity 0..1;
 		}
 	}
