@@ -13,6 +13,7 @@ import org.fenixedu.bennu.io.domain.IGenericFile;
 import org.fenixedu.treasury.services.accesscontrol.TreasuryAccessControlAPI;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
+import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.FenixFramework;
@@ -49,6 +50,21 @@ public class DebtReportRequestResultFile extends DebtReportRequestResultFile_Bas
         }
     }
     
+    public String getFileSizeWithUnitDescription() {
+        BigDecimal filesizeMb = getFilesizeMb();
+        if(TreasuryConstants.isGreaterOrEqualThan(filesizeMb, BigDecimal.ONE)) {
+            return filesizeMb.toString() + " Mb";
+        }
+        
+        return getFilesizeKb() + " Kb";
+    }
+    
+    public BigDecimal getFilesizeKb() {
+        return (new BigDecimal(getSize()).setScale(4, RoundingMode.DOWN)
+                .divide(new BigDecimal(1024)))
+                .setScale(1, RoundingMode.DOWN);
+    }
+
     public BigDecimal getFilesizeMb() {
         return (new BigDecimal(getSize()).setScale(4, RoundingMode.DOWN)
                 .divide(new BigDecimal(1024)))

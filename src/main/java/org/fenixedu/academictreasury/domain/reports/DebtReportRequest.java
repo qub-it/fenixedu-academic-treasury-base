@@ -84,6 +84,10 @@ public class DebtReportRequest extends DebtReportRequest_Base {
         if (getType() == null) {
             throw new AcademicTreasuryDomainException("error.DebtReportRequest.type.required");
         }
+        
+        if(getEndDate().isBefore(getBeginDate())) {
+            throw new AcademicTreasuryDomainException("error.DebtReportRequest.endDate.before.beginDate");
+        }
 
         if (Strings.isNullOrEmpty(getDecimalSeparator())
                 || (!getDecimalSeparator().equals(COMMA) && !getDecimalSeparator().equals(DOT))) {

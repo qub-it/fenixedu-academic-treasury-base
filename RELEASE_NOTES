@@ -1,4 +1,6 @@
 - Bug Fix: Do not consider as in academic debt, debit entries in compliant open payment plans
+- Improvement: Show debt report file size as kb, if the size is lower than 1MB
+- Bug Fix: Validate that debt report request's endDate is not before beginDate
 
 7.0.0 (10-04-2021)
 - New Fixture: Digital Payment Platforms
