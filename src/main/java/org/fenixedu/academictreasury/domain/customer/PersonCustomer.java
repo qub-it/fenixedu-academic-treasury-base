@@ -321,7 +321,7 @@ public class PersonCustomer extends PersonCustomer_Base {
     @Deprecated
     public static String countryCode(final Person person) {
         final IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
+    
         return services.fiscalCountry(person);
     }
     
@@ -457,6 +457,10 @@ public class PersonCustomer extends PersonCustomer_Base {
             return false;
         }
 
+        if (debitEntry.getOpenPaymentPlan() != null && debitEntry.getOpenPaymentPlan().isCompliant(when)) {
+            return false;
+        }
+
         if (!AcademicTreasurySettings.getInstance().isAcademicalActBlocking(debitEntry.getProduct())) {
             return false;
         }
@@ -467,7 +471,7 @@ public class PersonCustomer extends PersonCustomer_Base {
 
         return true;
     }
-    
+
     @Override
     public String getUsername() {
         return getAssociatedPerson().getUsername();
