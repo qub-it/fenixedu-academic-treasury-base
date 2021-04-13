@@ -1,3 +1,5 @@
+- New Fixture: tuition payment plan now shows if is reachable
+
 7.0.2 (13-04-2021)
 - Bug Fix: Invoking deprecated payment request service (UL-ISEG-552, UL-ISEG-560)
 
