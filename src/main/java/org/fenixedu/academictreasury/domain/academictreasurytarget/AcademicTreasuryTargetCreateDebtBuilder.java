@@ -1,7 +1,7 @@
 package org.fenixedu.academictreasury.domain.academictreasurytarget;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Optional;
 
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEvent;
@@ -19,10 +19,9 @@ import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.DebitNote;
 import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
-import org.fenixedu.treasury.domain.paymentcodes.PaymentReferenceCode;
+import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.domain.paymentcodes.integration.ISibsPaymentCodePoolService;
 import org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform;
-import org.fenixedu.treasury.dto.document.managepayments.PaymentReferenceCodeBean;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -90,8 +89,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             var documentNumberSeries =
                     DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
             var now = new DateTime();
-            var vat = Vat.findActiveUnique(((Product) product).getVatType(), finantialInstitution, when.toDateTimeAtStartOfDay())
-                    .get();
+            var vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, when.toDateTimeAtStartOfDay()).get();
             var person = target.getAcademicTreasuryTargetPerson();
 
             var personCustomer = person.getPersonCustomer();
@@ -110,8 +108,8 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             }
 
             var debitNote = DebitNote.create(debtAccount, documentNumberSeries, now);
-            var debitEntry = DebitEntry.create(Optional.of(debitNote), debtAccount, treasuryEvent, vat, amount,
-                    dueDate, target.getAcademicTreasuryTargetPropertiesMap(), product,
+            var debitEntry = DebitEntry.create(Optional.of(debitNote), debtAccount, treasuryEvent, vat, amount, dueDate,
+                    target.getAcademicTreasuryTargetPropertiesMap(), product,
                     target.getAcademicTreasuryTargetDescription().getContent(TreasuryConstants.DEFAULT_LANGUAGE), BigDecimal.ONE,
                     null, when.toDateTimeAtStartOfDay());
 
@@ -209,8 +207,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             var documentNumberSeries =
                     DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
             var now = new DateTime();
-            var vat = Vat.findActiveUnique(((Product) product).getVatType(), finantialInstitution, when.toDateTimeAtStartOfDay())
-                    .get();
+            var vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, when.toDateTimeAtStartOfDay()).get();
             var administrativeOffice = finantialEntity.getAdministrativeOffice();
             var person = target.getAcademicTreasuryTargetPerson();
 
@@ -286,19 +283,9 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
     protected AcademicTreasuryTargetCreateDebtBuilder() {
     }
 
-    private PaymentReferenceCode createPaymentReferenceCode(DebitEntry debitEntry, LocalDate dueDate) {
-
-        final PaymentReferenceCodeBean referenceCodeBean =
-                new PaymentReferenceCodeBean((DigitalPaymentPlatform) this.paymentCodePool, debitEntry.getDebtAccount());
-        referenceCodeBean.setValidFrom(when);
-        referenceCodeBean.setValidTo(dueDate);
-        referenceCodeBean.setSelectedDebitEntries(new ArrayList<DebitEntry>());
-        referenceCodeBean.getSelectedDebitEntries().add(debitEntry);
-
-        final PaymentReferenceCode paymentReferenceCode = PaymentReferenceCode
-                .createPaymentReferenceCodeForMultipleDebitEntries(debitEntry.getDebtAccount(), referenceCodeBean);
-
-        return paymentReferenceCode;
+    private SibsPaymentRequest createPaymentReferenceCode(DebitEntry debitEntry, LocalDate dueDate) {
+        return paymentCodePool
+                .createSibsPaymentRequest(debitEntry.getDebtAccount(), Collections.singleton(debitEntry), Collections.emptySet());
     }
 
     public static AcademicTreasuryTargetCreateDebtBuilder createBuilder() {
