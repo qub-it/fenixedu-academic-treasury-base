@@ -223,8 +223,8 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
         }
 
         DebtAccount debtAccount = debitEntries.iterator().next().getDebtAccount();
-        rule.getDigitalPaymentPlatform().castToSibsPaymentCodePoolService().createSibsPaymentRequest(debtAccount, debitEntries,
-                Collections.emptySet());
+        debtAccount.getFinantialInstitution().getDefaultDigitalPaymentPlatform().castToSibsPaymentCodePoolService()
+                .createSibsPaymentRequest(debtAccount, debitEntries, Collections.emptySet());
 
         if (rule.getAcademicTaxDueDateAlignmentType() != null) {
             FenixFramework.atomic(() -> rule.getAcademicTaxDueDateAlignmentType().applyDueDate(rule, debitEntries));

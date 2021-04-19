@@ -7,7 +7,6 @@ import org.fenixedu.academic.domain.serviceRequests.ServiceRequestType;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.serviceRequests.ITreasuryServiceRequest;
 import org.fenixedu.treasury.domain.Product;
-import org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform;
 
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
@@ -21,14 +20,13 @@ public class ServiceRequestMapEntry extends ServiceRequestMapEntry_Base {
 
     protected ServiceRequestMapEntry(Product product, ServiceRequestType requestType,
             AcademicServiceRequestSituationType createEventOnSituation, boolean generatePaymentCode,
-            DigitalPaymentPlatform digitalPaymentPlatform, String debitEntryDescriptionExtensionFormat) {
+            String debitEntryDescriptionExtensionFormat) {
         this();
 
         setProduct(product);
         setServiceRequestType(requestType);
         setCreateEventOnSituation(createEventOnSituation);
         setGeneratePaymentCode(generatePaymentCode);
-        setDigitalPaymentPlatform(digitalPaymentPlatform);
         setDebitEntryDescriptionExtensionFormat(debitEntryDescriptionExtensionFormat);
 
         checkRules();
@@ -66,8 +64,6 @@ public class ServiceRequestMapEntry extends ServiceRequestMapEntry_Base {
 
         setServiceRequestType(null);
         setProduct(null);
-        setPaymentCodePool(null);
-        setDigitalPaymentPlatform(null);
         setDomainRoot(null);
         super.deleteDomainObject();
     }
@@ -112,14 +108,14 @@ public class ServiceRequestMapEntry extends ServiceRequestMapEntry_Base {
     @Atomic
     public static ServiceRequestMapEntry create(final Product product, final ServiceRequestType requestType,
             AcademicServiceRequestSituationType situationType, final String debitEntryDescriptionExtensionFormat) {
-        return new ServiceRequestMapEntry(product, requestType, situationType, false, null, debitEntryDescriptionExtensionFormat);
+        return new ServiceRequestMapEntry(product, requestType, situationType, false, debitEntryDescriptionExtensionFormat);
     }
 
     @Atomic
     public static ServiceRequestMapEntry create(final Product product, final ServiceRequestType requestType,
             AcademicServiceRequestSituationType situationType, final boolean generatePaymentCode,
-            final DigitalPaymentPlatform paymentCodePool, final String debitEntryDescriptionExtensionFormat) {
-        return new ServiceRequestMapEntry(product, requestType, situationType, generatePaymentCode, paymentCodePool,
+            final String debitEntryDescriptionExtensionFormat) {
+        return new ServiceRequestMapEntry(product, requestType, situationType, generatePaymentCode,
                 debitEntryDescriptionExtensionFormat);
     }
 
