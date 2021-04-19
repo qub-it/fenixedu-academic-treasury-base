@@ -312,7 +312,7 @@ public class EmolumentServices {
         }
 
         if (serviceRequestMapEntry.getGeneratePaymentCode()) {
-            DigitalPaymentPlatform platform = serviceRequestMapEntry.getDigitalPaymentPlatform();
+            DigitalPaymentPlatform platform = finantialEntity.getFinantialInstitution().getDefaultDigitalPaymentPlatform();
             if (platform == null) {
                 throw new AcademicTreasuryDomainException(
                         "error.EmolumentServices.academicServiceRequest.paymentCodePool.is.required");

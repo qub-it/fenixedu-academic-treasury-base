@@ -185,26 +185,6 @@ class emoluments.ServiceRequestMapEntry {
 		}
 	}
 
-    relation ServiceRequestMapEntryPaymentCodePool {
-        .org.fenixedu.treasury.domain.paymentcodes.pool.PaymentCodePool playsRole paymentCodePool {
-            multiplicity 0..1;
-        }
-        
-        emoluments.ServiceRequestMapEntry playsRole serviceRequestMapEntries {
-            multiplicity *;
-        }
-    }
-    
-    relation ServiceRequestMapEntryDigitalPaymentPlatform {
-		.org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform playsRole digitalPaymentPlatform {
-			multiplicity 0..1;
-		}
-        
-        emoluments.ServiceRequestMapEntry playsRole serviceRequestMapEntries {
-            multiplicity *;
-        }
-    }
-	
 class emoluments.AcademicTax {
 	boolean appliedOnRegistration;
 	boolean appliedOnRegistrationFirstYear;
@@ -640,27 +620,6 @@ class debtGeneration.AcademicDebtGenerationRule {
 			multiplicity *;
 		}
 	}
-	
-	relation AcademicDebtGenerationRulePaymentCodePool {
-		.org.fenixedu.treasury.domain.paymentcodes.pool.PaymentCodePool playsRole paymentCodePool {
-			multiplicity 0..1;
-		}
-		
-		debtGeneration.AcademicDebtGenerationRule playsRole academicDebtGenerationRules {
-			multiplicity *;
-		}
-	}
-	
-	relation AcademicDebtGenerationRuleDigitalPaymentsPlatform {
-		.org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform playsRole digitalPaymentPlatform {
-			multiplicity 0..1;
-		}
-		
-		debtGeneration.AcademicDebtGenerationRule playsRole academicDebtGenerationRules {
-			multiplicity *;
-		}
-	}
-	
 	relation AcademicDebtGenerationRuleExecutionYear {
 		.org.fenixedu.academic.domain.ExecutionYear playsRole executionYear {
 			multiplicity 1..1;
@@ -1520,26 +1479,6 @@ class paymentpenalty.PaymentPenaltySettings {
 	
 		paymentpenalty.PaymentPenaltySettings playsRole paymentPenaltySettings {
 			multiplicity *;
-		}
-	}
-
-	relation PaymentPenaltySettingsPaymentCodePool {
-		paymentpenalty.PaymentPenaltySettings playsRole paymentPenaltySettings {
-			multiplicity 0..1;
-		}
-		
-		.org.fenixedu.treasury.domain.paymentcodes.pool.PaymentCodePool playsRole paymentCodePool {
-			multiplicity 0..1;
-		}
-	}
-
-	relation PaymentPenaltySettingsDigitalPaymentPlatform {
-		paymentpenalty.PaymentPenaltySettings playsRole paymentPenaltySettings {
-			multiplicity 0..1;
-		}
-
-		.org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform playsRole digitalPaymentPlatform {
-			multiplicity 0..1;
 		}
 	}
 
