@@ -4,23 +4,19 @@ import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.acade
 
 import org.fenixedu.commons.i18n.LocalizedString;
 
-public enum TuitionCalculationType {
-    FIXED_AMOUNT, ECTS, UNITS, CALCULATED_AMOUNT;
+public enum TuitionTariffCalculatedAmountType {
+    CAPTIVE, REMAINING, PERCENTAGE;
 
-    public boolean isFixedAmount() {
-        return this == FIXED_AMOUNT;
+    public boolean isCaptive() {
+        return this == CAPTIVE;
     }
 
-    public boolean isEcts() {
-        return this == ECTS;
+    public boolean isRemaining() {
+        return this == REMAINING;
     }
 
-    public boolean isUnits() {
-        return this == UNITS;
-    }
-
-    public boolean isCalculatedAmount() {
-        return this == CALCULATED_AMOUNT;
+    public boolean isPercentage() {
+        return this == PERCENTAGE;
     }
 
     public LocalizedString getDescriptionI18N() {
