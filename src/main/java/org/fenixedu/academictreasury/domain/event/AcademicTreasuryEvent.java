@@ -17,14 +17,11 @@ import org.apache.commons.lang.text.StrSubstitutor;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.EnrolmentEvaluation;
-import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.serviceRequests.AcademicServiceRequest;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationDataByExecutionYear;
-import org.fenixedu.academic.domain.studentCurriculum.CurriculumGroup;
-import org.fenixedu.academic.domain.studentCurriculum.RootCurriculumGroup;
 import org.fenixedu.academic.domain.treasury.AcademicTreasuryEventPayment;
 import org.fenixedu.academic.domain.treasury.IAcademicServiceRequestAndAcademicTaxTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEvent;
@@ -45,7 +42,6 @@ import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependent
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
-import org.fenixedu.bennu.core.util.CoreConfiguration;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.document.DebitEntry;
@@ -56,7 +52,6 @@ import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServ
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.joda.time.LocalDate;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -151,14 +146,14 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
                 String text = format("%s [%s] (%s)", product.getName().getContent(locale),
                         iTreasuryServiceRequest.getRegistration().getDegree().getPresentationName(null, locale),
                         iTreasuryServiceRequest.getServiceRequestNumberYear());
-                
+
                 if (!StringUtils.isEmpty(serviceRequestMapEntry.getDebitEntryDescriptionExtensionFormat())) {
                     final StrSubstitutor str = new StrSubstitutor(iTreasuryServiceRequest.getPropertyValuesMap());
 
                     final String extString = str.replace(serviceRequestMapEntry.getDebitEntryDescriptionExtensionFormat());
                     text += " " + extString;
                 }
-                
+
                 result = result.with(locale, text);
             }
         }
@@ -1059,7 +1054,12 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
         TUITION_PAYOR_DEBT_ACCOUNT("42"),
 
-        EFFECTIVE_TUITION_PAYMENT_PLAN("43");
+        EFFECTIVE_TUITION_PAYMENT_PLAN("43"),
+
+        CUSTOM_CALCULATOR("44"),
+
+        CALCULATED_AMOUNT_TYPE("45");
+
 
         private String code;
 
@@ -1630,6 +1630,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
      * --------------------
      */
 
+    @Override
     public String getPersonName() {
         if (getPerson() != null) {
             return getPerson().getName();
