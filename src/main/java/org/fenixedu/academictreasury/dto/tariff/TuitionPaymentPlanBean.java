@@ -3,6 +3,7 @@ package org.fenixedu.academictreasury.dto.tariff;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -10,11 +11,11 @@ import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
-import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.degree.DegreeType;
+import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.RegistrationProtocol;
 import org.fenixedu.academic.domain.student.RegistrationRegimeType;
 import org.fenixedu.academic.domain.student.StatuteType;
@@ -22,13 +23,21 @@ import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainExc
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.domain.tuition.EctsCalculationType;
 import org.fenixedu.academictreasury.domain.tuition.TuitionCalculationType;
+import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
 import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
+import org.fenixedu.academictreasury.domain.tuition.conditionRule.CurricularYearConditionRule;
+import org.fenixedu.academictreasury.domain.tuition.conditionRule.ExecutionIntervalConditionRule;
+import org.fenixedu.academictreasury.domain.tuition.conditionRule.FirstTimeStudentConditionRule;
+import org.fenixedu.academictreasury.domain.tuition.conditionRule.IngressionTypeConditionRule;
+import org.fenixedu.academictreasury.domain.tuition.conditionRule.RegistrationProtocolConditionRule;
+import org.fenixedu.academictreasury.domain.tuition.conditionRule.RegistrationRegimeTypeConditionRule;
+import org.fenixedu.academictreasury.domain.tuition.conditionRule.StatuteTypeConditionRule;
+import org.fenixedu.academictreasury.domain.tuition.conditionRule.WithLaboratorialClassesConditionRule;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
@@ -36,6 +45,7 @@ import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
 import org.fenixedu.treasury.domain.tariff.InterestType;
 import org.fenixedu.treasury.dto.ITreasuryBean;
 import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
+import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.joda.time.LocalDate;
 
 import com.google.common.collect.Lists;
@@ -59,19 +69,23 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
     private boolean showAllDcps;
     private boolean defaultPaymentPlan;
-    private RegistrationRegimeType registrationRegimeType;
-    private RegistrationProtocol registrationProtocol;
-    private IngressionType ingression;
-    private CurricularYear curricularYear;
-    private ExecutionInterval executionSemester;
-    private boolean firstTimeStudent;
     private boolean customized;
-    private StatuteType statuteType;
     private DebtAccount payorDebtAccount;
+
+    //TODO remove
+//    private RegistrationRegimeType registrationRegimeType;
+//    private RegistrationProtocol registrationProtocol;
+//    private IngressionType ingression;
+//    private CurricularYear curricularYear;
+//    private ExecutionInterval executionSemester;
+//    private boolean firstTimeStudent;
+//    private StatuteType statuteType;
+//    private boolean withLaboratorialClasses;
+
+    Set<TuitionConditionRule> conditionRules;
 
     // TODO: Anil Use LocalizedString when web component is compatible with AngularJS
     private String name;
-    private boolean withLaboratorialClasses;
 
     private List<TreasuryTupleDataSourceBean> executionYearDataSource = null;
     private List<TreasuryTupleDataSourceBean> degreeTypeDataSource = null;
@@ -151,6 +165,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this.tuitionPaymentPlanGroup = tuitionPaymentPlanGroup;
         this.finantialEntity = finantialEntity;
         this.executionYear = executionYear;
+        this.conditionRules = new HashSet();
 
         updateData();
         resetInstallmentFields();
@@ -164,22 +179,25 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
         this.copiedExecutionYear = tuitionPaymentPlan.getExecutionYear();
 
-        this.curricularYear = tuitionPaymentPlan.getCurricularYear();
         this.customized = tuitionPaymentPlan.isCustomized();
         this.defaultPaymentPlan = tuitionPaymentPlan.isDefaultPaymentPlan();
 
-        if (tuitionPaymentPlan.getSemester() != null) {
-            this.executionSemester = getExecutionYear().getExecutionSemesterFor(tuitionPaymentPlan.getSemester());
-        }
-
-        this.firstTimeStudent = tuitionPaymentPlan.isFirstTimeStudent();
-        this.ingression = tuitionPaymentPlan.getIngression();
-        this.name = tuitionPaymentPlan.getCustomizedName().getContent();
-        this.registrationProtocol = tuitionPaymentPlan.getRegistrationProtocol();
-        this.registrationRegimeType = tuitionPaymentPlan.getRegistrationRegimeType();
-        this.statuteType = tuitionPaymentPlan.getStatuteType();
-        this.withLaboratorialClasses = tuitionPaymentPlan.isWithLaboratorialClasses();
         this.payorDebtAccount = tuitionPaymentPlan.getPayorDebtAccount();
+        this.name = tuitionPaymentPlan.getCustomizedName().getContent();
+
+//        this.curricularYear = tuitionPaymentPlan.getCurricularYear();
+//        if (tuitionPaymentPlan.getSemester() != null) {
+//            this.executionSemester = getExecutionYear().getExecutionSemesterFor(tuitionPaymentPlan.getSemester());
+//        }
+//
+//        this.firstTimeStudent = tuitionPaymentPlan.isFirstTimeStudent();
+//        this.ingression = tuitionPaymentPlan.getIngression();
+//        this.registrationProtocol = tuitionPaymentPlan.getRegistrationProtocol();
+//        this.registrationRegimeType = tuitionPaymentPlan.getRegistrationRegimeType();
+//        this.statuteType = tuitionPaymentPlan.getStatuteType();
+//        this.withLaboratorialClasses = tuitionPaymentPlan.isWithLaboratorialClasses();
+
+        this.conditionRules = tuitionPaymentPlan.getTuitionConditionRulesSet();
 
         fillWithInstallments(tuitionPaymentPlan);
     }
@@ -508,52 +526,76 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this.defaultPaymentPlan = defaultPaymentPlan;
     }
 
-    public RegistrationRegimeType getRegistrationRegimeType() {
-        return registrationRegimeType;
+    public Set<TuitionConditionRule> getConditionRules() {
+        return conditionRules;
     }
 
-    public void setRegistrationRegimeType(RegistrationRegimeType registrationRegimeType) {
-        this.registrationRegimeType = registrationRegimeType;
+    public void addOrReplaceConditionRules(TuitionConditionRule tuitionConditionRule) {
+        TuitionConditionRule rule = conditionRules.stream().filter(c -> c.getClass().equals(tuitionConditionRule.getClass()))
+                .findFirst().orElse(null);
+        if (rule != null) {
+            conditionRules.remove(rule);
+        }
+        conditionRules.add(tuitionConditionRule);
+    }
+
+    public void addConditionRules(TuitionConditionRule tuitionConditionRule) {
+        TuitionConditionRule rule = conditionRules.stream().filter(c -> c.getClass().equals(tuitionConditionRule.getClass()))
+                .findFirst().orElse(null);
+        if (rule != null) {
+            throw new DomainException(TreasuryPlataformDependentServicesFactory.implementation()
+                    .bundle(AcademicTreasuryConstants.BUNDLE, "error.TuitionPaymentPlan.conditionRule.duplicated"));
+        }
+        conditionRules.add(tuitionConditionRule);
+    }
+
+    public void removeConditionRule(Class<? extends TuitionConditionRule> clazz) {
+        TuitionConditionRule rule = conditionRules.stream().filter(c -> c.getClass().equals(clazz)).findFirst().orElse(null);
+        if (rule != null) {
+            conditionRules.remove(rule);
+        }
+    }
+
+    public RegistrationRegimeType getRegistrationRegimeType() {
+        RegistrationRegimeTypeConditionRule condition = (RegistrationRegimeTypeConditionRule) conditionRules.stream()
+                .filter(c -> RegistrationRegimeTypeConditionRule.class.equals(c.getClass())).findFirst().orElse(null);
+
+        return condition == null ? null : condition.getRegistrationRegimeTypes().iterator().next();
     }
 
     public RegistrationProtocol getRegistrationProtocol() {
-        return registrationProtocol;
-    }
+        RegistrationProtocolConditionRule condition = (RegistrationProtocolConditionRule) conditionRules.stream()
+                .filter(c -> RegistrationProtocolConditionRule.class.equals(c.getClass())).findFirst().orElse(null);
 
-    public void setRegistrationProtocol(RegistrationProtocol registrationProtocol) {
-        this.registrationProtocol = registrationProtocol;
+        return condition == null ? null : condition.getRegistrationProtocolSet().iterator().next();
     }
 
     public IngressionType getIngression() {
-        return ingression;
-    }
+        IngressionTypeConditionRule condition = (IngressionTypeConditionRule) conditionRules.stream()
+                .filter(c -> IngressionTypeConditionRule.class.equals(c.getClass())).findFirst().orElse(null);
 
-    public void setIngression(IngressionType ingression) {
-        this.ingression = ingression;
+        return condition == null ? null : condition.getIngressionSet().iterator().next();
     }
 
     public CurricularYear getCurricularYear() {
-        return curricularYear;
-    }
+        CurricularYearConditionRule condition = (CurricularYearConditionRule) conditionRules.stream()
+                .filter(c -> CurricularYearConditionRule.class.equals(c.getClass())).findFirst().orElse(null);
 
-    public void setCurricularYear(CurricularYear curricularYear) {
-        this.curricularYear = curricularYear;
+        return condition == null ? null : condition.getCurricularYearSet().iterator().next();
     }
 
     public ExecutionInterval getExecutionSemester() {
-        return executionSemester;
+        ExecutionIntervalConditionRule condition = (ExecutionIntervalConditionRule) conditionRules.stream()
+                .filter(c -> ExecutionIntervalConditionRule.class.equals(c.getClass())).findFirst().orElse(null);
+
+        return condition == null ? null : condition.getExecutionIntervalSet().iterator().next();
     }
 
-    public void setExecutionSemester(ExecutionInterval executionSemester) {
-        this.executionSemester = executionSemester;
-    }
+    public Boolean isFirstTimeStudent() {
+        FirstTimeStudentConditionRule condition = (FirstTimeStudentConditionRule) conditionRules.stream()
+                .filter(c -> FirstTimeStudentConditionRule.class.equals(c.getClass())).findFirst().orElse(null);
 
-    public boolean isFirstTimeStudent() {
-        return firstTimeStudent;
-    }
-
-    public void setFirstTimeStudent(boolean firstTimeStudent) {
-        this.firstTimeStudent = firstTimeStudent;
+        return condition == null ? null : condition.getFirstTimeStudent();
     }
 
     public boolean isCustomized() {
@@ -572,12 +614,11 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this.name = name;
     }
 
-    public boolean isWithLaboratorialClasses() {
-        return withLaboratorialClasses;
-    }
+    public Boolean isWithLaboratorialClasses() {
+        WithLaboratorialClassesConditionRule condition = (WithLaboratorialClassesConditionRule) conditionRules.stream()
+                .filter(c -> WithLaboratorialClassesConditionRule.class.equals(c.getClass())).findFirst().orElse(null);
 
-    public void setWithLaboratorialClasses(boolean withLaboratorialClasses) {
-        this.withLaboratorialClasses = withLaboratorialClasses;
+        return condition == null ? null : condition.getWithLaboratorialClasses();
     }
 
     public List<AcademicTariffBean> getTuitionInstallmentBeans() {
@@ -817,11 +858,10 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     public StatuteType getStatuteType() {
-        return statuteType;
-    }
+        StatuteTypeConditionRule condition = (StatuteTypeConditionRule) conditionRules.stream()
+                .filter(c -> StatuteTypeConditionRule.class.equals(c.getClass())).findFirst().orElse(null);
 
-    public void setStatuteType(StatuteType statuteType) {
-        this.statuteType = statuteType;
+        return condition == null ? null : condition.getStatuteTypeSet().iterator().next();
     }
 
     public String getSheetName() {
@@ -862,20 +902,15 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
      * -------------
      */
 
-    public static final Comparator<TreasuryTupleDataSourceBean> COMPARE_BY_ID_AND_TEXT =
-            new Comparator<TreasuryTupleDataSourceBean>() {
+    public static final Comparator<TreasuryTupleDataSourceBean> COMPARE_BY_ID_AND_TEXT = (o1, o2) -> {
+        if (o1.getId() == "") {
+            return -1;
+        } else if (o2.getId() == "") {
+            return 1;
+        }
 
-                @Override
-                public int compare(final TreasuryTupleDataSourceBean o1, final TreasuryTupleDataSourceBean o2) {
-                    if (o1.getId() == "") {
-                        return -1;
-                    } else if (o2.getId() == "") {
-                        return 1;
-                    }
-
-                    return TreasuryTupleDataSourceBean.COMPARE_BY_TEXT.compare(o1, o2);
-                }
-            };
+        return TreasuryTupleDataSourceBean.COMPARE_BY_TEXT.compare(o1, o2);
+    };
 
     private List<TreasuryTupleDataSourceBean> degreeTypeDataSource() {
         final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
@@ -1097,24 +1132,15 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     private boolean hasStudentConditionSelected() {
-        return getRegistrationRegimeType() != null || getRegistrationProtocol() != null || getIngression() != null
-                || getCurricularYear() != null || getExecutionSemester() != null || isFirstTimeStudent()
-                || getStatuteType() != null;
+        return !conditionRules.isEmpty();
     }
 
     private boolean hasAtLeastOneConditionSpecified() {
         boolean hasAtLeastOneCondition = false;
 
         hasAtLeastOneCondition |= isDefaultPaymentPlan();
-        hasAtLeastOneCondition |= getRegistrationRegimeType() != null;
-        hasAtLeastOneCondition |= getRegistrationProtocol() != null;
-        hasAtLeastOneCondition |= getIngression() != null;
-        hasAtLeastOneCondition |= getCurricularYear() != null;
-        hasAtLeastOneCondition |= getStatuteType() != null;
-        hasAtLeastOneCondition |= getExecutionSemester() != null;
-        hasAtLeastOneCondition |= isFirstTimeStudent();
+        hasAtLeastOneCondition |= !conditionRules.isEmpty();
         hasAtLeastOneCondition |= isCustomized();
-        hasAtLeastOneCondition |= isWithLaboratorialClasses();
 
         return hasAtLeastOneCondition;
     }

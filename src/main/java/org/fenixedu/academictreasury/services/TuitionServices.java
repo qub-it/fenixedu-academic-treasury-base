@@ -1,6 +1,5 @@
 package org.fenixedu.academictreasury.services;
 
-
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
@@ -19,9 +18,7 @@ import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationDataByExecutionYear;
 import org.fenixedu.academic.domain.student.registrationStates.RegistrationState;
-import org.fenixedu.academic.domain.studentCurriculum.CurriculumGroup;
 import org.fenixedu.academic.domain.studentCurriculum.CurriculumLine;
-import org.fenixedu.academic.domain.studentCurriculum.RootCurriculumGroup;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
@@ -30,7 +27,6 @@ import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
 import org.fenixedu.academictreasury.dto.tuition.TuitionDebitEntryBean;
-import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Currency;
 import org.fenixedu.treasury.domain.Vat;
@@ -49,11 +45,11 @@ import pt.ist.fenixframework.Atomic;
 public class TuitionServices {
 
     private static final List<ITuitionServiceExtension> TUITION_SERVICE_EXTENSIONS = Lists.newArrayList();
-    
+
     public static synchronized void registerTuitionServiceExtension(final ITuitionServiceExtension extension) {
         TUITION_SERVICE_EXTENSIONS.add(extension);
     }
-    
+
     public static boolean isToPayRegistrationTuition(final Registration registration, final ExecutionYear executionYear) {
         return registration.getRegistrationProtocol().isToPayGratuity();
     }
@@ -82,20 +78,22 @@ public class TuitionServices {
 
     @Atomic
     public static boolean createTuitionForRegistration(final Registration registration, final ExecutionYear executionYear,
-            final LocalDate debtDate, final boolean forceCreationIfNotEnrolled, TuitionPaymentPlan tuitionPaymentPlan, final boolean applyTuitionServiceExtensions) {
+            final LocalDate debtDate, final boolean forceCreationIfNotEnrolled, TuitionPaymentPlan tuitionPaymentPlan,
+            final boolean applyTuitionServiceExtensions) {
 
         if (!isToPayRegistrationTuition(registration, executionYear) && !forceCreationIfNotEnrolled) {
             return false;
         }
 
-        if(applyTuitionServiceExtensions) {
+        if (applyTuitionServiceExtensions) {
             for (final ITuitionServiceExtension iTuitionServiceExtension : TUITION_SERVICE_EXTENSIONS) {
-                if(iTuitionServiceExtension.applyExtension(registration, executionYear)) {
-                    return iTuitionServiceExtension.createTuitionForRegistration(registration, executionYear, debtDate, forceCreationIfNotEnrolled, tuitionPaymentPlan);
+                if (iTuitionServiceExtension.applyExtension(registration, executionYear)) {
+                    return iTuitionServiceExtension.createTuitionForRegistration(registration, executionYear, debtDate,
+                            forceCreationIfNotEnrolled, tuitionPaymentPlan);
                 }
             }
         }
-        
+
         final Person person = registration.getPerson();
         final String addressFiscalCountryCode = PersonCustomer.addressCountryCode(person);
         final String fiscalNumber = PersonCustomer.fiscalNumber(person);
@@ -166,16 +164,18 @@ public class TuitionServices {
     }
 
     public static List<TuitionDebitEntryBean> calculateInstallmentDebitEntryBeans(final Registration registration,
-            final ExecutionYear executionYear, final LocalDate debtDate, TuitionPaymentPlan tuitionPaymentPlan, final boolean applyTuitionServiceExtensions) {
+            final ExecutionYear executionYear, final LocalDate debtDate, TuitionPaymentPlan tuitionPaymentPlan,
+            final boolean applyTuitionServiceExtensions) {
 
-        if(applyTuitionServiceExtensions) {
+        if (applyTuitionServiceExtensions) {
             for (final ITuitionServiceExtension iTuitionServiceExtension : TUITION_SERVICE_EXTENSIONS) {
-                if(iTuitionServiceExtension.applyExtension(registration, executionYear)) {
-                    return iTuitionServiceExtension.calculateInstallmentDebitEntryBeans(registration, executionYear, debtDate, tuitionPaymentPlan);
+                if (iTuitionServiceExtension.applyExtension(registration, executionYear)) {
+                    return iTuitionServiceExtension.calculateInstallmentDebitEntryBeans(registration, executionYear, debtDate,
+                            tuitionPaymentPlan);
                 }
             }
         }
-        
+
         if (tuitionPaymentPlan == null) {
             tuitionPaymentPlan = TuitionPaymentPlan.inferTuitionPaymentPlanForRegistration(registration, executionYear);
         }
@@ -184,34 +184,40 @@ public class TuitionServices {
             return Lists.newArrayList();
         }
 
-        final BigDecimal enrolledEctsUnits = AcademicTreasuryEvent.getEnrolledEctsUnits(tuitionPaymentPlan.getTuitionPaymentPlanGroup(), registration, executionYear);
-        final BigDecimal enrolledCoursesCount = AcademicTreasuryEvent.getEnrolledCoursesCount(tuitionPaymentPlan.getTuitionPaymentPlanGroup(), registration, executionYear);
-        
-        return buildInstallmentDebitEntryBeans(tuitionPaymentPlan, debtDate, enrolledEctsUnits, enrolledCoursesCount);
+        final BigDecimal enrolledEctsUnits = AcademicTreasuryEvent
+                .getEnrolledEctsUnits(tuitionPaymentPlan.getTuitionPaymentPlanGroup(), registration, executionYear);
+        final BigDecimal enrolledCoursesCount = AcademicTreasuryEvent
+                .getEnrolledCoursesCount(tuitionPaymentPlan.getTuitionPaymentPlanGroup(), registration, executionYear);
+
+        return buildInstallmentDebitEntryBeans(registration, tuitionPaymentPlan, debtDate, enrolledEctsUnits,
+                enrolledCoursesCount);
     }
 
-    public static List<TuitionDebitEntryBean> buildInstallmentDebitEntryBeans(final TuitionPaymentPlan tuitionPaymentPlan, final LocalDate debtDate,
-            final BigDecimal enrolledEctsUnits, final BigDecimal enrolledCoursesCount) {
-        
+    public static List<TuitionDebitEntryBean> buildInstallmentDebitEntryBeans(Registration registration,
+            final TuitionPaymentPlan tuitionPaymentPlan, final LocalDate debtDate, final BigDecimal enrolledEctsUnits,
+            final BigDecimal enrolledCoursesCount) {
+
         final List<TuitionDebitEntryBean> entries = Lists.newArrayList();
         for (final TuitionInstallmentTariff tuitionInstallmentTariff : tuitionPaymentPlan.getTuitionInstallmentTariffsSet()) {
             final int installmentOrder = tuitionInstallmentTariff.getInstallmentOrder();
-            final LocalizedString installmentName = tuitionPaymentPlan.installmentName(tuitionInstallmentTariff);
+            final LocalizedString installmentName = tuitionPaymentPlan.installmentName(registration, tuitionInstallmentTariff);
             final LocalDate dueDate = tuitionInstallmentTariff.dueDate(debtDate);
             final Vat vat = tuitionInstallmentTariff.vat(debtDate);
-            final BigDecimal amount = tuitionInstallmentTariff.amountToPay(enrolledEctsUnits, enrolledCoursesCount);
+            final BigDecimal amount = tuitionInstallmentTariff.amountToPay(registration, enrolledEctsUnits, enrolledCoursesCount);
             final Currency currency = tuitionInstallmentTariff.getFinantialEntity().getFinantialInstitution().getCurrency();
 
-            entries.add(new TuitionDebitEntryBean(installmentOrder, installmentName, dueDate, vat.getTaxRate(), amount, currency));
+            entries.add(
+                    new TuitionDebitEntryBean(installmentOrder, installmentName, dueDate, vat.getTaxRate(), amount, currency));
         }
 
-        final Comparator<? super TuitionDebitEntryBean> comparator = (o1, o2) -> o1.getInstallmentOrder() - o2.getInstallmentOrder();
-        
+        final Comparator<? super TuitionDebitEntryBean> comparator =
+                (o1, o2) -> o1.getInstallmentOrder() - o2.getInstallmentOrder();
+
         return entries.stream().sorted(comparator).collect(Collectors.toList());
     }
 
     /* **********
-     * Standalone 
+     * Standalone
      * **********
      */
 
@@ -277,7 +283,8 @@ public class TuitionServices {
 
             final PersonCustomer personCustomer = PersonCustomer.findUnique(person, addressFiscalCountryCode, fiscalNumber).get();
             if (!personCustomer.isActive()) {
-                throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active", addressFiscalCountryCode, fiscalNumber);
+                throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active", addressFiscalCountryCode,
+                        fiscalNumber);
             }
 
             final ExecutionYear executionYear = standaloneEnrolment.getExecutionYear();
@@ -432,17 +439,12 @@ public class TuitionServices {
             final BigDecimal amount = tuitionInstallmentTariff.amountToPay(academicTreasuryEvent, enrolment);
             final Currency currency = tuitionInstallmentTariff.getFinantialEntity().getFinantialInstitution().getCurrency();
 
-            entries.add(new TuitionDebitEntryBean(installmentOrder, installmentName, dueDate, vat.getTaxRate(), amount, currency));
+            entries.add(
+                    new TuitionDebitEntryBean(installmentOrder, installmentName, dueDate, vat.getTaxRate(), amount, currency));
         }
 
-        return entries.stream().sorted(new Comparator<TuitionDebitEntryBean>() {
-
-            @Override
-            public int compare(TuitionDebitEntryBean o1, TuitionDebitEntryBean o2) {
-                return o1.getInstallmentOrder() - o2.getInstallmentOrder();
-            }
-
-        }).collect(Collectors.toList());
+        return entries.stream().sorted((o1, o2) -> o1.getInstallmentOrder() - o2.getInstallmentOrder())
+                .collect(Collectors.toList());
     }
 
     public static boolean removeDebitEntryForStandaloneEnrolment(final Enrolment standaloneEnrolment) {
@@ -464,11 +466,12 @@ public class TuitionServices {
 
         DebitNote debitNote = (DebitNote) debitEntry.getFinantialDocument();
         if (!debitEntry.isProcessedInDebitNote()) {
-            debitEntry.annulDebitEntry(academicTreasuryBundle(TreasuryConstants.DEFAULT_LANGUAGE, "label.TuitionServices.removeDebitEntryForStandaloneEnrolment.reason"));
+            debitEntry.annulDebitEntry(academicTreasuryBundle(TreasuryConstants.DEFAULT_LANGUAGE,
+                    "label.TuitionServices.removeDebitEntryForStandaloneEnrolment.reason"));
 
         } else {
-            debitNote.anullDebitNoteWithCreditNote(
-                    academicTreasuryBundle(TreasuryConstants.DEFAULT_LANGUAGE, "label.TuitionServices.removeDebitEntryForStandaloneEnrolment.reason"), false);
+            debitNote.anullDebitNoteWithCreditNote(academicTreasuryBundle(TreasuryConstants.DEFAULT_LANGUAGE,
+                    "label.TuitionServices.removeDebitEntryForStandaloneEnrolment.reason"), false);
 
         }
 
@@ -542,7 +545,8 @@ public class TuitionServices {
 
             final PersonCustomer personCustomer = PersonCustomer.findUnique(person, addressFiscalCountryCode, fiscalNumber).get();
             if (!personCustomer.isActive()) {
-                throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active", addressFiscalCountryCode, fiscalNumber);
+                throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active", addressFiscalCountryCode,
+                        fiscalNumber);
             }
 
             final ExecutionYear executionYear = extracurricularEnrolment.getExecutionYear();
@@ -698,17 +702,12 @@ public class TuitionServices {
             final BigDecimal amount = tuitionInstallmentTariff.amountToPay(academicTreasuryEvent, enrolment);
             final Currency currency = tuitionInstallmentTariff.getFinantialEntity().getFinantialInstitution().getCurrency();
 
-            entries.add(new TuitionDebitEntryBean(installmentOrder, installmentName, dueDate, vat.getTaxRate(), amount, currency));
+            entries.add(
+                    new TuitionDebitEntryBean(installmentOrder, installmentName, dueDate, vat.getTaxRate(), amount, currency));
         }
 
-        return entries.stream().sorted(new Comparator<TuitionDebitEntryBean>() {
-
-            @Override
-            public int compare(TuitionDebitEntryBean o1, TuitionDebitEntryBean o2) {
-                return o1.getInstallmentOrder() - o2.getInstallmentOrder();
-            }
-
-        }).collect(Collectors.toList());
+        return entries.stream().sorted((o1, o2) -> o1.getInstallmentOrder() - o2.getInstallmentOrder())
+                .collect(Collectors.toList());
     }
 
     public static boolean removeDebitEntryForExtracurricularEnrolment(final Enrolment extracurricularEnrolment) {
@@ -785,10 +784,10 @@ public class TuitionServices {
         }
 
         final LocalDate stateDate = lastRegistrationState.getStateDate().toLocalDate();
-        final LocalDate dateOnBeginExecutionYearCivilDate =
-                new LocalDate(executionYear.getAcademicInterval().getStart().getYear(), stateDate.getMonthOfYear(), stateDate.getDayOfMonth());
-        final LocalDate dateOnEndExecutionYearCivilDate =
-                new LocalDate(executionYear.getAcademicInterval().getEnd().getYear(), stateDate.getMonthOfYear(), stateDate.getDayOfMonth());
+        final LocalDate dateOnBeginExecutionYearCivilDate = new LocalDate(
+                executionYear.getAcademicInterval().getStart().getYear(), stateDate.getMonthOfYear(), stateDate.getDayOfMonth());
+        final LocalDate dateOnEndExecutionYearCivilDate = new LocalDate(executionYear.getAcademicInterval().getEnd().getYear(),
+                stateDate.getMonthOfYear(), stateDate.getDayOfMonth());
 
         if (executionYear.containsDate(dateOnBeginExecutionYearCivilDate.toDateTimeAtStartOfDay())) {
             return dateOnBeginExecutionYearCivilDate;
@@ -819,7 +818,8 @@ public class TuitionServices {
     }
 
     // The result includes annuled enrolments
-    public static Set<Enrolment> normalEnrolmentsIncludingAnnuled(final Registration registration, final ExecutionYear executionYear) {
+    public static Set<Enrolment> normalEnrolmentsIncludingAnnuled(final Registration registration,
+            final ExecutionYear executionYear) {
         final StudentCurricularPlan studentCurricularPlan = registration.getStudentCurricularPlan(executionYear);
 
         if (studentCurricularPlan == null) {
@@ -838,11 +838,14 @@ public class TuitionServices {
         return result;
     }
 
-    public static Set<Enrolment> normalEnrolmentsWithoutAnnuled(final Registration registration, final ExecutionYear executionYear) {
-        return normalEnrolmentsIncludingAnnuled(registration, executionYear).stream().filter(e -> !e.isAnnulled()).collect(Collectors.toSet());
+    public static Set<Enrolment> normalEnrolmentsWithoutAnnuled(final Registration registration,
+            final ExecutionYear executionYear) {
+        return normalEnrolmentsIncludingAnnuled(registration, executionYear).stream().filter(e -> !e.isAnnulled())
+                .collect(Collectors.toSet());
     }
-        
-    public static Set<Enrolment> standaloneEnrolmentsIncludingAnnuled(final Registration registration, final ExecutionYear executionYear) {
+
+    public static Set<Enrolment> standaloneEnrolmentsIncludingAnnuled(final Registration registration,
+            final ExecutionYear executionYear) {
         final StudentCurricularPlan studentCurricularPlan = registration.getStudentCurricularPlan(executionYear);
 
         if (studentCurricularPlan == null) {
@@ -854,11 +857,14 @@ public class TuitionServices {
                 .collect(Collectors.<Enrolment> toSet());
     }
 
-    public static Set<Enrolment> standaloneEnrolmentsWithoutAnnuled(final Registration registration, final ExecutionYear executionYear) {
-        return standaloneEnrolmentsIncludingAnnuled(registration, executionYear).stream().filter(e -> !e.isAnnulled()).collect(Collectors.toSet());
-    }    
-    
-    public static Set<Enrolment> extracurricularEnrolmentsIncludingAnnuled(final Registration registration, final ExecutionYear executionYear) {
+    public static Set<Enrolment> standaloneEnrolmentsWithoutAnnuled(final Registration registration,
+            final ExecutionYear executionYear) {
+        return standaloneEnrolmentsIncludingAnnuled(registration, executionYear).stream().filter(e -> !e.isAnnulled())
+                .collect(Collectors.toSet());
+    }
+
+    public static Set<Enrolment> extracurricularEnrolmentsIncludingAnnuled(final Registration registration,
+            final ExecutionYear executionYear) {
         final StudentCurricularPlan studentCurricularPlan = registration.getStudentCurricularPlan(executionYear);
 
         if (studentCurricularPlan == null) {
@@ -870,10 +876,12 @@ public class TuitionServices {
                 .collect(Collectors.<Enrolment> toSet());
     }
 
-    public static Set<Enrolment> extracurricularEnrolmentsWithoutAnnuled(final Registration registration, final ExecutionYear executionYear) {
-        return extracurricularEnrolmentsIncludingAnnuled(registration, executionYear).stream().filter(e -> !e.isAnnulled()).collect(Collectors.toSet());
+    public static Set<Enrolment> extracurricularEnrolmentsWithoutAnnuled(final Registration registration,
+            final ExecutionYear executionYear) {
+        return extracurricularEnrolmentsIncludingAnnuled(registration, executionYear).stream().filter(e -> !e.isAnnulled())
+                .collect(Collectors.toSet());
     }
-    
+
     private static Predicate<? super CurriculumLine> enrolmentInExecutionYearTest(final ExecutionYear executionYear) {
         return l -> l.getExecutionYear() == executionYear && l.isEnrolment();
     }
