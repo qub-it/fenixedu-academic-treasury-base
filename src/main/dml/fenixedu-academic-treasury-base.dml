@@ -6,6 +6,7 @@ enum org.fenixedu.academictreasury.domain.tuition.TuitionCalculationType        
 enum org.fenixedu.academictreasury.domain.tuition.EctsCalculationType                                   as EctsCalculationType;
 enum org.fenixedu.academictreasury.domain.reports.DebtReportRequestType                                 as DebtReportRequestType;
 enum org.fenixedu.academictreasury.domain.debtGeneration.AcademicTaxDueDateAlignmentType                as AcademicTaxDueDateAlignmentType;
+enum org.fenixedu.academictreasury.domain.tuition.TuitionTariffCalculatedAmountType						as TuitionTariffCalculatedAmountType;
 
 valueType java.math.BigDecimal as BigDecimalAT
 {
@@ -223,6 +224,8 @@ class tuition.TuitionPaymentPlanGroup {
 	boolean forStandalone;
 	boolean forExtracurricular;
 	boolean forImprovement;
+	String allowedConditionRulesSerialized;
+	String allowedCalculatedAmountCalculatorsSerialized;
 }
 
 	relation TuitionPaymentPlanGroupBennu {
@@ -313,7 +316,7 @@ class tuition.TuitionPaymentPlan {
 	
 	relation TuitionPaymentPlanDegreeCurricularPlan {
 		.org.fenixedu.academic.domain.DegreeCurricularPlan playsRole degreeCurricularPlan {
-			multiplicity 1..1;
+			multiplicity 0..1;
 		}
 		
 		tuition.TuitionPaymentPlan playsRole tuitionPaymentPlans {
@@ -413,10 +416,45 @@ class tuition.TuitionPaymentPlan {
 			multiplicity *;
 		}
 	}
+class tuition.TuitionPaymentPlanOrder{
+	int paymentPlanOrder;
+}
+	relation TuitionPaymentPlanOrderBennu {
+		.pt.ist.fenixframework.DomainRoot playsRole domainRoot {
+			multiplicity 1..1;
+		}
+	
+		tuition.TuitionPaymentPlanOrder playsRole tuitionPaymentPlansOrder {
+			multiplicity *;
+		}
+	}
+	
+	relation TuitionPaymentPlanTuitionPaymentPlanOrder {
+		
+		tuition.TuitionPaymentPlan playsRole tuitionPaymentPlan {
+			multiplicity 0..1;
+		}
+		
+		tuition.TuitionPaymentPlanOrder playsRole tuitionPaymentPlanOrders {
+			multiplicity *;
+		}
+	}
+	
+	relation TuitionPaymentPlanOrderDegreeCurricularPlan {
+		.org.fenixedu.academic.domain.DegreeCurricularPlan playsRole degreeCurricularPlan {
+			multiplicity 1..1;
+		}
+		
+		tuition.TuitionPaymentPlanOrder playsRole tuitionPaymentPlanOrders {
+			multiplicity *;
+		}
+	}
+
 
 class tuition.TuitionInstallmentTariff extends .org.fenixedu.treasury.domain.tariff.Tariff {
 	int installmentOrder;
 	TuitionCalculationType tuitionCalculationType;
+	TuitionTariffCalculatedAmountType tuitionTariffCalculatedAmountType;
 	BigDecimalAT fixedAmount;
 	EctsCalculationType ectsCalculationType;
 	BigDecimalAT factor;
@@ -424,8 +462,9 @@ class tuition.TuitionInstallmentTariff extends .org.fenixedu.treasury.domain.tar
 	boolean academicalActBlockingOff;
 	boolean blockAcademicActsOnDebt;
 	BigDecimalAT maximumAmount;
-}
-
+	String tuitionTariffCustomCalculatorClassName;
+}	
+	
 	relation TuitionInstallmentTariffTuitionPaymentPlan {
 		tuition.TuitionPaymentPlan playsRole tuitionPaymentPlan {
 			multiplicity 1..1;
@@ -436,7 +475,99 @@ class tuition.TuitionInstallmentTariff extends .org.fenixedu.treasury.domain.tar
 		}
 	}
 
-
+class tuition.TuitionConditionRule {
+}
+	relation TuitionConditionRuleBennu {
+		.pt.ist.fenixframework.DomainRoot playsRole domainRoot {
+			multiplicity 1..1;
+		}
+	
+		tuition.TuitionConditionRule playsRole tuitionConditionRules {
+			multiplicity *;
+		}
+	}
+	
+	relation TuitionConditionRuleTuitionPaymentPlan {
+		tuition.TuitionPaymentPlan playsRole tuitionPaymentPlan {
+			multiplicity 0..1;
+		}
+		
+		tuition.TuitionConditionRule playsRole tuitionConditionRules {
+			multiplicity *;
+		}
+	}
+	
+	class tuition.conditionRule.RegistrationRegimeTypeConditionRule extends tuition.TuitionConditionRule {
+		String registrationRegimeTypesSerialized;
+	}
+		
+	class tuition.conditionRule.RegistrationProtocolConditionRule extends tuition.TuitionConditionRule {
+	}
+		relation TuitionConditionRuleRegistrationProtocol {
+			.org.fenixedu.academic.domain.student.RegistrationProtocol playsRole registrationProtocol {
+				multiplicity *;
+			}
+			
+			tuition.conditionRule.RegistrationProtocolConditionRule playsRole tuitionConditionRules {
+				multiplicity *;
+			}
+		}
+		
+	class tuition.conditionRule.IngressionTypeConditionRule extends tuition.TuitionConditionRule {
+	}
+		relation TuitionConditionRuleIngressionType {
+			.org.fenixedu.academic.domain.candidacy.IngressionType playsRole ingression {
+				multiplicity *;
+			}
+			
+			tuition.conditionRule.IngressionTypeConditionRule playsRole tuitionConditionRules {
+				multiplicity *;
+			}
+		}
+		
+	class tuition.conditionRule.CurricularYearConditionRule extends tuition.TuitionConditionRule {
+	}
+		relation TuitionConditionRuleCurricularYear {
+			.org.fenixedu.academic.domain.CurricularYear playsRole curricularYear {
+				multiplicity *;
+			}
+			
+			tuition.conditionRule.CurricularYearConditionRule playsRole tuitionConditionRules {
+				multiplicity *;
+			}
+		}
+	class tuition.conditionRule.ExecutionIntervalConditionRule extends tuition.TuitionConditionRule {
+	}
+		relation TuitionConditionRuleExecutionInterval {
+			.org.fenixedu.academic.domain.ExecutionInterval playsRole executionInterval {
+				multiplicity *;
+			}
+	
+			tuition.conditionRule.ExecutionIntervalConditionRule playsRole tuitionConditionRules {
+				multiplicity *;
+			}
+		}
+	
+	class tuition.conditionRule.StatuteTypeConditionRule extends tuition.TuitionConditionRule {
+	}
+		relation TuitionConditionRuleStatuteType {
+			.org.fenixedu.academic.domain.student.StatuteType playsRole statuteType {
+				multiplicity *;
+			}
+	
+			tuition.conditionRule.StatuteTypeConditionRule playsRole tuitionConditionRules {
+				multiplicity *;
+			}
+		}
+		
+	class tuition.conditionRule.FirstTimeStudentConditionRule extends tuition.TuitionConditionRule {
+		Boolean firstTimeStudent;
+	}
+	
+	class tuition.conditionRule.WithLaboratorialClassesConditionRule extends tuition.TuitionConditionRule {
+		Boolean withLaboratorialClasses;
+	}
+	
 /*----------------------
  * AcademicTreasuryEvent
  *---------------------- */
