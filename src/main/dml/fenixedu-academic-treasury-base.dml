@@ -1519,7 +1519,7 @@ class integration.ERPTuitionInfoCreationReportFile /* implements IGenericFile */
  
 class paymentpenalty.PaymentPenaltySettings {
 	Boolean active;
-	LocalizedString emolumentDescription;
+	LocalizedStringAT emolumentDescription;
 	Boolean createPaymentCode;
 }
 
