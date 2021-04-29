@@ -919,10 +919,6 @@ public class AcademicTariff extends AcademicTariff_Base {
     }
     
     protected static AcademicTariff findMatch(final FinantialEntity finantialEntity, final Product product, final AdministrativeOffice administrativeOffice, final DegreeType degreeType, final DateTime when) {
-        if (administrativeOffice == null) {
-            throw new RuntimeException("administrative office is null. wrong findMatch call");
-        }
-        
         if(degreeType == null) {
             throw new RuntimeException("degreeType is null. wrong findMatch call");
         }
@@ -969,8 +965,10 @@ public class AcademicTariff extends AcademicTariff_Base {
             }
         }
         
-        if(administrativeOffice != null && degreeType != null) {
+        if(degreeType != null) {
             return findMatch(finantialEntity, product, administrativeOffice, degreeType, when);
+        } else if(administrativeOffice != null) {
+            return findMatch(finantialEntity, product, administrativeOffice, when);
         }
         
         return findMatch(finantialEntity, product, when);

@@ -63,6 +63,7 @@ import org.fenixedu.treasury.domain.Vat;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.DebitNote;
+import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.LocalDate;
 
 import com.google.common.base.Strings;
@@ -119,6 +120,11 @@ public class AcademicTaxServices {
         final AcademicTariff academicTariff = AcademicTariff.findMatch(finantialEntity, academicTax.getProduct(),
                 registration.getDegree(), debtDate.toDateTimeAtStartOfDay());
 
+        if (academicTariff == null) {
+            throw new AcademicTreasuryDomainException("error.AcademicTaxServices.calculateAcademicTax.tariff.not.found",
+                    debtDate.toString(TreasuryConstants.DATE_FORMAT));
+        }
+        
         final LocalizedString debitEntryName = AcademicTreasuryEvent.nameForAcademicTax(academicTax, registration, executionYear);
         final LocalDate dueDate = academicTariff.dueDate(debtDate);
         final Vat vat = academicTariff.vat(debtDate);

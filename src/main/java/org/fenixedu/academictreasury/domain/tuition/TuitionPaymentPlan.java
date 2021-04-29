@@ -415,7 +415,11 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         String label = "label.TuitionInstallmentTariff.debitEntry.name.";
 
         if (getTuitionPaymentPlanGroup().isForRegistration()) {
-            label += "registration";
+            if(getTuitionInstallmentTariffsSet().size() == 1) {
+                label += "registration.one.installment";
+            } else {
+                label += "registration";
+            }
         } else if (getTuitionPaymentPlanGroup().isForStandalone()) {
             label += "standalone";
         } else if (getTuitionPaymentPlanGroup().isForExtracurricular()) {
