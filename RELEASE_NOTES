@@ -1,4 +1,6 @@
+7.0.3 (04-05-2021)
 - New Fixture: tuition payment plan now shows if is reachable
+- Released module for ISCTE
 
 7.0.2 (13-04-2021)
 - Bug Fix: Invoking deprecated payment request service (UL-ISEG-552, UL-ISEG-560)
