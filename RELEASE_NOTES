@@ -1,3 +1,4 @@
+7.0.4 (06-05-2021)
 - Refactor: Remove not used excludeIfMatches property from AcademicDebtGenerationRuleRestriction
 - Improvement: Create all person customers with student customer type and deprecate the candidate type
 
