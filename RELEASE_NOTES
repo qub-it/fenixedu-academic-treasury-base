@@ -1,3 +1,6 @@
+- Refactor: Remove not used excludeIfMatches property from AcademicDebtGenerationRuleRestriction
+- Improvement: Create all person customers with student customer type and deprecate the candidate type
+
 7.0.3 (04-05-2021)
 - New Fixture: tuition payment plan now shows if is reachable
 - Released module for ISCTE

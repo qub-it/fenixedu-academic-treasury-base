@@ -50,9 +50,9 @@ public class EnrolmentRenewalRestriction extends EnrolmentRenewalRestriction_Bas
         super();
     }
 
-    public EnrolmentRenewalRestriction(AcademicDebtGenerationRule rule, boolean excludeIfMatches) {
+    public EnrolmentRenewalRestriction(AcademicDebtGenerationRule rule) {
         this();
-        super.init(rule, excludeIfMatches);
+        super.init(rule);
     }
 
     @Override
@@ -71,14 +71,12 @@ public class EnrolmentRenewalRestriction extends EnrolmentRenewalRestriction_Bas
 
     @Override
     public boolean test(Registration registration) {
-        // TODO: Evaluate excludeIfMatches make sense
-//        return isToInclude() ? evaluateResult(registration) : !evaluateResult(registration);
         return evaluateResult(registration);
     }
 
     @Override
     public EnrolmentRenewalRestriction makeCopy(AcademicDebtGenerationRule ruleToCreate) {
-        return create(ruleToCreate, getExcludeIfMatches());
+        return create(ruleToCreate);
     }
 
     /*
@@ -87,8 +85,8 @@ public class EnrolmentRenewalRestriction extends EnrolmentRenewalRestriction_Bas
      * ********
      */
 
-    public static EnrolmentRenewalRestriction create(AcademicDebtGenerationRule rule, boolean excludeIfMatches) {
-        return new EnrolmentRenewalRestriction(rule, excludeIfMatches);
+    public static EnrolmentRenewalRestriction create(AcademicDebtGenerationRule rule) {
+        return new EnrolmentRenewalRestriction(rule);
     }
 
     public static LocalizedString RESTRICTION_NAME() {

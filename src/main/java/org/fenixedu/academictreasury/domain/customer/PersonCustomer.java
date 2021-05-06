@@ -936,11 +936,7 @@ public class PersonCustomer extends PersonCustomer_Base {
     }
 
     public static CustomerType getDefaultCustomerType(final PersonCustomer person) {
-        if (person.getPerson().getStudent() != null) {
-            return CustomerType.findByCode(STUDENT_CODE).findFirst().orElse(null);
-        } else {
-            return CustomerType.findByCode(CANDIDACY_CODE).findFirst().orElse(null);
-        }
+        return CustomerType.findByCode(STUDENT_CODE).findFirst().orElse(null);
     }
 
 }

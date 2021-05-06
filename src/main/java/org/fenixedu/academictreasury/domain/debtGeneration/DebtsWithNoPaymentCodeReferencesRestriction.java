@@ -52,9 +52,9 @@ public class DebtsWithNoPaymentCodeReferencesRestriction extends DebtsWithNoPaym
         super();
     }
     
-    protected DebtsWithNoPaymentCodeReferencesRestriction(AcademicDebtGenerationRule rule, boolean excludeIfMatches) {
+    protected DebtsWithNoPaymentCodeReferencesRestriction(AcademicDebtGenerationRule rule) {
         this();
-        super.init(rule, excludeIfMatches);
+        super.init(rule);
     }
 
     @Override
@@ -79,14 +79,12 @@ public class DebtsWithNoPaymentCodeReferencesRestriction extends DebtsWithNoPaym
 
     @Override
     public boolean test(Registration registration) {
-        // TODO: Evaluate if excludeifMatches make sense
-//        return isToInclude() ? evaluateResult(registration) : !evaluateResult(registration);
         return evaluateResult(registration);
     }
 
     @Override
     public DebtsWithNoPaymentCodeReferencesRestriction makeCopy(AcademicDebtGenerationRule ruleToCreate) {
-        return create(ruleToCreate, getExcludeIfMatches());
+        return create(ruleToCreate);
     }
     
     /*
@@ -95,8 +93,8 @@ public class DebtsWithNoPaymentCodeReferencesRestriction extends DebtsWithNoPaym
      * ********
      */
     
-    public static DebtsWithNoPaymentCodeReferencesRestriction create(AcademicDebtGenerationRule rule, boolean excludeIfMatches) {
-        return new DebtsWithNoPaymentCodeReferencesRestriction(rule, excludeIfMatches);
+    public static DebtsWithNoPaymentCodeReferencesRestriction create(AcademicDebtGenerationRule rule) {
+        return new DebtsWithNoPaymentCodeReferencesRestriction(rule);
     }
 
     public static LocalizedString RESTRICTION_NAME() {

@@ -50,9 +50,9 @@ public class FirstTimeFirstYearRestriction extends FirstTimeFirstYearRestriction
         super();
     }
     
-    protected FirstTimeFirstYearRestriction(AcademicDebtGenerationRule rule, boolean excludeIfMatches) {
+    protected FirstTimeFirstYearRestriction(AcademicDebtGenerationRule rule) {
         this();
-        super.init(rule, excludeIfMatches);
+        super.init(rule);
     }
     
     @Override
@@ -71,14 +71,12 @@ public class FirstTimeFirstYearRestriction extends FirstTimeFirstYearRestriction
     
     @Override
     public boolean test(Registration registration) {
-        // TODO: Evaluate if excludeIfMatches make sense
-//        return isToInclude() ? evaluateResult(registration) : !evaluateResult(registration);
         return evaluateResult(registration);
     }
 
     @Override
     public FirstTimeFirstYearRestriction makeCopy(AcademicDebtGenerationRule ruleToCreate) {
-        return create(ruleToCreate, getExcludeIfMatches());
+        return create(ruleToCreate);
     }
     
     /*
@@ -87,8 +85,8 @@ public class FirstTimeFirstYearRestriction extends FirstTimeFirstYearRestriction
      * ********
      */
 
-    public static FirstTimeFirstYearRestriction create(AcademicDebtGenerationRule rule, boolean excludeIfMatches) {
-        return new FirstTimeFirstYearRestriction(rule, excludeIfMatches);
+    public static FirstTimeFirstYearRestriction create(AcademicDebtGenerationRule rule) {
+        return new FirstTimeFirstYearRestriction(rule);
     }
 
     public static LocalizedString RESTRICTION_NAME() {
