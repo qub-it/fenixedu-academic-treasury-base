@@ -134,6 +134,8 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
                 tariff.getInterestRate() != null ? tariff.getInterestRate().getInterestFixedAmount() : null,
                 tariff.getInterestRate() != null ? tariff.getInterestRate().getRate() : null);
 
+        super.setTuitionTariffCalculatedAmountType(tariff.getTuitionTariffCalculatedAmountType());
+        setTuitionTariffCustomCalculator(tariff.getTuitionTariffCustomCalculator());
         super.setInstallmentOrder(tariff.getInstallmentOrder());
         super.setTuitionCalculationType(tariff.getTuitionCalculationType());
         super.setFixedAmount(tariff.getFixedAmount());
@@ -844,7 +846,8 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
     public Class<? extends TuitionTariffCustomCalculator> getTuitionTariffCustomCalculator() {
         try {
-            return (Class<? extends TuitionTariffCustomCalculator>) Class.forName(getTuitionTariffCustomCalculatorClassName());
+            return getTuitionTariffCustomCalculatorClassName() == null ? null : (Class<? extends TuitionTariffCustomCalculator>) Class
+                    .forName(getTuitionTariffCustomCalculatorClassName());
         } catch (ClassNotFoundException e) {
             return null;
         }
