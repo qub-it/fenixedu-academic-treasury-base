@@ -10,6 +10,8 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
+import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
+import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 
 @TuitionConditionAnnotation(CurricularYearConditionRule.BUNDLE_NAME)
@@ -64,10 +66,25 @@ public class CurricularYearConditionRule extends CurricularYearConditionRule_Bas
     }
 
     @Override
-    protected TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
+    public TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
         CurricularYearConditionRule result = new CurricularYearConditionRule();
         result.setTuitionPaymentPlan(tuitionPaymentPlan);
         getCurricularYearSet().forEach(c -> result.addCurricularYear(c));
         return result;
+    }
+
+    @Override
+    public void fillRuleFromImporter(String string) {
+        String[] split = string.split("\\|");
+        final IAcademicTreasuryPlatformDependentServices services =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        for (String s : split) {
+            CurricularYear readByYear = services.readAllCurricularYearsSet().stream()
+                    .filter(c -> c.getYear().toString().equals(s)).findFirst().orElse(null); //CurricularYear.readByYear(Integer.getInteger(s));
+            if (readByYear == null) {
+                throw new IllegalArgumentException();
+            }
+            addCurricularYear(readByYear);
+        }
     }
 }

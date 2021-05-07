@@ -1,5 +1,6 @@
 package org.fenixedu.academictreasury.domain.tuition.conditionRule;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -111,7 +112,7 @@ public class RegistrationRegimeTypeConditionRule extends RegistrationRegimeTypeC
     }
 
     @Override
-    protected TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
+    public TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
         RegistrationRegimeTypeConditionRule result = new RegistrationRegimeTypeConditionRule();
         result.setTuitionPaymentPlan(tuitionPaymentPlan);
         getRegistrationRegimeTypes().forEach(c -> result.addRegistrationRegimeTypes(c));
@@ -131,6 +132,19 @@ public class RegistrationRegimeTypeConditionRule extends RegistrationRegimeTypeC
                 rule.addRegistrationRegimeTypes(regime);
             }
             return super.addAll(c);
+        }
+    }
+
+    @Override
+    public void fillRuleFromImporter(String string) {
+        String[] split = string.split("\\|");
+        for (String s : split) {
+            RegistrationRegimeType value = Arrays.asList(RegistrationRegimeType.values()).stream()
+                    .filter(r -> r.getLocalizedName().equals(s)).findFirst().orElse(null);
+            if (value == null) {
+                throw new IllegalArgumentException();
+            }
+            addRegistrationRegimeTypes(value);
         }
     }
 
