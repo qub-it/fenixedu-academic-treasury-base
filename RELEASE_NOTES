@@ -1,3 +1,4 @@
+7.0.5 (07-05-2021)
 - Bug Fix: Retrieve SIBS entity code from sibs payment request, instead of reading from digital payment platform
 
 7.0.4 (06-05-2021)
