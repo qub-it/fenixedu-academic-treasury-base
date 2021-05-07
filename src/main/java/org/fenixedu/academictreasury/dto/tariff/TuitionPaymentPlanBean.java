@@ -3,8 +3,10 @@ package org.fenixedu.academictreasury.dto.tariff;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
@@ -27,6 +29,8 @@ import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
 import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
+import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCalculatedAmountType;
+import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCustomCalculator;
 import org.fenixedu.academictreasury.domain.tuition.conditionRule.CurricularYearConditionRule;
 import org.fenixedu.academictreasury.domain.tuition.conditionRule.ExecutionIntervalConditionRule;
 import org.fenixedu.academictreasury.domain.tuition.conditionRule.FirstTimeStudentConditionRule;
@@ -141,6 +145,8 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     private BigDecimal maximumAmount;
     private boolean academicalActBlockingOn;
     private boolean blockAcademicActsOnDebt;
+    private TuitionTariffCalculatedAmountType tuitionTariffCalculatedAmountType;
+    private Class<? extends TuitionTariffCustomCalculator> tuitionTariffCustomCalculator;
 
     // @formatter:off
     /*---------------------
@@ -155,6 +161,8 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     // Named in tuition importation
     private String sheetName;
 
+    private Map<Class<? extends TuitionConditionRule>, String> importerMap;
+
     public TuitionPaymentPlanBean() {
     }
 
@@ -166,6 +174,8 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this.finantialEntity = finantialEntity;
         this.executionYear = executionYear;
         this.conditionRules = new HashSet();
+        this.degreeCurricularPlans = new HashSet();
+        this.importerMap = new HashMap<Class<? extends TuitionConditionRule>, String>();
 
         updateData();
         resetInstallmentFields();
@@ -175,7 +185,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this(tuitionPaymentPlan.getProduct(), tuitionPaymentPlan.getTuitionPaymentPlanGroup(),
                 tuitionPaymentPlan.getFinantialEntity(), tuitionPaymentPlan.getExecutionYear());
 
-        this.degreeType = tuitionPaymentPlan.getDegreeCurricularPlan().getDegreeType();
+//        this.degreeType = tuitionPaymentPlan.getDegreeCurricularPlan().getDegreeType();
 
         this.copiedExecutionYear = tuitionPaymentPlan.getExecutionYear();
 
@@ -230,7 +240,8 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
             this.maximumAmount = tuitionInstallmentTariff.getMaximumAmount();
             this.academicalActBlockingOn = !tuitionInstallmentTariff.getAcademicalActBlockingOff();
             this.blockAcademicActsOnDebt = tuitionInstallmentTariff.getBlockAcademicActsOnDebt();
-
+            this.tuitionTariffCalculatedAmountType = tuitionInstallmentTariff.getTuitionTariffCalculatedAmountType();
+            this.tuitionTariffCustomCalculator = tuitionInstallmentTariff.getTuitionTariffCustomCalculator();
             addInstallment();
         }
     }
@@ -376,6 +387,8 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
             return errorMessages;
         }
 
+        installmentBean.setFinantialEntity(this.finantialEntity);
+
         installmentBean.setBeginDate(this.beginDate);
         installmentBean.setEndDate(this.endDate);
         installmentBean.setDueDateCalculationType(dueDateCalculationType);
@@ -392,6 +405,8 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
         installmentBean.setTuitionInstallmentProduct(getTuitionInstallmentProduct());
         installmentBean.setTuitionCalculationType(this.tuitionCalculationType);
+        installmentBean.setTuitionTariffCalculatedAmountType(this.tuitionTariffCalculatedAmountType);
+        installmentBean.setTuitionTariffCustomCalculator(this.tuitionTariffCustomCalculator);
         installmentBean.setFixedAmount(this.fixedAmount);
         installmentBean.setEctsCalculationType(this.ectsCalculationType);
         installmentBean.setFactor(this.factor);
@@ -528,6 +543,10 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
     public Set<TuitionConditionRule> getConditionRules() {
         return conditionRules;
+    }
+
+    public void setConditionRules(Set<TuitionConditionRule> set) {
+        conditionRules = set;
     }
 
     public void addOrReplaceConditionRules(TuitionConditionRule tuitionConditionRule) {
@@ -1143,6 +1162,22 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         hasAtLeastOneCondition |= isCustomized();
 
         return hasAtLeastOneCondition;
+    }
+
+    public void putImporterRule(Class<? extends TuitionConditionRule> ruleClass, String string) {
+        importerMap.put(ruleClass, string);
+    }
+
+    public Map<Class<? extends TuitionConditionRule>, String> getImporterRules() {
+        return importerMap;
+    }
+
+    public void addDegreeCurricularPlans(DegreeCurricularPlan degreeCurricularPlan) {
+        degreeCurricularPlans.add(degreeCurricularPlan);
+    }
+
+    public void addAllDegreeCurricularPlans(Set<DegreeCurricularPlan> degreeCurricularPlans) {
+        degreeCurricularPlans.addAll(degreeCurricularPlans);
     }
 
 }

@@ -154,7 +154,6 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         setDegreeType(academicTariff.getDegreeType());
         setDegree(academicTariff.getDegree());
         setCycleType(academicTariff.getCycleType());
-
         setBaseAmount(academicTariff.getBaseAmount());
         setUnitsForBase(academicTariff.getUnitsForBase());
         setApplyUnitsAmount(academicTariff.isApplyUnitsAmount());
@@ -165,6 +164,8 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         setMaximumAmount(academicTariff.getMaximumAmount());
         setUrgencyRate(academicTariff.getUrgencyRate());
         setLanguageTranslationRate(academicTariff.getLanguageTranslationRate());
+
+        setFinantialEntity(academicTariff.getFinantialEntity());
     }
 
     public AcademicTariffBean(final TuitionInstallmentTariff tuitionInstallmentTariff) {
