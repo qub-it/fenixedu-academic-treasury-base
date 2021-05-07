@@ -60,10 +60,24 @@ public class FirstTimeStudentConditionRule extends FirstTimeStudentConditionRule
     }
 
     @Override
-    protected TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
+    public TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
         FirstTimeStudentConditionRule result = new FirstTimeStudentConditionRule();
         result.setTuitionPaymentPlan(tuitionPaymentPlan);
         result.setFirstTimeStudent(getFirstTimeStudent());
         return result;
+    }
+
+    @Override
+    public void fillRuleFromImporter(String value) {
+        if (value.equals(i18n("label.true"))) {
+            setFirstTimeStudent(Boolean.TRUE);
+            return;
+        }
+
+        if (value.equals(i18n("label.false"))) {
+            setFirstTimeStudent(Boolean.FALSE);
+            return;
+        }
+        throw new IllegalArgumentException();
     }
 }

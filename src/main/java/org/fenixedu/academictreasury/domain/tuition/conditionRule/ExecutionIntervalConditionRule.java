@@ -70,7 +70,7 @@ public class ExecutionIntervalConditionRule extends ExecutionIntervalConditionRu
     }
 
     @Override
-    protected TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
+    public TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
         ExecutionIntervalConditionRule result = new ExecutionIntervalConditionRule();
         result.setTuitionPaymentPlan(tuitionPaymentPlan);
         getExecutionIntervalSet().forEach(c -> {
@@ -81,6 +81,18 @@ public class ExecutionIntervalConditionRule extends ExecutionIntervalConditionRu
             }
         });
         return result;
+    }
+
+    @Override
+    public void fillRuleFromImporter(String string) {
+        String[] split = string.split("\\|");
+        for (String s : split) {
+            ExecutionInterval value = ExecutionInterval.getExecutionInterval(s);
+            if (value == null) {
+                throw new IllegalArgumentException();
+            }
+            addExecutionInterval(value);
+        }
     }
 
 }

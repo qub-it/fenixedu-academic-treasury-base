@@ -67,10 +67,24 @@ public class WithLaboratorialClassesConditionRule extends WithLaboratorialClasse
     }
 
     @Override
-    protected TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
+    public TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
         WithLaboratorialClassesConditionRule result = new WithLaboratorialClassesConditionRule();
         result.setTuitionPaymentPlan(tuitionPaymentPlan);
         result.setWithLaboratorialClasses(getWithLaboratorialClasses());
         return result;
+    }
+
+    @Override
+    public void fillRuleFromImporter(String value) {
+        if (value.equals(i18n("label.true"))) {
+            setWithLaboratorialClasses(Boolean.TRUE);
+            return;
+        }
+
+        if (value.equals(i18n("label.false"))) {
+            setWithLaboratorialClasses(Boolean.FALSE);
+            return;
+        }
+        throw new IllegalArgumentException();
     }
 }

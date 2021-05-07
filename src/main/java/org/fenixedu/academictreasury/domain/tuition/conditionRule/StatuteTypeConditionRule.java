@@ -74,10 +74,26 @@ public class StatuteTypeConditionRule extends StatuteTypeConditionRule_Base {
     }
 
     @Override
-    protected TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
+    public TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
         StatuteTypeConditionRule result = new StatuteTypeConditionRule();
         result.setTuitionPaymentPlan(tuitionPaymentPlan);
         getStatuteTypeSet().forEach(c -> result.addStatuteType(c));
         return result;
+    }
+
+    @Override
+    public void fillRuleFromImporter(String string) {
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        String[] split = string.split("\\|");
+        for (String s : split) {
+            StatuteType value = academicTreasuryServices.readAllStatuteTypesSet().stream()
+                    .filter(statute -> academicTreasuryServices.localizedNameOfStatuteType(statute).equals(s)).findFirst()
+                    .orElse(null);
+            if (value == null) {
+                throw new IllegalArgumentException();
+            }
+            addStatuteType(value);
+        }
     }
 }

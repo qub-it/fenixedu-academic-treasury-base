@@ -69,11 +69,24 @@ public class IngressionTypeConditionRule extends IngressionTypeConditionRule_Bas
     }
 
     @Override
-    protected TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
+    public TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
         IngressionTypeConditionRule result = new IngressionTypeConditionRule();
         result.setTuitionPaymentPlan(tuitionPaymentPlan);
         getIngressionSet().forEach(c -> result.addIngression(c));
         return result;
+    }
+
+    @Override
+    public void fillRuleFromImporter(String string) {
+        String[] split = string.split("\\|");
+        for (String s : split) {
+            IngressionType value =
+                    IngressionType.findAllByPredicate(i -> i.getLocalizedName().equals(s)).findFirst().orElse(null);
+            if (value == null) {
+                throw new IllegalArgumentException();
+            }
+            addIngression(value);
+        }
     }
 
 }
