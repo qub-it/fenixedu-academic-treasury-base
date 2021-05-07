@@ -1,8 +1,7 @@
 package org.fenixedu.academictreasury.domain.tuition;
 
-import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
-
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -127,7 +126,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     }
 
-    private void checkRules() {
+    public void checkRules() {
         if (getTuitionPaymentPlanGroup() == null) {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.tuitionPaymentPlanGroup.required");
         }
@@ -166,10 +165,10 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
             }
         }
 
-        if (findDefaultPaymentPlans(getDegreeCurricularPlan(), getExecutionYear()).count() > 1) {
-            throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.defaultPaymentPlan.not.unique",
-                    getDegreeCurricularPlan().getPresentationName());
-        }
+//        if (findDefaultPaymentPlans(getDegreeCurricularPlan(), getExecutionYear()).count() > 1) {
+//            throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.defaultPaymentPlan.not.unique",
+//                    getDegreeCurricularPlan().getPresentationName());
+//        }
 
 //        if (find(getTuitionPaymentPlanGroup(), getDegreeCurricularPlan(), getExecutionYear(), getPaymentPlanOrder())
 //                .count() > 1) {
@@ -178,6 +177,10 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
         if (getTuitionInstallmentTariffsSet().isEmpty()) {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.installments.must.not.be.empty");
+        }
+        if (existesAtLeastOneTariffCalculatedAmountWithoutRemaining()) {
+            throw new AcademicTreasuryDomainException(
+                    "error.TuitionPaymentPlan.installments.customCalculators.must.have.remaining");
         }
 
         if ((getTuitionPaymentPlanGroup().isForStandalone() || getTuitionPaymentPlanGroup().isForExtracurricular())
@@ -189,6 +192,17 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         if (getTuitionPaymentPlanGroup().isForRegistration() && !hasAtLeastOneConditionSpecified()) {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.specify.at.least.one.condition");
         }
+
+    }
+
+    private boolean existesAtLeastOneTariffCalculatedAmountWithoutRemaining() {
+        return !getTuitionInstallmentTariffsSet().stream()
+                .filter(tariff -> tariff.getTuitionCalculationType().isCalculatedAmount())
+                .map(tariff -> tariff.getTuitionTariffCustomCalculator())
+                .allMatch(calculator -> getTuitionInstallmentTariffsSet().stream()
+                        .anyMatch(tariff -> (tariff.getTuitionCalculationType().isCalculatedAmount()
+                                && tariff.getTuitionTariffCalculatedAmountType().isRemaining()
+                                && tariff.getTuitionTariffCustomCalculator() == calculator)));
     }
 
     private boolean hasStudentSpecificConditionSelected() {
@@ -258,11 +272,17 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         }
 
         if (getTuitionPaymentPlanGroup().isForStandalone()) {
-            return academicTreasuryBundle("label.TuitionPaymentPlan.standalone");
+            return academicTreasuryBundle("label.TuitionPaymentPlan.standalone") + ", "
+                    + getTuitionConditionRulesSet().stream().sorted(TuitionConditionRule.COMPARE_BY_CONDITION_RULE_NAME)
+                            .map(c -> TuitionConditionRule.getPresentationName(c.getClass()) + " [" + c.getDescription() + "]")
+                            .collect(Collectors.joining(", "));
 
         }
         if (getTuitionPaymentPlanGroup().isForExtracurricular()) {
-            return academicTreasuryBundle("label.TuitionPaymentPlan.extracurricular");
+            return academicTreasuryBundle("label.TuitionPaymentPlan.extracurricular") + ", "
+                    + getTuitionConditionRulesSet().stream().sorted(TuitionConditionRule.COMPARE_BY_CONDITION_RULE_NAME)
+                            .map(c -> TuitionConditionRule.getPresentationName(c.getClass()) + " [" + c.getDescription() + "]")
+                            .collect(Collectors.joining(", "));
         }
 
         return getTuitionConditionRulesSet().stream().sorted(TuitionConditionRule.COMPARE_BY_CONDITION_RULE_NAME)
@@ -470,7 +490,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         while (!getTuitionInstallmentTariffsSet().isEmpty()) {
             getTuitionInstallmentTariffsSet().iterator().next().delete();
         }
-
+        super.getTuitionConditionRulesSet().forEach(rule -> rule.delete());
         super.setTuitionPaymentPlanGroup(null);
         super.setExecutionYear(null);
 //        super.setDegreeCurricularPlan(null);
@@ -485,6 +505,9 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         setCopyFromTuitionPaymentPlan(null);
         while (!getTuitionPaymentPlanCopiesSet().isEmpty()) {
             getTuitionPaymentPlanCopiesSet().iterator().next().setCopyFromTuitionPaymentPlan(null);
+        }
+        while (!getTuitionPaymentPlanOrdersSet().isEmpty()) {
+            getTuitionPaymentPlanOrdersSet().iterator().next().delete(false);
         }
 
         super.deleteDomainObject();
@@ -550,7 +573,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
     public static Stream<TuitionPaymentPlan> findSortedByPaymentPlanOrder(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
             final DegreeCurricularPlan degreeCurricularPlan, final ExecutionYear executionYear) {
         return TuitionPaymentPlanOrder.findSortedByPaymentPlanOrder(tuitionPaymentPlanGroup, degreeCurricularPlan, executionYear)
-                .stream().map(order -> order.getTuitionPaymentPlan());
+                .map(order -> order.getTuitionPaymentPlan());
     }
 
     protected static Stream<TuitionPaymentPlan> find(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
@@ -614,7 +637,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         }
 
         Predicate<? super TuitionPaymentPlan> predicate =
-                plan -> !plan.isCustomized() && plan.isValidTo(registration, executionYear, null);
+                plan -> !plan.isCustomized() && plan.isValidTo(registration, executionYear, null, Collections.emptySet());
 
         return inferTuitionPaymentPlanForRegistration(registration, executionYear, predicate);
     }
@@ -633,7 +656,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                         degreeCurricularPlan, executionYear)
                 .collect(Collectors.toList());
 
-        return filtered.stream().filter(plan -> !plan.isCustomized() && plan.isValidTo(registration, executionYear, enrolment))
+        return filtered.stream().filter(
+                plan -> !plan.isCustomized() && plan.isValidTo(registration, executionYear, enrolment, Collections.emptySet()))
                 .findFirst().orElse(null);
     }
 
@@ -650,13 +674,15 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                         degreeCurricularPlan, executionYear)
                 .collect(Collectors.toList());
 
-        return filtered.stream().filter(plan -> !plan.isCustomized() && plan.isValidTo(registration, executionYear, enrolment))
+        return filtered.stream().filter(
+                plan -> !plan.isCustomized() && plan.isValidTo(registration, executionYear, enrolment, Collections.emptySet()))
                 .findFirst().orElse(null);
     }
 
-    public boolean isValidTo(Registration registration, ExecutionYear executionYear, Enrolment enrolment) {
-        return isCustomized() || isDefaultPaymentPlan()
-                || getTuitionConditionRulesSet().stream().allMatch(c -> c.isValidTo(registration, executionYear, enrolment));
+    public boolean isValidTo(Registration registration, ExecutionYear executionYear, Enrolment enrolment,
+            Set<Class<? extends TuitionConditionRule>> exclude) {
+        return isCustomized() || isDefaultPaymentPlan() || getTuitionConditionRulesSet().stream()
+                .allMatch(c -> !exclude.contains(c.getClass()) && c.isValidTo(registration, executionYear, enrolment));
     }
 
     public static boolean firstTimeStudent(final Registration registration, final ExecutionYear executionYear) {
@@ -696,4 +722,5 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         }
         return true;
     }
+
 }
