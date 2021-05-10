@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Product;
-import org.fenixedu.treasury.domain.paymentcodes.pool.PaymentCodePool;
+import org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 
 import pt.ist.fenixframework.Atomic;
@@ -22,7 +22,7 @@ public class PaymentPenaltySettings extends PaymentPenaltySettings_Base {
         setDomainRoot(FenixFramework.getDomainRoot());
         setActive(false);
         setCreatePaymentCode(false);
-        setPaymentCodePool(null);
+        setDigitalPaymentPlatform(null);
 
         checkRules();
     }
@@ -48,7 +48,7 @@ public class PaymentPenaltySettings extends PaymentPenaltySettings_Base {
             throw new IllegalStateException("error.PaymentPenaltySettings.createPaymentCode.required");
         }
 
-        if (Boolean.TRUE.equals(super.getCreatePaymentCode()) && getPaymentCodePool() == null) {
+        if (Boolean.TRUE.equals(super.getCreatePaymentCode()) && getDigitalPaymentPlatform() == null) {
             throw new IllegalStateException("error.PaymentPenaltySettings.paymentCodePool.required");
         }
         
@@ -74,17 +74,20 @@ public class PaymentPenaltySettings extends PaymentPenaltySettings_Base {
     public void delete() {
         setDomainRoot(null);
         setPaymentCodePool(null);
+        setDigitalPaymentPlatform(null);
+        setPenaltyProduct(null);
+        
         super.deleteDomainObject();
     }
 
     public void edit(boolean active, Product penaltyProduct, LocalizedString emolumentDescription, boolean createPaymentCode,
-            PaymentCodePool paymentCodePool) {
+            DigitalPaymentPlatform digitalPaymentPlatform) {
         super.setActive(active);
 
         super.setPenaltyProduct(penaltyProduct);
         super.setEmolumentDescription(emolumentDescription);
         super.setCreatePaymentCode(createPaymentCode);
-        super.setPaymentCodePool(paymentCodePool);
+        super.setDigitalPaymentPlatform(digitalPaymentPlatform);
 
         checkRules();
     }
