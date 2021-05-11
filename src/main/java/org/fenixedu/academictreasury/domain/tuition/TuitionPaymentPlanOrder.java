@@ -213,4 +213,15 @@ public class TuitionPaymentPlanOrder extends TuitionPaymentPlanOrder_Base {
         }
         super.deleteDomainObject();
     }
+
+    public TuitionPaymentPlanOrder copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
+        TuitionPaymentPlanOrder result = new TuitionPaymentPlanOrder();
+        result.setDomainRoot(getDomainRoot());
+        result.setDegreeCurricularPlan(getDegreeCurricularPlan());
+        result.setPaymentPlanOrder(getPaymentPlanOrder());
+
+        result.setTuitionPaymentPlan(tuitionPaymentPlan);
+        result.checkRules();
+        return result;
+    }
 }
