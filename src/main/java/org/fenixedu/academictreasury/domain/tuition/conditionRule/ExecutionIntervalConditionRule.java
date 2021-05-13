@@ -84,6 +84,13 @@ public class ExecutionIntervalConditionRule extends ExecutionIntervalConditionRu
     }
 
     @Override
+    public TuitionConditionRule duplicate() {
+        ExecutionIntervalConditionRule result = new ExecutionIntervalConditionRule();
+        getExecutionIntervalSet().forEach(c -> result.addExecutionInterval(c));
+        return result;
+    }
+
+    @Override
     public void fillRuleFromImporter(String string) {
         String[] split = string.split("\\|");
         for (String s : split) {

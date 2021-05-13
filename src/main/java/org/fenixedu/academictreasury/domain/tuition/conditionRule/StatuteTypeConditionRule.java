@@ -10,7 +10,6 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.StatuteType;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
-import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
@@ -74,9 +73,8 @@ public class StatuteTypeConditionRule extends StatuteTypeConditionRule_Base {
     }
 
     @Override
-    public TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
+    public TuitionConditionRule duplicate() {
         StatuteTypeConditionRule result = new StatuteTypeConditionRule();
-        result.setTuitionPaymentPlan(tuitionPaymentPlan);
         getStatuteTypeSet().forEach(c -> result.addStatuteType(c));
         return result;
     }

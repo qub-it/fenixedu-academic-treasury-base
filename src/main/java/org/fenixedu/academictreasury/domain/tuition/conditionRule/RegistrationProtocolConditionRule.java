@@ -9,7 +9,6 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationProtocol;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
-import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 
 @TuitionConditionAnnotation(RegistrationProtocolConditionRule.BUNDLE_NAME)
@@ -64,9 +63,8 @@ public class RegistrationProtocolConditionRule extends RegistrationProtocolCondi
     }
 
     @Override
-    public TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
+    public TuitionConditionRule duplicate() {
         RegistrationProtocolConditionRule result = new RegistrationProtocolConditionRule();
-        result.setTuitionPaymentPlan(tuitionPaymentPlan);
         getRegistrationProtocolSet().forEach(c -> result.addRegistrationProtocol(c));
         return result;
     }

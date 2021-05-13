@@ -6,7 +6,6 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
-import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 
 @TuitionConditionAnnotation(FirstTimeStudentConditionRule.BUNDLE_NAME)
@@ -60,9 +59,8 @@ public class FirstTimeStudentConditionRule extends FirstTimeStudentConditionRule
     }
 
     @Override
-    public TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
+    public TuitionConditionRule duplicate() {
         FirstTimeStudentConditionRule result = new FirstTimeStudentConditionRule();
-        result.setTuitionPaymentPlan(tuitionPaymentPlan);
         result.setFirstTimeStudent(getFirstTimeStudent());
         return result;
     }
@@ -80,4 +78,5 @@ public class FirstTimeStudentConditionRule extends FirstTimeStudentConditionRule
         }
         throw new IllegalArgumentException();
     }
+
 }
