@@ -9,7 +9,6 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
-import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
@@ -66,9 +65,8 @@ public class CurricularYearConditionRule extends CurricularYearConditionRule_Bas
     }
 
     @Override
-    public TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
+    public TuitionConditionRule duplicate() {
         CurricularYearConditionRule result = new CurricularYearConditionRule();
-        result.setTuitionPaymentPlan(tuitionPaymentPlan);
         getCurricularYearSet().forEach(c -> result.addCurricularYear(c));
         return result;
     }
@@ -87,4 +85,5 @@ public class CurricularYearConditionRule extends CurricularYearConditionRule_Bas
             addCurricularYear(readByYear);
         }
     }
+
 }

@@ -13,7 +13,6 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationRegimeType;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
-import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
@@ -112,9 +111,8 @@ public class RegistrationRegimeTypeConditionRule extends RegistrationRegimeTypeC
     }
 
     @Override
-    public TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
+    public TuitionConditionRule duplicate() {
         RegistrationRegimeTypeConditionRule result = new RegistrationRegimeTypeConditionRule();
-        result.setTuitionPaymentPlan(tuitionPaymentPlan);
         getRegistrationRegimeTypes().forEach(c -> result.addRegistrationRegimeTypes(c));
         return result;
     }

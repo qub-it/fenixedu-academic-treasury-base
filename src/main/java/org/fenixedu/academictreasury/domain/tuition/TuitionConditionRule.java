@@ -48,8 +48,14 @@ public abstract class TuitionConditionRule extends TuitionConditionRule_Base {
         return TreasuryPlataformDependentServicesFactory.implementation().bundle(getBundle(), key, args);
     }
 
-    public abstract TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan);
+    public TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
+        TuitionConditionRule result = duplicate();
+        result.setTuitionPaymentPlan(tuitionPaymentPlan);
+        return result;
+    }
 
     public abstract void fillRuleFromImporter(String string);
+
+    public abstract TuitionConditionRule duplicate();
 
 }
