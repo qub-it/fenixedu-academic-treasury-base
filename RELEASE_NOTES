@@ -1,3 +1,4 @@
+- New Fixture: Shared tuition payment plan between curricular plans, check if payment plan is reachable, tuition conditions, tuition installments custom calculators
 - Improvement: Use default payment platform to Automatic rules and Academic services
 - Improvement: Add settlement note ERP certification date
 
