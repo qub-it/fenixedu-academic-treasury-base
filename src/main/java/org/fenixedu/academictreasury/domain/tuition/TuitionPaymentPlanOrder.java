@@ -39,7 +39,7 @@ public class TuitionPaymentPlanOrder extends TuitionPaymentPlanOrder_Base {
                 degreeCurricularPlan, tuitionPaymentPlan.getExecutionYear())
                         .sorted(TuitionPaymentPlanOrder.COMPARE_BY_PAYMENT_PLAN_ORDER.reversed()).findFirst().orElse(null);
 
-        setPaymentPlanOrder(planOrder1 == null ? 0 : planOrder1.getPaymentPlanOrder() + 1);
+        setPaymentPlanOrder(planOrder1 == null ? 1 : planOrder1.getPaymentPlanOrder());
         setTuitionPaymentPlan(tuitionPaymentPlan);
         setDegreeCurricularPlan(degreeCurricularPlan);
 
@@ -171,7 +171,7 @@ public class TuitionPaymentPlanOrder extends TuitionPaymentPlanOrder_Base {
         }
 
         return findSortedByPaymentPlanOrder(getTuitionPaymentPlanGroup(), getDegreeCurricularPlan(), getExecutionYear())
-                .collect(Collectors.toList()).get(getPaymentPlanOrder() - 1);
+                .collect(Collectors.toList()).get(getPaymentPlanOrder() - 2);
     }
 
     private TuitionPaymentPlanOrder getNextTuitionPaymentPlan() {
@@ -180,7 +180,7 @@ public class TuitionPaymentPlanOrder extends TuitionPaymentPlanOrder_Base {
         }
 
         return findSortedByPaymentPlanOrder(getTuitionPaymentPlanGroup(), getDegreeCurricularPlan(), getExecutionYear())
-                .collect(Collectors.toList()).get(getPaymentPlanOrder() + 1);
+                .collect(Collectors.toList()).get(getPaymentPlanOrder());
     }
 
     private ExecutionYear getExecutionYear() {
@@ -206,7 +206,7 @@ public class TuitionPaymentPlanOrder extends TuitionPaymentPlanOrder_Base {
         if (deletePlan && tuitionPaymentPlan.getTuitionPaymentPlanOrdersSet().isEmpty()) {
             tuitionPaymentPlan.delete();
         }
-        int i = 0;
+        int i = 1;
         for (TuitionPaymentPlanOrder order : collect) {
             order.setPaymentPlanOrder(i);
             i++;
