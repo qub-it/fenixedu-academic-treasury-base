@@ -76,16 +76,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     private boolean customized;
     private DebtAccount payorDebtAccount;
 
-    //TODO remove
-//    private RegistrationRegimeType registrationRegimeType;
-//    private RegistrationProtocol registrationProtocol;
-//    private IngressionType ingression;
-//    private CurricularYear curricularYear;
-//    private ExecutionInterval executionSemester;
-//    private boolean firstTimeStudent;
-//    private StatuteType statuteType;
-//    private boolean withLaboratorialClasses;
-
+    
     Set<TuitionConditionRule> conditionRules;
 
     // TODO: Anil Use LocalizedString when web component is compatible with AngularJS
@@ -173,8 +164,8 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this.tuitionPaymentPlanGroup = tuitionPaymentPlanGroup;
         this.finantialEntity = finantialEntity;
         this.executionYear = executionYear;
-        this.conditionRules = new HashSet();
-        this.degreeCurricularPlans = new HashSet();
+        this.conditionRules = new HashSet<>();
+        this.degreeCurricularPlans = new HashSet<>();
         this.importerMap = new HashMap<Class<? extends TuitionConditionRule>, String>();
 
         updateData();
@@ -185,8 +176,6 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this(tuitionPaymentPlan.getProduct(), tuitionPaymentPlan.getTuitionPaymentPlanGroup(),
                 tuitionPaymentPlan.getFinantialEntity(), tuitionPaymentPlan.getExecutionYear());
 
-//        this.degreeType = tuitionPaymentPlan.getDegreeCurricularPlan().getDegreeType();
-
         this.copiedExecutionYear = tuitionPaymentPlan.getExecutionYear();
 
         this.customized = tuitionPaymentPlan.isCustomized();
@@ -194,18 +183,6 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
         this.payorDebtAccount = tuitionPaymentPlan.getPayorDebtAccount();
         this.name = tuitionPaymentPlan.getCustomizedName().getContent();
-
-//        this.curricularYear = tuitionPaymentPlan.getCurricularYear();
-//        if (tuitionPaymentPlan.getSemester() != null) {
-//            this.executionSemester = getExecutionYear().getExecutionSemesterFor(tuitionPaymentPlan.getSemester());
-//        }
-//
-//        this.firstTimeStudent = tuitionPaymentPlan.isFirstTimeStudent();
-//        this.ingression = tuitionPaymentPlan.getIngression();
-//        this.registrationProtocol = tuitionPaymentPlan.getRegistrationProtocol();
-//        this.registrationRegimeType = tuitionPaymentPlan.getRegistrationRegimeType();
-//        this.statuteType = tuitionPaymentPlan.getStatuteType();
-//        this.withLaboratorialClasses = tuitionPaymentPlan.isWithLaboratorialClasses();
 
         this.conditionRules = tuitionPaymentPlan.getTuitionConditionRulesSet();
 

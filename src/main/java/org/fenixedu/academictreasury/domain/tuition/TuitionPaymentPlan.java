@@ -22,6 +22,7 @@ import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.dto.tariff.AcademicTariffBean;
 import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
+import org.fenixedu.academictreasury.util.LocalizedStringUtil;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
@@ -43,27 +44,6 @@ import pt.ist.fenixframework.FenixFramework;
 public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     private static final String CONDITIONS_DESCRIPTION_SEPARATOR = ", ";
-
-//    public static final Comparator<TuitionPaymentPlan> COMPARE_BY_PAYMENT_PLAN_ORDER = (o1, o2) -> {
-//        return TuitionPaymentPlanOrder.COMPARE_BY_PAYMENT_PLAN_ORDER.compare(
-//                o1.getTuitionPaymentPlanOrder(o1.getDegreeCurricularPlan()),
-//                o2.getTuitionPaymentPlanOrder(o2.getDegreeCurricularPlan()));
-//    };
-//
-//    public static final Comparator<TuitionPaymentPlan> COMPARE_BY_DCP_AND_PAYMENT_PLAN_ORDER = (o1, o2) -> {
-//        int c = DegreeCurricularPlan.COMPARATOR_BY_PRESENTATION_NAME.compare(o1.getDegreeCurricularPlan(),
-//                o2.getDegreeCurricularPlan());
-//
-//        if (c != 0) {
-//            return c;
-//        }
-//
-//        return TuitionPaymentPlanOrder.COMPARE_BY_PAYMENT_PLAN_ORDER.compare(
-//                o1.getTuitionPaymentPlanOrder(o1.getDegreeCurricularPlan()),
-//                o2.getTuitionPaymentPlanOrder(o2.getDegreeCurricularPlan()));
-//    };
-
-//    private static final int MAX_PAYMENT_PLANS_LIMIT = 50;
 
     public TuitionPaymentPlan() {
         super();
@@ -142,9 +122,9 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.tuitionPaymentPlanOrders.required");
         }
 
-//        if (isCustomized() && LocalizedStringUtil.isTrimmedEmpty(getName())) {
-//            throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.customized.required.name");
-//        }
+        if (isCustomized() && LocalizedStringUtil.isTrimmedEmpty(getCustomizedName())) {
+            throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.customized.required.name");
+        }
 
         if (isCustomized() && hasStudentSpecificConditionSelected()) {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.customized.plan.cannot.have.other.options");
@@ -164,20 +144,10 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
             }
         }
 
-//        if (findDefaultPaymentPlans(getDegreeCurricularPlan(), getExecutionYear()).count() > 1) {
-//            throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.defaultPaymentPlan.not.unique",
-//                    getDegreeCurricularPlan().getPresentationName());
-//        }
-
-//        if (find(getTuitionPaymentPlanGroup(), getDegreeCurricularPlan(), getExecutionYear(), getPaymentPlanOrder())
-//                .count() > 1) {
-//            throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.paymentPlan.with.order.already.exists");
-//        }
-
         if (getTuitionInstallmentTariffsSet().isEmpty()) {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.installments.must.not.be.empty");
         }
-        if (existesAtLeastOneTariffCalculatedAmountWithoutRemaining()) {
+        if (existsAtLeastOneTariffCalculatedAmountWithoutRemaining()) {
             throw new AcademicTreasuryDomainException(
                     "error.TuitionPaymentPlan.installments.customCalculators.must.have.remaining");
         }
@@ -194,7 +164,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     }
 
-    private boolean existesAtLeastOneTariffCalculatedAmountWithoutRemaining() {
+    private boolean existsAtLeastOneTariffCalculatedAmountWithoutRemaining() {
         return !getTuitionInstallmentTariffsSet().stream()
                 .filter(tariff -> tariff.getTuitionCalculationType().isCalculatedAmount())
                 .map(tariff -> tariff.getTuitionTariffCustomCalculator())
@@ -241,25 +211,6 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                 .sorted(TuitionInstallmentTariff.COMPARATOR_BY_INSTALLMENT_NUMBER)
                 .forEach(t -> TuitionInstallmentTariff.copy(t, this));
     }
-
-//    public LocalizedString getName() {
-//        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-//
-//        LocalizedString result = new LocalizedString();
-//
-//        for (final Locale locale : treasuryServices.availableLocales()) {
-//            final String paymentPlanLabel =
-//                    isCustomized() ? "label.TuitionPaymentPlan.paymentPlanName.customized" : "label.TuitionPaymentPlan.paymentPlanName";
-//
-//            result = result.with(locale,
-//                    AcademicTreasuryConstants.academicTreasuryBundle(locale, paymentPlanLabel,
-//                            "",
-//                            getExecutionYear().getQualifiedName(),
-//                            isCustomized() ? getCustomizedName().getContent(locale) : null));
-//        }
-//
-//        return result;
-//    }
 
     public String getConditionsDescription() {
         if (isCustomized()) {
@@ -498,13 +449,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         super.getTuitionConditionRulesSet().forEach(rule -> rule.delete());
         super.setTuitionPaymentPlanGroup(null);
         super.setExecutionYear(null);
-//        super.setDegreeCurricularPlan(null);
-//        super.setRegistrationProtocol(null);
         super.setProduct(null);
-//        this.setCurricularYear(null);
         this.setFinantialEntity(null);
-//        this.setIngression(null);
-//        this.setStatuteType(null);
         this.setPayorDebtAccount(null);
 
         setCopyFromTuitionPaymentPlan(null);
@@ -581,16 +527,6 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         return TuitionPaymentPlanOrder.findSortedByPaymentPlanOrder(tuitionPaymentPlanGroup, degreeCurricularPlan, executionYear)
                 .map(order -> order.getTuitionPaymentPlan());
     }
-
-//    protected static Stream<TuitionPaymentPlan> find(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
-//            final DegreeCurricularPlan degreeCurricularPlan, final ExecutionYear executionYear, final int paymentPlanOrder) {
-//        return find(tuitionPaymentPlanGroup, degreeCurricularPlan, executionYear)
-//                .filter(t -> t.getPaymentPlanOrder() == paymentPlanOrder);
-//    }
-//    protected static Optional<TuitionPaymentPlan> findUnique(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
-//            final DegreeCurricularPlan degreeCurricularPlan, final ExecutionYear executionYear, final int paymentPlanOrder) {
-//        return find(tuitionPaymentPlanGroup, degreeCurricularPlan, executionYear, paymentPlanOrder).findFirst();
-//    }
 
     private static Stream<TuitionPaymentPlan> findDefaultPaymentPlans(final DegreeCurricularPlan degreeCurricularPlan,
             final ExecutionYear executionYear) {

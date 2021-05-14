@@ -681,8 +681,6 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         propertiesMap.put(
                 AcademicTreasuryEvent.AcademicTreasuryEventKeys.TUITION_CALCULATION_TYPE.getDescriptionI18N().getContent(),
                 getTuitionCalculationType().getDescriptionI18N().getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE));
-//        propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN.getDescriptionI18N().getContent(),
-//                getTuitionPaymentPlan().getName().getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE));
         propertiesMap.put(
                 AcademicTreasuryEvent.AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN_CONDITIONS.getDescriptionI18N().getContent(),
                 getTuitionPaymentPlan().getConditionsDescription());
