@@ -181,14 +181,14 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
                 String text = format("%s [%s] (%s)", product.getName().getContent(locale),
                         iTreasuryServiceRequest.getRegistration().getDegree().getPresentationName(null, locale),
                         iTreasuryServiceRequest.getServiceRequestNumberYear());
-                
+
                 if (!StringUtils.isEmpty(serviceRequestMapEntry.getDebitEntryDescriptionExtensionFormat())) {
                     final StrSubstitutor str = new StrSubstitutor(iTreasuryServiceRequest.getPropertyValuesMap());
 
                     final String extString = str.replace(serviceRequestMapEntry.getDebitEntryDescriptionExtensionFormat());
                     text += " " + extString;
                 }
-                
+
                 result = result.with(locale, text);
             }
         }
@@ -1094,7 +1094,12 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
         TUITION_PAYOR_DEBT_ACCOUNT("42"),
 
-        EFFECTIVE_TUITION_PAYMENT_PLAN("43");
+        EFFECTIVE_TUITION_PAYMENT_PLAN("43"),
+
+        CUSTOM_CALCULATOR("44"),
+
+        CALCULATED_AMOUNT_TYPE("45");
+
 
         private String code;
 
@@ -1665,6 +1670,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
      * --------------------
      */
 
+    @Override
     public String getPersonName() {
         if (getPerson() != null) {
             return getPerson().getName();

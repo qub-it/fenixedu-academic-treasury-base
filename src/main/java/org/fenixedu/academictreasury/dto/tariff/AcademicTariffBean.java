@@ -47,13 +47,15 @@ import org.fenixedu.academictreasury.domain.tariff.AcademicTariff;
 import org.fenixedu.academictreasury.domain.tuition.EctsCalculationType;
 import org.fenixedu.academictreasury.domain.tuition.TuitionCalculationType;
 import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
+import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCalculatedAmountType;
+import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCustomCalculator;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
-import org.fenixedu.treasury.dto.ITreasuryBean;
-import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
 import org.fenixedu.treasury.domain.tariff.InterestType;
+import org.fenixedu.treasury.dto.ITreasuryBean;
+import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
 import org.joda.time.LocalDate;
 
 public class AcademicTariffBean implements ITreasuryBean, Serializable {
@@ -119,7 +121,11 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
     /* Signal bean information is filled */
     public boolean beanInfoFilled;
-    
+
+    private TuitionTariffCalculatedAmountType tuitionTariffCalculatedAmountType;
+
+    private Class<? extends TuitionTariffCustomCalculator> tuitionTariffCustomCalculator;
+
     public AcademicTariffBean() {
         setBeginDate(new LocalDate());
         setEndDate(new LocalDate().plusYears(1));
@@ -183,7 +189,6 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         setDegreeType(academicTariff.getDegreeType());
         setDegree(academicTariff.getDegree());
         setCycleType(academicTariff.getCycleType());
-
         setBaseAmount(academicTariff.getBaseAmount());
         setUnitsForBase(academicTariff.getUnitsForBase());
         setApplyUnitsAmount(academicTariff.isApplyUnitsAmount());
@@ -194,6 +199,8 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         setMaximumAmount(academicTariff.getMaximumAmount());
         setUrgencyRate(academicTariff.getUrgencyRate());
         setLanguageTranslationRate(academicTariff.getLanguageTranslationRate());
+
+        setFinantialEntity(academicTariff.getFinantialEntity());
     }
 
     public AcademicTariffBean(final TuitionInstallmentTariff tuitionInstallmentTariff) {
@@ -290,7 +297,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
                 || getDueDateCalculationType().isBestOfFixedDateAndDaysAfterCreation()) && getFixedDueDate() == null) {
             setFixedDueDate(new LocalDate());
         }
-        
+
         this.setBeanInfoFilled(false);
     }
 
@@ -639,13 +646,33 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
     public void setSheetName(String sheetName) {
         this.sheetName = sheetName;
     }
-    
+
     public boolean isBeanInfoFilled() {
         return beanInfoFilled;
     }
-    
+
     public void setBeanInfoFilled(boolean beanInfoFilled) {
         this.beanInfoFilled = beanInfoFilled;
     }
-    
+
+    public void setTuitionTariffCalculatedAmountType(TuitionTariffCalculatedAmountType tuitionTariffCalculatedAmountType) {
+        this.tuitionTariffCalculatedAmountType = tuitionTariffCalculatedAmountType;
+
+    }
+
+    public TuitionTariffCalculatedAmountType getTuitionTariffCalculatedAmountType() {
+        return tuitionTariffCalculatedAmountType;
+
+    }
+
+    public void setTuitionTariffCustomCalculator(Class<? extends TuitionTariffCustomCalculator> tuitionTariffCustomCalculator) {
+        this.tuitionTariffCustomCalculator = tuitionTariffCustomCalculator;
+
+    }
+
+    public Class<? extends TuitionTariffCustomCalculator> getTuitionTariffCustomCalculator() {
+        return tuitionTariffCustomCalculator;
+
+    }
+
 }

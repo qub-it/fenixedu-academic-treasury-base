@@ -36,12 +36,14 @@
 package org.fenixedu.academictreasury.domain.tuition;
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.util.LocalizedStringUtil;
-import pt.ist.fenixframework.FenixFramework;
 import org.fenixedu.commons.StringNormalizer;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Product;
@@ -49,17 +51,14 @@ import org.fenixedu.treasury.domain.Product;
 import com.google.common.base.Strings;
 
 import pt.ist.fenixframework.Atomic;
+import pt.ist.fenixframework.FenixFramework;
 
 public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
 
-    public static final Comparator<TuitionPaymentPlanGroup> COMPARE_BY_NAME = new Comparator<TuitionPaymentPlanGroup>() {
+    public static final Comparator<TuitionPaymentPlanGroup> COMPARE_BY_NAME = (o1, o2) -> {
+        int c = o1.getName().getContent().compareTo(o2.getName().getContent());
 
-        @Override
-        public int compare(TuitionPaymentPlanGroup o1, TuitionPaymentPlanGroup o2) {
-            int c = o1.getName().getContent().compareTo(o2.getName().getContent());
-
-            return c != 0 ? c : o1.getExternalId().compareTo(o2.getExternalId());
-        }
+        return c != 0 ? c : o1.getExternalId().compareTo(o2.getExternalId());
     };
 
     protected TuitionPaymentPlanGroup() {
@@ -201,6 +200,65 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
     public static TuitionPaymentPlanGroup create(final String code, final LocalizedString name, boolean forRegistration,
             boolean forStandalone, boolean forExtracurricular, final Product currentProduct) {
         return new TuitionPaymentPlanGroup(code, name, forRegistration, forStandalone, forExtracurricular, currentProduct);
+    }
+
+    public Set<Class<? extends TuitionConditionRule>> getAllowedConditionRules() {
+        if (getAllowedConditionRulesSerialized() == null) {
+            return new HashSet<>();
+        }
+        String[] allowedConditionRulesSerialized = getAllowedConditionRulesSerialized().split(",");
+        Set<Class<? extends TuitionConditionRule>> result = new HashSet<>();
+        for (String allowedConditionRule : allowedConditionRulesSerialized) {
+            try {
+                result.add((Class<? extends TuitionConditionRule>) Class.forName(allowedConditionRule));
+            } catch (ClassNotFoundException e) {
+                continue;
+            }
+        }
+        return result;
+    }
+
+    public void addAllowedConditionRules(Class<? extends TuitionConditionRule> allowedConditionRules) {
+        Set<Class<? extends TuitionConditionRule>> classes = getAllowedConditionRules();
+        classes.add(allowedConditionRules);
+        setAllowedConditionRulesSerialized(classes.stream().map(clazz -> clazz.getName()).collect(Collectors.joining(",")));
+    }
+
+    public void removeAllowedConditionRules(Class<? extends TuitionConditionRule> allowedConditionRules) {
+        Set<Class<? extends TuitionConditionRule>> classes = getAllowedConditionRules();
+        classes.remove(allowedConditionRules);
+        setAllowedConditionRulesSerialized(classes.stream().map(t -> t.getName()).collect(Collectors.joining(",")));
+    }
+
+    public Set<Class<? extends TuitionTariffCustomCalculator>> getAllowedCalculatedAmountCalculators() {
+        if (getAllowedCalculatedAmountCalculatorsSerialized() == null) {
+            return new HashSet<>();
+        }
+        String[] allowedCalculatedAmountCalculatorsSerialized = getAllowedCalculatedAmountCalculatorsSerialized().split(",");
+        Set<Class<? extends TuitionTariffCustomCalculator>> result = new HashSet<>();
+        for (String allowedCalculatedAmountCalculators : allowedCalculatedAmountCalculatorsSerialized) {
+            try {
+                result.add((Class<? extends TuitionTariffCustomCalculator>) Class.forName(allowedCalculatedAmountCalculators));
+            } catch (ClassNotFoundException e) {
+                continue;
+            }
+        }
+        return result;
+    }
+
+    public void addAllowedCalculatedAmountCalculators(
+            Class<? extends TuitionTariffCustomCalculator> allowedCalculatedAmountCalculators) {
+        Set<Class<? extends TuitionTariffCustomCalculator>> classes = getAllowedCalculatedAmountCalculators();
+        classes.add(allowedCalculatedAmountCalculators);
+        setAllowedCalculatedAmountCalculatorsSerialized(
+                classes.stream().map(clazz -> clazz.getName()).collect(Collectors.joining(",")));
+    }
+
+    public void removeAllowedCalculatedAmountCalculators(
+            Class<? extends TuitionTariffCustomCalculator> allowedCalculatedAmountCalculators) {
+        Set<Class<? extends TuitionTariffCustomCalculator>> classes = getAllowedCalculatedAmountCalculators();
+        classes.remove(allowedCalculatedAmountCalculators);
+        setAllowedCalculatedAmountCalculatorsSerialized(classes.stream().map(t -> t.getName()).collect(Collectors.joining(",")));
     }
 
 }

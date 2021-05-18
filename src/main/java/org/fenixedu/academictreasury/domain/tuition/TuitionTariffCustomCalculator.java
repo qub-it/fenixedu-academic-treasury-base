@@ -35,30 +35,27 @@
  */
 package org.fenixedu.academictreasury.domain.tuition;
 
-import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundleI18N;
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigDecimal;
 
-import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.academic.domain.student.Registration;
+import org.joda.time.LocalDate;
 
-public enum TuitionCalculationType {
-    FIXED_AMOUNT, ECTS, UNITS, CALCULATED_AMOUNT;
+public interface TuitionTariffCustomCalculator {
+    public BigDecimal getTotalAmount(final Registration registration, final LocalDate debtDate,
+            TuitionPaymentPlan tuitionPaymentPlan);
 
-    public boolean isFixedAmount() {
-        return this == FIXED_AMOUNT;
-    }
+    public String getPresentationName();
 
-    public boolean isEcts() {
-        return this == ECTS;
-    }
+    public static TuitionTariffCustomCalculator instanceOf(
+            Class<? extends TuitionTariffCustomCalculator> tuitionTariffCustomCalculator) {
 
-    public boolean isUnits() {
-        return this == UNITS;
-    }
+        try {
+            return tuitionTariffCustomCalculator.getConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException e) {
+            throw new IllegalArgumentException("error.create.instance.of.TuitionTariffCustomCalculator");
 
-    public boolean isCalculatedAmount() {
-        return this == CALCULATED_AMOUNT;
-    }
-
-    public LocalizedString getDescriptionI18N() {
-        return academicTreasuryBundleI18N(getClass().getSimpleName() + "." + name());
+        }
     }
 }

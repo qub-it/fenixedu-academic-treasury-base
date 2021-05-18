@@ -86,6 +86,9 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
         academicTreasuryBundle("label.PaymentReportEntryBean.header.address"),
         academicTreasuryBundle("label.PaymentReportEntryBean.header.studentNumber"),
         academicTreasuryBundle("label.PaymentReportEntryBean.header.closeDate"),
+        academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificationDate"),
+        academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificateDocumentReference"),
+        
     };
  
     
@@ -125,6 +128,7 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
     private String erpPayorCustomerId;
     
     private String decimalSeparator;
+    
     
     public PaymentReportEntryBean(final PaymentEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
@@ -257,12 +261,23 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
             row.createCell(i++).setCellValue(valueOrEmpty(studentNumber));
             row.createCell(i++).setCellValue(valueOrEmpty(closeDate));
    
+            row.createCell(i++).setCellValue(valueOrEmpty(erpCertificationDate));
+            row.createCell(i++).setCellValue(valueOrEmpty(erpCertificateDocumentReference));
+            
         } catch(final Exception e) {
             e.printStackTrace();
             errorsLog.addError(paymentEntry, e);
         }
     }
     
+    private String valueOrEmpty(final LocalDate value) {
+        if (value == null) {
+            return "";
+        }
+
+        return value.toString(AcademicTreasuryConstants.DATE_FORMAT_YYYY_MM_DD);
+    }
+
     private String valueOrEmpty(final DateTime value) {
         if (value == null) {
             return "";

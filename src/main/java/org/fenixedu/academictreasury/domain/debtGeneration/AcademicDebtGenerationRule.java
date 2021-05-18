@@ -49,20 +49,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
-import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.student.StatuteType;
-import org.fenixedu.academictreasury.domain.debtGeneration.restrictions.DebtsWithNoPaymentCodeReferences;
-import org.fenixedu.academictreasury.domain.debtGeneration.restrictions.EnrolmentRenewalRestriction;
-import org.fenixedu.academictreasury.domain.debtGeneration.restrictions.FirstTimeFirstYearRestriction;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.dto.debtGeneration.AcademicDebtGenerationRuleBean;
 import org.fenixedu.academictreasury.dto.debtGeneration.AcademicDebtGenerationRuleBean.ProductEntry;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
-import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.slf4j.Logger;
@@ -77,33 +70,23 @@ import pt.ist.fenixframework.FenixFramework;
 
 public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base {
 
-    public static final Comparator<AcademicDebtGenerationRule> COMPARE_BY_ORDER_NUMBER =
-            new Comparator<AcademicDebtGenerationRule>() {
+    public static final Comparator<AcademicDebtGenerationRule> COMPARE_BY_ORDER_NUMBER = (o1, o2) -> {
+        int v = Integer.compare(o1.getAcademicDebtGenerationRuleType().getOrderNumber(),
+                o2.getAcademicDebtGenerationRuleType().getOrderNumber());
 
-                @Override
-                public int compare(final AcademicDebtGenerationRule o1, final AcademicDebtGenerationRule o2) {
-                    int v = Integer.compare(o1.getAcademicDebtGenerationRuleType().getOrderNumber(),
-                            o2.getAcademicDebtGenerationRuleType().getOrderNumber());
+        if (v != 0) {
+            return v;
+        }
 
-                    if (v != 0) {
-                        return v;
-                    }
+        int c = Integer.compare(o1.getOrderNumber(), o2.getOrderNumber());
+        return c != 0 ? c : o1.getExternalId().compareTo(o2.getExternalId());
+    };
 
-                    int c = Integer.compare(o1.getOrderNumber(), o2.getOrderNumber());
-                    return c != 0 ? c : o1.getExternalId().compareTo(o2.getExternalId());
-                }
-            };
+    public static Comparator<AcademicDebtGenerationRule> COMPARATOR_BY_EXECUTION_YEAR = (o1, o2) -> {
+        int c = o1.getExecutionYear().compareTo(o2.getExecutionYear());
 
-    public static Comparator<AcademicDebtGenerationRule> COMPARATOR_BY_EXECUTION_YEAR =
-            new Comparator<AcademicDebtGenerationRule>() {
-
-                @Override
-                public int compare(AcademicDebtGenerationRule o1, AcademicDebtGenerationRule o2) {
-                    int c = o1.getExecutionYear().compareTo(o2.getExecutionYear());
-
-                    return c != 0 ? c : o1.getExternalId().compareTo(o2.getExternalId());
-                }
-            };
+        return c != 0 ? c : o1.getExternalId().compareTo(o2.getExternalId());
+    };
 
     protected AcademicDebtGenerationRule() {
         super();
@@ -124,7 +107,6 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         setCloseDebitNote(false);
         setAlignAllAcademicTaxesDebitToMaxDueDate(false);
         setCreatePaymentReferenceCode(bean.isToCreatePaymentReferenceCodes());
-        setDigitalPaymentPlatform(bean.getDigitalPaymentPlatform());
 
         if (bean.isToAlignAcademicTaxesDueDate()) {
             setAcademicTaxDueDateAlignmentType(bean.getAcademicTaxDueDateAlignmentType());
@@ -169,7 +151,6 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         setCloseDebitNote(ruleToCopy.isCloseDebitNote());
         setAlignAllAcademicTaxesDebitToMaxDueDate(ruleToCopy.isAlignAllAcademicTaxesDebitToMaxDueDate());
         setCreatePaymentReferenceCode(ruleToCopy.isCreatePaymentReferenceCode());
-        setDigitalPaymentPlatform(ruleToCopy.getDigitalPaymentPlatform());
 
         setAcademicTaxDueDateAlignmentType(ruleToCopy.getAcademicTaxDueDateAlignmentType());
 
@@ -178,7 +159,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
                     entry.isToCreateAfterLastRegistrationStateDate(), entry.isForceCreation(),
                     entry.isLimitToRegisteredOnExecutionYear());
         }
-        
+
         ruleToCopy.getAcademicDebtGenerationRuleRestrictionsSet().stream().forEach(r -> r.makeCopy(this));
 
         getDegreeCurricularPlansSet().addAll((ruleToCopy.getDegreeCurricularPlansSet()));
@@ -226,10 +207,6 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         if (getAcademicDebtGenerationRuleType().strategyImplementation().isEntriesRequired()
                 && getAcademicDebtGenerationRuleEntriesSet().isEmpty()) {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.entries.required");
-        }
-
-        if (isCreatePaymentReferenceCode() && getDigitalPaymentPlatform() == null) {
-            throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.paymentCodePool.required");
         }
 
         if (getDegreeCurricularPlansSet().isEmpty()) {
@@ -333,15 +310,12 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         setAcademicDebtGenerationRuleType(null);
         getDegreeCurricularPlansSet().clear();
         setExecutionYear(null);
-        setPaymentCodePool(null);
-        setDigitalPaymentPlatform(null);
         while (getAcademicDebtGenerationRuleEntriesSet().size() > 0) {
             getAcademicDebtGenerationRuleEntriesSet().iterator().next().delete();
         }
-        
 
         setDebtGenerationRuleRestriction(null);
-        while(!getAcademicDebtGenerationRuleRestrictionsSet().isEmpty()) {
+        while (!getAcademicDebtGenerationRuleRestrictionsSet().isEmpty()) {
             getAcademicDebtGenerationRuleRestrictionsSet().iterator().next().delete();
         }
 
@@ -487,7 +461,6 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         setCloseDebitNote(false);
         setAlignAllAcademicTaxesDebitToMaxDueDate(false);
         setCreatePaymentReferenceCode(bean.isToCreatePaymentReferenceCodes());
-        setDigitalPaymentPlatform(bean.getDigitalPaymentPlatform());
 
         if (bean.isToAlignAcademicTaxesDueDate()) {
             setAcademicTaxDueDateAlignmentType(bean.getAcademicTaxDueDateAlignmentType());

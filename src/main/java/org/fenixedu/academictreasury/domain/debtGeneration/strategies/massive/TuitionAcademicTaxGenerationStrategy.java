@@ -108,15 +108,15 @@ public class TuitionAcademicTaxGenerationStrategy implements IMassiveDebtGenerat
                     if (!createdTuition) {
                         final Integer registrationNumber = row.getStudentCurricularPlan().getRegistration().getNumber();
                         final String studentName = row.getStudentCurricularPlan().getRegistration().getStudent().getName();
-                        final String tuitionPaymentPlanName = row.getTuitionPaymentPlan().getConditionsDescription().getContent();
+                        final String tuitionPaymentPlanName = row.getTuitionPaymentPlan().getConditionsDescription();
 
                         throw new AcademicTreasuryDomainException("error.MassiveDebtGenerationRequestFile.tuition.not.created",
                                 String.valueOf(registrationNumber), studentName, tuitionPaymentPlanName);
                     }
                 } else if (file.getAcademicTax() != null) {
-                    boolean createdAcademicTax =
-                            AcademicTaxServices.createAcademicTaxForDefaultFinantialEntity(row.getStudentCurricularPlan().getRegistration(),
-                                    file.getExecutionYear(), file.getAcademicTax(), file.getDebtDate(), true);
+                    boolean createdAcademicTax = AcademicTaxServices.createAcademicTaxForDefaultFinantialEntity(
+                            row.getStudentCurricularPlan().getRegistration(), file.getExecutionYear(), file.getAcademicTax(),
+                            file.getDebtDate(), true);
 
                     if (!createdAcademicTax) {
                         final Integer registrationNumber = row.getStudentCurricularPlan().getRegistration().getNumber();
@@ -240,8 +240,7 @@ public class TuitionAcademicTaxGenerationStrategy implements IMassiveDebtGenerat
                 if (tuitionPaymentPlanGroup != null) {
                     TuitionPaymentPlan tuitionPaymentPlan = TuitionPaymentPlan
                             .find(tuitionPaymentPlanGroup, studentCurricularPlan.getDegreeCurricularPlan(), executionYear)
-                            .filter(t -> t.getConditionsDescription().getContent().equals(tuitionPaymentPlanName)).findFirst()
-                            .orElse(null);
+                            .filter(t -> t.getConditionsDescription().equals(tuitionPaymentPlanName)).findFirst().orElse(null);
 
                     if (tuitionPaymentPlan == null) {
                         throw new AcademicTreasuryDomainException(
@@ -326,24 +325,23 @@ public class TuitionAcademicTaxGenerationStrategy implements IMassiveDebtGenerat
         return false;
     }
 
+    @Override
     public String viewUrl() {
         return "/WEB-INF/academicTreasury/debtGeneration/strategies/massive/TuitionAcademicTaxGenerationStrategy.jsp";
     }
 
     @Override
     public String dataDescription(final MassiveDebtGenerationRequestFile file) {
-        if(file.getTuitionPaymentPlanGroup() != null) {
-            return academicTreasuryBundle("label.TuitionAcademicTaxGenerationStrategy.dataDescription.tuitionPaymentPlanGroup", 
-                        file.getTuitionPaymentPlanGroup().getName().getContent(), 
-                        file.getExecutionYear().getQualifiedName(), 
-                        file.getDebtDate().toString(org.fenixedu.academictreasury.util.AcademicTreasuryConstants.DATE_FORMAT));
-            
-        } else {
-            return academicTreasuryBundle("label.TuitionAcademicTaxGenerationStrategy.dataDescription.academicTax", 
-                    file.getAcademicTax().getProduct().getName().getContent(), 
-                    file.getExecutionYear().getQualifiedName(), 
+        if (file.getTuitionPaymentPlanGroup() != null) {
+            return academicTreasuryBundle("label.TuitionAcademicTaxGenerationStrategy.dataDescription.tuitionPaymentPlanGroup",
+                    file.getTuitionPaymentPlanGroup().getName().getContent(), file.getExecutionYear().getQualifiedName(),
                     file.getDebtDate().toString(org.fenixedu.academictreasury.util.AcademicTreasuryConstants.DATE_FORMAT));
-            
+
+        } else {
+            return academicTreasuryBundle("label.TuitionAcademicTaxGenerationStrategy.dataDescription.academicTax",
+                    file.getAcademicTax().getProduct().getName().getContent(), file.getExecutionYear().getQualifiedName(),
+                    file.getDebtDate().toString(org.fenixedu.academictreasury.util.AcademicTreasuryConstants.DATE_FORMAT));
+
         }
     }
 

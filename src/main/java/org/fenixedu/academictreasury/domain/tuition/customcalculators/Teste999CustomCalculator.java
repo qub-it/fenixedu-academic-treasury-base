@@ -33,32 +33,27 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.fenixedu.academictreasury.domain.tuition;
+package org.fenixedu.academictreasury.domain.tuition.customcalculators;
 
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundleI18N;
 
-import org.fenixedu.commons.i18n.LocalizedString;
+import java.math.BigDecimal;
 
-public enum TuitionCalculationType {
-    FIXED_AMOUNT, ECTS, UNITS, CALCULATED_AMOUNT;
+import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
+import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCustomCalculator;
+import org.joda.time.LocalDate;
 
-    public boolean isFixedAmount() {
-        return this == FIXED_AMOUNT;
+public class Teste999CustomCalculator implements TuitionTariffCustomCalculator {
+
+    @Override
+    public BigDecimal getTotalAmount(Registration registration, LocalDate debtDate, TuitionPaymentPlan tuitionPaymentPlan) {
+        return new BigDecimal(999.99);
     }
 
-    public boolean isEcts() {
-        return this == ECTS;
+    @Override
+    public String getPresentationName() {
+        return academicTreasuryBundleI18N(getClass().getName()).getContent();
     }
 
-    public boolean isUnits() {
-        return this == UNITS;
-    }
-
-    public boolean isCalculatedAmount() {
-        return this == CALCULATED_AMOUNT;
-    }
-
-    public LocalizedString getDescriptionI18N() {
-        return academicTreasuryBundleI18N(getClass().getSimpleName() + "." + name());
-    }
 }

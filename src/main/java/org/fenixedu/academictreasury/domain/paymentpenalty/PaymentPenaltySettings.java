@@ -43,7 +43,6 @@ import java.util.stream.Stream;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Product;
-import org.fenixedu.treasury.domain.paymentcodes.pool.PaymentCodePool;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 
 import pt.ist.fenixframework.Atomic;
@@ -57,7 +56,6 @@ public class PaymentPenaltySettings extends PaymentPenaltySettings_Base {
         setDomainRoot(FenixFramework.getDomainRoot());
         setActive(false);
         setCreatePaymentCode(false);
-        setPaymentCodePool(null);
 
         checkRules();
     }
@@ -83,11 +81,7 @@ public class PaymentPenaltySettings extends PaymentPenaltySettings_Base {
             throw new IllegalStateException("error.PaymentPenaltySettings.createPaymentCode.required");
         }
 
-        if (Boolean.TRUE.equals(super.getCreatePaymentCode()) && getPaymentCodePool() == null) {
-            throw new IllegalStateException("error.PaymentPenaltySettings.paymentCodePool.required");
-        }
-        
-        if(findAll().count() > 1) {
+        if (findAll().count() > 1) {
             throw new IllegalStateException("error.PaymentPenaltySettings.already.created");
         }
     }
@@ -101,25 +95,24 @@ public class PaymentPenaltySettings extends PaymentPenaltySettings_Base {
 
             result = result.with(locale, StrSubstitutor.replace(getEmolumentDescription().getContent(locale), valueMap));
         }
-        
+
         return result;
     }
 
     @Atomic
     public void delete() {
         setDomainRoot(null);
-        setPaymentCodePool(null);
+        setPenaltyProduct(null);
+
         super.deleteDomainObject();
     }
 
-    public void edit(boolean active, Product penaltyProduct, LocalizedString emolumentDescription, boolean createPaymentCode,
-            PaymentCodePool paymentCodePool) {
+    public void edit(boolean active, Product penaltyProduct, LocalizedString emolumentDescription, boolean createPaymentCode) {
         super.setActive(active);
 
         super.setPenaltyProduct(penaltyProduct);
         super.setEmolumentDescription(emolumentDescription);
         super.setCreatePaymentCode(createPaymentCode);
-        super.setPaymentCodePool(paymentCodePool);
 
         checkRules();
     }
@@ -131,7 +124,7 @@ public class PaymentPenaltySettings extends PaymentPenaltySettings_Base {
     public static PaymentPenaltySettings create() {
         return new PaymentPenaltySettings();
     }
-    
+
     public static Stream<PaymentPenaltySettings> findAll() {
         return FenixFramework.getDomainRoot().getPaymentPenaltySettingsSet().stream();
     }

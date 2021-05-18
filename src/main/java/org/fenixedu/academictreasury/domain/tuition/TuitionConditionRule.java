@@ -35,30 +35,62 @@
  */
 package org.fenixedu.academictreasury.domain.tuition;
 
-import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundleI18N;
+import java.util.Comparator;
 
-import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.academic.domain.Enrolment;
+import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 
-public enum TuitionCalculationType {
-    FIXED_AMOUNT, ECTS, UNITS, CALCULATED_AMOUNT;
+import pt.ist.fenixframework.FenixFramework;
 
-    public boolean isFixedAmount() {
-        return this == FIXED_AMOUNT;
+public abstract class TuitionConditionRule extends TuitionConditionRule_Base {
+
+    public static final Comparator<TuitionConditionRule> COMPARE_BY_CONDITION_RULE_NAME = (o1, o2) -> {
+        return getPresentationName(o1.getClass()).compareTo(getPresentationName(o2.getClass()));
+    };
+
+    public TuitionConditionRule() {
+        super();
+        setDomainRoot(FenixFramework.getDomainRoot());
     }
 
-    public boolean isEcts() {
-        return this == ECTS;
+    public abstract boolean containsRule(TuitionConditionRule tuitionConditionRule);
+
+    public boolean isValidTo(final Registration registration, final ExecutionYear executionYear) {
+        return isValidTo(registration, executionYear, null);
     }
 
-    public boolean isUnits() {
-        return this == UNITS;
+    public abstract boolean checkRules();
+
+    public String getDescription() {
+        throw new IllegalArgumentException("description not implemented");
     }
 
-    public boolean isCalculatedAmount() {
-        return this == CALCULATED_AMOUNT;
+    public abstract void delete();
+
+    public abstract boolean isValidTo(final Registration registration, final ExecutionYear executionYear,
+            final Enrolment enrolment);
+
+    protected abstract String getBundle();
+
+    public static String getPresentationName(Class<? extends TuitionConditionRule> tuitionConditionRule) {
+        return TreasuryPlataformDependentServicesFactory.implementation().bundle(
+                tuitionConditionRule.getAnnotation(TuitionConditionAnnotation.class).value(), tuitionConditionRule.getName());
     }
 
-    public LocalizedString getDescriptionI18N() {
-        return academicTreasuryBundleI18N(getClass().getSimpleName() + "." + name());
+    public String i18n(String key, String... args) {
+        return TreasuryPlataformDependentServicesFactory.implementation().bundle(getBundle(), key, args);
     }
+
+    public TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
+        TuitionConditionRule result = duplicate();
+        result.setTuitionPaymentPlan(tuitionPaymentPlan);
+        return result;
+    }
+
+    public abstract void fillRuleFromImporter(String string);
+
+    public abstract TuitionConditionRule duplicate();
+
 }
