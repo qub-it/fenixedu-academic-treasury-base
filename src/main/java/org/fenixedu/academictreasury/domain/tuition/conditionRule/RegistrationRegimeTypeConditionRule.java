@@ -109,14 +109,14 @@ public class RegistrationRegimeTypeConditionRule extends RegistrationRegimeTypeC
         Set<RegistrationRegimeType> registrationRegimeTypes = getRegimeTypesConverted();
         registrationRegimeTypes.add(type);
         setRegistrationRegimeTypesSerialized(
-                registrationRegimeTypes.stream().map(t -> t.getName()).collect(Collectors.joining(",")));
+                registrationRegimeTypes.stream().map(t -> t.name()).collect(Collectors.joining(",")));
     }
 
     public void removeRegistrationRegimeTypes(RegistrationRegimeType type) {
         Set<RegistrationRegimeType> registrationRegimeTypes = getRegimeTypesConverted();
         registrationRegimeTypes.remove(type);
         setRegistrationRegimeTypesSerialized(
-                registrationRegimeTypes.stream().map(t -> t.getName()).collect(Collectors.joining(",")));
+                registrationRegimeTypes.stream().map(t -> t.name()).collect(Collectors.joining(",")));
     }
 
     @Override
