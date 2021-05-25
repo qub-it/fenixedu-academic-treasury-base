@@ -35,16 +35,34 @@
  */
 package org.fenixedu.academictreasury.domain.tuition.customcalculators;
 
-import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundleI18N;
-
 import java.math.BigDecimal;
 
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCustomCalculator;
+import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.joda.time.LocalDate;
 
 public class Teste999CustomCalculator implements TuitionTariffCustomCalculator {
+
+    private BigDecimal total;
+    private String calculeDescription;
+
+    public Teste999CustomCalculator() {
+    }
+
+    public Teste999CustomCalculator(Registration registration, TuitionPaymentPlan paymentPlan) {
+        StringBuilder strBuilder = new StringBuilder();
+
+        total = calculateValue(strBuilder, registration, paymentPlan);
+
+        calculeDescription = strBuilder.toString();
+    }
+
+    private BigDecimal calculateValue(StringBuilder strBuilder, Registration registration, TuitionPaymentPlan paymentPlan) {
+        strBuilder.append("- Descrição do calculo 999.99");
+        return new BigDecimal("999.99");
+    }
 
     @Override
     public BigDecimal getTotalAmount(Registration registration, LocalDate debtDate, TuitionPaymentPlan tuitionPaymentPlan) {
@@ -53,7 +71,16 @@ public class Teste999CustomCalculator implements TuitionTariffCustomCalculator {
 
     @Override
     public String getPresentationName() {
-        return academicTreasuryBundleI18N(getClass().getName()).getContent();
+        return AcademicTreasuryConstants.academicTreasuryBundle(getClass().getName());
     }
 
+    @Override
+    public BigDecimal getTotalAmount() {
+        return total;
+    }
+
+    @Override
+    public String getCalculeDescritpion() {
+        return calculeDescription;
+    }
 }

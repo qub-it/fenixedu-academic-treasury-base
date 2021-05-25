@@ -39,19 +39,31 @@ import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 
 import org.fenixedu.academic.domain.student.Registration;
-import org.joda.time.LocalDate;
 
 public interface TuitionTariffCustomCalculator {
-    public BigDecimal getTotalAmount(final Registration registration, final LocalDate debtDate,
-            TuitionPaymentPlan tuitionPaymentPlan);
+    public BigDecimal getTotalAmount();
+
+    public String getCalculeDescritpion();
 
     public String getPresentationName();
 
-    public static TuitionTariffCustomCalculator instanceOf(
-            Class<? extends TuitionTariffCustomCalculator> tuitionTariffCustomCalculator) {
+    public static TuitionTariffCustomCalculator getNewInstanceFor(
+            Class<? extends TuitionTariffCustomCalculator> tuitionTariffCustomCalculator, Registration registration,
+            TuitionPaymentPlan tuitionPaymentPlan) {
 
         try {
-            return tuitionTariffCustomCalculator.getConstructor().newInstance();
+            return tuitionTariffCustomCalculator.getConstructor(Registration.class, TuitionPaymentPlan.class)
+                    .newInstance(registration, tuitionPaymentPlan);
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException e) {
+            throw new IllegalArgumentException("error.create.instance.of.TuitionTariffCustomCalculator");
+
+        }
+    }
+
+    public static String getPresentationNameFor(Class<? extends TuitionTariffCustomCalculator> tuitionTariffCustomCalculator) {
+        try {
+            return tuitionTariffCustomCalculator.getConstructor().newInstance().getPresentationName();
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
                 | NoSuchMethodException | SecurityException e) {
             throw new IllegalArgumentException("error.create.instance.of.TuitionTariffCustomCalculator");
