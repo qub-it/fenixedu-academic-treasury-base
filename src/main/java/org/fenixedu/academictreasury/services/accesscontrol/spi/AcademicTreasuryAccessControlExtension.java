@@ -48,6 +48,8 @@ import org.joda.time.LocalDate;
 
 import com.google.common.collect.Sets;
 
+@Deprecated
+// TODO: Access Control is pluggable and its plugins can be in other specific modules
 public class AcademicTreasuryAccessControlExtension implements ITreasuryAccessControlExtension<Object> {
 
     @Override
