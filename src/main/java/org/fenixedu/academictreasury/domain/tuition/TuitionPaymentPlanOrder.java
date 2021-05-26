@@ -39,7 +39,7 @@ public class TuitionPaymentPlanOrder extends TuitionPaymentPlanOrder_Base {
                 degreeCurricularPlan, tuitionPaymentPlan.getExecutionYear())
                         .sorted(TuitionPaymentPlanOrder.COMPARE_BY_PAYMENT_PLAN_ORDER.reversed()).findFirst().orElse(null);
 
-        setPaymentPlanOrder(planOrder1 == null ? 1 : planOrder1.getPaymentPlanOrder());
+        setPaymentPlanOrder(planOrder1 == null ? 1 : planOrder1.getPaymentPlanOrder() + 1);
         setTuitionPaymentPlan(tuitionPaymentPlan);
         setDegreeCurricularPlan(degreeCurricularPlan);
 

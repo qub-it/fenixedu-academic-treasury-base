@@ -184,7 +184,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this.payorDebtAccount = tuitionPaymentPlan.getPayorDebtAccount();
         this.name = tuitionPaymentPlan.getCustomizedName().getContent();
 
-        this.conditionRules = tuitionPaymentPlan.getTuitionConditionRulesSet();
+        this.conditionRules = new HashSet<>(tuitionPaymentPlan.getTuitionConditionRulesSet());
 
         fillWithInstallments(tuitionPaymentPlan);
     }
