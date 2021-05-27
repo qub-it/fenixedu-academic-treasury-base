@@ -64,11 +64,6 @@ public class TesteCustomCalculator implements TuitionTariffCustomCalculator {
     }
 
     @Override
-    public BigDecimal getTotalAmount(Registration registration, LocalDate debtDate, TuitionPaymentPlan tuitionPaymentPlan) {
-        return new BigDecimal(1000);
-    }
-
-    @Override
     public String getPresentationName() {
         return AcademicTreasuryConstants.academicTreasuryBundle(getClass().getName());
     }
