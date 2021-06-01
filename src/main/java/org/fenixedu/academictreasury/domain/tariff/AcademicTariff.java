@@ -38,6 +38,7 @@ import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.DebitNote;
 import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
+import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
 import org.fenixedu.treasury.domain.tariff.InterestRate;
 import org.fenixedu.treasury.domain.tariff.InterestType;
@@ -74,7 +75,8 @@ public class AcademicTariff extends AcademicTariff_Base {
     protected void init(final FinantialEntity finantialEntity, final Product product, final AcademicTariffBean bean) {
 
         super.init(finantialEntity, product, bean.getBeginDate().toDateTimeAtStartOfDay(),
-                bean.getEndDate() != null ? bean.getEndDate().toDateTimeAtStartOfDay() : null, bean.getDueDateCalculationType(),
+                bean.getEndDate() != null ? bean.getEndDate().toDateTimeAtStartOfDay().plusDays(1).minusSeconds(1) : null, 
+                bean.getDueDateCalculationType(),
                 bean.getFixedDueDate() != null ? bean.getFixedDueDate() : null, bean.getNumberOfDaysAfterCreationForDueDate(),
                 bean.isApplyInterests(), bean.getInterestType(), bean.getNumberOfDaysAfterDueDate(), bean.isApplyInFirstWorkday(),
                 bean.getMaximumDaysToApplyPenalty(), bean.getInterestFixedAmount(),
@@ -263,6 +265,11 @@ public class AcademicTariff extends AcademicTariff_Base {
         setDegree(null);
 
         super.delete();
+    }
+    
+    @Override
+    public BigDecimal amountToPay() {
+        return getBaseAmount();
     }
 
     public BigDecimal amountToPay(final AcademicTreasuryEvent academicTreasuryEvent) {
@@ -539,6 +546,11 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         return debitEntry;
     }
+        
+    @Override
+    public boolean isBroadTariffForFinantialEntity() {
+        return getDegreeType() == null && getDegree() == null && getCycleType() == null;
+    }
 
     private void updatePriceValuesInEvent(final AcademicTreasuryEvent academicTreasuryEvent,
             final EnrolmentEvaluation enrolmentEvaluation) {
@@ -753,6 +765,8 @@ public class AcademicTariff extends AcademicTariff_Base {
         return find(finantialEntity, product, administrativeOffice, degreeType).filter(t -> t.getDegree() == degree);
     }
 
+    @Deprecated
+    // TODO: Remove this method, no school define tariff based on cycle type
     private static Stream<? extends AcademicTariff> find(final FinantialEntity finantialEntity, final Product product, final AdministrativeOffice administrativeOffice,
             final DegreeType degreeType, final Degree degree, final CycleType cycleType) {
         if (cycleType == null) {
@@ -790,6 +804,8 @@ public class AcademicTariff extends AcademicTariff_Base {
         return find(finantialEntity, product, administrativeOffice, degreeType, degree).filter(t -> t.isActive(when));
     }
 
+    @Deprecated
+    // TODO: Remove this method, no school define tariff based on cycle type
     public static Stream<? extends AcademicTariff> findActive(final FinantialEntity finantialEntity, final Product product,
             final AdministrativeOffice administrativeOffice, final DegreeType degreeType, final Degree degree,
             final CycleType cycleType, final DateTime when) {
@@ -932,6 +948,8 @@ public class AcademicTariff extends AcademicTariff_Base {
         return findMatch(finantialEntity, product, administrativeOffice, degreeType, when);
     }
 
+    @Deprecated
+    // TODO: Remove this method, no school define tariff based on cycle type
     public static AcademicTariff findMatch(final FinantialEntity finantialEntity, final Product product, final Degree degree, final CycleType cycleType,
             final DateTime when) {
         if (degree == null || cycleType == null) {

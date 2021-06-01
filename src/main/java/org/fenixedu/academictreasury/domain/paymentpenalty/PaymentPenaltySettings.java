@@ -13,6 +13,7 @@ import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServ
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 
+@Deprecated
 public class PaymentPenaltySettings extends PaymentPenaltySettings_Base {
 
     public PaymentPenaltySettings() {
