@@ -577,6 +577,12 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         while (!getTuitionPaymentPlanOrdersSet().isEmpty()) {
             getTuitionPaymentPlanOrdersSet().iterator().next().delete(false);
         }
+        
+        setDegreeCurricularPlan(null);
+        setRegistrationProtocol(null);
+        setIngression(null);
+        setStatuteType(null);
+        setCurricularYear(null);
 
         super.deleteDomainObject();
     }

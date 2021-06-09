@@ -1,3 +1,5 @@
+- Bug Fix: Dissociate dcp and other objects when deleting tuition payment plan
+
 7.2.0 (27-05-2021)
 - Improvement: Refactorization to use CustomCalculatorsMap on fillProperties
 
