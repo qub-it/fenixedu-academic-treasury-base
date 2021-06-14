@@ -37,7 +37,6 @@ package org.fenixedu.academictreasury.domain.tuition;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -75,7 +74,7 @@ public class TuitionPaymentPlanOrder extends TuitionPaymentPlanOrder_Base {
                 degreeCurricularPlan, tuitionPaymentPlan.getExecutionYear())
                         .sorted(TuitionPaymentPlanOrder.COMPARE_BY_PAYMENT_PLAN_ORDER.reversed()).findFirst().orElse(null);
 
-        setPaymentPlanOrder(planOrder1 == null ? 1 : planOrder1.getPaymentPlanOrder());
+        setPaymentPlanOrder(planOrder1 == null ? 1 : planOrder1.getPaymentPlanOrder() + 1);
         setTuitionPaymentPlan(tuitionPaymentPlan);
         setDegreeCurricularPlan(degreeCurricularPlan);
 
@@ -200,7 +199,7 @@ public class TuitionPaymentPlanOrder extends TuitionPaymentPlanOrder_Base {
                         && o.getTuitionPaymentPlan().getExecutionYear() == executionYear)
                 .sorted(COMPARE_BY_PAYMENT_PLAN_ORDER);
     }
-    
+
     private TuitionPaymentPlanOrder getPreviousTuitionPaymentPlan() {
         if (isFirst()) {
             return null;
@@ -229,13 +228,13 @@ public class TuitionPaymentPlanOrder extends TuitionPaymentPlanOrder_Base {
 
     public void delete(boolean deletePlan) {
         TuitionPaymentPlan tuitionPaymentPlan = getTuitionPaymentPlan();
-        List<TuitionPaymentPlanOrder> collect = find(getDegreeCurricularPlan())
-                .filter(
-                        order -> order.getTuitionPaymentPlan().getExecutionYear() == tuitionPaymentPlan.getExecutionYear()
+        List<TuitionPaymentPlanOrder> collect =
+                find(getDegreeCurricularPlan())
+                        .filter(order -> order.getTuitionPaymentPlan().getExecutionYear() == tuitionPaymentPlan.getExecutionYear()
                                 && order != this
                                 && tuitionPaymentPlan.getTuitionPaymentPlanGroup() == order.getTuitionPaymentPlan()
                                         .getTuitionPaymentPlanGroup())
-                .sorted(COMPARE_BY_PAYMENT_PLAN_ORDER).collect(Collectors.toList());
+                        .sorted(COMPARE_BY_PAYMENT_PLAN_ORDER).collect(Collectors.toList());
         setDomainRoot(null);
         setTuitionPaymentPlan(null);
         setDegreeCurricularPlan(null);
@@ -260,13 +259,13 @@ public class TuitionPaymentPlanOrder extends TuitionPaymentPlanOrder_Base {
         result.checkRules();
         return result;
     }
-    
+
     // Services
-    
+
     public static Stream<TuitionPaymentPlanOrder> findAll() {
         return FenixFramework.getDomainRoot().getTuitionPaymentPlansOrderSet().stream();
     }
-    
+
     public static Stream<TuitionPaymentPlanOrder> find(DegreeCurricularPlan dcp) {
         return findAll().filter(o -> o.getDegreeCurricularPlan() == dcp);
     }

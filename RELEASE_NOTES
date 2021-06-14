@@ -1,3 +1,5 @@
+- Bug Fix: Change payment plan order to last plus one
+
 7.2.1 (09-06-2021)
 - Bug Fix: Dissociate dcp and other objects when deleting tuition payment plan
 
