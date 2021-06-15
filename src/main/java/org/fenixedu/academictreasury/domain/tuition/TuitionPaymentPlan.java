@@ -521,6 +521,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                 .filter(t -> t.getExecutionYear() == executionYear);
     }
 
+    @Deprecated
     public static Stream<TuitionPaymentPlan> find(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
             final DegreeCurricularPlan degreeCurricularPlan, final ExecutionYear executionYear) {
 
@@ -529,6 +530,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                         .anyMatch(order -> order.getDegreeCurricularPlan() == degreeCurricularPlan));
     }
 
+    @Deprecated
     public static Stream<TuitionPaymentPlan> findSortedByPaymentPlanOrder(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
             final DegreeCurricularPlan degreeCurricularPlan, final ExecutionYear executionYear) {
         return TuitionPaymentPlanOrder.findSortedByPaymentPlanOrder(tuitionPaymentPlanGroup, degreeCurricularPlan, executionYear)
