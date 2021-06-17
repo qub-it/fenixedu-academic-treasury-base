@@ -1,3 +1,6 @@
+- Refactor: Deprecate PaymentPenaltyEventTarget
+- Bug Fix: Include other treasury events than AcademicTreasuryEvent, associated with debt account 
+
 7.1.1 (15-06-2021)
 - Refactor: Use TuitionPaymentPlanOrder to find a tuition payment plan by degree curricular plan
 
