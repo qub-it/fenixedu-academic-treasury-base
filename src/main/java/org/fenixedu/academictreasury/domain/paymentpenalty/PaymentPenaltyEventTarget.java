@@ -21,6 +21,8 @@ import org.joda.time.LocalDate;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 
+@Deprecated
+// Replaced by fenixedu-treasury-base PaymentPenaltyTaxTreasuryEvent
 public class PaymentPenaltyEventTarget extends PaymentPenaltyEventTarget_Base implements IAcademicTreasuryTarget {
 
     public PaymentPenaltyEventTarget() {
@@ -125,7 +127,7 @@ public class PaymentPenaltyEventTarget extends PaymentPenaltyEventTarget_Base im
      */
     
     public static PaymentPenaltyEventTarget create(DebitEntry originDebitEntry) {
-        return new PaymentPenaltyEventTarget(originDebitEntry);
+        throw new RuntimeException("deprecated");
     }
     
     public static Stream<PaymentPenaltyEventTarget> findAll() {

@@ -631,6 +631,8 @@ public class PersonCustomer extends PersonCustomer_Base {
             result.add((TreasuryEvent) event);
         }
 
+        result.addAll(getDebtAccountsSet().stream().flatMap(d -> d.getTreasuryEventsSet().stream()).collect(Collectors.toSet()));
+
         return result;
     }
 
