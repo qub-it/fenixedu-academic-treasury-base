@@ -70,6 +70,7 @@ import org.fenixedu.academictreasury.domain.emoluments.ServiceRequestMapEntry;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.serviceRequests.ITreasuryServiceRequest;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
+import org.fenixedu.academictreasury.domain.tariff.AcademicTariff;
 import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
@@ -78,11 +79,13 @@ import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependent
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
+import org.fenixedu.treasury.domain.tariff.Tariff;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.joda.time.LocalDate;
@@ -819,6 +822,18 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         setTreasuryEventTarget(null);
 
         super.delete();
+    }
+    
+    @Override
+    public Optional<Tariff> findMatchTariff(FinantialEntity finantialEntity, Product product, LocalDate when) {
+        
+        if(degree() != null) {
+            return Optional.ofNullable(AcademicTariff.findMatch(finantialEntity, product, degree(), when.toDateTimeAtStartOfDay()));
+        } else if(getDegree() != null) {
+            return Optional.ofNullable(AcademicTariff.findMatch(finantialEntity, product, getDegree(), when.toDateTimeAtStartOfDay()));
+        }
+        
+        return Optional.ofNullable(AcademicTariff.findMatch(finantialEntity, product, finantialEntity.getAdministrativeOffice(), when.toDateTimeAtStartOfDay()));
     }
 
     // @formatter: off

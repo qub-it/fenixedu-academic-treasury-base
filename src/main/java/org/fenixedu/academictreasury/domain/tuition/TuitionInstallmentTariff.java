@@ -898,6 +898,16 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         super.delete();
     }
 
+    @Override
+    public BigDecimal amountToPay() {
+        throw new RuntimeException("not supported");
+    }
+    
+    @Override
+    public boolean isBroadTariffForFinantialEntity() {
+        return false;
+    }
+    
     // @formatter:off
     /* --------
      * SERVICES

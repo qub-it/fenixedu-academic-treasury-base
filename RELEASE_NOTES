@@ -1,3 +1,12 @@
+- New Fixture: Shared tuition payment plan between curricular plans, check if payment plan is reachable, tuition conditions, tuition installments custom calculators
+- Improvement: Use default payment platform to Automatic rules and Academic services
+- Improvement: Add settlement note ERP certification date
+- Refactor: Refactor payment penalty from fenixedu-academic-treasury-base to fenixedu-treasury
+- Refactor: Use TuitionPaymentPlanOrder to find a tuition payment plan by degree curricular plan
+- Refactor: Deprecate PaymentPenaltyEventTarget
+- Bug Fix: Include other treasury events than AcademicTreasuryEvent, associated with debt account 
+- Bug Fix: Remove and replace condition tuition rule beans
+
 7.2.2 (15-06-2021)
 - Bug Fix: Change payment plan order to last plus one
 

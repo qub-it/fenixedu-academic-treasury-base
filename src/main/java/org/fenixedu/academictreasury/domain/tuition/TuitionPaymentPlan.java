@@ -584,6 +584,13 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         setStatuteType(null);
         setCurricularYear(null);
 
+        // From old model but migrated tuition payment plans might have associated dcp or other conditions
+        super.setDegreeCurricularPlan(null);
+        super.setCurricularYear(null);
+        super.setRegistrationProtocol(null);
+        super.setStatuteType(null);
+        super.setIngression(null);
+        
         super.deleteDomainObject();
     }
 
@@ -637,6 +644,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                 .filter(t -> t.getExecutionYear() == executionYear);
     }
 
+    @Deprecated
     public static Stream<TuitionPaymentPlan> find(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
             final DegreeCurricularPlan degreeCurricularPlan, final ExecutionYear executionYear) {
 
@@ -645,6 +653,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                         .anyMatch(order -> order.getDegreeCurricularPlan() == degreeCurricularPlan));
     }
 
+    @Deprecated
     public static Stream<TuitionPaymentPlan> findSortedByPaymentPlanOrder(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
             final DegreeCurricularPlan degreeCurricularPlan, final ExecutionYear executionYear) {
         return TuitionPaymentPlanOrder.findSortedByPaymentPlanOrder(tuitionPaymentPlanGroup, degreeCurricularPlan, executionYear)

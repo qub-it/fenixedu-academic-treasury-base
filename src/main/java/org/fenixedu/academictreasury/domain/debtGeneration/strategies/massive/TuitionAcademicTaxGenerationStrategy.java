@@ -53,6 +53,7 @@ import org.fenixedu.academictreasury.domain.emoluments.AcademicTax;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
+import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanOrder;
 import org.fenixedu.academictreasury.services.AcademicTaxServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.academictreasury.util.ExcelUtils;
@@ -238,18 +239,20 @@ public class TuitionAcademicTaxGenerationStrategy implements IMassiveDebtGenerat
                 }
 
                 if (tuitionPaymentPlanGroup != null) {
-                    TuitionPaymentPlan tuitionPaymentPlan = TuitionPaymentPlan
-                            .find(tuitionPaymentPlanGroup, studentCurricularPlan.getDegreeCurricularPlan(), executionYear)
-                            .filter(t -> t.getConditionsDescription().equals(tuitionPaymentPlanName)).findFirst().orElse(null);
+                    TuitionPaymentPlanOrder tuitionPaymentPlanOrder = TuitionPaymentPlanOrder
+                            .findSortedByPaymentPlanOrder(tuitionPaymentPlanGroup,
+                                    studentCurricularPlan.getDegreeCurricularPlan(), executionYear)
+                            .filter(t -> t.getTuitionPaymentPlan().getConditionsDescription().equals(tuitionPaymentPlanName))
+                            .findFirst().orElse(null);
 
-                    if (tuitionPaymentPlan == null) {
+                    if (tuitionPaymentPlanOrder == null) {
                         throw new AcademicTreasuryDomainException(
                                 "error.MassiveDebtGenerationRequest.tuition.payment.plan.not.found", String.valueOf(rowNum),
                                 studentCurricularPlan.getName(), tuitionPaymentPlanName);
                     }
 
                     result.add(new MassiveDebtGenerationRowResult(rowNum, executionYear, studentCurricularPlan,
-                            tuitionPaymentPlan, debtDate));
+                            tuitionPaymentPlanOrder.getTuitionPaymentPlan(), debtDate));
                 } else if (academicTax != null) {
                     result.add(new MassiveDebtGenerationRowResult(rowNum, executionYear, studentCurricularPlan, academicTax,
                             debtDate));
