@@ -1,3 +1,5 @@
+- Bug Fix: Remove and replace condition tuition rule beans
+
 7.2.0 (17-06-2021)
 - Refactor: Deprecate PaymentPenaltyEventTarget
 - Bug Fix: Include other treasury events than AcademicTreasuryEvent, associated with debt account 

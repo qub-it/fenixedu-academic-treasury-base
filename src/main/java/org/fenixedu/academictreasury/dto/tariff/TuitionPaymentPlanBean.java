@@ -527,26 +527,28 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     public void addOrReplaceConditionRules(TuitionConditionRule tuitionConditionRule) {
-        TuitionConditionRule rule = conditionRules.stream().filter(c -> c.getClass().equals(tuitionConditionRule.getClass()))
+        TuitionConditionRule rule = conditionRules.stream().filter(c -> c.getClass().isAssignableFrom(tuitionConditionRule.getClass()))
                 .findFirst().orElse(null);
         if (rule != null) {
             conditionRules.remove(rule);
         }
+        
         conditionRules.add(tuitionConditionRule);
     }
 
     public void addConditionRules(TuitionConditionRule tuitionConditionRule) {
-        TuitionConditionRule rule = conditionRules.stream().filter(c -> c.getClass().equals(tuitionConditionRule.getClass()))
+        TuitionConditionRule rule = conditionRules.stream().filter(c -> c.getClass().isAssignableFrom(tuitionConditionRule.getClass()))
                 .findFirst().orElse(null);
         if (rule != null) {
             throw new DomainException(TreasuryPlataformDependentServicesFactory.implementation()
                     .bundle(AcademicTreasuryConstants.BUNDLE, "error.TuitionPaymentPlan.conditionRule.duplicated"));
         }
+        
         conditionRules.add(tuitionConditionRule);
     }
 
     public void removeConditionRule(Class<? extends TuitionConditionRule> clazz) {
-        TuitionConditionRule rule = conditionRules.stream().filter(c -> c.getClass().equals(clazz)).findFirst().orElse(null);
+        TuitionConditionRule rule = conditionRules.stream().filter(c -> clazz.isAssignableFrom(c.getClass())).findFirst().orElse(null);
         if (rule != null) {
             conditionRules.remove(rule);
         }
