@@ -1605,8 +1605,9 @@ class integration.ERPTuitionInfoCreationReportFile /* implements IGenericFile */
 		
 	}
 
-/*
- * PaymentPenalty
+/* ***************************
+ * PaymentPenalty - Deprecated
+ * ***************************
  */
 
 // Deprecated 
@@ -1667,5 +1668,165 @@ class paymentpenalty.PaymentPenaltyEventTarget {
 		
 		paymentpenalty.PaymentPenaltyEventTarget playsRole paymentPenaltyEventTarget {
 			multiplicity 0..1;
+		}
+	}
+
+	
+/* ***************
+ * Reservation Tax
+ * ***************
+ */
+
+class reservationtax.ReservationTax {
+	LocalizedString name;
+	Boolean discountInTuitionFee;
+	Boolean active;
+	Boolean createPaymentReferenceCode;
+	LocalizedString taxReservationDescription;
+}
+
+	relation ReservationTaxDomainRoot {
+		.pt.ist.fenixframework.DomainRoot playsRole domainRoot {
+			multiplicity 1..1;
+		}
+		
+		reservationtax.ReservationTax playsRole reservationTaxes {
+			multiplicity *;
+		}
+	}
+	
+	relation ReservationTaxFinantialEntity {
+		.org.fenixedu.treasury.domain.FinantialEntity playsRole finantialEntity {
+			multiplicity 1..1;
+		}
+		
+		reservationtax.ReservationTax playsRole reservationTaxes {
+			multiplicity *;
+		}
+	}
+	
+	relation ReservationTaxProduct {
+		.org.fenixedu.treasury.domain.Product playsRole product {
+			multiplicity 1..1;
+		}
+		
+		reservationtax.ReservationTax playsRole reservationTaxes {
+			multiplicity *;
+		}
+	}
+
+class reservationtax.ReservationTaxTariff {
+	BigDecimalAT baseAmount;
+	DueDateCalculationType dueDateCalculationType;
+	int numberOfDaysAfterCreationForDueDate;
+	LocalDate fixedDueDate;	
+	Boolean applyInterests;
+	InterestType interestType;
+	BigDecimalT interestFixedAmount;
+}
+
+	relation ReservationTaxTariffDomainRoot {
+		.pt.ist.fenixframework.DomainRoot playsRole domainRoot {
+			multiplicity 1..1;
+		}
+		
+		reservationtax.ReservationTaxTariff playsRole reservationTaxTariffs {
+			multiplicity *;
+		}
+	}
+
+	relation ReservationTaxTariff {
+		reservationtax.ReservationTax playsRole reservationTax {
+			multiplicity 1..1;
+		}
+		
+		reservationtax.ReservationTaxTariff playsRole reservationTaxTariffs {
+			multiplicity *;
+		}
+	}
+	
+	relation ReservationTaxTariffExecutionYear {
+		.org.fenixedu.academic.domain.ExecutionYear playsRole executionYear {
+			multiplicity 1..1;
+		}
+	
+		reservationtax.ReservationTaxTariff playsRole reservationTaxTariffs {
+			multiplicity *;
+		}
+	}
+	
+	relation ReservationTaxTariffDegree {
+		reservationtax.ReservationTaxTariff playsRole reservationTaxTariffs {
+			multiplicity *;
+		}
+		
+		.org.fenixedu.academic.domain.Degree playsRole degrees {
+			multiplicity *;
+		}
+	}
+
+class reservationtax.ReservationTaxEventTarget {
+	Boolean discountInTuitionFee;
+	LocalDate taxReservationDate;
+	LocalizedString taxReservationDescription;
+}
+
+	relation ReservationTaxEventTargetDomainRoot {
+		.pt.ist.fenixframework.DomainRoot playsRole domainRoot {
+			multiplicity 1..1;
+		}
+		
+		reservationtax.ReservationTaxEventTarget playsRole reservationTaxEventTargets {
+			multiplicity *;
+		}
+	}
+	
+	relation ReservationTaxEventTargetFinantialEntity {
+		.org.fenixedu.treasury.domain.FinantialEntity playsRole FinantialEntity {
+			multiplicity 1..1;
+		}
+		
+		reservationtax.ReservationTaxEventTarget playsRole reservationTaxEventTargets {
+			multiplicity *;
+		}
+	}
+	
+	relation ReservationTaxEventTargetProduct {
+		.org.fenixedu.treasury.domain.Product playsRole product {
+			multiplicity 1..1;
+		}
+		
+		reservationtax.ReservationTaxEventTarget playsRole reservationTaxEventTargets {
+			multiplicity *;
+		}
+	}
+	
+	relation ReservationTaxEventTargetPerson {
+		.org.fenixedu.academic.domain.Person playsRole person {
+			multiplicity 1..1;
+		}
+			
+		reservationtax.ReservationTaxEventTarget playsRole reservationTaxEventTargets {
+			multiplicity *;
+		}
+	}
+	
+	relation ReservationTaxEventTargetExecutionYear {
+		.org.fenixedu.academic.domain.ExecutionYear playsRole executionYear {
+			multiplicity 1..1;
+		}
+	
+		reservationtax.ReservationTaxEventTarget playsRole reservationTaxEventTargets {
+			multiplicity *;
+		}
+	}
+	
+	relation ReservationTaxEventTargetDegreeCurricularPlan {
+		.org.fenixedu.academic.domain.DegreeCurricularPlan playsRole degreeCurricularPlan {
+			multiplicity 1..1;
+		}
+	
+		reservationtax.ReservationTaxEventTarget playsRole reservationTaxEventTargets {
+			multiplicity *;
 		}
 	}

@@ -690,8 +690,12 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
     @Override
     public String getExecutionYearName() {
-        if (getExecutionYear() != null) {
-            return getExecutionYear().getQualifiedName();
+        if (super.getExecutionYear() != null) {
+            return super.getExecutionYear().getQualifiedName();
+        } else if (isForTreasuryEventTarget()
+                && ((IAcademicTreasuryTarget) getTreasuryEventTarget()).getAcademicTreasuryTargetExecutionYear() != null) {
+            return ((IAcademicTreasuryTarget) getTreasuryEventTarget()).getAcademicTreasuryTargetExecutionYear()
+                    .getQualifiedName();
         }
 
         return null;
@@ -839,6 +843,24 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
                 when.toDateTimeAtStartOfDay()));
     }
 
+    @Override
+    public boolean isEventAccountedAsTuition() {
+        if (isForTreasuryEventTarget()) {
+            ((IAcademicTreasuryTarget) getTreasuryEventTarget()).isEventAccountedAsTuition();
+        }
+
+        return isForRegistrationTuition() || isForStandaloneTuition() || isForExtracurricularTuition();
+    }
+
+    @Override
+    public boolean isEventDiscountInTuitionFee() {
+        if (isForTreasuryEventTarget()) {
+            return ((IAcademicTreasuryTarget) getTreasuryEventTarget()).isEventDiscountInTuitionFee();
+        }
+
+        return false;
+    }
+
     // @formatter: off
     /************
      * SERVICES *
@@ -858,7 +880,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     public static Stream<? extends AcademicTreasuryEvent> find(Registration registration, ExecutionYear executionYear) {
-        return find(registration.getPerson()).filter(e -> e.getRegistration() == registration).filter(l -> l.getExecutionYear() == executionYear);
+        return find(registration.getPerson()).filter(e -> e.getRegistration() == registration)
+                .filter(l -> l.getExecutionYear() == executionYear);
     }
 
     /* --- Academic Service Requests --- */

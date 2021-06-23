@@ -51,8 +51,11 @@ import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEvent;
+import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
@@ -69,8 +72,10 @@ import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.DebitNote;
 import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
+import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
+import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -346,8 +351,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         return getDefaultPaymentPlan();
     }
 
-    public boolean createDebitEntriesForRegistration(final DebtAccount debtAccount,
-            final AcademicTreasuryEvent academicTreasuryEvent, final LocalDate when) {
+    public boolean createDebitEntriesForRegistration(DebtAccount debtAccount, AcademicTreasuryEvent academicTreasuryEvent,
+            LocalDate when) {
 
         if (!getTuitionPaymentPlanGroup().isForRegistration()) {
             throw new RuntimeException("wrong call");
@@ -381,16 +386,53 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                     + " )", strBuilder.toString());
             academicTreasuryEvent.editPropertiesMap(propertiesMap);
         }
+
+        BigDecimal amountToDiscountTuitionFromOtherEvents = TuitionPaymentPlan.getOtherEventsAmountToDiscountInTuitionFee(
+                academicTreasuryEvent.getPerson(), academicTreasuryEvent.getExecutionYear());
+
         boolean createdDebitEntries = false;
         for (final TuitionInstallmentTariff tariff : getTuitionInstallmentTariffsSet().stream()
-                .sorted(TuitionInstallmentTariff.COMPARATOR_BY_INSTALLMENT_NUMBER).collect(Collectors.toSet())) {
+                .sorted(TuitionInstallmentTariff.COMPARATOR_BY_INSTALLMENT_NUMBER).collect(Collectors.toList())) {
+            BigDecimal amountToPay = tariff.amountToPay(academicTreasuryEvent, calculatorsMap);
+
+            BigDecimal amountToDiscount = BigDecimal.ZERO;
+            if (TreasuryConstants.isGreaterOrEqualThan(amountToDiscountTuitionFromOtherEvents.subtract(amountToPay),
+                    BigDecimal.ZERO)) {
+                amountToDiscountTuitionFromOtherEvents = amountToDiscountTuitionFromOtherEvents.subtract(amountToPay);
+                continue;
+            } else if (TreasuryConstants.isPositive(amountToDiscountTuitionFromOtherEvents)) {
+                amountToDiscount = amountToDiscountTuitionFromOtherEvents;
+                amountToDiscountTuitionFromOtherEvents = BigDecimal.ZERO;
+            }
+
             if (!academicTreasuryEvent.isChargedWithDebitEntry(tariff)) {
-                tariff.createDebitEntryForRegistration(debtAccount, academicTreasuryEvent, when, calculatorsMap);
+                tariff.createDebitEntryForRegistration(debtAccount, academicTreasuryEvent, when, calculatorsMap, amountToDiscount);
                 createdDebitEntries = true;
             }
         }
 
         return createdDebitEntries;
+    }
+
+    public static BigDecimal getOtherEventsAmountToDiscountInTuitionFee(Person person, ExecutionYear executionYear) {
+
+        List<TreasuryEvent> treasuryEventsSet = TreasuryBridgeAPIFactory.implementation().getAllAcademicTreasuryEventsList(person)
+                .stream().map(e -> (TreasuryEvent) e).collect(Collectors.toList());
+
+        BigDecimal result = BigDecimal.ZERO;
+        for (TreasuryEvent treasuryEvent : treasuryEventsSet) {
+            if (!treasuryEvent.isEventDiscountInTuitionFee()) {
+                continue;
+            }
+
+            if (!executionYear.getQualifiedName().equals(treasuryEvent.getExecutionYearName())) {
+                continue;
+            }
+
+            result = result.add(treasuryEvent.getAmountToPay());
+        }
+
+        return result;
     }
 
     public boolean createDebitEntriesForStandalone(final DebtAccount debtAccount,

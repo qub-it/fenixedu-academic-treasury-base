@@ -1,5 +1,13 @@
 - Improvement: Throw exception when create a person customer to a person already with person customer
 - Bug Fix: Only write ingressionType if it is set in the registration
+- Refactor: Handler for settlement note payment, equal to declared in AcademicTreasuryBridgeImpl
+- New Fixture: Reservation taxes, which can discount amount from tuition debts
+- Improvement: Allow set interest type in AcademicTreasuryTargetCreateDebtBuilder
+- Bug Fix: Get execution year name from treasury event target
+- Refactor: Predicates in TreasuryEvent to check if it is related with tuition debts, and if the event discount on tuition total amount
+- Refactor: Handle settlement note payment to HandleSettlementNotePayment class
+
+
 
 8.1.1 (09-11-2021)
 - Bug Fix: Align headers in debt reports

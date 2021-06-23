@@ -68,6 +68,7 @@ import org.fenixedu.treasury.domain.tariff.InterestRate;
 import org.fenixedu.treasury.domain.tariff.InterestType;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
+import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -475,13 +476,26 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
     public DebitEntry createDebitEntryForRegistration(final DebtAccount debtAccount,
             final AcademicTreasuryEvent academicTreasuryEvent, final LocalDate when,
-            Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap) {
+            Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap, BigDecimal amountToDiscount) {
+
+        if(amountToDiscount == null) {
+            amountToDiscount = BigDecimal.ZERO;
+        }
+        
+        if(TreasuryConstants.isNegative(amountToDiscount)) {
+            throw new RuntimeException("invalid amount to discount");
+        }
+        
         if (!getTuitionPaymentPlan().getTuitionPaymentPlanGroup().isForRegistration()) {
             throw new RuntimeException("wrong call");
         }
 
-        final BigDecimal amount = amountToPay(academicTreasuryEvent, calculatorsMap);
+        final BigDecimal amount = amountToPay(academicTreasuryEvent, calculatorsMap).subtract(amountToDiscount);
 
+        if(TreasuryConstants.isNegative(amount)) {
+            throw new RuntimeException("invalid tuition installment amount");
+        }
+        
         final LocalDate dueDate = dueDate(when != null ? when : new LocalDate());
 
         updatePriceValuesInEvent(academicTreasuryEvent);

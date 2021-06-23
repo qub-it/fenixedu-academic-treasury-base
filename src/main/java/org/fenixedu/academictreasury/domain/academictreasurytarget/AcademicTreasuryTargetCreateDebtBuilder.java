@@ -57,7 +57,7 @@ import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.domain.paymentcodes.integration.ISibsPaymentCodePoolService;
-import org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform;
+import org.fenixedu.treasury.domain.tariff.InterestType;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -75,6 +75,9 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
     public class DebtBuilderWithAmountAndDueDate {
         private BigDecimal amount;
         private LocalDate dueDate;
+
+        private InterestType interestType;
+        private BigDecimal interestFixedAmount;
 
         public DebtBuilderWithAmountAndDueDate setAmount(BigDecimal amount) {
             this.amount = amount;
@@ -113,6 +116,16 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
 
         public DebtBuilderWithAmountAndDueDate setTarget(IAcademicTreasuryTarget target) {
             AcademicTreasuryTargetCreateDebtBuilder.this.target = target;
+            return this;
+        }
+
+        public DebtBuilderWithAmountAndDueDate setInterestType(InterestType interestType) {
+            this.interestType = interestType;
+            return this;
+        }
+
+        public DebtBuilderWithAmountAndDueDate setInterestFixedAmount(BigDecimal interestFixedAmount) {
+            this.interestFixedAmount = interestFixedAmount;
             return this;
         }
 
