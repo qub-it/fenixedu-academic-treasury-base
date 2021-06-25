@@ -1,14 +1,52 @@
+/**
+ * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, without modification, are permitted
+ * provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this list of
+ * conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice, this list
+ * of conditions and the following disclaimer in the documentation and/or other materials
+ * provided with the distribution.
+ * * Neither the name of Quorum Born IT nor the names of its contributors may be used to
+ * endorse or promote products derived from this software without specific prior written
+ * permission.
+ * * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade
+ * de Lisboa (Departamento de Informática), hereby referred to as the Beneficiary, is the
+ * sole demonstrated end-user and ultimately the only beneficiary of the redistributed binary
+ * form and/or source code.
+ * * The Beneficiary is entrusted with either the binary form, the source code, or both, and
+ * by accepting it, accepts the terms of this License.
+ * * Redistribution of any binary form and/or source code is only allowed in the scope of the
+ * Universidade de Lisboa FenixEdu(™)’s implementation projects.
+ * * This license and conditions of redistribution of source code/binary can only be reviewed
+ * by the Steering Comittee of FenixEdu(™) <http://www.fenixedu.org/>.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL “Quorum Born IT” BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.fenixedu.academictreasury.services;
 
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.ExecutionInterval;
@@ -26,6 +64,7 @@ import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
+import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCustomCalculator;
 import org.fenixedu.academictreasury.dto.tuition.TuitionDebitEntryBean;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Currency;
@@ -44,6 +83,14 @@ import pt.ist.fenixframework.Atomic;
 
 public class TuitionServices {
 
+    public static Comparator<Enrolment> ENROLMENT_COMPARATOR_BY_NAME_AND_ID = (o1, o2) -> {
+        IAcademicTreasuryPlatformDependentServices implementation =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
+        int c = implementation.localizedNameOfEnrolment(o1).compareTo(implementation.localizedNameOfEnrolment(o2));
+        return c != 0 ? c : DomainObjectUtil.COMPARATOR_BY_ID.compare(o1, o2);
+    };
+
     private static final List<ITuitionServiceExtension> TUITION_SERVICE_EXTENSIONS = Lists.newArrayList();
 
     public static synchronized void registerTuitionServiceExtension(final ITuitionServiceExtension extension) {
@@ -51,7 +98,9 @@ public class TuitionServices {
     }
 
     public static boolean isToPayRegistrationTuition(final Registration registration, final ExecutionYear executionYear) {
-        return registration.getRegistrationProtocol().isToPayGratuity();
+        final IAcademicTreasuryPlatformDependentServices academicServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+	return academicServices.registrationProtocol(registration).isToPayGratuity();
     }
 
     public static AcademicTreasuryEvent findAcademicTreasuryEventTuitionForRegistration(final Registration registration,
@@ -197,13 +246,25 @@ public class TuitionServices {
             final TuitionPaymentPlan tuitionPaymentPlan, final LocalDate debtDate, final BigDecimal enrolledEctsUnits,
             final BigDecimal enrolledCoursesCount) {
 
+        Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap = new HashMap<>();
+
+        tuitionPaymentPlan.getTuitionInstallmentTariffsSet().stream().map(tariff -> tariff.getTuitionTariffCustomCalculator())
+                .collect(Collectors.toSet()).forEach(clazz -> {
+                    if (clazz != null) {
+                        TuitionTariffCustomCalculator newInstanceFor =
+                                TuitionTariffCustomCalculator.getNewInstanceFor(clazz, registration, tuitionPaymentPlan);
+                        calculatorsMap.put(clazz, newInstanceFor);
+                    }
+                });
+
         final List<TuitionDebitEntryBean> entries = Lists.newArrayList();
         for (final TuitionInstallmentTariff tuitionInstallmentTariff : tuitionPaymentPlan.getTuitionInstallmentTariffsSet()) {
             final int installmentOrder = tuitionInstallmentTariff.getInstallmentOrder();
             final LocalizedString installmentName = tuitionPaymentPlan.installmentName(registration, tuitionInstallmentTariff);
             final LocalDate dueDate = tuitionInstallmentTariff.dueDate(debtDate);
             final Vat vat = tuitionInstallmentTariff.vat(debtDate);
-            final BigDecimal amount = tuitionInstallmentTariff.amountToPay(registration, enrolledEctsUnits, enrolledCoursesCount);
+            final BigDecimal amount =
+                    tuitionInstallmentTariff.amountToPay(registration, enrolledEctsUnits, enrolledCoursesCount, calculatorsMap);
             final Currency currency = tuitionInstallmentTariff.getFinantialEntity().getFinantialInstitution().getCurrency();
 
             entries.add(
@@ -431,12 +492,24 @@ public class TuitionServices {
             final AcademicTreasuryEvent academicTreasuryEvent =
                     AcademicTreasuryEvent.findUniqueForStandaloneTuition(registration, executionYear).get();
 
+            Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap = new HashMap<>();
+
+            TuitionPaymentPlan tuitionPaymentPlanToCalculator = tuitionPaymentPlan;
+            tuitionPaymentPlan.getTuitionInstallmentTariffsSet().stream().map(tariff -> tariff.getTuitionTariffCustomCalculator())
+                    .collect(Collectors.toSet()).forEach(clazz -> {
+                        if (clazz != null) {
+                            TuitionTariffCustomCalculator newInstanceFor = TuitionTariffCustomCalculator.getNewInstanceFor(clazz,
+                                    registration, tuitionPaymentPlanToCalculator);
+                            calculatorsMap.put(clazz, newInstanceFor);
+                        }
+                    });
+
             final TuitionInstallmentTariff tuitionInstallmentTariff = tuitionPaymentPlan.getStandaloneTuitionInstallmentTariff();
             final int installmentOrder = tuitionInstallmentTariff.getInstallmentOrder();
             final LocalizedString installmentName = tuitionInstallmentTariff.standaloneDebitEntryName(enrolment);
             final LocalDate dueDate = tuitionInstallmentTariff.dueDate(debtDate);
             final Vat vat = tuitionInstallmentTariff.vat(debtDate);
-            final BigDecimal amount = tuitionInstallmentTariff.amountToPay(academicTreasuryEvent, enrolment);
+            final BigDecimal amount = tuitionInstallmentTariff.amountToPay(academicTreasuryEvent, enrolment, calculatorsMap);
             final Currency currency = tuitionInstallmentTariff.getFinantialEntity().getFinantialInstitution().getCurrency();
 
             entries.add(
@@ -693,13 +766,25 @@ public class TuitionServices {
             final AcademicTreasuryEvent academicTreasuryEvent =
                     AcademicTreasuryEvent.findUniqueForExtracurricularTuition(registration, executionYear).get();
 
+            Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap = new HashMap<>();
+
+            TuitionPaymentPlan tuitionPaymentPlanToCalculator = tuitionPaymentPlan;
+            tuitionPaymentPlan.getTuitionInstallmentTariffsSet().stream().map(tariff -> tariff.getTuitionTariffCustomCalculator())
+                    .collect(Collectors.toSet()).forEach(clazz -> {
+                        if (clazz != null) {
+                            TuitionTariffCustomCalculator newInstanceFor = TuitionTariffCustomCalculator.getNewInstanceFor(clazz,
+                                    registration, tuitionPaymentPlanToCalculator);
+                            calculatorsMap.put(clazz, newInstanceFor);
+                        }
+                    });
+
             final TuitionInstallmentTariff tuitionInstallmentTariff =
                     tuitionPaymentPlan.getExtracurricularTuitionInstallmentTariff();
             final int installmentOrder = tuitionInstallmentTariff.getInstallmentOrder();
             final LocalizedString installmentName = tuitionInstallmentTariff.extracurricularDebitEntryName(enrolment);
             final LocalDate dueDate = tuitionInstallmentTariff.dueDate(debtDate);
             final Vat vat = tuitionInstallmentTariff.vat(debtDate);
-            final BigDecimal amount = tuitionInstallmentTariff.amountToPay(academicTreasuryEvent, enrolment);
+            final BigDecimal amount = tuitionInstallmentTariff.amountToPay(academicTreasuryEvent, enrolment, calculatorsMap);
             final Currency currency = tuitionInstallmentTariff.getFinantialEntity().getFinantialInstitution().getCurrency();
 
             entries.add(
@@ -851,6 +936,9 @@ public class TuitionServices {
         if (studentCurricularPlan == null) {
             return Sets.newHashSet();
         }
+
+	// TODO Check code Refactor/20210624-MergeWithISCTE
+	// Abstract to a service
 
         return studentCurricularPlan.getStandaloneCurriculumLines().stream()
                 .filter(l -> l.getExecutionYear() == executionYear && l.isEnrolment()).map(l -> (Enrolment) l)

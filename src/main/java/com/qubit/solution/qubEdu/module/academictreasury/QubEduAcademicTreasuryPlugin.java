@@ -33,29 +33,18 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.fenixedu.academic.domain.treasury;
+package com.qubit.solution.qubEdu.module.academictreasury;
 
-import java.math.BigDecimal;
+import com.qubit.solution.qubEdu.framework.domain.module.AbstractQubEduPlugin;
+import com.qubit.terra.framework.domain.packages.interfaces.QubJar;
 
-import org.fenixedu.treasury.domain.document.SettlementEntry;
-import org.joda.time.LocalDate;
+public class QubEduAcademicTreasuryPlugin extends AbstractQubEduPlugin {
 
-public class AcademicTreasuryEventPayment implements IAcademicTreasuryEventPayment {
-
-    private SettlementEntry settlementEntry;
+    static final private String PLUGIN_NAME = "fenixedu-academic-treasury-base-iscte";
+    static final public String BUNDLE = PLUGIN_NAME + "Resources";
     
-    public AcademicTreasuryEventPayment(final SettlementEntry settlementEntry) {
-        this.settlementEntry = settlementEntry;
-    }
-    
-    @Override
-    public LocalDate getPaymentDate() {
-        return settlementEntry.getEntryDateTime().toLocalDate();
-    }
-
-    @Override
-    public BigDecimal getPayedAmount() {
-        return settlementEntry.getAmount();
+    public QubEduAcademicTreasuryPlugin(QubJar module) {
+        super(module);
     }
 
 }

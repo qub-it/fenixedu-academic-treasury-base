@@ -26,6 +26,7 @@ import org.fenixedu.treasury.services.accesscontrol.TreasuryAccessControlAPI;
 import pt.ist.fenixframework.FenixFramework;
 
 @WebListener
+// TODO Check code Refactor/20210624-MergeWithISCTE
 public class AcademicTreasuryInitializer implements ServletContextListener {
 
     @Override

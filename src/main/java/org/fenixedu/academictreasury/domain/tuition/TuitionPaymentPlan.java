@@ -1,9 +1,46 @@
+/**
+ * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, without modification, are permitted
+ * provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this list of
+ * conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice, this list
+ * of conditions and the following disclaimer in the documentation and/or other materials
+ * provided with the distribution.
+ * * Neither the name of Quorum Born IT nor the names of its contributors may be used to
+ * endorse or promote products derived from this software without specific prior written
+ * permission.
+ * * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade
+ * de Lisboa (Departamento de Informática), hereby referred to as the Beneficiary, is the
+ * sole demonstrated end-user and ultimately the only beneficiary of the redistributed binary
+ * form and/or source code.
+ * * The Beneficiary is entrusted with either the binary form, the source code, or both, and
+ * by accepting it, accepts the terms of this License.
+ * * Redistribution of any binary form and/or source code is only allowed in the scope of the
+ * Universidade de Lisboa FenixEdu(™)’s implementation projects.
+ * * This license and conditions of redistribution of source code/binary can only be reviewed
+ * by the Steering Comittee of FenixEdu(™) <http://www.fenixedu.org/>.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL “Quorum Born IT” BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.fenixedu.academictreasury.domain.tuition;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -21,6 +58,8 @@ import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainExc
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.dto.tariff.AcademicTariffBean;
 import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
+import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
+import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.academictreasury.util.LocalizedStringUtil;
 import org.fenixedu.commons.i18n.LocalizedString;
@@ -170,6 +209,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                 .map(tariff -> tariff.getTuitionTariffCustomCalculator())
                 .allMatch(calculator -> getTuitionInstallmentTariffsSet().stream()
                         .anyMatch(tariff -> (tariff.getTuitionCalculationType().isCalculatedAmount()
+                                && tariff.getTuitionTariffCalculatedAmountType() != null
                                 && tariff.getTuitionTariffCalculatedAmountType().isRemaining()
                                 && tariff.getTuitionTariffCustomCalculator() == calculator)));
     }
@@ -271,7 +311,11 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         String label = "label.TuitionInstallmentTariff.debitEntry.name.";
 
         if (getTuitionPaymentPlanGroup().isForRegistration()) {
-            label += "registration";
+            if (getTuitionInstallmentTariffsSet().size() == 1 && getTuitionPaymentPlanGroup().isBypassInstallmentNameIfSingleInstallmentApplied()) {
+                label += "registration.one.installment";
+            } else {
+                label += "registration";
+            }
         } else if (getTuitionPaymentPlanGroup().isForStandalone()) {
             label += "standalone";
         } else if (getTuitionPaymentPlanGroup().isForExtracurricular()) {
@@ -312,10 +356,34 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
             return false;
         }
 
+        StringBuilder strBuilder = new StringBuilder();
+
+        Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap = new HashMap<>();
+
+        getTuitionInstallmentTariffsSet().stream().map(tariff -> tariff.getTuitionTariffCustomCalculator())
+                .collect(Collectors.toSet()).forEach(clazz -> {
+                    if (clazz != null) {
+                        TuitionTariffCustomCalculator newInstanceFor = TuitionTariffCustomCalculator.getNewInstanceFor(clazz,
+                                academicTreasuryEvent.getRegistration(), this);
+                        calculatorsMap.put(clazz, newInstanceFor);
+                        strBuilder.append(newInstanceFor.getPresentationName()).append(" (")
+                                .append(academicTreasuryEvent.formatMoney(newInstanceFor.getTotalAmount())).append("): \n");
+                        String description = newInstanceFor.getCalculeDescritpion();
+                        strBuilder.append(description).append("\n");
+                    }
+                });
+
+        if (strBuilder.length() > 0) {
+            Map<String, String> propertiesMap = academicTreasuryEvent.getPropertiesMap();
+            propertiesMap.put(TreasuryPlataformDependentServicesFactory.implementation().bundle(AcademicTreasuryConstants.BUNDLE,
+                    "label.AcademicTreasury.CustomCalculatorDescription"), strBuilder.toString());
+            academicTreasuryEvent.editPropertiesMap(propertiesMap);
+        }
         boolean createdDebitEntries = false;
-        for (final TuitionInstallmentTariff tariff : getTuitionInstallmentTariffsSet()) {
+        for (final TuitionInstallmentTariff tariff : getTuitionInstallmentTariffsSet().stream()
+                .sorted(TuitionInstallmentTariff.COMPARATOR_BY_INSTALLMENT_NUMBER).collect(Collectors.toSet())) {
             if (!academicTreasuryEvent.isChargedWithDebitEntry(tariff)) {
-                tariff.createDebitEntryForRegistration(debtAccount, academicTreasuryEvent, when);
+                tariff.createDebitEntryForRegistration(debtAccount, academicTreasuryEvent, when, calculatorsMap);
                 createdDebitEntries = true;
             }
         }
@@ -333,13 +401,38 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         if (!standaloneEnrolment.isStandalone()) {
             throw new RuntimeException("error.TuitionPaymentPlan.enrolment.not.standalone");
         }
+        StringBuilder strBuilder = new StringBuilder();
+
+        Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap = new HashMap<>();
+
+        getTuitionInstallmentTariffsSet().stream().map(tariff -> tariff.getTuitionTariffCustomCalculator())
+                .collect(Collectors.toSet()).forEach(clazz -> {
+                    if (clazz != null) {
+                        TuitionTariffCustomCalculator newInstanceFor = TuitionTariffCustomCalculator.getNewInstanceFor(clazz,
+                                academicTreasuryEvent.getRegistration(), this);
+                        calculatorsMap.put(clazz, newInstanceFor);
+                        strBuilder.append(newInstanceFor.getPresentationName()).append(" (")
+                                .append(academicTreasuryEvent.formatMoney(newInstanceFor.getTotalAmount())).append("): \n");
+                        String description = newInstanceFor.getCalculeDescritpion();
+                        strBuilder.append(description).append("\n");
+                    }
+                });
+
+        if (strBuilder.length() > 0) {
+            Map<String, String> propertiesMap = academicTreasuryEvent.getPropertiesMap();
+            propertiesMap.put(
+                    TreasuryPlataformDependentServicesFactory.implementation()
+                            .bundleI18N(AcademicTreasuryConstants.BUNDLE, "Custom Calculator Description").getContent(),
+                    strBuilder.toString());
+            academicTreasuryEvent.editPropertiesMap(propertiesMap);
+        }
 
         boolean createdDebitEntries = false;
         final Set<DebitEntry> createdDebitEntriesSet = Sets.newHashSet();
         for (final TuitionInstallmentTariff tariff : getTuitionInstallmentTariffsSet()) {
             if (!academicTreasuryEvent.isChargedWithDebitEntry(standaloneEnrolment)) {
-                createdDebitEntriesSet
-                        .add(tariff.createDebitEntryForStandalone(debtAccount, academicTreasuryEvent, standaloneEnrolment, when));
+                createdDebitEntriesSet.add(tariff.createDebitEntryForStandalone(debtAccount, academicTreasuryEvent,
+                        standaloneEnrolment, when, calculatorsMap));
                 createdDebitEntries = true;
             }
         }
@@ -369,13 +462,37 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         if (!extracurricularEnrolment.isExtraCurricular()) {
             throw new RuntimeException("error.TuitionPaymentPlan.enrolment.not.standalone");
         }
+        StringBuilder strBuilder = new StringBuilder();
 
+        Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap = new HashMap<>();
+
+        getTuitionInstallmentTariffsSet().stream().map(tariff -> tariff.getTuitionTariffCustomCalculator())
+                .collect(Collectors.toSet()).forEach(clazz -> {
+                    if (clazz != null) {
+                        TuitionTariffCustomCalculator newInstanceFor = TuitionTariffCustomCalculator.getNewInstanceFor(clazz,
+                                academicTreasuryEvent.getRegistration(), this);
+                        calculatorsMap.put(clazz, newInstanceFor);
+                        strBuilder.append(newInstanceFor.getPresentationName()).append(" (")
+                                .append(academicTreasuryEvent.formatMoney(newInstanceFor.getTotalAmount())).append("): \n");
+                        String description = newInstanceFor.getCalculeDescritpion();
+                        strBuilder.append(description).append("\n");
+                    }
+                });
+
+        if (strBuilder.length() > 0) {
+            Map<String, String> propertiesMap = academicTreasuryEvent.getPropertiesMap();
+            propertiesMap.put(
+                    TreasuryPlataformDependentServicesFactory.implementation()
+                            .bundleI18N(AcademicTreasuryConstants.BUNDLE, "Custom Calculator Description").getContent(),
+                    strBuilder.toString());
+            academicTreasuryEvent.editPropertiesMap(propertiesMap);
+        }
         boolean createdDebitEntries = false;
         final Set<DebitEntry> createdDebitEntriesSet = Sets.newHashSet();
         for (final TuitionInstallmentTariff tariff : getTuitionInstallmentTariffsSet()) {
             if (!academicTreasuryEvent.isChargedWithDebitEntry(extracurricularEnrolment)) {
                 createdDebitEntriesSet.add(tariff.createDebitEntryForExtracurricular(debtAccount, academicTreasuryEvent,
-                        extracurricularEnrolment, when));
+                        extracurricularEnrolment, when, calculatorsMap));
                 createdDebitEntries = true;
             }
         }
@@ -644,8 +761,11 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
     }
 
     public static Set<Integer> semestersWithEnrolments(final Registration registration, final ExecutionYear executionYear) {
-        return registration.getEnrolments(executionYear).stream().map(e -> e.getExecutionInterval().getChildOrder())
-                .collect(Collectors.toSet());
+        IAcademicTreasuryPlatformDependentServices implementation =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
+        return registration.getEnrolments(executionYear).stream()
+                .map(e -> implementation.executionIntervalChildOrder(e.getExecutionPeriod())).collect(Collectors.toSet());
     }
 
     @Atomic
