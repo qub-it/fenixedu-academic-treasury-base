@@ -49,8 +49,9 @@ import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
+import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
+import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
-import pt.ist.fenixframework.FenixFramework;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.document.DebitEntry;
@@ -59,6 +60,8 @@ import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServ
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 
 import com.google.common.collect.Sets;
+
+import pt.ist.fenixframework.FenixFramework;
 
 public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicEntry_Base {
 
@@ -350,11 +353,10 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
     }
 
     public LocalizedString getDescription() {
-        ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
         if (isDefinedForDegreeType()) {
             LocalizedString result = new LocalizedString();
-            for (Locale locale : services.availableLocales()) {
-                result = result.with(locale, services.localizedNameOfDegreeType(getDegreeType(), locale));
+            for (Locale locale : treasuryServices().availableLocales()) {
+                result = result.with(locale, academicTreasuryServices().localizedNameOfDegreeType(getDegreeType(), locale));
             }
             return result;
         }
@@ -385,6 +387,14 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
         }
 
         throw new RuntimeException("error");
+    }
+
+    private IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
+        return AcademicTreasuryPlataformDependentServicesFactory.implementation();
+    }
+
+    private ITreasuryPlatformDependentServices treasuryServices() {
+        return TreasuryPlataformDependentServicesFactory.implementation();
     }
 
     public void delete() {

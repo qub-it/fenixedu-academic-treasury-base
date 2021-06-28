@@ -80,8 +80,6 @@ import com.google.common.eventbus.Subscribe;
 
 import pt.ist.fenixframework.Atomic;
 
-// TODO Check code Refactor/20210624-MergeWithISCTE
-// Consider remove Bennu Signals
 public class EmolumentServices {
 
     public static Stream<Product> findEmoluments(final FinantialEntity finantialEntity) {
@@ -94,6 +92,8 @@ public class EmolumentServices {
     }
 
     @Subscribe
+	// TODO Check code Refactor/20210624-MergeWithISCTE
+	// Consider remove Bennu Signals
     public void newAcademicServiceRequestSituationEvent(final DomainObjectEvent<AcademicServiceRequest> event) {
         newAcademicServiceRequestSituationEvent(event.getInstance());
     }
@@ -105,10 +105,8 @@ public class EmolumentServices {
         } ;
 
         ITreasuryServiceRequest iTreasuryServiceRequest = (ITreasuryServiceRequest) academicServiceRequest;
-	
-	// TODO Check code Refactor/20210624-MergeWithISCTE
 
-        if (!iTreasuryServiceRequest.getServiceRequestType().isPayable()) {
+        if (!Boolean.TRUE.equals(iTreasuryServiceRequest.getServiceRequestType().getPayable())) {
             return false;
         }
 
@@ -177,7 +175,7 @@ public class EmolumentServices {
 
     public static AcademicDebitEntryBean calculateForAcademicServiceRequest(final FinantialEntity finantialEntity,
             final ITreasuryServiceRequest iTreasuryServiceRequest, final LocalDate debtDate) {
-        if (!iTreasuryServiceRequest.getServiceRequestType().isPayable()) {
+        if (!Boolean.TRUE.equals(iTreasuryServiceRequest.getServiceRequestType().getPayable())) {
             return null;
         }
 
@@ -262,7 +260,7 @@ public class EmolumentServices {
     public static boolean createAcademicServiceRequestEmolument(final FinantialEntity finantialEntity,
             final ITreasuryServiceRequest iTreasuryServiceRequest, final LocalDate when) {
 
-        if (!iTreasuryServiceRequest.getServiceRequestType().isPayable()) {
+        if (!Boolean.TRUE.equals(iTreasuryServiceRequest.getServiceRequestType().getPayable())) {
             return false;
         }
 
@@ -372,7 +370,7 @@ public class EmolumentServices {
     public static LocalDate possibleDebtDateOnAcademicService(final ITreasuryServiceRequest iTreasuryServiceRequest) {
         // Find the configured state to create debt on academic service request
 
-        if (!iTreasuryServiceRequest.getServiceRequestType().isPayable()) {
+        if (!Boolean.TRUE.equals(iTreasuryServiceRequest.getServiceRequestType().getPayable())) {
             return null;
         }
 

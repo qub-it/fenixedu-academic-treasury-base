@@ -50,6 +50,7 @@ import com.google.common.eventbus.Subscribe;
 
 import pt.ist.fenixframework.Atomic;
 
+// TODO Check code Refactor/20210624-MergeWithISCTE
 public class RegistrationServices {
 
     private static final Logger logger = LoggerFactory.getLogger(RegistrationServices.class);

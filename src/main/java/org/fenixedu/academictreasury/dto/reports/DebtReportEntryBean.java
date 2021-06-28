@@ -40,7 +40,6 @@ import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.acade
 import java.math.BigDecimal;
 
 import org.apache.poi.ss.usermodel.Row;
-import org.fenixedu.academic.domain.ExecutionSemester;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
@@ -58,7 +57,6 @@ import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependent
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
-import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Currency;
 import org.fenixedu.treasury.domain.Customer;

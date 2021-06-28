@@ -100,7 +100,7 @@ public class TuitionServices {
     public static boolean isToPayRegistrationTuition(final Registration registration, final ExecutionYear executionYear) {
         final IAcademicTreasuryPlatformDependentServices academicServices =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
-	return academicServices.registrationProtocol(registration).isToPayGratuity();
+	return Boolean.TRUE.equals(academicServices.registrationProtocol(registration).getPayGratuity());
     }
 
     public static AcademicTreasuryEvent findAcademicTreasuryEventTuitionForRegistration(final Registration registration,
