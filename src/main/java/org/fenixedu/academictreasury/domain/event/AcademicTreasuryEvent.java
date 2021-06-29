@@ -853,6 +853,10 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         return academicTreasuryServices().academicTreasuryEventsSet(person).stream();
     }
 
+    public static Stream<? extends AcademicTreasuryEvent> find(ExecutionYear executionYear) {
+        return findAll().filter(e -> e.getExecutionYear() == executionYear);
+    }
+
     public static Stream<? extends AcademicTreasuryEvent> find(Registration registration, ExecutionYear executionYear) {
         return find(registration.getPerson()).filter(e -> e.getRegistration() == registration).filter(l -> l.getExecutionYear() == executionYear);
     }

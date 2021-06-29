@@ -69,7 +69,9 @@ import org.joda.time.LocalDate;
 
 public interface IAcademicTreasuryPlatformDependentServices {
 
-    /* Read data sets */
+    /* **************
+     * Read data sets 
+     * ************** */
 
     Set<DegreeType> readAllDegreeTypes();
 
@@ -87,14 +89,18 @@ public interface IAcademicTreasuryPlatformDependentServices {
     Set<StatuteType> readAllStatuteTypesSet();
 
     Set<StatuteType> readAllStatuteTypesSet(boolean active);
-    
-    /* Registrations */
+
+    /* *************
+     * Registrations 
+     * ************* */
 
     Set<Registration> readAllRegistrations(RegistrationProtocol registrationProtocol);
 
     Set<Registration> readAllRegistrations(IngressionType ingressionType);
     
-    /* Person & PersonCustomer */
+    /* ***********************
+     * Person & PersonCustomer 
+     * *********************** */
     
     Set<Person> readAllPersonsSet();
     
@@ -123,35 +129,53 @@ public interface IAcademicTreasuryPlatformDependentServices {
     PhysicalAddress createPhysicalAddress(Person person, Country countryOfResidence, String districtOfResidence,
             String districtSubdivisionOfResidence, String areaCode, String address);
 
-    /* Fiscal Information */
+    /* ******************
+     * Fiscal Information 
+     * ****************** */
 
     String fiscalCountry(final Person person);
 
     String fiscalNumber(final Person person);
 
-    /* Permissions */
+    /* ***********
+     * Permissions 
+     * *********** */
 
-    boolean isFrontOfficeMember(final String username, final FinantialEntity finantialEntity);
+    @Deprecated
+    // TreasuryAccressControl is used for this purpose
+    boolean isFrontOfficeMember(String username, FinantialEntity finantialEntity);
 
-    boolean isBackOfficeMember(final String username, final FinantialEntity finantialEntity);
+    @Deprecated
+    // TreasuryAccressControl is used for this purpose
+    boolean isBackOfficeMember(String username, FinantialEntity finantialEntity);
 
-    boolean isAllowToModifySettlements(final String username, final FinantialEntity finantialEntity);
+    @Deprecated
+    // TreasuryAccressControl is used for this purpose
+    boolean isAllowToModifySettlements(String username, FinantialEntity finantialEntity);
 
-    boolean isAllowToModifyInvoices(final String username, final FinantialEntity finantialEntity);
+    @Deprecated
+    // TreasuryAccressControl is used for this purpose
+    boolean isAllowToModifyInvoices(String username, FinantialEntity finantialEntity);
 
-    Set<Degree> readDegrees(final FinantialEntity finantialEntity);
+    Set<Degree> readDegrees(FinantialEntity finantialEntity);
 
-    FinantialEntity finantialEntityOfDegree(final Degree degree, final LocalDate when);
+    FinantialEntity finantialEntityOfDegree(Degree degree, LocalDate when);
 
     Optional<FinantialEntity> finantialEntity(AdministrativeOffice administrativeOffice);
 
     Optional<FinantialEntity> finantialEntity(Unit unit);
 
+    @Deprecated
+    // TreasuryAccressControl is used for this purpose
     Set<String> getFrontOfficeMemberUsernames(final FinantialEntity finantialEntity);
 
+    @Deprecated
+    // TreasuryAccressControl is used for this purpose
     Set<String> getBackOfficeMemberUsernames(final FinantialEntity finantialEntity);
 
-    /* Localized names */
+    /* ***************
+     * Localized names 
+     * *************** */
 
     String localizedNameOfDegreeType(DegreeType degreeType);
 
@@ -169,7 +193,9 @@ public interface IAcademicTreasuryPlatformDependentServices {
 
     String localizedNameOfAdministrativeOffice(AdministrativeOffice administrativeOffice, Locale locale);
 
-    /* Student & Registration */
+    /* **********************
+     * Student & Registration 
+     * ********************** */
 
     RegistrationDataByExecutionYear findRegistrationDataByExecutionYear(Registration registration, ExecutionYear executionYear);
 
@@ -183,12 +209,13 @@ public interface IAcademicTreasuryPlatformDependentServices {
 
     Stream<AdministrativeOffice> findAdministrativeOfficesByPredicate(Predicate<AdministrativeOffice> predicate);
 
-    /* Execution Intervals */
+    /* *******************
+     * Execution Intervals 
+     * ******************* */
     
     ExecutionInterval executionSemester(Enrolment enrolment);
     ExecutionInterval executionSemester(EnrolmentEvaluation enrolmentEvaluation);
     ExecutionYear executionYearOfExecutionSemester(ExecutionInterval executionInterval);
-    
     Integer executionIntervalChildOrder(ExecutionInterval executionInterval);
 
 }
