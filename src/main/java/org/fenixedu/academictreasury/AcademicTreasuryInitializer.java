@@ -32,11 +32,6 @@ public class AcademicTreasuryInitializer implements ServletContextListener {
         ProductDeletionListener.attach();
         FinantialEntityListener.attach();
 
-        final AcademicTreasuryBridgeImpl impl = new AcademicTreasuryBridgeImpl();
-
-        TreasuryBridgeAPIFactory.registerImplementation(impl);
-        BennuSignalsServices.registerSettlementEventHandler(impl);
-
         addDeletionListeners();
     }
 
