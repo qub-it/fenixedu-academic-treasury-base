@@ -70,7 +70,7 @@ import org.joda.time.LocalDate;
 public interface IAcademicTreasuryPlatformDependentServices {
 
     /* **************
-     * Read data sets 
+     * Read data sets
      * ************** */
 
     Set<DegreeType> readAllDegreeTypes();
@@ -91,19 +91,19 @@ public interface IAcademicTreasuryPlatformDependentServices {
     Set<StatuteType> readAllStatuteTypesSet(boolean active);
 
     /* *************
-     * Registrations 
+     * Registrations
      * ************* */
 
     Set<Registration> readAllRegistrations(RegistrationProtocol registrationProtocol);
 
     Set<Registration> readAllRegistrations(IngressionType ingressionType);
-    
+
     /* ***********************
-     * Person & PersonCustomer 
+     * Person & PersonCustomer
      * *********************** */
-    
+
     Set<Person> readAllPersonsSet();
-    
+
     PersonCustomer personCustomer(Person person);
 
     Set<PersonCustomer> inactivePersonCustomers(Person person);
@@ -130,7 +130,7 @@ public interface IAcademicTreasuryPlatformDependentServices {
             String districtSubdivisionOfResidence, String areaCode, String address);
 
     /* ******************
-     * Fiscal Information 
+     * Fiscal Information
      * ****************** */
 
     String fiscalCountry(final Person person);
@@ -138,7 +138,7 @@ public interface IAcademicTreasuryPlatformDependentServices {
     String fiscalNumber(final Person person);
 
     /* ***********
-     * Permissions 
+     * Permissions
      * *********** */
 
     @Deprecated
@@ -174,7 +174,7 @@ public interface IAcademicTreasuryPlatformDependentServices {
     Set<String> getBackOfficeMemberUsernames(final FinantialEntity finantialEntity);
 
     /* ***************
-     * Localized names 
+     * Localized names
      * *************** */
 
     String localizedNameOfDegreeType(DegreeType degreeType);
@@ -194,7 +194,7 @@ public interface IAcademicTreasuryPlatformDependentServices {
     String localizedNameOfAdministrativeOffice(AdministrativeOffice administrativeOffice, Locale locale);
 
     /* **********************
-     * Student & Registration 
+     * Student & Registration
      * ********************** */
 
     RegistrationDataByExecutionYear findRegistrationDataByExecutionYear(Registration registration, ExecutionYear executionYear);
@@ -210,12 +210,17 @@ public interface IAcademicTreasuryPlatformDependentServices {
     Stream<AdministrativeOffice> findAdministrativeOfficesByPredicate(Predicate<AdministrativeOffice> predicate);
 
     /* *******************
-     * Execution Intervals 
+     * Execution Intervals
      * ******************* */
-    
+
     ExecutionInterval executionSemester(Enrolment enrolment);
+
     ExecutionInterval executionSemester(EnrolmentEvaluation enrolmentEvaluation);
+
     ExecutionYear executionYearOfExecutionSemester(ExecutionInterval executionInterval);
+
     Integer executionIntervalChildOrder(ExecutionInterval executionInterval);
+
+    ExecutionInterval getExecutionIntervalByName(String s);
 
 }

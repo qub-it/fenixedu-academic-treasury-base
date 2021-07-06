@@ -41,6 +41,7 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
+import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 
 @TuitionConditionAnnotation(FirstTimeStudentConditionRule.BUNDLE_NAME)
@@ -101,7 +102,8 @@ public class FirstTimeStudentConditionRule extends FirstTimeStudentConditionRule
     }
 
     @Override
-    public void fillRuleFromImporter(String value) {
+    public void fillRuleFromImporter(TuitionPaymentPlanBean bean) {
+        String value = bean.getImporterRules().get(this.getClass());
         if (value.equals(i18n("label.true"))) {
             setFirstTimeStudent(Boolean.TRUE);
             return;

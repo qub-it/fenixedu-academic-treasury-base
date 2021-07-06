@@ -40,6 +40,7 @@ import java.util.Comparator;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 
 import pt.ist.fenixframework.FenixFramework;
@@ -89,7 +90,7 @@ public abstract class TuitionConditionRule extends TuitionConditionRule_Base {
         return result;
     }
 
-    public abstract void fillRuleFromImporter(String string);
+    public abstract void fillRuleFromImporter(TuitionPaymentPlanBean bean);
 
     public abstract TuitionConditionRule duplicate();
 

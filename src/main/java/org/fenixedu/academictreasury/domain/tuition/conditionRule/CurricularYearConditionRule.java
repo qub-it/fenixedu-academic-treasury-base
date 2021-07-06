@@ -44,6 +44,7 @@ import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
+import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
@@ -107,7 +108,8 @@ public class CurricularYearConditionRule extends CurricularYearConditionRule_Bas
     }
 
     @Override
-    public void fillRuleFromImporter(String string) {
+    public void fillRuleFromImporter(TuitionPaymentPlanBean bean) {
+        String string = bean.getImporterRules().get(this.getClass());
         String[] split = string.split("\\|");
         final IAcademicTreasuryPlatformDependentServices services =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
