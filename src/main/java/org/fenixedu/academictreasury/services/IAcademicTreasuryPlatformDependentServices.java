@@ -75,6 +75,11 @@ public interface IAcademicTreasuryPlatformDependentServices {
 	default public Set<StatuteType> readAllStatuteTypesSet() {
     	return StatuteType.readAll((s) -> true).collect(Collectors.toSet());
     }
+
+    default public Set<StatuteType> readAllStatuteTypesSet(boolean active) {
+        return StatuteType.readAll((s) -> true).filter(s -> s.isActive() == active).collect(Collectors.toSet());
+    }
+
     
 	default public Set<Person> readAllPersonsSet() { 
     	return Party.readAllPersons();
@@ -109,6 +114,8 @@ public interface IAcademicTreasuryPlatformDependentServices {
     public String localizedNameOfDegreeType(final DegreeType degreeType);
     
     public String localizedNameOfStatuteType(final StatuteType statuteType);
+
+    public String localizedNameOfStatuteType(StatuteType statuteType, Locale locale);
     
     public String localizedNameOfEnrolment(final Enrolment enrolment);
 

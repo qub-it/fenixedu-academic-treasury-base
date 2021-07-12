@@ -107,6 +107,11 @@ public class FenixEduAcademicTreasuryPlatformDependentServices implements IAcade
 		return statuteType.getName().getContent();
 	}
 
+    @Override
+    public String localizedNameOfStatuteType(StatuteType statuteType, Locale locale) {
+        return statuteType.getName().getContent(locale);
+    }
+
     /* Student & Registration */
 	
 	public IngressionType ingression(final Registration registration) {

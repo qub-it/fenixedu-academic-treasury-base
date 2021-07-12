@@ -17,15 +17,14 @@ public abstract class AcademicDebtGenerationRuleRestriction extends AcademicDebt
         setDomainRoot(FenixFramework.getDomainRoot());
     }
     
-    protected AcademicDebtGenerationRuleRestriction(AcademicDebtGenerationRule rule, boolean excludeIfMatches) {
+    protected AcademicDebtGenerationRuleRestriction(AcademicDebtGenerationRule rule) {
         this();
         
-        init(rule, excludeIfMatches);
+        init(rule);
     }
 
-    protected void init(AcademicDebtGenerationRule rule, boolean excludeIfMatches) {
+    protected void init(AcademicDebtGenerationRule rule) {
         super.setAcademicDebtGenerationRule(rule);
-        super.setExcludeIfMatches(excludeIfMatches);
         
         checkRules();
     }
@@ -46,14 +45,6 @@ public abstract class AcademicDebtGenerationRuleRestriction extends AcademicDebt
     
     public abstract AcademicDebtGenerationRuleRestriction makeCopy(AcademicDebtGenerationRule academicDebtGenerationRule);
     
-    public boolean isToInclude() {
-        return !getExcludeIfMatches();
-    }
-    
-    public boolean isToExclude() {
-        return getExcludeIfMatches();
-    }
-
     public void delete() {
         setDomainRoot(null);
         setAcademicDebtGenerationRule(null);
@@ -74,6 +65,5 @@ public abstract class AcademicDebtGenerationRuleRestriction extends AcademicDebt
     public static Stream<AcademicDebtGenerationRuleRestriction> find(AcademicDebtGenerationRule rule) {
         return rule.getAcademicDebtGenerationRuleRestrictionsSet().stream();
     }
-
     
 }

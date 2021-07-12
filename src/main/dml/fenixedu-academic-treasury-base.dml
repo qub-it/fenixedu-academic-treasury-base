@@ -829,7 +829,6 @@ class debtGeneration.AcademicDebtGenerationRuleEntry {
 	}
 
 class debtGeneration.AcademicDebtGenerationRuleRestriction {
-	boolean excludeIfMatches;
 }
 
 	relation AcademicDebtGenerationRuleRestrictionDomainRoot {
