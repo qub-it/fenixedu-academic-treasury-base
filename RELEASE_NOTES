@@ -1,3 +1,5 @@
+- Refactor: Allow specification of different product for standalone/extacurricular payment plans
+
 7.3.0 (21-06-2021)
 - New Fixture: Shared tuition payment plan between curricular plans, check if payment plan is reachable, tuition conditions, tuition installments custom calculators
 - Improvement: Use default payment platform to Automatic rules and Academic services
