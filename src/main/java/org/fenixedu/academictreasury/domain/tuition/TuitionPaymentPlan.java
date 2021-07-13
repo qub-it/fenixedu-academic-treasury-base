@@ -368,7 +368,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                         calculatorsMap.put(clazz, newInstanceFor);
                         strBuilder.append(newInstanceFor.getPresentationName()).append(" (")
                                 .append(academicTreasuryEvent.formatMoney(newInstanceFor.getTotalAmount())).append("): \n");
-                        String description = newInstanceFor.getCalculationDescription();
+                        String description = newInstanceFor.getCalculeDescritpion();
                         strBuilder.append(description).append("\n");
                     }
                 });
@@ -413,7 +413,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                         calculatorsMap.put(clazz, newInstanceFor);
                         strBuilder.append(newInstanceFor.getPresentationName()).append(" (")
                                 .append(academicTreasuryEvent.formatMoney(newInstanceFor.getTotalAmount())).append("): \n");
-                        String description = newInstanceFor.getCalculationDescription();
+                        String description = newInstanceFor.getCalculeDescritpion();
                         strBuilder.append(description).append("\n");
                     }
                 });
@@ -474,7 +474,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                         calculatorsMap.put(clazz, newInstanceFor);
                         strBuilder.append(newInstanceFor.getPresentationName()).append(" (")
                                 .append(academicTreasuryEvent.formatMoney(newInstanceFor.getTotalAmount())).append("): \n");
-                        String description = newInstanceFor.getCalculationDescription();
+                        String description = newInstanceFor.getCalculeDescritpion();
                         strBuilder.append(description).append("\n");
                     }
                 });

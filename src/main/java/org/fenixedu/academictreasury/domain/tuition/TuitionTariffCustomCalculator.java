@@ -44,7 +44,7 @@ import org.fenixedu.academic.domain.student.Registration;
 public interface TuitionTariffCustomCalculator {
     public BigDecimal getTotalAmount();
 
-    public String getCalculationDescription();
+    public String getCalculeDescritpion();
 
     public String getPresentationName();
 

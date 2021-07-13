@@ -79,7 +79,7 @@ public class Teste999CustomCalculator implements TuitionTariffCustomCalculator {
     }
 
     @Override
-    public String getCalculationDescription() {
+    public String getCalculeDescritpion() {
         return calculeDescription;
     }
 }
