@@ -368,7 +368,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                         calculatorsMap.put(clazz, newInstanceFor);
                         strBuilder.append(newInstanceFor.getPresentationName()).append(" (")
                                 .append(academicTreasuryEvent.formatMoney(newInstanceFor.getTotalAmount())).append("): \n");
-                        String description = newInstanceFor.getCalculeDescritpion();
+                        String description = newInstanceFor.getCalculationDescription();
                         strBuilder.append(description).append("\n");
                     }
                 });
@@ -409,11 +409,11 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                 .collect(Collectors.toSet()).forEach(clazz -> {
                     if (clazz != null) {
                         TuitionTariffCustomCalculator newInstanceFor = TuitionTariffCustomCalculator.getNewInstanceFor(clazz,
-                                academicTreasuryEvent.getRegistration(), this);
+                                academicTreasuryEvent.getRegistration(), this, standaloneEnrolment);
                         calculatorsMap.put(clazz, newInstanceFor);
                         strBuilder.append(newInstanceFor.getPresentationName()).append(" (")
                                 .append(academicTreasuryEvent.formatMoney(newInstanceFor.getTotalAmount())).append("): \n");
-                        String description = newInstanceFor.getCalculeDescritpion();
+                        String description = newInstanceFor.getCalculationDescription();
                         strBuilder.append(description).append("\n");
                     }
                 });
@@ -470,11 +470,11 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                 .collect(Collectors.toSet()).forEach(clazz -> {
                     if (clazz != null) {
                         TuitionTariffCustomCalculator newInstanceFor = TuitionTariffCustomCalculator.getNewInstanceFor(clazz,
-                                academicTreasuryEvent.getRegistration(), this);
+                                academicTreasuryEvent.getRegistration(), this, extracurricularEnrolment);
                         calculatorsMap.put(clazz, newInstanceFor);
                         strBuilder.append(newInstanceFor.getPresentationName()).append(" (")
                                 .append(academicTreasuryEvent.formatMoney(newInstanceFor.getTotalAmount())).append("): \n");
-                        String description = newInstanceFor.getCalculeDescritpion();
+                        String description = newInstanceFor.getCalculationDescription();
                         strBuilder.append(description).append("\n");
                     }
                 });
