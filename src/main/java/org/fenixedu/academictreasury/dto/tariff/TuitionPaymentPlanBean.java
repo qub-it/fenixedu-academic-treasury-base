@@ -1148,7 +1148,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
     public List<String> validateStudentConditions() {
         List<String> result = Lists.newArrayList();
-        if (!hasAtLeastOneConditionSpecified()) {
+        if (getTuitionPaymentPlanGroup().isForRegistration() &&  !hasAtLeastOneConditionSpecified()) {
             result.add("error.TuitionPaymentPlan.specify.at.least.one.condition");
         }
 

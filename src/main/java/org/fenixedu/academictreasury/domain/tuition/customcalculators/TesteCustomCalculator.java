@@ -37,11 +37,11 @@ package org.fenixedu.academictreasury.domain.tuition.customcalculators;
 
 import java.math.BigDecimal;
 
+import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCustomCalculator;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
-import org.joda.time.LocalDate;
 
 public class TesteCustomCalculator implements TuitionTariffCustomCalculator {
     private BigDecimal total;
@@ -56,6 +56,10 @@ public class TesteCustomCalculator implements TuitionTariffCustomCalculator {
         total = calculateValue(strBuilder, registration, paymentPlan);
 
         calculeDescription = strBuilder.toString();
+    }
+
+    public TesteCustomCalculator(Registration registration, TuitionPaymentPlan paymentPlan, Enrolment enrolment) {
+        throw new RuntimeException("not supported");
     }
 
     private BigDecimal calculateValue(StringBuilder strBuilder, Registration registration, TuitionPaymentPlan paymentPlan) {

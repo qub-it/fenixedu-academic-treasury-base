@@ -124,16 +124,6 @@ public class ExecutionIntervalConditionRule extends ExecutionIntervalConditionRu
 
         result.getExecutionIntervalSet().addAll(executionIntervalOfTuitionPaymentPlanExecutionYear);
         return result;
-
-//	// TODO Check code Refactor/20210624-MergeWithISCTE
-//        getExecutionIntervalSet().forEach(c -> {
-//            ExecutionInterval executionInterval =
-//                    tuitionPaymentPlan.getExecutionYear().getChildInterval(c.getChildOrder(), c.getAcademicPeriod());
-//            if (executionInterval != null) {
-//                result.addExecutionInterval(executionInterval);
-//            }
-//        });
-//        return result;
     }
 
     @Override
@@ -142,21 +132,6 @@ public class ExecutionIntervalConditionRule extends ExecutionIntervalConditionRu
         getExecutionIntervalSet().forEach(c -> result.addExecutionInterval(c));
         return result;
     }
-
-//    @Override
-//    public void fillRuleFromImporter(String string) {
-//        String[] split = string.split("\\|");
-//        for (String s : split) {
-//            // TODO Check code Refactor/20210624-MergeWithISCTE
-//            IAcademicTreasuryPlatformDependentServices implementation =
-//                    AcademicTreasuryPlataformDependentServicesFactory.implementation();
-//            ExecutionInterval value = implementation.getExecutionIntervalByName(s);
-//            if (value == null) {
-//                throw new IllegalArgumentException();
-//            }
-//            addExecutionInterval(value);
-//        }
-//    }
 
     @Override
     public void fillRuleFromImporter(TuitionPaymentPlanBean bean) {

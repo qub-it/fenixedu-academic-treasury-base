@@ -38,6 +38,7 @@ package org.fenixedu.academictreasury.domain.tuition;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 
+import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.student.Registration;
 
 public interface TuitionTariffCustomCalculator {
@@ -58,6 +59,18 @@ public interface TuitionTariffCustomCalculator {
                 | NoSuchMethodException | SecurityException e) {
             throw new IllegalArgumentException("error.create.instance.of.TuitionTariffCustomCalculator");
 
+        }
+    }
+
+    public static TuitionTariffCustomCalculator getNewInstanceFor(
+            Class<? extends TuitionTariffCustomCalculator> tuitionTariffCustomCalculator, Registration registration,
+            TuitionPaymentPlan tuitionPaymentPlan, Enrolment enrolment) {
+        try {
+            return tuitionTariffCustomCalculator.getConstructor(Registration.class, TuitionPaymentPlan.class, Enrolment.class)
+                    .newInstance(registration, tuitionPaymentPlan, enrolment);
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException e) {
+            throw new IllegalArgumentException("error.create.instance.of.TuitionTariffCustomCalculator");
         }
     }
 

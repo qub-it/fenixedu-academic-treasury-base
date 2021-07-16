@@ -112,9 +112,12 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
     protected void init(final FinantialEntity finantialEntity, final TuitionPaymentPlan tuitionPaymentPlan,
             final AcademicTariffBean bean) {
 
-        final Product product = tuitionPaymentPlan.getTuitionPaymentPlanGroup().isForStandalone()
-                || tuitionPaymentPlan.getTuitionPaymentPlanGroup().isForExtracurricular() ? tuitionPaymentPlan
-                        .getProduct() : bean.getTuitionInstallmentProduct();
+        Product product = bean.getTuitionInstallmentProduct();
+
+        if (product == null && (tuitionPaymentPlan.getTuitionPaymentPlanGroup().isForStandalone()
+                || tuitionPaymentPlan.getTuitionPaymentPlanGroup().isForExtracurricular())) {
+            product = tuitionPaymentPlan.getProduct();
+        }
 
         super.init(finantialEntity, product, bean.getBeginDate().toDateTimeAtStartOfDay(),
                 bean.getEndDate() != null ? bean.getEndDate().toDateTimeAtStartOfDay() : null, bean.getDueDateCalculationType(),
