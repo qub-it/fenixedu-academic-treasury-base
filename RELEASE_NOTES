@@ -1,3 +1,8 @@
+- Refactor: Allow specification of different product for standalone/extacurricular payment plans
+- Improvement: Refactorization to use CustomCalculatorsMap on fillProperties
+- Refactor: Refactor academic domain to dependent platform services
+- Refactor: Move Bennu specific service implementations to fenixedu-academic-treasury-ui
+
 7.2.2 (13-07-2021)
 - Refactor: Remove excludesIfMatches property, which is not used
 - Refactor: Use academic treasury dependent platform services to translate statute type description

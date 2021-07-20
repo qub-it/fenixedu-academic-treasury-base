@@ -1,3 +1,38 @@
+/**
+ * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, without modification, are permitted
+ * provided that the following conditions are met:
+ *
+ * * Redistributions of source code must retain the above copyright notice, this list of
+ * conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice, this list
+ * of conditions and the following disclaimer in the documentation and/or other materials
+ * provided with the distribution.
+ * * Neither the name of Quorum Born IT nor the names of its contributors may be used to
+ * endorse or promote products derived from this software without specific prior written
+ * permission.
+ * * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade
+ * de Lisboa (Departamento de Informática), hereby referred to as the Beneficiary, is the
+ * sole demonstrated end-user and ultimately the only beneficiary of the redistributed binary
+ * form and/or source code.
+ * * The Beneficiary is entrusted with either the binary form, the source code, or both, and
+ * by accepting it, accepts the terms of this License.
+ * * Redistribution of any binary form and/or source code is only allowed in the scope of the
+ * Universidade de Lisboa FenixEdu(™)’s implementation projects.
+ * * This license and conditions of redistribution of source code/binary can only be reviewed
+ * by the Steering Comittee of FenixEdu(™) <http://www.fenixedu.org/>.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
+ * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL “Quorum Born IT” BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+ * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 package org.fenixedu.academictreasury.domain.event;
 
 import static java.lang.String.format;
@@ -571,7 +606,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         }
 
         debitEntry.setCurricularCourse(enrolment.getCurricularCourse());
-        debitEntry.setExecutionSemester(enrolment.getExecutionInterval());
+        debitEntry.setExecutionSemester(academicTreasuryServices().executionSemester(enrolment));
     }
 
     public void associateEnrolmentEvaluation(final DebitEntry debitEntry, final EnrolmentEvaluation enrolmentEvaluation) {
@@ -584,10 +619,10 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         }
 
         debitEntry.setCurricularCourse(enrolmentEvaluation.getEnrolment().getCurricularCourse());
-        debitEntry.setExecutionSemester(enrolmentEvaluation.getEnrolment().getExecutionInterval());
+        debitEntry.setExecutionSemester(academicTreasuryServices().executionSemester(enrolmentEvaluation.getEnrolment()));
 
-        if (enrolmentEvaluation.getExecutionPeriod() != null) {
-            debitEntry.setExecutionSemester(enrolmentEvaluation.getExecutionInterval());
+        if (academicTreasuryServices().executionSemester(enrolmentEvaluation) != null) {
+            debitEntry.setExecutionSemester(academicTreasuryServices().executionSemester(enrolmentEvaluation));
         }
 
         debitEntry.setEvaluationSeason(enrolmentEvaluation.getEvaluationSeason());
@@ -788,17 +823,20 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
         super.delete();
     }
-    
+
     @Override
     public Optional<Tariff> findMatchTariff(FinantialEntity finantialEntity, Product product, LocalDate when) {
-        
-        if(degree() != null) {
-            return Optional.ofNullable(AcademicTariff.findMatch(finantialEntity, product, degree(), when.toDateTimeAtStartOfDay()));
-        } else if(getDegree() != null) {
-            return Optional.ofNullable(AcademicTariff.findMatch(finantialEntity, product, getDegree(), when.toDateTimeAtStartOfDay()));
+
+        if (degree() != null) {
+            return Optional
+                    .ofNullable(AcademicTariff.findMatch(finantialEntity, product, degree(), when.toDateTimeAtStartOfDay()));
+        } else if (getDegree() != null) {
+            return Optional
+                    .ofNullable(AcademicTariff.findMatch(finantialEntity, product, getDegree(), when.toDateTimeAtStartOfDay()));
         }
-        
-        return Optional.ofNullable(AcademicTariff.findMatch(finantialEntity, product, finantialEntity.getAdministrativeOffice(), when.toDateTimeAtStartOfDay()));
+
+        return Optional.ofNullable(AcademicTariff.findMatch(finantialEntity, product, finantialEntity.getAdministrativeOffice(),
+                when.toDateTimeAtStartOfDay()));
     }
 
     // @formatter: off
@@ -811,18 +849,21 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         return TreasuryEvent.findAll().filter(e -> e instanceof AcademicTreasuryEvent).map(AcademicTreasuryEvent.class::cast);
     }
 
-    public static Stream<? extends AcademicTreasuryEvent> find(final Person person) {
-        return person.getAcademicTreasuryEventSet().stream();
+    public static Stream<? extends AcademicTreasuryEvent> find(Person person) {
+        return academicTreasuryServices().academicTreasuryEventsSet(person).stream();
     }
 
-    public static Stream<? extends AcademicTreasuryEvent> find(final Registration registration,
-            final ExecutionYear executionYear) {
-        return registration.getAcademicTreasuryEventSet().stream().filter(l -> l.getExecutionYear() == executionYear);
+    public static Stream<? extends AcademicTreasuryEvent> find(ExecutionYear executionYear) {
+        return findAll().filter(e -> e.getExecutionYear() == executionYear);
+    }
+
+    public static Stream<? extends AcademicTreasuryEvent> find(Registration registration, ExecutionYear executionYear) {
+        return find(registration.getPerson()).filter(e -> e.getRegistration() == registration).filter(l -> l.getExecutionYear() == executionYear);
     }
 
     /* --- Academic Service Requests --- */
 
-    public static Stream<? extends AcademicTreasuryEvent> find(final ITreasuryServiceRequest iTreasuryServiceRequest) {
+    public static Stream<? extends AcademicTreasuryEvent> find(ITreasuryServiceRequest iTreasuryServiceRequest) {
         if (iTreasuryServiceRequest == null) {
             throw new RuntimeException("wrong call");
         }
@@ -831,11 +872,11 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
                 && e.getITreasuryServiceRequest().getExternalId().equals(iTreasuryServiceRequest.getExternalId()));
     }
 
-    public static Optional<? extends AcademicTreasuryEvent> findUnique(final ITreasuryServiceRequest iTreasuryServiceRequest) {
+    public static Optional<? extends AcademicTreasuryEvent> findUnique(ITreasuryServiceRequest iTreasuryServiceRequest) {
         return find(iTreasuryServiceRequest).findFirst();
     }
 
-    public static AcademicTreasuryEvent createForAcademicServiceRequest(final ITreasuryServiceRequest iTreasuryServiceRequest) {
+    public static AcademicTreasuryEvent createForAcademicServiceRequest(ITreasuryServiceRequest iTreasuryServiceRequest) {
         return new AcademicTreasuryEvent(iTreasuryServiceRequest);
     }
 
@@ -935,7 +976,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
     public static Stream<? extends AcademicTreasuryEvent> findForAcademicTax(final Registration registration,
             final ExecutionYear executionYear, final AcademicTax academicTax) {
-        return registration.getPerson().getAcademicTreasuryEventSet().stream()
+        return find(registration.getPerson())
                 .filter(e -> e.isForAcademicTax() && e.getAcademicTax() == academicTax && e.getExecutionYear() == executionYear
                         && (!e.getAcademicTax().isAppliedOnRegistration() && e.getPerson() == registration.getPerson()
                                 || e.getRegistration() == registration));
@@ -1075,7 +1116,6 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
         CALCULATED_AMOUNT_TYPE("45");
 
-
         private String code;
 
         private AcademicTreasuryEventKeys(final String code) {
@@ -1209,6 +1249,10 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         super.setMaximumAmount(maximumAmount);
         super.setAmountForLanguageTranslationRate(amountForLanguageTranslationRate);
         super.setAmountForUrgencyRate(amountForUrgencyRate);
+    }
+
+    private static IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
+        return AcademicTreasuryPlataformDependentServicesFactory.implementation();
     }
 
     /* ----------------------
