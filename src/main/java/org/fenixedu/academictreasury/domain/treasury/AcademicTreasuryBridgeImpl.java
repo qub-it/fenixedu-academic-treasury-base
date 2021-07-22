@@ -634,8 +634,10 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         AcademicDebtGenerationRule.runAllActiveForRegistration(registration, true);
     }
 
-    // TODO heck code Refactor/20210624-MergeWithISCTE
     // TODO After the virtual payments going to production, replace Bennu Signals  with settlement note handlers
+    // The settlement creation is now in SettlementNote.processSettlementNoteCreation(SettlementNoteBean) except 
+    // when TreasurySettings.isRestrictPaymentMixingLegacyInvoices==true . 
+    // This handle could be called in SettlementNote.processSettlementNoteCreation(SettlementNoteBean)
     // For now maintain it
     @Subscribe
     public void handle(final DomainObjectEvent<SettlementNote> settlementNoteEvent) {

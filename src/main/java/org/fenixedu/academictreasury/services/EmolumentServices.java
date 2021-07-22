@@ -92,7 +92,6 @@ public class EmolumentServices {
     }
 
     @Subscribe
-	// TODO Check code Refactor/20210624-MergeWithISCTE
 	// Consider remove Bennu Signals
     public void newAcademicServiceRequestSituationEvent(final DomainObjectEvent<AcademicServiceRequest> event) {
         newAcademicServiceRequestSituationEvent(event.getInstance());

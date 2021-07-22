@@ -44,7 +44,7 @@ import org.fenixedu.academic.domain.student.Registration;
 public interface TuitionTariffCustomCalculator {
     public BigDecimal getTotalAmount();
 
-    public String getCalculeDescritpion();
+    public String getCalculationDescription();
 
     public String getPresentationName();
 
@@ -57,7 +57,7 @@ public interface TuitionTariffCustomCalculator {
                     .newInstance(registration, tuitionPaymentPlan);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
                 | NoSuchMethodException | SecurityException e) {
-            throw new IllegalArgumentException("error.create.instance.of.TuitionTariffCustomCalculator");
+            throw new IllegalArgumentException("error.create.instance.of.TuitionTariffCustomCalculator", e);
 
         }
     }
@@ -70,7 +70,7 @@ public interface TuitionTariffCustomCalculator {
                     .newInstance(registration, tuitionPaymentPlan, enrolment);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
                 | NoSuchMethodException | SecurityException e) {
-            throw new IllegalArgumentException("error.create.instance.of.TuitionTariffCustomCalculator");
+            throw new IllegalArgumentException("error.create.instance.of.TuitionTariffCustomCalculator", e);
         }
     }
 
@@ -79,7 +79,7 @@ public interface TuitionTariffCustomCalculator {
             return tuitionTariffCustomCalculator.getConstructor().newInstance().getPresentationName();
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
                 | NoSuchMethodException | SecurityException e) {
-            throw new IllegalArgumentException("error.create.instance.of.TuitionTariffCustomCalculator");
+            throw new IllegalArgumentException("error.create.instance.of.TuitionTariffCustomCalculator", e);
 
         }
     }

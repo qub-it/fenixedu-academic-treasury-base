@@ -499,7 +499,7 @@ public class TuitionServices {
                     .collect(Collectors.toSet()).forEach(clazz -> {
                         if (clazz != null) {
                             TuitionTariffCustomCalculator newInstanceFor = TuitionTariffCustomCalculator.getNewInstanceFor(clazz,
-                                    registration, tuitionPaymentPlanToCalculator);
+                                    registration, tuitionPaymentPlanToCalculator, enrolment);
                             calculatorsMap.put(clazz, newInstanceFor);
                         }
                     });
@@ -773,7 +773,7 @@ public class TuitionServices {
                     .collect(Collectors.toSet()).forEach(clazz -> {
                         if (clazz != null) {
                             TuitionTariffCustomCalculator newInstanceFor = TuitionTariffCustomCalculator.getNewInstanceFor(clazz,
-                                    registration, tuitionPaymentPlanToCalculator);
+                                    registration, tuitionPaymentPlanToCalculator, enrolment);
                             calculatorsMap.put(clazz, newInstanceFor);
                         }
                     });
@@ -936,9 +936,6 @@ public class TuitionServices {
         if (studentCurricularPlan == null) {
             return Sets.newHashSet();
         }
-
-	// TODO Check code Refactor/20210624-MergeWithISCTE
-	// Abstract to a service
 
         return studentCurricularPlan.getStandaloneCurriculumLines().stream()
                 .filter(l -> l.getExecutionYear() == executionYear && l.isEnrolment()).map(l -> (Enrolment) l)
