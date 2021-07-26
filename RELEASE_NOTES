@@ -1,3 +1,4 @@
+8.0.0 (26-07-2021)
 - Refactor: Allow specification of different product for standalone/extacurricular payment plans
 - Improvement: Refactorization to use CustomCalculatorsMap on fillProperties
 - Refactor: Refactor academic domain to dependent platform services
