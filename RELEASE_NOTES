@@ -1,3 +1,4 @@
+8.0.1 (27-07-2021)
 - Bug Fix: Error on copy of plans, invisible fields not are deleted
 - Bug Fix: Reverted deletion of  PaymentPenaltySettings and PaymentPenaltyEventTarget (#UL-ISEG-1757)
 
