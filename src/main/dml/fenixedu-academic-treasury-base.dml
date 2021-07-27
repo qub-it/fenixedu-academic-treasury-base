@@ -1603,3 +1603,66 @@ class integration.ERPTuitionInfoCreationReportFile /* implements IGenericFile */
 		}
 		
 	}
+
+/*
+ * PaymentPenalty
+ */
+ 
+class paymentpenalty.PaymentPenaltySettings {
+	Boolean active;
+	LocalizedString emolumentDescription;
+	Boolean createPaymentCode;
+}
+
+	relation PaymentPenaltySettingsDomainRoot {
+		.pt.ist.fenixframework.DomainRoot playsRole domainRoot {
+			multiplicity 1..1;
+		}
+	
+		paymentpenalty.PaymentPenaltySettings playsRole paymentPenaltySettings {
+			multiplicity *;
+		}
+	}
+
+	relation PaymentPenaltySettingsProduct {
+		paymentpenalty.PaymentPenaltySettings playsRole paymentPenaltySettingsForPenaltyProduct {
+			multiplicity 0..1;
+		}
+	
+		.org.fenixedu.treasury.domain.Product playsRole penaltyProduct {
+			multiplicity 0..1;
+		}
+	}
+	
+	relation PaymentPenaltySettingsProductsToTax {
+		paymentpenalty.PaymentPenaltySettings playsRole paymentPenaltySettingsForTargetProduct {
+			multiplicity 0..1;
+		}
+		
+		.org.fenixedu.treasury.domain.Product playsRole targetProducts {
+			multiplicity *;
+		}
+	}
+	
+class paymentpenalty.PaymentPenaltyEventTarget {
+}
+
+	relation PaymentPenaltyEventTargetDomainRoot {
+		.pt.ist.fenixframework.DomainRoot playsRole domainRoot {
+			multiplicity 1..1;
+		}
+	
+		paymentpenalty.PaymentPenaltyEventTarget playsRole paymentPenaltyEventTargets {
+			multiplicity *;
+		}
+	}
+	
+	relation PaymentPenaltyEventTargetDebitEntry {
+		.org.fenixedu.treasury.domain.document.DebitEntry playsRole originDebitEntry {
+			multiplicity 1..1;
+		}
+		
+		paymentpenalty.PaymentPenaltyEventTarget playsRole paymentPenaltyEventTarget {
+			multiplicity 0..1;
+		}
+	}
