@@ -261,9 +261,9 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
     }
 
     private boolean isFixedAmountRequired() {
-	// TODO Check code Refactor/20210624-MergeWithISCTE
-	// getEctsCalculationType() != null and getTuitionTariffCalculatedAmountType() != null
-	// should not be necessary
+        // TODO Check code Refactor/20210624-MergeWithISCTE
+        // getEctsCalculationType() != null and getTuitionTariffCalculatedAmountType() != null
+        // should not be necessary
 
         return !((isTuitionCalculationByEctsOrUnits() && getEctsCalculationType() != null
                 && getEctsCalculationType().isDependentOnDefaultPaymentPlan())
@@ -276,9 +276,9 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
     }
 
     public boolean isDefaultPaymentPlanDependent() {
-	// TODO Check code Refactor/20210624-MergeWithISCTE
-	// getEctsCalculationType() != null and getTuitionTariffCalculatedAmountType() != null
-	// should not be necessary
+        // TODO Check code Refactor/20210624-MergeWithISCTE
+        // getEctsCalculationType() != null and getTuitionTariffCalculatedAmountType() != null
+        // should not be necessary
 
         return isTuitionCalculationByEctsOrUnits() && getEctsCalculationType() != null
                 && getEctsCalculationType().isDependentOnDefaultPaymentPlan();
@@ -866,17 +866,19 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
         super.setBeginDate(bean.getBeginDate().toDateTimeAtStartOfDay());
         super.setEndDate(bean.getEndDate() != null ? bean.getEndDate().toDateTimeAtStartOfDay() : null);
-	
-	// TODO Check code Refactor/20210624-MergeWithISCTE
-	// Check why super.setTuitionCalculationType(bean.getTuitionCalculationType()); is not called
+
+        // TODO Check code Refactor/20210624-MergeWithISCTE
+        // Check why super.setTuitionCalculationType(bean.getTuitionCalculationType()); is not called
 
         super.setTuitionTariffCalculatedAmountType(bean.getTuitionTariffCalculatedAmountType());
 
         super.setTuitionTariffCustomCalculatorClassName(
                 bean.getTuitionTariffCustomCalculator() != null ? bean.getTuitionTariffCustomCalculator().getName() : null);
 
-        super.setDueDateCalculationType(bean.getDueDateCalculationType());
-        super.setFixedDueDate(bean.getFixedDueDate());
+        setDueDateCalculationType(bean.getDueDateCalculationType());
+
+        setFixedDueDate(bean.getFixedDueDate());
+
         super.setNumberOfDaysAfterCreationForDueDate(bean.getNumberOfDaysAfterCreationForDueDate());
         super.setApplyInterests(bean.isApplyInterests());
 
@@ -913,12 +915,12 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
     public BigDecimal amountToPay() {
         throw new RuntimeException("not supported");
     }
-    
+
     @Override
     public boolean isBroadTariffForFinantialEntity() {
         return false;
     }
-    
+
     // @formatter:off
     /* --------
      * SERVICES
@@ -958,6 +960,25 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
     public void setTuitionTariffCustomCalculator(Class<? extends TuitionTariffCustomCalculator> clazz) {
         setTuitionTariffCustomCalculatorClassName(clazz != null ? clazz.getName() : "");
+    }
+
+    @Override
+    public void setFixedDueDate(LocalDate fixedDueDate) {
+        // TODO Auto-generated method stub
+        if (getDueDateCalculationType().isBestOfFixedDateAndDaysAfterCreation()) {
+            super.setFixedDueDate(fixedDueDate);
+        } else {
+            super.setFixedDueDate(null);
+        }
+    }
+
+    @Override
+    public void setDueDateCalculationType(DueDateCalculationType dueDateCalculationType) {
+        super.setDueDateCalculationType(dueDateCalculationType);
+        if (!dueDateCalculationType.isBestOfFixedDateAndDaysAfterCreation()) {
+            setFixedDueDate(null);
+        }
+
     }
 
 }
