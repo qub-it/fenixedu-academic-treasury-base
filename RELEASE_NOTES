@@ -1,3 +1,4 @@
+8.0.2 (29-07-2021)
 - Improvement: Close debit notes academic debt generation rule allow close of interests (#UL-IGOT-1129)
 - Improvement: Add document observations & terms and conditions to be exported in debt report beans
 
