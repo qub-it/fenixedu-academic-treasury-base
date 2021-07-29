@@ -251,6 +251,9 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     private String originSettlementNoteForAdvancedCredit;
 
     private String decimalSeparator;
+    
+    private String documentObservations;
+    private String documentTermsAndConditions;
 
     public DebtReportEntryBean(final InvoiceEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
@@ -286,6 +289,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
             if (entry.getFinantialDocument() != null) {
                 this.documentNumber = entry.getFinantialDocument().getUiDocumentNumber();
                 this.documentExportationPending = entry.getFinantialDocument().isDocumentToExport();
+                this.documentObservations = entry.getFinantialDocument().getDocumentObservations();
+                this.documentTermsAndConditions = entry.getFinantialDocument().getDocumentTermsAndConditions();
             }
 
             this.annuled = entry.isAnnulled();
@@ -304,6 +309,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
             this.pendingInterestAmount =
                     currency.getValueWithScale(entry.getOpenAmountWithInterests().subtract(entry.getOpenAmount()));
 
+            
             fillERPInformation(entry);
 
             this.completed = true;
@@ -1276,5 +1282,21 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     public void setOriginSettlementNoteForAdvancedCredit(String originSettlementNoteForAdvancedCredit) {
         this.originSettlementNoteForAdvancedCredit = originSettlementNoteForAdvancedCredit;
     }
-
+    
+    public String getDocumentObservations() {
+        return documentObservations;
+    }
+    
+    public void setDocumentObservations(String documentObservations) {
+        this.documentObservations = documentObservations;
+    }
+    
+    public String getDocumentTermsAndConditions() {
+        return documentTermsAndConditions;
+    }
+    
+    public void setDocumentTermsAndConditions(String documentTermsAndConditions) {
+        this.documentTermsAndConditions = documentTermsAndConditions;
+    }
+    
 }

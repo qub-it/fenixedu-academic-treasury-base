@@ -605,7 +605,7 @@ public class PersonCustomer extends PersonCustomer_Base {
             personCustomer.checkRules();
         }
 
-        final Person thisPerson = isActive() ? getPerson() : getPersonForInactivePersonCustomer();
+        final Person thisPerson = getAssociatedPerson();
         for (final AcademicTreasuryEvent e : Sets.newHashSet(services.academicTreasuryEventsSet(person))) {
             e.setPerson(thisPerson);
         }

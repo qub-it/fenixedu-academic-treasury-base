@@ -151,6 +151,9 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
     private String erpPayorCustomerId;
 
     private String decimalSeparator;
+    
+    private String documentObservations;
+    private String documentTermsAndConditions;
 
     public SettlementReportEntryBean(final SettlementEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
@@ -161,7 +164,7 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
         this.settlementNote = (SettlementNote) entry.getFinantialDocument();
 
         try {
-            final Currency currency = settlementNote.getDebtAccount().getFinantialInstitution().getCurrency();
+            final Currency currency = this.settlementNote.getDebtAccount().getFinantialInstitution().getCurrency();
 
             this.identification = entry.getExternalId();
             this.creationDate = treasuryServices.versioningCreationDate(entry);
@@ -181,7 +184,9 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
 
             this.productCode = entry.getInvoiceEntry().getProduct().getCode();
             this.settlementEntryDescription = entry.getDescription();
-
+            this.documentObservations = this.settlementNote.getDocumentObservations();
+            this.documentTermsAndConditions = this.settlementNote.getDocumentTermsAndConditions();
+            
             fillStudentInformation(entry);
 
             fillAcademicInformation(entry.getInvoiceEntry());
@@ -846,5 +851,20 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
     public void setDecimalSeparator(String decimalSeparator) {
         this.decimalSeparator = decimalSeparator;
     }
+    
+    public String getDocumentObservations() {
+        return documentObservations;
+    }
+    
+    public void setDocumentObservations(String documentObservations) {
+        this.documentObservations = documentObservations;
+    }
 
+    public String getDocumentTermsAndConditions() {
+        return documentTermsAndConditions;
+    }
+    
+    public void setDocumentTermsAndConditions(String documentTermsAndConditions) {
+        this.documentTermsAndConditions = documentTermsAndConditions;
+    }
 }

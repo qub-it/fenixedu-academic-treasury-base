@@ -37,12 +37,14 @@ package org.fenixedu.academictreasury.domain.debtGeneration.strategies;
 
 import static org.fenixedu.academictreasury.domain.debtGeneration.IAcademicDebtGenerationRuleStrategy.findActiveDebitEntries;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.debtGeneration.AcademicDebtGenerationProcessingResult;
@@ -59,8 +61,13 @@ import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependent
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.treasury.domain.Product;
+import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.DebitNote;
+import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
+import org.fenixedu.treasury.domain.document.FinantialDocumentType;
+import org.fenixedu.treasury.domain.settings.TreasurySettings;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,7 +143,8 @@ public class CloseDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
                     continue;
                 }
 
-                final AcademicDebtGenerationProcessingResult result = new AcademicDebtGenerationProcessingResult(rule, registration);
+                final AcademicDebtGenerationProcessingResult result =
+                        new AcademicDebtGenerationProcessingResult(rule, registration);
                 resultList.add(result);
 
                 try {
@@ -151,13 +159,14 @@ public class CloseDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
                 }
             }
         }
-        
+
         return resultList;
     }
 
     @Override
     @Atomic(mode = TxMode.READ)
-    public List<AcademicDebtGenerationProcessingResult> process(final AcademicDebtGenerationRule rule, final Registration registration) {
+    public List<AcademicDebtGenerationProcessingResult> process(final AcademicDebtGenerationRule rule,
+            final Registration registration) {
         if (!rule.isActive()) {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.not.active.to.process");
         }
@@ -186,7 +195,7 @@ public class CloseDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
     }
 
     @Atomic(mode = TxMode.WRITE)
-    private void processDebtsForRegistration(final AcademicDebtGenerationRule rule, final Registration registration) {
+    private void processDebtsForRegistration(AcademicDebtGenerationRule rule, Registration registration) {
         final Set<DebitEntry> debitEntriesSetForAlignment = Sets.newHashSet();
 
         for (final AcademicDebtGenerationRuleEntry entry : rule.getAcademicDebtGenerationRuleEntriesSet()) {
@@ -198,6 +207,8 @@ public class CloseDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
             } else if (AcademicTax.findUnique(product).isPresent()) {
                 // Check if the product is an academic tax
                 grabbedDebitEntries = grabDebitEntryForAcademicTax(rule, registration, entry);
+            } else if (product == TreasurySettings.getInstance().getInterestProduct()) {
+                grabbedDebitEntries = grabInterestDebitEntries(rule, registration);
             }
 
             if (grabbedDebitEntries != null) {
@@ -220,8 +231,8 @@ public class CloseDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
             }
 
             final DebitNote debitNote = (DebitNote) grabbedDebitEntry.getFinantialDocument();
-            
-            if(!AcademicTreasuryConstants.isPositive(debitNote.getTotalAmount())) {
+
+            if (!AcademicTreasuryConstants.isPositive(debitNote.getTotalAmount())) {
                 continue;
             }
 
@@ -229,9 +240,41 @@ public class CloseDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
         }
     }
 
+    private Set<DebitEntry> grabInterestDebitEntries(AcademicDebtGenerationRule rule, Registration registration) {
+        final Set<DebitEntry> result = new HashSet<>();
+
+        Person person = registration.getStudent().getPerson();
+
+        PersonCustomer.find(person).forEach(pc -> {
+            pc.getDebtAccountsSet().forEach(da -> {
+                DebitEntry.find(da).filter(de -> de.getProduct() == TreasurySettings.getInstance().getInterestProduct())
+                        .filter(de -> de.getFinantialDocument() == null || de.getFinantialDocument().isPreparing())
+                        .filter(de -> de.isInDebt()).filter(de -> de.getDebitEntry() != null)
+                        .filter(de -> de.getDebitEntry().getTreasuryEvent() != null)
+                        .filter(de -> de.getDebitEntry().getTreasuryEvent() instanceof AcademicTreasuryEvent)
+                        .filter(de -> ((AcademicTreasuryEvent) de.getDebitEntry().getTreasuryEvent()).getExecutionYear() == rule
+                                .getExecutionYear())
+                        .collect(Collectors.toCollection(() -> result));
+            });
+        });
+
+        for (DebitEntry debitEntry : result) {
+            if (debitEntry.getFinantialDocument() == null) {
+                DebtAccount debtAccount = debitEntry.getDebtAccount();
+                DebitNote debitNote = DebitNote.create(debtAccount, DocumentNumberSeries
+                        .findUniqueDefault(FinantialDocumentType.findForDebitNote(), debtAccount.getFinantialInstitution()).get(),
+                        new DateTime());
+                debitEntry.setFinantialDocument(debitNote);
+            }
+        }
+
+        return result;
+    }
+
     private Set<DebitEntry> grabDebitEntryForTuitions(final AcademicDebtGenerationRule rule, final Registration registration,
             final AcademicDebtGenerationRuleEntry entry) {
-        IAcademicTreasuryPlatformDependentServices implementation = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        IAcademicTreasuryPlatformDependentServices implementation =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
         final PersonCustomer customer = implementation.personCustomer(registration.getPerson());
         if (customer == null) {
             return Sets.newHashSet();
@@ -252,7 +295,8 @@ public class CloseDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
 
     private Set<DebitEntry> grabDebitEntryForAcademicTax(final AcademicDebtGenerationRule rule, final Registration registration,
             final AcademicDebtGenerationRuleEntry entry) {
-        IAcademicTreasuryPlatformDependentServices implementation = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        IAcademicTreasuryPlatformDependentServices implementation =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
         final PersonCustomer customer = implementation.personCustomer(registration.getPerson());
         if (customer == null) {
             return Sets.newHashSet();
