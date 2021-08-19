@@ -59,7 +59,11 @@ public class TesteCustomCalculator implements TuitionTariffCustomCalculator {
     }
 
     public TesteCustomCalculator(Registration registration, TuitionPaymentPlan paymentPlan, Enrolment enrolment) {
-        throw new RuntimeException("not supported");
+        StringBuilder strBuilder = new StringBuilder();
+
+        total = calculateValue(strBuilder, registration, paymentPlan);
+
+        calculeDescription = strBuilder.toString();
     }
 
     private BigDecimal calculateValue(StringBuilder strBuilder, Registration registration, TuitionPaymentPlan paymentPlan) {
