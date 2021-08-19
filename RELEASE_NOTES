@@ -1,4 +1,5 @@
 - Refactor: Allow specification of different product for standalone/extacurricular payment plans
+- Bug Fix: Invoice tuition calculation for standalone and extracurricular, passing the Enrolment
 
 7.3.0 (21-06-2021)
 - New Fixture: Shared tuition payment plan between curricular plans, check if payment plan is reachable, tuition conditions, tuition installments custom calculators
