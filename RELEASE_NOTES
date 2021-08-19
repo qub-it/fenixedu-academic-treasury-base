@@ -1,3 +1,4 @@
+7.3.1 (19-08-2021)
 - Refactor: Allow specification of different product for standalone/extacurricular payment plans
 - Bug Fix: Invoice tuition calculation for standalone and extracurricular, passing the Enrolment
 
