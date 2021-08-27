@@ -261,6 +261,10 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
     }
 
     private boolean isFixedAmountRequired() {
+        // TODO Check code Refactor/20210624-MergeWithISCTE
+        // getEctsCalculationType() != null and getTuitionTariffCalculatedAmountType() != null
+        // should not be necessary
+
         return !((isTuitionCalculationByEctsOrUnits() && getEctsCalculationType() != null
                 && getEctsCalculationType().isDependentOnDefaultPaymentPlan())
                 || (getTuitionCalculationType().isCalculatedAmount() && getTuitionTariffCalculatedAmountType() != null
@@ -272,6 +276,10 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
     }
 
     public boolean isDefaultPaymentPlanDependent() {
+        // TODO Check code Refactor/20210624-MergeWithISCTE
+        // getEctsCalculationType() != null and getTuitionTariffCalculatedAmountType() != null
+        // should not be necessary
+
         return isTuitionCalculationByEctsOrUnits() && getEctsCalculationType() != null
                 && getEctsCalculationType().isDependentOnDefaultPaymentPlan();
     }
@@ -468,7 +476,6 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
     public DebitEntry createDebitEntryForRegistration(final DebtAccount debtAccount,
             final AcademicTreasuryEvent academicTreasuryEvent, final LocalDate when,
             Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap) {
-        System.out.println();
         if (!getTuitionPaymentPlan().getTuitionPaymentPlanGroup().isForRegistration()) {
             throw new RuntimeException("wrong call");
         }
@@ -831,8 +838,6 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
         propertiesMap.put(AcademicTreasuryEventKeys.DEGREE_CODE.getDescriptionI18N().getContent(),
                 event.getRegistration().getDegree().getCode());
-//        propertiesMap.put(AcademicTreasuryEventKeys.DEGREE.getDescriptionI18N().getContent(),
-//                event.getRegistration().getDegree().getPresentationName(event.getExecutionYear()));
         propertiesMap.put(AcademicTreasuryEventKeys.DEGREE.getDescriptionI18N().getContent(),
                 event.getRegistration().getDegree().getPresentationName(event.getExecutionYear()));
         propertiesMap.put(AcademicTreasuryEventKeys.DEGREE_CURRICULAR_PLAN.getDescriptionI18N().getContent(),
@@ -862,13 +867,18 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         super.setBeginDate(bean.getBeginDate().toDateTimeAtStartOfDay());
         super.setEndDate(bean.getEndDate() != null ? bean.getEndDate().toDateTimeAtStartOfDay() : null);
 
+        // TODO Check code Refactor/20210624-MergeWithISCTE
+        // Check why super.setTuitionCalculationType(bean.getTuitionCalculationType()); is not called
+
         super.setTuitionTariffCalculatedAmountType(bean.getTuitionTariffCalculatedAmountType());
 
         super.setTuitionTariffCustomCalculatorClassName(
                 bean.getTuitionTariffCustomCalculator() != null ? bean.getTuitionTariffCustomCalculator().getName() : null);
 
-        super.setDueDateCalculationType(bean.getDueDateCalculationType());
-        super.setFixedDueDate(bean.getFixedDueDate());
+        setDueDateCalculationType(bean.getDueDateCalculationType());
+
+        setFixedDueDate(bean.getFixedDueDate());
+
         super.setNumberOfDaysAfterCreationForDueDate(bean.getNumberOfDaysAfterCreationForDueDate());
         super.setApplyInterests(bean.isApplyInterests());
 
@@ -950,6 +960,25 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
     public void setTuitionTariffCustomCalculator(Class<? extends TuitionTariffCustomCalculator> clazz) {
         setTuitionTariffCustomCalculatorClassName(clazz != null ? clazz.getName() : "");
+    }
+
+    @Override
+    public void setFixedDueDate(LocalDate fixedDueDate) {
+        // TODO Auto-generated method stub
+        if (getDueDateCalculationType().isBestOfFixedDateAndDaysAfterCreation()) {
+            super.setFixedDueDate(fixedDueDate);
+        } else {
+            super.setFixedDueDate(null);
+        }
+    }
+
+    @Override
+    public void setDueDateCalculationType(DueDateCalculationType dueDateCalculationType) {
+        super.setDueDateCalculationType(dueDateCalculationType);
+        if (!dueDateCalculationType.isBestOfFixedDateAndDaysAfterCreation()) {
+            setFixedDueDate(null);
+        }
+
     }
 
 }

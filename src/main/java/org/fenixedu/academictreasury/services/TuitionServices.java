@@ -100,9 +100,7 @@ public class TuitionServices {
     public static boolean isToPayRegistrationTuition(final Registration registration, final ExecutionYear executionYear) {
         final IAcademicTreasuryPlatformDependentServices academicServices =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        //TODO: how to check if needs to pay
-//        return academicServices.registrationProtocol(registration).isToPayGratuity();
-        return true;
+	return Boolean.TRUE.equals(academicServices.registrationProtocol(registration).getPayGratuity());
     }
 
     public static AcademicTreasuryEvent findAcademicTreasuryEventTuitionForRegistration(final Registration registration,
@@ -248,7 +246,7 @@ public class TuitionServices {
             final TuitionPaymentPlan tuitionPaymentPlan, final LocalDate debtDate, final BigDecimal enrolledEctsUnits,
             final BigDecimal enrolledCoursesCount) {
 
-        Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap = new HashMap();
+        Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap = new HashMap<>();
 
         tuitionPaymentPlan.getTuitionInstallmentTariffsSet().stream().map(tariff -> tariff.getTuitionTariffCustomCalculator())
                 .collect(Collectors.toSet()).forEach(clazz -> {
@@ -501,7 +499,7 @@ public class TuitionServices {
                     .collect(Collectors.toSet()).forEach(clazz -> {
                         if (clazz != null) {
                             TuitionTariffCustomCalculator newInstanceFor = TuitionTariffCustomCalculator.getNewInstanceFor(clazz,
-                                    registration, tuitionPaymentPlanToCalculator);
+                                    registration, tuitionPaymentPlanToCalculator, enrolment);
                             calculatorsMap.put(clazz, newInstanceFor);
                         }
                     });
@@ -775,7 +773,7 @@ public class TuitionServices {
                     .collect(Collectors.toSet()).forEach(clazz -> {
                         if (clazz != null) {
                             TuitionTariffCustomCalculator newInstanceFor = TuitionTariffCustomCalculator.getNewInstanceFor(clazz,
-                                    registration, tuitionPaymentPlanToCalculator);
+                                    registration, tuitionPaymentPlanToCalculator, enrolment);
                             calculatorsMap.put(clazz, newInstanceFor);
                         }
                     });

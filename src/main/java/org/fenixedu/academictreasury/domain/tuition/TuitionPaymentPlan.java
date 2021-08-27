@@ -311,7 +311,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         String label = "label.TuitionInstallmentTariff.debitEntry.name.";
 
         if (getTuitionPaymentPlanGroup().isForRegistration()) {
-            if (getTuitionInstallmentTariffsSet().size() == 1) {
+            if (getTuitionInstallmentTariffsSet().size() == 1 && getTuitionPaymentPlanGroup().isBypassInstallmentNameIfSingleInstallmentApplied()) {
                 label += "registration.one.installment";
             } else {
                 label += "registration";
@@ -368,7 +368,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                         calculatorsMap.put(clazz, newInstanceFor);
                         strBuilder.append(newInstanceFor.getPresentationName()).append(" (")
                                 .append(academicTreasuryEvent.formatMoney(newInstanceFor.getTotalAmount())).append("): \n");
-                        String description = newInstanceFor.getCalculeDescritpion();
+                        String description = newInstanceFor.getCalculationDescription();
                         strBuilder.append(description).append("\n");
                     }
                 });
@@ -413,7 +413,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                         calculatorsMap.put(clazz, newInstanceFor);
                         strBuilder.append(newInstanceFor.getPresentationName()).append(" (")
                                 .append(academicTreasuryEvent.formatMoney(newInstanceFor.getTotalAmount())).append("): \n");
-                        String description = newInstanceFor.getCalculeDescritpion();
+                        String description = newInstanceFor.getCalculationDescription();
                         strBuilder.append(description).append("\n");
                     }
                 });
@@ -476,7 +476,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                         calculatorsMap.put(clazz, newInstanceFor);
                         strBuilder.append(newInstanceFor.getPresentationName()).append(" (")
                                 .append(academicTreasuryEvent.formatMoney(newInstanceFor.getTotalAmount())).append("): \n");
-                        String description = newInstanceFor.getCalculeDescritpion();
+                        String description = newInstanceFor.getCalculationDescription();
                         strBuilder.append(description).append("\n");
                     }
                 });

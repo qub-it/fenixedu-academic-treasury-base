@@ -152,6 +152,9 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
     private String erpPayorCustomerId;
 
     private String decimalSeparator;
+    
+    private String documentObservations;
+    private String documentTermsAndConditions;
 
     public SettlementReportEntryBean(final SettlementEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
@@ -162,7 +165,7 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
         this.settlementNote = (SettlementNote) entry.getFinantialDocument();
 
         try {
-            final Currency currency = settlementNote.getDebtAccount().getFinantialInstitution().getCurrency();
+            final Currency currency = this.settlementNote.getDebtAccount().getFinantialInstitution().getCurrency();
 
             this.identification = entry.getExternalId();
             this.creationDate = treasuryServices.versioningCreationDate(entry);
@@ -182,7 +185,9 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
 
             this.productCode = entry.getInvoiceEntry().getProduct().getCode();
             this.settlementEntryDescription = entry.getDescription();
-
+            this.documentObservations = this.settlementNote.getDocumentObservations();
+            this.documentTermsAndConditions = this.settlementNote.getDocumentTermsAndConditions();
+            
             fillStudentInformation(entry);
 
             fillAcademicInformation(entry.getInvoiceEntry());
@@ -248,7 +253,8 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
                     }
 
                     if (debitEntry.getExecutionSemester() != null) {
-                        this.executionYear = ((ExecutionSemester) debitEntry.getExecutionSemester()).getExecutionYear().getQualifiedName();
+                        this.executionYear = academicTreasuryServices()
+                                .executionYearOfExecutionSemester(debitEntry.getExecutionSemester()).getQualifiedName();
                         this.executionSemester = debitEntry.getExecutionSemester().getQualifiedName();
                     }
 
@@ -261,8 +267,8 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
                     }
 
                     if (debitEntry.getExecutionSemester() != null) {
-                        this.executionYear =
-                                ((ExecutionSemester) debitEntry.getExecutionSemester()).getExecutionYear().getQualifiedName();
+                        this.executionYear = academicTreasuryServices()
+                                .executionYearOfExecutionSemester(debitEntry.getExecutionSemester()).getQualifiedName();
                         this.executionSemester = debitEntry.getExecutionSemester().getQualifiedName();
                     }
 
@@ -336,6 +342,10 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
         }
     }
 
+    private IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
+        return AcademicTreasuryPlataformDependentServicesFactory.implementation();
+    }
+
     private void fillStudentInformation(final SettlementEntry entry) {
         final Customer customer = entry.getFinantialDocument().getDebtAccount().getCustomer();
 
@@ -356,7 +366,8 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
             final Person person = ((PersonCustomer) customer).getAssociatedPerson();
             this.institutionalOrDefaultEmail = person.getInstitutionalOrDefaultEmailAddressValue();
             this.emailForSendingEmails = person.getEmailForSendingEmails();
-            this.personalEmail = DebtReportEntryBean.personalEmail(person) != null ? DebtReportEntryBean.personalEmail(person).getValue() : "";
+            this.personalEmail =
+                    DebtReportEntryBean.personalEmail(person) != null ? DebtReportEntryBean.personalEmail(person).getValue() : "";
         }
 
         this.address = customer.getAddress();
@@ -841,5 +852,20 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
     public void setDecimalSeparator(String decimalSeparator) {
         this.decimalSeparator = decimalSeparator;
     }
+    
+    public String getDocumentObservations() {
+        return documentObservations;
+    }
+    
+    public void setDocumentObservations(String documentObservations) {
+        this.documentObservations = documentObservations;
+    }
 
+    public String getDocumentTermsAndConditions() {
+        return documentTermsAndConditions;
+    }
+    
+    public void setDocumentTermsAndConditions(String documentTermsAndConditions) {
+        this.documentTermsAndConditions = documentTermsAndConditions;
+    }
 }

@@ -605,7 +605,7 @@ public class PersonCustomer extends PersonCustomer_Base {
             personCustomer.checkRules();
         }
 
-        final Person thisPerson = isActive() ? getPerson() : getPersonForInactivePersonCustomer();
+        final Person thisPerson = getAssociatedPerson();
         for (final AcademicTreasuryEvent e : Sets.newHashSet(services.academicTreasuryEventsSet(person))) {
             e.setPerson(thisPerson);
         }
@@ -938,7 +938,11 @@ public class PersonCustomer extends PersonCustomer_Base {
     }
 
     public static CustomerType getDefaultCustomerType(final PersonCustomer person) {
-        return CustomerType.findByCode(STUDENT_CODE).findFirst().orElse(null);
+        if (person.getPerson().getStudent() == null && !CustomerType.findByCode(CANDIDACY_CODE).findFirst().isEmpty()) {
+            return CustomerType.findByCode(CANDIDACY_CODE).findFirst().get();
+        }
+
+        return CustomerType.findByCode(STUDENT_CODE).findFirst().get();
     }
 
 }

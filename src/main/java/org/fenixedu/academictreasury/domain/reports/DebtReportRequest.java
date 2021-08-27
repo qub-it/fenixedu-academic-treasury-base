@@ -449,26 +449,7 @@ public class DebtReportRequest extends DebtReportRequest_Base {
 
     @Atomic
     public static DebtReportRequest create(final DebtReportRequestBean bean) {
-        final DebtReportRequest request = new DebtReportRequest(bean);
-
-        new Thread() {
-
-            @Atomic(mode = TxMode.READ)
-            public void run() {
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                }
-
-                // Execute directly to avoid references to CronTask
-                // TODO: Evaluate if task should periodically verify if some report is pending
-                request.processRequest();
-            };
-
-        }.start();
-
-        return request;
+        return new DebtReportRequest(bean);
     }
 
 }

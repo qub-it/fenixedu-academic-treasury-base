@@ -606,7 +606,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         }
 
         debitEntry.setCurricularCourse(enrolment.getCurricularCourse());
-        debitEntry.setExecutionSemester(enrolment.getExecutionPeriod());
+        debitEntry.setExecutionSemester(academicTreasuryServices().executionSemester(enrolment));
     }
 
     public void associateEnrolmentEvaluation(final DebitEntry debitEntry, final EnrolmentEvaluation enrolmentEvaluation) {
@@ -619,10 +619,10 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         }
 
         debitEntry.setCurricularCourse(enrolmentEvaluation.getEnrolment().getCurricularCourse());
-        debitEntry.setExecutionSemester(enrolmentEvaluation.getEnrolment().getExecutionPeriod());
+        debitEntry.setExecutionSemester(academicTreasuryServices().executionSemester(enrolmentEvaluation.getEnrolment()));
 
-        if (enrolmentEvaluation.getExecutionPeriod() != null) {
-            debitEntry.setExecutionSemester(enrolmentEvaluation.getExecutionPeriod());
+        if (academicTreasuryServices().executionSemester(enrolmentEvaluation) != null) {
+            debitEntry.setExecutionSemester(academicTreasuryServices().executionSemester(enrolmentEvaluation));
         }
 
         debitEntry.setEvaluationSeason(enrolmentEvaluation.getEvaluationSeason());
@@ -823,17 +823,20 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
         super.delete();
     }
-    
+
     @Override
     public Optional<Tariff> findMatchTariff(FinantialEntity finantialEntity, Product product, LocalDate when) {
-        
-        if(degree() != null) {
-            return Optional.ofNullable(AcademicTariff.findMatch(finantialEntity, product, degree(), when.toDateTimeAtStartOfDay()));
-        } else if(getDegree() != null) {
-            return Optional.ofNullable(AcademicTariff.findMatch(finantialEntity, product, getDegree(), when.toDateTimeAtStartOfDay()));
+
+        if (degree() != null) {
+            return Optional
+                    .ofNullable(AcademicTariff.findMatch(finantialEntity, product, degree(), when.toDateTimeAtStartOfDay()));
+        } else if (getDegree() != null) {
+            return Optional
+                    .ofNullable(AcademicTariff.findMatch(finantialEntity, product, getDegree(), when.toDateTimeAtStartOfDay()));
         }
-        
-        return Optional.ofNullable(AcademicTariff.findMatch(finantialEntity, product, finantialEntity.getAdministrativeOffice(), when.toDateTimeAtStartOfDay()));
+
+        return Optional.ofNullable(AcademicTariff.findMatch(finantialEntity, product, finantialEntity.getAdministrativeOffice(),
+                when.toDateTimeAtStartOfDay()));
     }
 
     // @formatter: off
@@ -847,22 +850,20 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     public static Stream<? extends AcademicTreasuryEvent> find(Person person) {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        return findAll().filter(e -> e.getPerson() == person);
+        return academicTreasuryServices().academicTreasuryEventsSet(person).stream();
     }
-    
+
     public static Stream<? extends AcademicTreasuryEvent> find(ExecutionYear executionYear) {
         return findAll().filter(e -> e.getExecutionYear() == executionYear);
     }
 
-    public static Stream<? extends AcademicTreasuryEvent> find(Registration registration,
-            ExecutionYear executionYear) {
-        return findAll().filter(e -> e.getRegistration() == registration).filter(l -> l.getExecutionYear() == executionYear);
+    public static Stream<? extends AcademicTreasuryEvent> find(Registration registration, ExecutionYear executionYear) {
+        return find(registration.getPerson()).filter(e -> e.getRegistration() == registration).filter(l -> l.getExecutionYear() == executionYear);
     }
 
     /* --- Academic Service Requests --- */
 
-    public static Stream<? extends AcademicTreasuryEvent> find(final ITreasuryServiceRequest iTreasuryServiceRequest) {
+    public static Stream<? extends AcademicTreasuryEvent> find(ITreasuryServiceRequest iTreasuryServiceRequest) {
         if (iTreasuryServiceRequest == null) {
             throw new RuntimeException("wrong call");
         }
@@ -871,11 +872,11 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
                 && e.getITreasuryServiceRequest().getExternalId().equals(iTreasuryServiceRequest.getExternalId()));
     }
 
-    public static Optional<? extends AcademicTreasuryEvent> findUnique(final ITreasuryServiceRequest iTreasuryServiceRequest) {
+    public static Optional<? extends AcademicTreasuryEvent> findUnique(ITreasuryServiceRequest iTreasuryServiceRequest) {
         return find(iTreasuryServiceRequest).findFirst();
     }
 
-    public static AcademicTreasuryEvent createForAcademicServiceRequest(final ITreasuryServiceRequest iTreasuryServiceRequest) {
+    public static AcademicTreasuryEvent createForAcademicServiceRequest(ITreasuryServiceRequest iTreasuryServiceRequest) {
         return new AcademicTreasuryEvent(iTreasuryServiceRequest);
     }
 
@@ -1115,7 +1116,6 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
         CALCULATED_AMOUNT_TYPE("45");
 
-
         private String code;
 
         private AcademicTreasuryEventKeys(final String code) {
@@ -1249,6 +1249,10 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         super.setMaximumAmount(maximumAmount);
         super.setAmountForLanguageTranslationRate(amountForLanguageTranslationRate);
         super.setAmountForUrgencyRate(amountForUrgencyRate);
+    }
+
+    private static IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
+        return AcademicTreasuryPlataformDependentServicesFactory.implementation();
     }
 
     /* ----------------------

@@ -48,6 +48,7 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationRegimeType;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
+import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
@@ -169,7 +170,8 @@ public class RegistrationRegimeTypeConditionRule extends RegistrationRegimeTypeC
     }
 
     @Override
-    public void fillRuleFromImporter(String string) {
+    public void fillRuleFromImporter(TuitionPaymentPlanBean bean) {
+        String string = bean.getImporterRules().get(this.getClass());
         String[] split = string.split("\\|");
         for (String s : split) {
             RegistrationRegimeType value = Arrays.asList(RegistrationRegimeType.values()).stream()

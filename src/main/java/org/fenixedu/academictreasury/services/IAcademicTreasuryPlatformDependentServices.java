@@ -35,13 +35,11 @@
  */
 package org.fenixedu.academictreasury.services;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.Country;
@@ -49,18 +47,16 @@ import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.Enrolment;
-import org.fenixedu.academic.domain.ExecutionDegree;
+import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOfficeType;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
-import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.PartyContact;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.degree.DegreeType;
-import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationDataByExecutionYear;
@@ -72,11 +68,11 @@ import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.joda.time.LocalDate;
 
-import com.google.common.collect.Sets;
-
 public interface IAcademicTreasuryPlatformDependentServices {
 
-    /* Read data sets */
+    /* **************
+     * Read data sets
+     * ************** */
 
     Set<DegreeType> readAllDegreeTypes();
 
@@ -95,11 +91,19 @@ public interface IAcademicTreasuryPlatformDependentServices {
 
     Set<StatuteType> readAllStatuteTypesSet(boolean active);
 
-    Set<Person> readAllPersonsSet();
+    /* *************
+     * Registrations
+     * ************* */
 
     Set<Registration> readAllRegistrations(RegistrationProtocol registrationProtocol);
 
     Set<Registration> readAllRegistrations(IngressionType ingressionType);
+
+    /* ***********************
+     * Person & PersonCustomer
+     * *********************** */
+
+    Set<Person> readAllPersonsSet();
 
     PersonCustomer personCustomer(Person person);
 
@@ -126,35 +130,53 @@ public interface IAcademicTreasuryPlatformDependentServices {
     PhysicalAddress createPhysicalAddress(Person person, Country countryOfResidence, String districtOfResidence,
             String districtSubdivisionOfResidence, String areaCode, String address);
 
-    /* Fiscal Information */
+    /* ******************
+     * Fiscal Information
+     * ****************** */
 
     String fiscalCountry(final Person person);
 
     String fiscalNumber(final Person person);
 
-    /* Permissions */
+    /* ***********
+     * Permissions
+     * *********** */
 
-    boolean isFrontOfficeMember(final String username, final FinantialEntity finantialEntity);
+    @Deprecated
+    // TreasuryAccressControl is used for this purpose
+    boolean isFrontOfficeMember(String username, FinantialEntity finantialEntity);
 
-    boolean isBackOfficeMember(final String username, final FinantialEntity finantialEntity);
+    @Deprecated
+    // TreasuryAccressControl is used for this purpose
+    boolean isBackOfficeMember(String username, FinantialEntity finantialEntity);
 
-    boolean isAllowToModifySettlements(final String username, final FinantialEntity finantialEntity);
+    @Deprecated
+    // TreasuryAccressControl is used for this purpose
+    boolean isAllowToModifySettlements(String username, FinantialEntity finantialEntity);
 
-    boolean isAllowToModifyInvoices(final String username, final FinantialEntity finantialEntity);
+    @Deprecated
+    // TreasuryAccressControl is used for this purpose
+    boolean isAllowToModifyInvoices(String username, FinantialEntity finantialEntity);
 
-    Set<Degree> readDegrees(final FinantialEntity finantialEntity);
+    Set<Degree> readDegrees(FinantialEntity finantialEntity);
 
-    FinantialEntity finantialEntityOfDegree(final Degree degree, final LocalDate when);
+    FinantialEntity finantialEntityOfDegree(Degree degree, LocalDate when);
 
     Optional<FinantialEntity> finantialEntity(AdministrativeOffice administrativeOffice);
 
     Optional<FinantialEntity> finantialEntity(Unit unit);
 
+    @Deprecated
+    // TreasuryAccressControl is used for this purpose
     Set<String> getFrontOfficeMemberUsernames(final FinantialEntity finantialEntity);
 
+    @Deprecated
+    // TreasuryAccressControl is used for this purpose
     Set<String> getBackOfficeMemberUsernames(final FinantialEntity finantialEntity);
 
-    /* Localized names */
+    /* ***************
+     * Localized names
+     * *************** */
 
     String localizedNameOfDegreeType(DegreeType degreeType);
 
@@ -172,7 +194,9 @@ public interface IAcademicTreasuryPlatformDependentServices {
 
     String localizedNameOfAdministrativeOffice(AdministrativeOffice administrativeOffice, Locale locale);
 
-    /* Student & Registration */
+    /* **********************
+     * Student & Registration
+     * ********************** */
 
     RegistrationDataByExecutionYear findRegistrationDataByExecutionYear(Registration registration, ExecutionYear executionYear);
 
@@ -186,7 +210,18 @@ public interface IAcademicTreasuryPlatformDependentServices {
 
     Stream<AdministrativeOffice> findAdministrativeOfficesByPredicate(Predicate<AdministrativeOffice> predicate);
 
-    /* Execution Intervals */
+    /* *******************
+     * Execution Intervals
+     * ******************* */
+
+    ExecutionInterval executionSemester(Enrolment enrolment);
+
+    ExecutionInterval executionSemester(EnrolmentEvaluation enrolmentEvaluation);
+
+    ExecutionYear executionYearOfExecutionSemester(ExecutionInterval executionInterval);
+
     Integer executionIntervalChildOrder(ExecutionInterval executionInterval);
+
+    ExecutionInterval getExecutionIntervalByName(String s);
 
 }

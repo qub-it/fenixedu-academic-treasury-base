@@ -38,11 +38,15 @@ package org.fenixedu.academictreasury.domain.tuition.conditionRule;
 import java.math.BigDecimal;
 
 import org.fenixedu.academic.domain.Enrolment;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
+import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
+import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
+import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 
 @TuitionConditionAnnotation(WithLaboratorialClassesConditionRule.BUNDLE_NAME)
@@ -68,10 +72,27 @@ public class WithLaboratorialClassesConditionRule extends WithLaboratorialClasse
         if (enrolment == null) {
             return false;
         }
+
+        // TODO Check code Refactor/20210624-MergeWithISCTE
+        //
+        // The method getLaboratiorialHours differ in signature between fenixedu-academic-core and qubEdu-ISCTE
+        // And the academicTreasuryServices().executionSemester() returns ExecutionInterval in fenixedu-academic-core
+        // But in qubEdu-ISCTE returns ExecutionSemester
+        //
+        // For now leave the code for ISCTE
         boolean hasLaboratorialClasses = AcademicTreasuryConstants.isPositive(new BigDecimal(
                 enrolment.getCurricularCourse().getCompetenceCourse().getLaboratorialHours(enrolment.getExecutionPeriod())));
 
+        // code from master
+//        ExecutionInterval executionSemester = academicTreasuryServices().executionSemester(enrolment);
+//        boolean hasLaboratorialClasses = AcademicTreasuryConstants.isPositive(
+//                new BigDecimal(enrolment.getCurricularCourse().getCompetenceCourse().getLaboratorialHours(executionSemester)));
+
         return Boolean.TRUE.equals(getWithLaboratorialClasses()) ? hasLaboratorialClasses : !hasLaboratorialClasses;
+    }
+
+    private IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
+        return AcademicTreasuryPlataformDependentServicesFactory.implementation();
     }
 
     @Override
@@ -108,7 +129,8 @@ public class WithLaboratorialClassesConditionRule extends WithLaboratorialClasse
     }
 
     @Override
-    public void fillRuleFromImporter(String value) {
+    public void fillRuleFromImporter(TuitionPaymentPlanBean bean) {
+        String value = bean.getImporterRules().get(this.getClass());
         if (value.equals(i18n("label.true"))) {
             setWithLaboratorialClasses(Boolean.TRUE);
             return;

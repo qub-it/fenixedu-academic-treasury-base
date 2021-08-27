@@ -138,6 +138,10 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
     public boolean isForImprovement() {
         return getForImprovement();
     }
+    
+    public boolean isBypassInstallmentNameIfSingleInstallmentApplied() {
+        return getBypassInstallmentNameIfSingleInstallmentApplied();
+    }
 
     public boolean isDeletable() {
         // ACFSILVA

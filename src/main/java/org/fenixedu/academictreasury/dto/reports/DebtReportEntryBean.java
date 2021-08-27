@@ -58,7 +58,6 @@ import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependent
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
-import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Currency;
 import org.fenixedu.treasury.domain.Customer;
@@ -83,112 +82,110 @@ import com.google.common.base.Strings;
 public class DebtReportEntryBean implements SpreadsheetRow {
 
     // @formatter:off
-    public static String[] SPREADSHEET_DEBIT_HEADERS = { 
-            academicTreasuryBundle("label.DebtReportEntryBean.header.identification"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.entryType"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.versioningCreator"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.creationDate"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.entryDate"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.dueDate"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.customerId"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.debtAccountId"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.name"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.identificationType"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.identificationNumber"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.vatNumber"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.email"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.address"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.studentNumber"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.registrationNumber"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.degreeType"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.degreeCode"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.degreeName"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.executionYear"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.executionSemester"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.productCode"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.invoiceEntryDescription"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.documentNumber"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.documentExportationPending"),
-            "",
-            academicTreasuryBundle("label.DebtReportEntryBean.header.amountToPay"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountToPay"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountWithInterestToDate"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.pendingInterestAmount"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.payorDebtAcount.vatNumber"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.payorDebtAcount.name"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.agreement"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.ingression"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.firstTimeStudent"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.partialRegime"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.statutes"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.numberOfNormalEnrolments"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.numberOfStandaloneEnrolments"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.numberOfExtracurricularEnrolments"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.tuitionPaymentPlan"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.tuitionPaymentPlanConditions"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.documentAnnuled"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.documentAnnuledReason"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.closeDate"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountAtERPStartDate"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.exportedInLegacyERP"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.legacyERPCertificateDocumentReference"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificationDate"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificateDocumentReference"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.originSettlementNoteForAdvancedCredit")
-            
-    };
+    public static String[] SPREADSHEET_DEBIT_HEADERS =
+            { academicTreasuryBundle("label.DebtReportEntryBean.header.identification"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.entryType"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.versioningCreator"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.creationDate"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.entryDate"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.dueDate"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.customerId"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.debtAccountId"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.name"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.identificationType"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.identificationNumber"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.vatNumber"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.email"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.address"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.studentNumber"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.registrationNumber"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.degreeType"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.degreeCode"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.degreeName"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.executionYear"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.executionSemester"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.productCode"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.invoiceEntryDescription"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.documentNumber"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.documentExportationPending"), "",
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.amountToPay"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountToPay"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountWithInterestToDate"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.pendingInterestAmount"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.payorDebtAcount.vatNumber"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.payorDebtAcount.name"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.agreement"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.ingression"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.firstTimeStudent"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.partialRegime"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.statutes"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.numberOfNormalEnrolments"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.numberOfStandaloneEnrolments"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.numberOfExtracurricularEnrolments"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.tuitionPaymentPlan"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.tuitionPaymentPlanConditions"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.documentAnnuled"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.documentAnnuledReason"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.closeDate"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountAtERPStartDate"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.exportedInLegacyERP"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.legacyERPCertificateDocumentReference"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificationDate"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificateDocumentReference"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.originSettlementNoteForAdvancedCredit")
 
-    public static String[] SPREADSHEET_CREDIT_HEADERS = { 
-            academicTreasuryBundle("label.DebtReportEntryBean.header.identification"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.entryType"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.versioningCreator"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.creationDate"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.entryDate"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.dueDate"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.customerId"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.debtAccountId"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.name"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.identificationType"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.identificationNumber"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.vatNumber"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.email"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.address"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.studentNumber"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.registrationNumber"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.degreeType"),            
-            academicTreasuryBundle("label.DebtReportEntryBean.header.degreeCode"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.degreeName"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.executionYear"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.executionSemester"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.productCode"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.invoiceEntryDescription"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.documentNumber"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.documentExportationPending"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.debitEntry.identification"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.amountToCredit"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountToCredit"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.payorDebtAcount.vatNumber"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.payorDebtAcount.name"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.agreement"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.ingression"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.firstTimeStudent"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.partialRegime"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.statutes"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.numberOfNormalEnrolments"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.numberOfStandaloneEnrolments"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.numberOfExtracurricularEnrolments"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.tuitionPaymentPlan"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.tuitionPaymentPlanConditions"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.documentAnnuled"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.documentAnnuledReason"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.closeDate"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountAtERPStartDate"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.exportedInLegacyERP"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.legacyERPCertificateDocumentReference"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificationDate"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificateDocumentReference"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.originSettlementNoteForAdvancedCredit")
-    };
+            };
+
+    public static String[] SPREADSHEET_CREDIT_HEADERS =
+            { academicTreasuryBundle("label.DebtReportEntryBean.header.identification"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.entryType"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.versioningCreator"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.creationDate"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.entryDate"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.dueDate"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.customerId"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.debtAccountId"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.name"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.identificationType"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.identificationNumber"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.vatNumber"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.email"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.address"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.studentNumber"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.registrationNumber"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.degreeType"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.degreeCode"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.degreeName"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.executionYear"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.executionSemester"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.productCode"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.invoiceEntryDescription"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.documentNumber"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.documentExportationPending"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.debitEntry.identification"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.amountToCredit"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountToCredit"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.payorDebtAcount.vatNumber"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.payorDebtAcount.name"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.agreement"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.ingression"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.firstTimeStudent"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.partialRegime"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.statutes"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.numberOfNormalEnrolments"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.numberOfStandaloneEnrolments"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.numberOfExtracurricularEnrolments"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.tuitionPaymentPlan"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.tuitionPaymentPlanConditions"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.documentAnnuled"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.documentAnnuledReason"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.closeDate"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountAtERPStartDate"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.exportedInLegacyERP"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.legacyERPCertificateDocumentReference"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificationDate"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificateDocumentReference"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.originSettlementNoteForAdvancedCredit") };
     // @formatter:on
 
     private InvoiceEntry invoiceEntry;
@@ -248,20 +245,23 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
     private LocalDate erpCertificationDate;
     private String erpCertificateDocumentReference;
-    
+
     private String erpCustomerId;
     private String erpPayorCustomerId;
 
     private String originSettlementNoteForAdvancedCredit;
-    
+
     private String decimalSeparator;
+    
+    private String documentObservations;
+    private String documentTermsAndConditions;
 
     public DebtReportEntryBean(final InvoiceEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
 
         this.decimalSeparator = request != null ? request.getDecimalSeparator() : DebtReportRequest.DOT;
         final Currency currency = entry.getDebtAccount().getFinantialInstitution().getCurrency();
-        
+
         this.invoiceEntry = entry;
 
         try {
@@ -274,12 +274,14 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
             this.payorDebtAccountVatNumber = "";
             this.payorDebtAccountName = "";
-            
-            if(entry.getFinantialDocument() != null && ((Invoice) entry.getFinantialDocument()).getPayorDebtAccount() != null) {
-                this.payorDebtAccountVatNumber = ((Invoice) entry.getFinantialDocument()).getPayorDebtAccount().getCustomer().getUiFiscalNumber();
-                this.payorDebtAccountName = ((Invoice) entry.getFinantialDocument()).getPayorDebtAccount().getCustomer().getName();
+
+            if (entry.getFinantialDocument() != null && ((Invoice) entry.getFinantialDocument()).getPayorDebtAccount() != null) {
+                this.payorDebtAccountVatNumber =
+                        ((Invoice) entry.getFinantialDocument()).getPayorDebtAccount().getCustomer().getUiFiscalNumber();
+                this.payorDebtAccountName =
+                        ((Invoice) entry.getFinantialDocument()).getPayorDebtAccount().getCustomer().getName();
             }
-            
+
             fillStudentInformation(entry);
 
             this.productCode = entry.getProduct().getCode();
@@ -288,6 +290,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
             if (entry.getFinantialDocument() != null) {
                 this.documentNumber = entry.getFinantialDocument().getUiDocumentNumber();
                 this.documentExportationPending = entry.getFinantialDocument().isDocumentToExport();
+                this.documentObservations = entry.getFinantialDocument().getDocumentObservations();
+                this.documentTermsAndConditions = entry.getFinantialDocument().getDocumentTermsAndConditions();
             }
 
             this.annuled = entry.isAnnulled();
@@ -306,6 +310,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
             this.pendingInterestAmount =
                     currency.getValueWithScale(entry.getOpenAmountWithInterests().subtract(entry.getOpenAmount()));
 
+            
             fillERPInformation(entry);
 
             this.completed = true;
@@ -320,9 +325,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
         final Currency currency = entry.getDebtAccount().getFinantialInstitution().getCurrency();
 
         this.closeDate = entry.getFinantialDocument() != null ? entry.getFinantialDocument().getCloseDate() : null;
-        this.openAmountAtERPStartDate = currency
-                .getValueWithScale(
-                        SAPExporterUtils.openAmountAtDate((InvoiceEntry) entry, SAPExporter.ERP_INTEGRATION_START_DATE));
+        this.openAmountAtERPStartDate = currency.getValueWithScale(
+                SAPExporterUtils.openAmountAtDate((InvoiceEntry) entry, SAPExporter.ERP_INTEGRATION_START_DATE));
         this.exportedInLegacyERP =
                 entry.getFinantialDocument() != null ? entry.getFinantialDocument().isExportedInLegacyERP() : false;
 
@@ -332,15 +336,16 @@ public class DebtReportEntryBean implements SpreadsheetRow {
         this.erpCertificationDate =
                 entry.getFinantialDocument() != null ? entry.getFinantialDocument().getErpCertificationDate() : null;
 
-        this.erpCertificateDocumentReference = entry.getFinantialDocument() != null ? entry.getFinantialDocument()
-                .getErpCertificateDocumentReference() : null;
+        this.erpCertificateDocumentReference =
+                entry.getFinantialDocument() != null ? entry.getFinantialDocument().getErpCertificateDocumentReference() : null;
 
         this.erpCustomerId = entry.getDebtAccount().getCustomer().getErpCustomerId();
 
-        if(entry.getFinantialDocument() != null && ((Invoice) entry.getFinantialDocument()).getPayorDebtAccount() != null) {
-            this.erpPayorCustomerId = ((Invoice) entry.getFinantialDocument()).getPayorDebtAccount().getCustomer().getErpCustomerId();
+        if (entry.getFinantialDocument() != null && ((Invoice) entry.getFinantialDocument()).getPayorDebtAccount() != null) {
+            this.erpPayorCustomerId =
+                    ((Invoice) entry.getFinantialDocument()).getPayorDebtAccount().getCustomer().getErpCustomerId();
         }
-        
+
         if (entry.getFinantialDocument() != null && entry.getFinantialDocument().isCreditNote()
                 && ((CreditNote) entry.getFinantialDocument()).isAdvancePayment()) {
             final AdvancedPaymentCreditNote advancedCreditNote = (AdvancedPaymentCreditNote) entry.getFinantialDocument();
@@ -351,8 +356,9 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     }
 
     private void fillStudentInformation(final InvoiceEntry entry) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
         final Customer customer = entry.getDebtAccount().getCustomer();
 
         this.customerId = customer.getExternalId();
@@ -364,7 +370,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 && ((PersonCustomer) customer).getAssociatedPerson().getIdDocumentType() != null) {
             this.identificationType = ((PersonCustomer) customer).getAssociatedPerson().getIdDocumentType().getLocalizedName();
         }
-        
+
         this.identificationNumber = customer.getIdentificationNumber();
         this.vatNumber = customer.getUiFiscalNumber();
 
@@ -386,23 +392,16 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     }
 
     static EmailAddress personalEmail(final Person person) {
-    	IAcademicTreasuryPlatformDependentServices implementation = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        return implementation.pendingOrValidPartyContacts(person, EmailAddress.class).stream().map(EmailAddress.class::cast).filter(e -> e.getType() == PartyContactType.PERSONAL).sorted((e1, e2) ->  {
-            if(Boolean.TRUE.equals(e1.getIsValidated()) && Boolean.FALSE.equals(e2.getIsValidated())) {
-                return -1;
-            }
-            
-            if(Boolean.FALSE.equals(e1.getIsValidated()) && Boolean.TRUE.equals(e2.getIsValidated())) {
-                return 1;
-            }
-            
-            return EmailAddress.COMPARATOR_BY_EMAIL.compare(e1, e2);
-        }).findFirst().orElse(null);
+        IAcademicTreasuryPlatformDependentServices implementation =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        return implementation.pendingOrValidPartyContacts(person, EmailAddress.class).stream().map(EmailAddress.class::cast)
+                .filter(e -> e.getType() == PartyContactType.PERSONAL).findFirst().orElse(null);
     }
 
     private void fillAcademicInformation(final InvoiceEntry entry) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
         final DebitEntry debitEntry = entry.isDebitNoteEntry() ? (DebitEntry) entry : ((CreditEntry) entry).getDebitEntry();
 
         if (debitEntry != null) {
@@ -413,7 +412,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
                 if (academicTreasuryEvent.isForRegistrationTuition()) {
                     this.registrationNumber = academicTreasuryEvent.getRegistration().getNumber();
-                    this.degreeType = academicTreasuryServices.localizedNameOfDegreeType(academicTreasuryEvent.getRegistration().getDegree().getDegreeType());
+                    this.degreeType = academicTreasuryServices
+                            .localizedNameOfDegreeType(academicTreasuryEvent.getRegistration().getDegree().getDegreeType());
                     this.degreeCode = academicTreasuryEvent.getRegistration().getDegree().getCode();
                     this.degreeName = academicTreasuryEvent.getRegistration().getDegree().getPresentationName();
                     this.executionYear = academicTreasuryEvent.getExecutionYear().getQualifiedName();
@@ -428,16 +428,17 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 } else if (academicTreasuryEvent.isForStandaloneTuition()
                         || academicTreasuryEvent.isForExtracurricularTuition()) {
                     if (debitEntry.getCurricularCourse() != null) {
-                        this.degreeType = academicTreasuryServices.localizedNameOfDegreeType(debitEntry.getCurricularCourse().getDegree().getDegreeType());
+                        this.degreeType = academicTreasuryServices
+                                .localizedNameOfDegreeType(debitEntry.getCurricularCourse().getDegree().getDegreeType());
                         this.degreeCode = debitEntry.getCurricularCourse().getDegree().getCode();
                         this.degreeName = debitEntry.getCurricularCourse().getDegree().getPresentationName();
                     }
 
                     if (debitEntry.getExecutionSemester() != null) {
-                        this.executionYear = ((ExecutionSemester)debitEntry.getExecutionSemester()).getExecutionYear().getQualifiedName();
+                        this.executionYear = academicTreasuryServices().executionYearOfExecutionSemester(debitEntry.getExecutionSemester()).getQualifiedName();
                         this.executionSemester = debitEntry.getExecutionSemester().getQualifiedName();
                     }
-                    
+
                     this.tuitionPaymentPlan =
                             AcademicTreasuryEventKeys.valueFor(debitEntry, AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN);
                     this.tuitionPaymentPlanConditions = AcademicTreasuryEventKeys.valueFor(debitEntry,
@@ -451,13 +452,14 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
                 } else if (academicTreasuryEvent.isForImprovementTax()) {
                     if (debitEntry.getCurricularCourse() != null) {
-                        this.degreeType = academicTreasuryServices.localizedNameOfDegreeType(debitEntry.getCurricularCourse().getDegree().getDegreeType());
+                        this.degreeType = academicTreasuryServices
+                                .localizedNameOfDegreeType(debitEntry.getCurricularCourse().getDegree().getDegreeType());
                         this.degreeCode = debitEntry.getCurricularCourse().getDegree().getCode();
                         this.degreeName = debitEntry.getCurricularCourse().getDegree().getPresentationName();
                     }
 
                     if (debitEntry.getExecutionSemester() != null) {
-                        this.executionYear = ((ExecutionSemester)debitEntry.getExecutionSemester()).getExecutionYear().getQualifiedName();
+                        this.executionYear = academicTreasuryServices().executionYearOfExecutionSemester(debitEntry.getExecutionSemester()).getQualifiedName();
                         this.executionSemester = debitEntry.getExecutionSemester().getQualifiedName();
                     }
 
@@ -468,7 +470,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 } else if (academicTreasuryEvent.isForAcademicTax()) {
 
                     this.registrationNumber = academicTreasuryEvent.getRegistration().getNumber();
-                    this.degreeType = academicTreasuryServices.localizedNameOfDegreeType(academicTreasuryEvent.getRegistration().getDegree().getDegreeType());
+                    this.degreeType = academicTreasuryServices
+                            .localizedNameOfDegreeType(academicTreasuryEvent.getRegistration().getDegree().getDegreeType());
                     this.degreeCode = academicTreasuryEvent.getRegistration().getDegree().getCode();
                     this.degreeName = academicTreasuryEvent.getRegistration().getDegree().getPresentationName();
                     this.executionYear = academicTreasuryEvent.getExecutionYear().getQualifiedName();
@@ -481,8 +484,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     final ITreasuryServiceRequest iTreasuryServiceRequest = academicTreasuryEvent.getITreasuryServiceRequest();
 
                     this.registrationNumber = iTreasuryServiceRequest.getRegistration().getNumber();
-                    this.degreeType =
-                            academicTreasuryServices.localizedNameOfDegreeType(iTreasuryServiceRequest.getRegistration().getDegree().getDegreeType());
+                    this.degreeType = academicTreasuryServices
+                            .localizedNameOfDegreeType(iTreasuryServiceRequest.getRegistration().getDegree().getDegreeType());
                     this.degreeCode = iTreasuryServiceRequest.getRegistration().getDegree().getCode();
                     this.degreeName = iTreasuryServiceRequest.getRegistration().getDegree().getPresentationName();
 
@@ -491,26 +494,29 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                         fillStudentConditionsInformation(iTreasuryServiceRequest.getRegistration(),
                                 iTreasuryServiceRequest.getExecutionYear());
                     }
-                } else if(academicTreasuryEvent.isForTreasuryEventTarget()) {
-                    final IAcademicTreasuryTarget treasuryEventTarget = (IAcademicTreasuryTarget) academicTreasuryEvent.getTreasuryEventTarget();
+                } else if (academicTreasuryEvent.isForTreasuryEventTarget()) {
+                    final IAcademicTreasuryTarget treasuryEventTarget =
+                            (IAcademicTreasuryTarget) academicTreasuryEvent.getTreasuryEventTarget();
 
-                    if(treasuryEventTarget.getAcademicTreasuryTargetRegistration() != null) {
+                    if (treasuryEventTarget.getAcademicTreasuryTargetRegistration() != null) {
                         this.registrationNumber = treasuryEventTarget.getAcademicTreasuryTargetRegistration().getNumber();
-                        this.degreeType =
-                                treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree().getDegreeType().getName().getContent();
+                        this.degreeType = treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree().getDegreeType()
+                                .getName().getContent();
                         this.degreeCode = treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree().getCode();
-                        this.degreeName = treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree().getPresentationName();
+                        this.degreeName =
+                                treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree().getPresentationName();
                     }
-                    
-                    if(treasuryEventTarget.getAcademicTreasuryTargetExecutionYear() != null) {
+
+                    if (treasuryEventTarget.getAcademicTreasuryTargetExecutionYear() != null) {
                         this.executionYear = treasuryEventTarget.getAcademicTreasuryTargetExecutionYear().getQualifiedName();
                     }
-                    
-                    if(treasuryEventTarget.getAcademicTreasuryTargetExecutionSemester() != null) {
-                        this.executionSemester = treasuryEventTarget.getAcademicTreasuryTargetExecutionSemester().getQualifiedName();
+
+                    if (treasuryEventTarget.getAcademicTreasuryTargetExecutionSemester() != null) {
+                        this.executionSemester =
+                                treasuryEventTarget.getAcademicTreasuryTargetExecutionSemester().getQualifiedName();
                     }
                 }
-                    
+
             } else if (debitEntry.getTreasuryEvent() != null) {
                 final TreasuryEvent treasuryEvent = debitEntry.getTreasuryEvent();
 
@@ -536,6 +542,10 @@ public class DebtReportEntryBean implements SpreadsheetRow {
             }
         }
     }
+    
+    private IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
+        return AcademicTreasuryPlataformDependentServicesFactory.implementation();
+    }
 
     private String entryType(final InvoiceEntry entry) {
         if (entry.isDebitNoteEntry()) {
@@ -548,22 +558,27 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     }
 
     private void fillStudentConditionsInformation(final Registration registration, final ExecutionYear executionYear) {
-        final IAcademicTreasuryPlatformDependentServices academicServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        
+        final IAcademicTreasuryPlatformDependentServices academicServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
         this.firstTimeStudent = registration.isFirstTime(executionYear);
-        this.partialRegime =  academicServices.registrationRegimeType(registration, executionYear) == RegistrationRegimeType.PARTIAL_TIME;
+        this.partialRegime =
+                academicServices.registrationRegimeType(registration, executionYear) == RegistrationRegimeType.PARTIAL_TIME;
         this.statutes = statutes(registration, executionYear);
         this.agreement = academicServices.registrationProtocol(registration).getDescription();
         this.ingression = academicServices.ingression(registration).getDescription();
 
         this.numberOfNormalEnrolments = TuitionServices.normalEnrolmentsIncludingAnnuled(registration, executionYear).size();
-        this.numberOfStandaloneEnrolments = TuitionServices.standaloneEnrolmentsIncludingAnnuled(registration, executionYear).size();
-        this.numberOfExtracurricularEnrolments = TuitionServices.extracurricularEnrolmentsIncludingAnnuled(registration, executionYear).size();
+        this.numberOfStandaloneEnrolments =
+                TuitionServices.standaloneEnrolmentsIncludingAnnuled(registration, executionYear).size();
+        this.numberOfExtracurricularEnrolments =
+                TuitionServices.extracurricularEnrolmentsIncludingAnnuled(registration, executionYear).size();
     }
 
     private String statutes(final Registration registration, final ExecutionYear executionYear) {
-        final IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        
+        final IAcademicTreasuryPlatformDependentServices services =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
         return services.statutesTypesValidOnAnyExecutionSemesterFor(registration, executionYear).stream()
                 .map(s -> s != null ? services.localizedNameOfStatuteType(s) : "").reduce((a, c) -> c + ", " + a).orElse(null);
     }
@@ -576,7 +591,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
             row.createCell(0).setCellValue(valueOrEmpty(identification));
 
             if (!completed) {
-                row.createCell(1).setCellValue(academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                row.createCell(1)
+                        .setCellValue(academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
@@ -608,7 +624,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 row.createCell(i++).setCellValue(valueOrEmpty(documentNumber));
                 row.createCell(i++).setCellValue(valueOrEmpty(documentExportationPending));
                 i++;
-                
+
                 {
                     String value = amountToPay != null ? amountToPay.toString() : "";
                     if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
@@ -616,7 +632,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     }
                     row.createCell(i++).setCellValue(valueOrEmpty(value));
                 }
-                
+
                 {
                     String value = openAmountToPay != null ? openAmountToPay.toString() : "";
                     if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
@@ -656,7 +672,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 row.createCell(i++).setCellValue(valueOrEmpty(annuled));
                 row.createCell(i++).setCellValue(valueOrEmpty(annuledReason));
                 row.createCell(i++).setCellValue(valueOrEmpty(closeDate));
-                
+
                 {
                     String value = openAmountAtERPStartDate != null ? openAmountAtERPStartDate.toString() : "";
                     if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
@@ -664,7 +680,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     }
                     row.createCell(i++).setCellValue(valueOrEmpty(value));
                 }
-                
+
                 row.createCell(i++).setCellValue(valueOrEmpty(exportedInLegacyERP));
                 row.createCell(i++).setCellValue(valueOrEmpty(legacyERPCertificateDocumentReference));
                 row.createCell(i++).setCellValue(valueOrEmpty(erpCertificationDate));
@@ -698,7 +714,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 row.createCell(i++).setCellValue(valueOrEmpty(documentNumber));
                 row.createCell(i++).setCellValue(valueOrEmpty(documentExportationPending));
                 row.createCell(i++).setCellValue(valueOrEmpty(debitEntryIdentification));
-                
+
                 {
                     String value = amountToPay != null ? amountToPay.toString() : "";
                     if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
@@ -706,7 +722,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     }
                     row.createCell(i++).setCellValue(valueOrEmpty(value));
                 }
-                
+
                 {
                     String value = openAmountToPay != null ? openAmountToPay.toString() : "";
                     if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
@@ -714,7 +730,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     }
                     row.createCell(i++).setCellValue(valueOrEmpty(value));
                 }
-                
+
                 row.createCell(i++).setCellValue(valueOrEmpty(payorDebtAccountVatNumber));
                 row.createCell(i++).setCellValue(valueOrEmpty(payorDebtAccountName));
                 row.createCell(i++).setCellValue(valueOrEmpty(agreement));
@@ -730,7 +746,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 row.createCell(i++).setCellValue(valueOrEmpty(annuled));
                 row.createCell(i++).setCellValue(valueOrEmpty(annuledReason));
                 row.createCell(i++).setCellValue(valueOrEmpty(closeDate));
-                
+
                 {
                     String value = openAmountAtERPStartDate != null ? openAmountAtERPStartDate.toString() : "";
                     if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
@@ -738,7 +754,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     }
                     row.createCell(i++).setCellValue(valueOrEmpty(value));
                 }
-                
+
                 row.createCell(i++).setCellValue(valueOrEmpty(exportedInLegacyERP));
                 row.createCell(i++).setCellValue(valueOrEmpty(legacyERPCertificateDocumentReference));
                 row.createCell(i++).setCellValue(valueOrEmpty(erpCertificationDate));
@@ -804,15 +820,14 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
         return "";
     }
-    
+
     // @formatter:off
     /* *****************
      * GETTERS & SETTERS
      * *****************
      */
     // @formatter:on
-    
-    
+
     public InvoiceEntry getInvoiceEntry() {
         return invoiceEntry;
     }
@@ -932,23 +947,23 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     public void setInstitutionalOrDefaultEmail(String institutionalOrDefaultEmail) {
         this.institutionalOrDefaultEmail = institutionalOrDefaultEmail;
     }
-    
+
     public String getEmailForSendingEmails() {
         return emailForSendingEmails;
     }
-    
+
     public void setEmailForSendingEmails(String emailForSendingEmails) {
         this.emailForSendingEmails = emailForSendingEmails;
     }
-    
+
     public String getPersonalEmail() {
         return personalEmail;
     }
-    
+
     public void setPersonalEmail(String personalEmail) {
         this.personalEmail = personalEmail;
     }
-    
+
     public String getAddress() {
         return address;
     }
@@ -1244,19 +1259,19 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     public void setErpCertificateDocumentReference(String erpCertificateDocumentReference) {
         this.erpCertificateDocumentReference = erpCertificateDocumentReference;
     }
-    
+
     public String getErpCustomerId() {
         return erpCustomerId;
     }
-    
+
     public void setErpCustomerId(String erpCustomerId) {
         this.erpCustomerId = erpCustomerId;
     }
-    
+
     public String getErpPayorCustomerId() {
         return erpPayorCustomerId;
     }
-    
+
     public void setErpPayorCustomerId(String erpPayorCustomerId) {
         this.erpPayorCustomerId = erpPayorCustomerId;
     }
@@ -1267,6 +1282,22 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
     public void setOriginSettlementNoteForAdvancedCredit(String originSettlementNoteForAdvancedCredit) {
         this.originSettlementNoteForAdvancedCredit = originSettlementNoteForAdvancedCredit;
+    }
+    
+    public String getDocumentObservations() {
+        return documentObservations;
+    }
+    
+    public void setDocumentObservations(String documentObservations) {
+        this.documentObservations = documentObservations;
+    }
+    
+    public String getDocumentTermsAndConditions() {
+        return documentTermsAndConditions;
+    }
+    
+    public void setDocumentTermsAndConditions(String documentTermsAndConditions) {
+        this.documentTermsAndConditions = documentTermsAndConditions;
     }
     
 }

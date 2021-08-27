@@ -51,6 +51,8 @@ import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
+import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
+import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.dto.ITreasuryBean;
 import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
@@ -268,11 +270,7 @@ public class ERPTuitionInfoTypeBean implements ITreasuryBean, Serializable {
         } else if(DEGREE_CURRICULAR_PLANS_OPTION.equals(this.degreeInfoSelectOption)) {
             if(this.selectedDegreeType != null) {
                 
-                Set<DegreeCurricularPlan> dcpSet = new HashSet<>();
-                dcpSet.addAll(DegreeCurricularPlan.readBolonhaDegreeCurricularPlans());
-                dcpSet.addAll(DegreeCurricularPlan.readPreBolonhaDegreeCurricularPlans());
-                
-                this.degreeCurricularPlanDataSource =  dcpSet.stream()
+                this.degreeCurricularPlanDataSource = academicTreasuryServices().readAllDegreeCurricularPlansSet().stream()
                     .filter(d -> d.getDegreeType() == this.selectedDegreeType)
                     .filter(d -> d.getExecutionDegreeByYear(executionYear) != null)
                     .filter(d -> !this.degrees.contains(d.getDegree()))
@@ -288,6 +286,10 @@ public class ERPTuitionInfoTypeBean implements ITreasuryBean, Serializable {
             
         }
         
+    }
+
+    private IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
+        return AcademicTreasuryPlataformDependentServicesFactory.implementation();
     }
 
     private String degreeDescription(final Degree d) {

@@ -723,8 +723,9 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.EXECUTION_SEMESTER.getDescriptionI18N().getContent(),
                 improvementEnrolmentEvaluation.getExecutionPeriod().getQualifiedName());
-
-        // TODO
+	
+        // TODO Check code Refactor/20210624-MergeWithISCTE
+        // For now maintain this
 //        propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.EVALUATION_SEASON.getDescriptionI18N().getContent(),
 //                improvementEnrolmentEvaluation.getEvaluationSeason().getName().getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE));
 

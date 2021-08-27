@@ -236,6 +236,7 @@ class tuition.TuitionPaymentPlanGroup {
 	boolean forImprovement;
 	String allowedConditionRulesSerialized;
 	String allowedCalculatedAmountCalculatorsSerialized;
+	boolean bypassInstallmentNameIfSingleInstallmentApplied;
 }
 
 	relation TuitionPaymentPlanGroupBennu {

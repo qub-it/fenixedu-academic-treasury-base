@@ -46,6 +46,7 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
+import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
@@ -70,12 +71,16 @@ public class ExecutionIntervalConditionRule extends ExecutionIntervalConditionRu
 
     @Override
     public boolean isValidTo(Registration registration, ExecutionYear executionYear, Enrolment enrolment) {
-        Set<ExecutionInterval> collect =
-                registration.getEnrolments(executionYear).stream().map(e -> e.getExecutionPeriod()).collect(Collectors.toSet());
+        Set<ExecutionInterval> collect = registration.getEnrolments(executionYear).stream()
+                .map(e -> academicTreasuryServices().executionSemester(e)).collect(Collectors.toSet());
         if (collect.size() != 1) {
             return false;
         }
         return getExecutionIntervalSet().contains(collect.iterator().next());
+    }
+
+    private IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
+        return AcademicTreasuryPlataformDependentServicesFactory.implementation();
     }
 
     @Override
@@ -108,14 +113,13 @@ public class ExecutionIntervalConditionRule extends ExecutionIntervalConditionRu
 
     @Override
     public TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {
+
         IAcademicTreasuryPlatformDependentServices implementation =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         ExecutionIntervalConditionRule result = new ExecutionIntervalConditionRule();
         result.setTuitionPaymentPlan(tuitionPaymentPlan);
-        Set<ExecutionInterval> executionIntervalOfTuitionPaymentPlanExecutionYear = getExecutionIntervalSet()
-                .stream().map(c -> tuitionPaymentPlan.getExecutionYear()
-                        .getExecutionSemesterFor(c.getAcademicInterval().getAcademicSemesterOfAcademicYear()))
+        Set<ExecutionInterval> executionIntervalOfTuitionPaymentPlanExecutionYear = getExecutionIntervalSet().stream().map(
+                c -> tuitionPaymentPlan.getExecutionYear().getExecutionSemesterFor(implementation.executionIntervalChildOrder(c)))
                 .collect(Collectors.toSet());
 
         result.getExecutionIntervalSet().addAll(executionIntervalOfTuitionPaymentPlanExecutionYear);
@@ -130,16 +134,25 @@ public class ExecutionIntervalConditionRule extends ExecutionIntervalConditionRu
     }
 
     @Override
-    public void fillRuleFromImporter(String string) {
+    public void fillRuleFromImporter(TuitionPaymentPlanBean bean) {
+        String string = bean.getImporterRules().get(this.getClass());
         String[] split = string.split("\\|");
         for (String s : split) {
-            // TODO: For ISCTE
+            ExecutionYear b = bean.getExecutionYear();
+            
+            // TODO Check code Refactor/20210624-MergeWithISCTE
+            //
+            // ExecutionInterval.getChildIntervals() is not available in qubEdu-ISCTE
+            // For now to compile set ExecutionInterval = null;
             ExecutionInterval value = null; // ExecutionInterval.getExecutionInterval(s);
+            
+            // code from master
+//            ExecutionInterval value = b.getChildIntervals().stream().filter(i -> i.getName().equals(s)).findFirst().orElse(null);
+            
             if (value == null) {
                 throw new IllegalArgumentException();
             }
             addExecutionInterval(value);
         }
     }
-
 }

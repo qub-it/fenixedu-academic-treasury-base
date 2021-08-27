@@ -76,6 +76,7 @@ import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependent
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.PersonServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
+import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.FinantialInstitution;
 import org.fenixedu.treasury.domain.Product;
@@ -303,8 +304,10 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
     @Override
     public IAcademicServiceRequestAndAcademicTaxTreasuryEvent academicTreasuryEventForAcademicServiceRequest(
-            final AcademicServiceRequest academicServiceRequest) {
-        return AcademicTreasuryEvent.findAll().filter(e -> e.getAcademicServiceRequest() == academicServiceRequest).findFirst().orElse(null);
+            AcademicServiceRequest academicServiceRequest) {
+        return AcademicTreasuryPlataformDependentServicesFactory.implementation()
+                .academicTreasuryEventsSet(academicServiceRequest.getPerson()).stream()
+                .filter(e -> e.getAcademicServiceRequest() == academicServiceRequest).findFirst().orElse(null);
     }
 
     /* ----------
@@ -313,12 +316,12 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
      */
 
     @Override
-    public void standaloneUnenrolment(final Enrolment standaloneEnrolment) {
+    public void standaloneUnenrolment(Enrolment standaloneEnrolment) {
         TuitionServices.removeDebitEntryForStandaloneEnrolment(standaloneEnrolment);
     }
 
     @Override
-    public void extracurricularUnenrolment(final Enrolment extracurricularEnrolment) {
+    public void extracurricularUnenrolment(Enrolment extracurricularEnrolment) {
         TuitionServices.removeDebitEntryForExtracurricularEnrolment(extracurricularEnrolment);
     }
 
@@ -415,15 +418,16 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
         return createDebt(finantialEntity, product, target, when, createPaymentCode, platform, numberOfUnits, numberOfPages);
     }
-    
+
     // TODO: Use AcademicTreasuryTargetCreateDebtBuilder class
     @Deprecated
     public IAcademicTreasuryEvent createDebt(final FinantialEntity finantialEntity, final Product product,
             final IAcademicTreasuryTarget target, final LocalDate when, final boolean createPaymentCode,
             final DigitalPaymentPlatform platform, final int numberOfUnits, final int numberOfPages) {
 
-        IAcademicTreasuryPlatformDependentServices implementation = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        
+        IAcademicTreasuryPlatformDependentServices implementation =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
         final FinantialInstitution finantialInstitution = finantialEntity.getFinantialInstitution();
         final DocumentNumberSeries documentNumberSeries =
                 DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
@@ -488,7 +492,8 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
     public IAcademicTreasuryEvent createDebt(final ITreasuryEntity treasuryEntity, final ITreasuryProduct treasuryProduct,
             final IAcademicTreasuryTarget target, final BigDecimal amount, final LocalDate when, final LocalDate dueDate,
             final boolean createPaymentCode, final IPaymentCodePool paymentCodePool) {
-        IAcademicTreasuryPlatformDependentServices implementation = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        IAcademicTreasuryPlatformDependentServices implementation =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
         final FinantialInstitution finantialInstitution =
                 ((TreasuryEntity) treasuryEntity).finantialEntity.getFinantialInstitution();
@@ -534,7 +539,8 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
     public IAcademicTreasuryEvent createDebt(final FinantialEntity finantialEntity, final Product product,
             final IAcademicTreasuryTarget target, final BigDecimal amount, final LocalDate when, final LocalDate dueDate,
             final boolean createPaymentCode, final DigitalPaymentPlatform platform) {
-        IAcademicTreasuryPlatformDependentServices implementation = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        IAcademicTreasuryPlatformDependentServices implementation =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
         final FinantialInstitution finantialInstitution = finantialEntity.getFinantialInstitution();
         final DocumentNumberSeries documentNumberSeries =
@@ -627,7 +633,11 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         AcademicDebtGenerationRule.runAllActiveForRegistration(registration, true);
     }
 
-// TODO
+// TODO After the virtual payments going to production, replace Bennu Signals  with settlement note handlers
+// The settlement creation is now in SettlementNote.processSettlementNoteCreation(SettlementNoteBean) except 
+// when TreasurySettings.isRestrictPaymentMixingLegacyInvoices==true . 
+// This handle could be called in SettlementNote.processSettlementNoteCreation(SettlementNoteBean)
+// For now maintain it
 //    @Subscribe
 //    public void handle(final DomainObjectEvent<SettlementNote> settlementNoteEvent) {
 //        final SettlementNote settlementNote = settlementNoteEvent.getInstance();
@@ -712,8 +722,9 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
     @Override
     public void saveFiscalAddressFieldsFromPersonInActiveCustomer(final Person person) {
-        IAcademicTreasuryPlatformDependentServices implementation = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        
+        IAcademicTreasuryPlatformDependentServices implementation =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
         if (implementation.personCustomer(person) == null) {
             return;
         }
@@ -723,19 +734,13 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
     @Override
     public PhysicalAddress createSaftDefaultPhysicalAddress(final Person person) {
-        IAcademicTreasuryPlatformDependentServices implementation = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        
-        
-        PhysicalAddressData data = new PhysicalAddressData();
+        IAcademicTreasuryPlatformDependentServices implementation =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
-        data.setAddress("Desconhecido");
-        data.setCountryOfResidence(Country.readDefault());
-        data.setDistrictOfResidence("Desconhecido");
-        data.setDistrictSubdivisionOfResidence("Desconhecido");
-        data.setAreaCode("0000-000");
-        
-        PhysicalAddress result = implementation.createPhysicalAddress(person, Country.readDefault(), "Desconhecido", 
-                "Desconhecido", "0000-000", "Desconhecido");
+        String unknownAddress =
+                AcademicTreasuryConstants.academicTreasuryBundle("label.AcademicTreasuryBridgeImpl.unknown.address");
+        PhysicalAddress result = implementation.createPhysicalAddress(person, Country.readDefault(), unknownAddress,
+                unknownAddress, "0000-000", unknownAddress);
         result.setValid();
 
         return result;

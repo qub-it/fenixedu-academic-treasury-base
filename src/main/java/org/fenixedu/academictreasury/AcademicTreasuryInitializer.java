@@ -33,53 +33,49 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.fenixedu.academictreasury.domain.tuition.customcalculators;
+package org.fenixedu.academictreasury;
 
-import java.math.BigDecimal;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 
-import org.fenixedu.academic.domain.Enrolment;
-import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
-import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCustomCalculator;
-import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
+import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academictreasury.domain.listeners.DebitEntryDeletionListener;
+import org.fenixedu.academictreasury.domain.listeners.FinantialEntityListener;
+import org.fenixedu.academictreasury.domain.listeners.ProductDeletionListener;
+import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
+import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 
-public class TesteCustomCalculator implements TuitionTariffCustomCalculator {
-    private BigDecimal total;
-    private String calculeDescription;
+import pt.ist.fenixframework.FenixFramework;
 
-    public TesteCustomCalculator() {
-    }
+@WebListener
+public class AcademicTreasuryInitializer implements ServletContextListener {
 
-    public TesteCustomCalculator(Registration registration, TuitionPaymentPlan paymentPlan) {
-        StringBuilder strBuilder = new StringBuilder();
-
-        total = calculateValue(strBuilder, registration, paymentPlan);
-
-        calculeDescription = strBuilder.toString();
-    }
-
-    public TesteCustomCalculator(Registration registration, TuitionPaymentPlan paymentPlan, Enrolment enrolment) {
-        throw new RuntimeException("not supported");
-    }
-
-    private BigDecimal calculateValue(StringBuilder strBuilder, Registration registration, TuitionPaymentPlan paymentPlan) {
-        strBuilder.append("- Descrição do calculo 1000");
-        return new BigDecimal("1000");
+    @Override
+    public void contextDestroyed(final ServletContextEvent arg0) {
     }
 
     @Override
-    public String getPresentationName() {
-        return AcademicTreasuryConstants.academicTreasuryBundle(getClass().getName());
+    public void contextInitialized(final ServletContextEvent arg0) {
+        DebitEntryDeletionListener.attach();
+        ProductDeletionListener.attach();
+        FinantialEntityListener.attach();
+
+        addDeletionListeners();
     }
 
-    @Override
-    public BigDecimal getTotalAmount() {
-        return total;
+    private void addDeletionListeners() {
+        FenixFramework.getDomainModel().registerDeletionListener(Person.class, p -> {
+            if(academicTreasuryServices().personCustomer(p) != null) {
+                academicTreasuryServices().personCustomer(p).delete(); 
+            }
+
+            academicTreasuryServices().inactivePersonCustomers(p).forEach(ipc -> ipc.delete());
+        });
     }
 
-    @Override
-    public String getCalculationDescription() {
-        return calculeDescription;
+    private IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
+        return AcademicTreasuryPlataformDependentServicesFactory.implementation();
     }
-
+    
 }

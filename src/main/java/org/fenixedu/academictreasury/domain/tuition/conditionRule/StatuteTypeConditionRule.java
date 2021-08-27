@@ -47,6 +47,7 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.StatuteType;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
+import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
@@ -55,13 +56,12 @@ import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 public class StatuteTypeConditionRule extends StatuteTypeConditionRule_Base {
 
     public static Comparator<StatuteType> STATUTE_TYPE_COMPARATOR_BY_NAME = (o1, o2) -> {
-        IAcademicTreasuryPlatformDependentServices services =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        
+        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
         int c = services.localizedNameOfStatuteType(o1).compareTo(services.localizedNameOfStatuteType(o2));
         return c != 0 ? c : DomainObjectUtil.COMPARATOR_BY_ID.compare(o1, o2);
     };
-    
+
     public static final String BUNDLE_NAME = AcademicTreasuryConstants.BUNDLE;
 
     public StatuteTypeConditionRule() {
@@ -125,7 +125,8 @@ public class StatuteTypeConditionRule extends StatuteTypeConditionRule_Base {
     }
 
     @Override
-    public void fillRuleFromImporter(String string) {
+    public void fillRuleFromImporter(TuitionPaymentPlanBean bean) {
+        String string = bean.getImporterRules().get(this.getClass());
         final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
         String[] split = string.split("\\|");
