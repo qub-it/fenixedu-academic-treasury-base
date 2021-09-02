@@ -76,6 +76,7 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
         setForStandalone(forStandalone);
         setForExtracurricular(forExtracurricular);
         setCurrentProduct(currentProduct);
+        setBypassInstallmentNameIfSingleInstallmentApplied(false);
 
         checkRules();
     }
@@ -112,13 +113,14 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
 
     @Atomic
     public void edit(final String code, final LocalizedString name, final boolean forRegistration, final boolean forStandalone,
-            final boolean forExtracurricular, final Product currentProduct) {
+            final boolean forExtracurricular, final Product currentProduct, boolean bypassInstallmentNameIfSingleInstallmentApplied) {
         setCode(code);
         setName(name);
         setForRegistration(forRegistration);
         setForStandalone(forStandalone);
         setForExtracurricular(forExtracurricular);
         setCurrentProduct(currentProduct);
+        setBypassInstallmentNameIfSingleInstallmentApplied(bypassInstallmentNameIfSingleInstallmentApplied);
 
         checkRules();
     }
