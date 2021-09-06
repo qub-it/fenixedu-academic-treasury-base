@@ -936,7 +936,9 @@ public class TuitionServices {
         if (studentCurricularPlan == null) {
             return Sets.newHashSet();
         }
-
+	
+	// TODO Check code Refactor/20210624-MergeWithISCTE
+	// This code should be in academic treasury dependent platform services
         return studentCurricularPlan.getStandaloneCurriculumLines().stream()
                 .filter(l -> l.getExecutionYear() == executionYear && l.isEnrolment()).map(l -> (Enrolment) l)
                 .collect(Collectors.<Enrolment> toSet());

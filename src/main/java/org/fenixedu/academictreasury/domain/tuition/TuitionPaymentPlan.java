@@ -418,21 +418,23 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                     }
                 });
 
-        if (strBuilder.length() > 0) {
-            Map<String, String> propertiesMap = academicTreasuryEvent.getPropertiesMap();
-            propertiesMap.put(
-                    TreasuryPlataformDependentServicesFactory.implementation()
-                            .bundleI18N(AcademicTreasuryConstants.BUNDLE, "Custom Calculator Description").getContent(),
-                    strBuilder.toString());
-            academicTreasuryEvent.editPropertiesMap(propertiesMap);
-        }
-
         boolean createdDebitEntries = false;
         final Set<DebitEntry> createdDebitEntriesSet = Sets.newHashSet();
         for (final TuitionInstallmentTariff tariff : getTuitionInstallmentTariffsSet()) {
             if (!academicTreasuryEvent.isChargedWithDebitEntry(standaloneEnrolment)) {
-                createdDebitEntriesSet.add(tariff.createDebitEntryForStandalone(debtAccount, academicTreasuryEvent,
-                        standaloneEnrolment, when, calculatorsMap));
+                DebitEntry debitEntry = tariff.createDebitEntryForStandalone(debtAccount, academicTreasuryEvent,
+                        standaloneEnrolment, when, calculatorsMap);
+                
+                if (strBuilder.length() > 0) {
+                    Map<String, String> propertiesMap = debitEntry.getPropertiesMap();
+                    propertiesMap.put(
+                            TreasuryPlataformDependentServicesFactory.implementation()
+                                    .bundleI18N(AcademicTreasuryConstants.BUNDLE, "label.AcademicTreasury.CustomCalculatorDescription").getContent(),
+                            strBuilder.toString());
+                    debitEntry.editPropertiesMap(propertiesMap);
+                }
+                
+                createdDebitEntriesSet.add(debitEntry);
                 createdDebitEntries = true;
             }
         }
@@ -479,20 +481,23 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                     }
                 });
 
-        if (strBuilder.length() > 0) {
-            Map<String, String> propertiesMap = academicTreasuryEvent.getPropertiesMap();
-            propertiesMap.put(
-                    TreasuryPlataformDependentServicesFactory.implementation()
-                            .bundleI18N(AcademicTreasuryConstants.BUNDLE, "Custom Calculator Description").getContent(),
-                    strBuilder.toString());
-            academicTreasuryEvent.editPropertiesMap(propertiesMap);
-        }
         boolean createdDebitEntries = false;
         final Set<DebitEntry> createdDebitEntriesSet = Sets.newHashSet();
         for (final TuitionInstallmentTariff tariff : getTuitionInstallmentTariffsSet()) {
             if (!academicTreasuryEvent.isChargedWithDebitEntry(extracurricularEnrolment)) {
-                createdDebitEntriesSet.add(tariff.createDebitEntryForExtracurricular(debtAccount, academicTreasuryEvent,
-                        extracurricularEnrolment, when, calculatorsMap));
+                DebitEntry debitEntry = tariff.createDebitEntryForExtracurricular(debtAccount, academicTreasuryEvent,
+                        extracurricularEnrolment, when, calculatorsMap);
+                
+                if (strBuilder.length() > 0) {
+                    Map<String, String> propertiesMap = debitEntry.getPropertiesMap();
+                    propertiesMap.put(
+                            TreasuryPlataformDependentServicesFactory.implementation()
+                                    .bundleI18N(AcademicTreasuryConstants.BUNDLE, "label.AcademicTreasury.CustomCalculatorDescription").getContent(),
+                            strBuilder.toString());
+                    debitEntry.editPropertiesMap(propertiesMap);
+                }
+                
+                createdDebitEntriesSet.add(debitEntry);
                 createdDebitEntries = true;
             }
         }

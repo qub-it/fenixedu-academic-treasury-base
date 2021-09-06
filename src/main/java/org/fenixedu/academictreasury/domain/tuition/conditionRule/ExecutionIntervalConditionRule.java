@@ -139,6 +139,12 @@ public class ExecutionIntervalConditionRule extends ExecutionIntervalConditionRu
         String[] split = string.split("\\|");
         for (String s : split) {
             ExecutionYear b = bean.getExecutionYear();
+
+            // TODO Check code Refactor/20210624-MergeWithISCTE
+            //
+            // ExecutionInterval.getChildIntervals() is not available in qubEdu-ISCTE
+            // For now to compile set ExecutionInterval = null;
+
             ExecutionInterval value = b.getChildIntervals().stream().filter(i -> i.getName().equals(s)).findFirst().orElse(null);
             if (value == null) {
                 throw new IllegalArgumentException();
