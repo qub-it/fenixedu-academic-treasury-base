@@ -83,7 +83,7 @@ public class PersonCustomer extends PersonCustomer_Base {
     private static final String STUDENT_CODE = "STUDENT";
     private static final String CANDIDACY_CODE = "CANDIDATE";
 
-    protected PersonCustomer() {
+    public PersonCustomer() {
         super();
     }
 
