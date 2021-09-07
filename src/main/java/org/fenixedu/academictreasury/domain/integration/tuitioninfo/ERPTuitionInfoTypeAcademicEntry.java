@@ -353,7 +353,6 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
     }
 
     public LocalizedString getDescription() {
-        ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
         if (isDefinedForDegreeType()) {
             LocalizedString result = new LocalizedString();
             for (Locale locale : treasuryServices().availableLocales()) {

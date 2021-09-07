@@ -1,3 +1,5 @@
+- Improvement: In standalone and extracurricular tuitions, save the custom calculation description in debit entry instead of academic treasury event
+
 8.0.0 (02-09-2021)
 - Improvement: Close debit notes academic debt generation rule allow close of interests (#UL-IGOT-1129)
 - Improvement: Add document observations & terms and conditions to be exported in debt report beans

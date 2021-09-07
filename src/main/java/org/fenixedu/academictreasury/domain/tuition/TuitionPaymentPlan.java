@@ -582,12 +582,6 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         while (!getTuitionPaymentPlanOrdersSet().isEmpty()) {
             getTuitionPaymentPlanOrdersSet().iterator().next().delete(false);
         }
-        
-        setDegreeCurricularPlan(null);
-        setRegistrationProtocol(null);
-        setIngression(null);
-        setStatuteType(null);
-        setCurricularYear(null);
 
         // From old model but migrated tuition payment plans might have associated dcp or other conditions
         super.setDegreeCurricularPlan(null);
