@@ -754,8 +754,6 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
      */
     // @formatter:on
 
-    // TODO DECLARE IN INTERFACE ITreasuryBridgeAPI
-    // @Override
     @Override
     public ITreasuryCustomer getActiveCustomer(final Person person) {
         PersonCustomer customer = PersonCustomer
@@ -768,8 +766,6 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         return new TreasuryCustomer(customer);
     }
 
-    // TODO DECLARE IN INTERFACE ITreasuryBridgeAPI
-    // @Override
     @Override
     public List<ITreasuryCustomer> getCustomersForFiscalNumber(final Person person, final String fiscalCountry,
             final String fiscalNumber) {
@@ -777,13 +773,11 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
                 .collect(Collectors.toList());
     }
 
-    // TODO DECLARE IN INTERFACE ITreasuryBridgeAPI
-    // @Override
     @Override
     public ITreasuryDebtAccount getActiveDebtAccountForRegistration(final Registration registration) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+        IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        final Person person = registration.getPerson();
+        Person person = registration.getPerson();
 
         String addressCountryCode = PersonCustomer.addressCountryCode(person);
         String fiscalNumber = PersonCustomer.fiscalNumber(person);
@@ -793,9 +787,14 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
             return null;
         }
 
-        final FinantialEntity finantialEntity =
+        FinantialEntity finantialEntity =
                 academicTreasuryServices.finantialEntityOfDegree(registration.getDegree(), new LocalDate());
-        final FinantialInstitution finantialInstitution = finantialEntity.getFinantialInstitution();
+        
+        if(finantialEntity == null) {
+            return null;
+        }
+        
+        FinantialInstitution finantialInstitution = finantialEntity.getFinantialInstitution();
 
         DebtAccount debtAccount = DebtAccount.findUnique(finantialInstitution, customer).orElse(null);
 

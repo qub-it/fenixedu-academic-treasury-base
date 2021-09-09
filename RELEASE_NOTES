@@ -1,5 +1,6 @@
 8.0.1 (08-09-2021)
 - Improvement: In standalone and extracurricular tuitions, save the custom calculation description in debit entry instead of academic treasury event
+- Bug Fix: In Treasury Bridge API, if there is not finantial entity associated to a degree return null as debt account
 
 8.0.0 (02-09-2021)
 - Improvement: Close debit notes academic debt generation rule allow close of interests (#UL-IGOT-1129)
