@@ -311,7 +311,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         String label = "label.TuitionInstallmentTariff.debitEntry.name.";
 
         if (getTuitionPaymentPlanGroup().isForRegistration()) {
-            if (getTuitionInstallmentTariffsSet().size() == 1 && getTuitionPaymentPlanGroup().isBypassInstallmentNameIfSingleInstallmentApplied()) {
+            if (getTuitionInstallmentTariffsSet().size() == 1
+                    && getTuitionPaymentPlanGroup().isBypassInstallmentNameIfSingleInstallmentApplied()) {
                 label += "registration.one.installment";
             } else {
                 label += "registration";
@@ -376,7 +377,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         if (strBuilder.length() > 0) {
             Map<String, String> propertiesMap = academicTreasuryEvent.getPropertiesMap();
             propertiesMap.put(TreasuryPlataformDependentServicesFactory.implementation().bundle(AcademicTreasuryConstants.BUNDLE,
-                    "label.AcademicTreasury.CustomCalculatorDescription"), strBuilder.toString());
+                    "label.AcademicTreasury.CustomCalculatorDescription") + " ( " + DateTime.now().toString("yyyy-MM-dd HH:mm")
+                    + " )", strBuilder.toString());
             academicTreasuryEvent.editPropertiesMap(propertiesMap);
         }
         boolean createdDebitEntries = false;
@@ -424,16 +426,18 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
             if (!academicTreasuryEvent.isChargedWithDebitEntry(standaloneEnrolment)) {
                 DebitEntry debitEntry = tariff.createDebitEntryForStandalone(debtAccount, academicTreasuryEvent,
                         standaloneEnrolment, when, calculatorsMap);
-                
+
                 if (strBuilder.length() > 0) {
                     Map<String, String> propertiesMap = debitEntry.getPropertiesMap();
                     propertiesMap.put(
                             TreasuryPlataformDependentServicesFactory.implementation()
-                                    .bundleI18N(AcademicTreasuryConstants.BUNDLE, "label.AcademicTreasury.CustomCalculatorDescription").getContent(),
+                                    .bundleI18N(AcademicTreasuryConstants.BUNDLE,
+                                            "label.AcademicTreasury.CustomCalculatorDescription")
+                                    .getContent(),
                             strBuilder.toString());
                     debitEntry.editPropertiesMap(propertiesMap);
                 }
-                
+
                 createdDebitEntriesSet.add(debitEntry);
                 createdDebitEntries = true;
             }
@@ -487,16 +491,18 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
             if (!academicTreasuryEvent.isChargedWithDebitEntry(extracurricularEnrolment)) {
                 DebitEntry debitEntry = tariff.createDebitEntryForExtracurricular(debtAccount, academicTreasuryEvent,
                         extracurricularEnrolment, when, calculatorsMap);
-                
+
                 if (strBuilder.length() > 0) {
                     Map<String, String> propertiesMap = debitEntry.getPropertiesMap();
                     propertiesMap.put(
                             TreasuryPlataformDependentServicesFactory.implementation()
-                                    .bundleI18N(AcademicTreasuryConstants.BUNDLE, "label.AcademicTreasury.CustomCalculatorDescription").getContent(),
+                                    .bundleI18N(AcademicTreasuryConstants.BUNDLE,
+                                            "label.AcademicTreasury.CustomCalculatorDescription")
+                                    .getContent(),
                             strBuilder.toString());
                     debitEntry.editPropertiesMap(propertiesMap);
                 }
-                
+
                 createdDebitEntriesSet.add(debitEntry);
                 createdDebitEntries = true;
             }
@@ -589,7 +595,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         super.setRegistrationProtocol(null);
         super.setStatuteType(null);
         super.setIngression(null);
-        
+
         super.deleteDomainObject();
     }
 

@@ -1,3 +1,4 @@
+- Improvement: Add date to key of description of custom calculator in Tuition payment plan 
 - Improvement: In standalone and extracurricular tuitions, save the custom calculation description in debit entry instead of academic treasury event
 - Bug Fix: In Treasury Bridge API, if there is not finantial entity associated to a degree return null as debt account
 
