@@ -1,3 +1,5 @@
+- Bug Fix: Only write ingressionType if it is set in the registration
+
 8.0.2 (17-09-2021)
 - Improvement: Add date to key of description of custom calculator in Tuition payment plan 
 
