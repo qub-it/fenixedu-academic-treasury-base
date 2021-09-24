@@ -1,3 +1,5 @@
+- Bug Fix: Refer to extracurricular tuition group when creating infered tuition for extra curricular course, instead of standalone tuition group
+
 8.0.3 (16-09-2021)
 - Improvement: Add date to key of description of custom calculator in Tuition payment plan 
 - Improvement: In standalone and extracurricular tuitions, save the custom calculation description in debit entry instead of academic treasury event

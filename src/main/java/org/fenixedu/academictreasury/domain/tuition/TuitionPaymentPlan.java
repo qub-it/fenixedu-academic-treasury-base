@@ -748,7 +748,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
         final DegreeCurricularPlan degreeCurricularPlan = enrolment.getCurricularCourse().getDegreeCurricularPlan();
         final List<TuitionPaymentPlan> filtered = TuitionPaymentPlan
-                .findSortedByPaymentPlanOrder(TuitionPaymentPlanGroup.findUniqueDefaultGroupForStandalone().get(),
+                .findSortedByPaymentPlanOrder(TuitionPaymentPlanGroup.findUniqueDefaultGroupForExtracurricular().get(),
                         degreeCurricularPlan, executionYear)
                 .collect(Collectors.toList());
 
