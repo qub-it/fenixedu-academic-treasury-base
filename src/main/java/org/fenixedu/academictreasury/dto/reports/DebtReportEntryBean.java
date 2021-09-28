@@ -46,8 +46,8 @@ import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
 import org.fenixedu.academic.domain.student.RegistrationRegimeType;
+import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent.AcademicTreasuryEventKeys;
@@ -377,7 +377,9 @@ public class DebtReportEntryBean implements SpreadsheetRow {
         if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null) {
             final Person person = ((PersonCustomer) customer).getAssociatedPerson();
             this.institutionalOrDefaultEmail = person.getInstitutionalOrDefaultEmailAddressValue();
-            this.emailForSendingEmails = person.getEmailForSendingEmails();
+            // TODO Check code Refactor/20210624-MergeWithISCTE
+            //This line was commented on iscte branch, because performance issues
+//            this.emailForSendingEmails = person.getEmailForSendingEmails();
             this.personalEmail = personalEmail(person) != null ? personalEmail(person).getValue() : "";
         }
 
