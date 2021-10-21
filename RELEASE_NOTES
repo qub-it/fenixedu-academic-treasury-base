@@ -1,3 +1,5 @@
+- Improvement: And "when" parameter on AcademicTreasuryTargetCreateDebtBuilder.(useInferedAcademicTariff and explicitAmountAndDueDate) to prevent NPE
+
 8.0.5 (01-10-2021)
 - Bug Fix: Align headers in debit and credit entries in debts report
 

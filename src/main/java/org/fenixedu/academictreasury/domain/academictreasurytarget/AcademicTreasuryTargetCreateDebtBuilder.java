@@ -57,7 +57,6 @@ import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.domain.paymentcodes.integration.ISibsPaymentCodePoolService;
-import org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -329,21 +328,23 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
     }
 
     public DebtBuilderWithAmountAndDueDate explicitAmountAndDueDate(FinantialEntity finantialEntity, Product product,
-            IAcademicTreasuryTarget target) {
+            IAcademicTreasuryTarget target, LocalDate when) {
         var result = new DebtBuilderWithAmountAndDueDate();
         result.setFinantialEntity(finantialEntity);
         result.setProduct(product);
         result.setTarget(target);
+        result.setWhen(when);
 
         return result;
     }
 
     public DebtBuilderWithAcademicTariff useInferedAcademicTariff(FinantialEntity finantialEntity, Product product,
-            IAcademicTreasuryTarget target) {
+            IAcademicTreasuryTarget target, LocalDate when) {
         var result = new DebtBuilderWithAcademicTariff();
         result.setFinantialEntity(finantialEntity);
         result.setProduct(product);
         result.setTarget(target);
+        result.setWhen(when);
 
         return result;
     }
