@@ -329,21 +329,23 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
     }
 
     public DebtBuilderWithAmountAndDueDate explicitAmountAndDueDate(FinantialEntity finantialEntity, Product product,
-            IAcademicTreasuryTarget target) {
+            IAcademicTreasuryTarget target, LocalDate when) {
         var result = new DebtBuilderWithAmountAndDueDate();
         result.setFinantialEntity(finantialEntity);
         result.setProduct(product);
         result.setTarget(target);
+        result.setWhen(when);
 
         return result;
     }
 
     public DebtBuilderWithAcademicTariff useInferedAcademicTariff(FinantialEntity finantialEntity, Product product,
-            IAcademicTreasuryTarget target) {
+            IAcademicTreasuryTarget target, LocalDate when) {
         var result = new DebtBuilderWithAcademicTariff();
         result.setFinantialEntity(finantialEntity);
         result.setProduct(product);
         result.setTarget(target);
+        result.setWhen(when);
 
         return result;
     }
