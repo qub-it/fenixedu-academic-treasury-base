@@ -106,7 +106,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     academicTreasuryBundle("label.DebtReportEntryBean.header.productCode"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.invoiceEntryDescription"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.documentNumber"),
-                    academicTreasuryBundle("label.DebtReportEntryBean.header.documentExportationPending"), "",
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.documentExportationPending"),
+                    "",// Empty header
                     academicTreasuryBundle("label.DebtReportEntryBean.header.amountToPay"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountToPay"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountWithInterestToDate"),
@@ -164,6 +165,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     academicTreasuryBundle("label.DebtReportEntryBean.header.debitEntry.identification"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.amountToCredit"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountToCredit"),
+                    "",// Empty Header
+                    "",// Empty Header
                     academicTreasuryBundle("label.DebtReportEntryBean.header.payorDebtAcount.vatNumber"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.payorDebtAcount.name"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.agreement"),
@@ -729,6 +732,9 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     }
                     row.createCell(i++).setCellValue(valueOrEmpty(value));
                 }
+
+                row.createCell(i++).setCellValue("");
+                row.createCell(i++).setCellValue("");
 
                 row.createCell(i++).setCellValue(valueOrEmpty(payorDebtAccountVatNumber));
                 row.createCell(i++).setCellValue(valueOrEmpty(payorDebtAccountName));
