@@ -880,10 +880,12 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         return new AcademicTreasuryEvent(iTreasuryServiceRequest);
     }
 
+    // @formatter: off
     /* *******
      * TUITION
      * *******
      */
+    // @formatter: on
 
     /* For Registration */
 
@@ -957,10 +959,12 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
                 executionYear);
     }
 
+    // @formatter: off
     /* ************
      * ACADEMIC TAX
      * ************
      */
+    // @formatter: on
 
     public static Stream<? extends AcademicTreasuryEvent> findAllForAcademicTax(final Registration registration,
             final ExecutionYear executionYear) {
@@ -1008,12 +1012,26 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         return new AcademicTreasuryEvent(product, target);
     }
 
+    // @formatter: off
+    /* ********************
+     * CUSTOM ACADEMIC DEBT
+     * ********************
+     */
+    // @formatter: on
+
     public static AcademicTreasuryEvent createForCustomAcademicDebt(final Product product, final Registration registration,
             final ExecutionYear executionYear, final int customAcademicDebtNumberOfUnits,
             final int customAcademicDebtNumberOfPages, final boolean customAcademicDebtUrgent,
             final LocalDate customAcademicDebtEventDate) {
         return new AcademicTreasuryEvent(product, registration, executionYear, customAcademicDebtNumberOfUnits,
                 customAcademicDebtNumberOfPages, customAcademicDebtUrgent, customAcademicDebtEventDate);
+    }
+
+    public static Stream<? extends AcademicTreasuryEvent> findForCustomAcademicDebt(final Product product,
+            final Registration registration, final ExecutionYear executionYear) {
+
+        return find(registration.getPerson()).filter(e -> e.getExecutionYear() == executionYear)
+                .filter(e -> e.isCustomAcademicDebt()).filter(e -> e.getProduct() == product);
     }
 
     // @formatter:off
