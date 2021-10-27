@@ -1,3 +1,4 @@
+8.1.0 (27-10-2021)
 - Improvement: Add method to find academic custom debt AcademicTreasuryEvent 
 - Improvement: Change API of academic debt builder to receive the required DateTime when parameter
 - Bug Fix: Refer to extracurricular tuition group when creating infered tuition for extra curricular course, instead of standalone tuition group
