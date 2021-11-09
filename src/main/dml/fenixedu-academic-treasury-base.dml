@@ -909,6 +909,7 @@ class academicalAct.AcademicActBlockingSuspension {
  * --------------------
  */
 
+// Refactor move to customers-ulisboa
 class coursefunctioncost.CourseFunctionCost {
 	BigDecimalAT functionCost;
 }
@@ -1607,7 +1608,8 @@ class integration.ERPTuitionInfoCreationReportFile /* implements IGenericFile */
 /*
  * PaymentPenalty
  */
- 
+
+// Deprecated 
 class paymentpenalty.PaymentPenaltySettings {
 	Boolean active;
 	LocalizedStringAT emolumentDescription;
@@ -1644,6 +1646,7 @@ class paymentpenalty.PaymentPenaltySettings {
 		}
 	}
 	
+// Deprecated 
 class paymentpenalty.PaymentPenaltyEventTarget {
 }
 
