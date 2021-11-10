@@ -47,23 +47,6 @@
 	
 	</dependencies>
 
-	 <pluginRepositories>
-        <pluginRepository>
-            <id>ulisboa-repo</id>
-            <url>http://nexus.ulisboa.pt:8081/nexus/content/groups/public/</url>
-        </pluginRepository>
-    </pluginRepositories>
-    
-    <repositories>
-        <repository>
-            <id>ulisboa-repo</id>
-            <url>http://nexus.ulisboa.pt:8081/nexus/content/groups/public/</url>
-        </repository>
-        <repository>
-            <id>fenixedu-maven-repository</id>
-            <url>https://repo.fenixedu.org/fenixedu-maven-repository</url>
-        </repository>
-    </repositories>
 	 <distributionManagement>
                 <repository>
                         <id>ulisboa-repo</id>
