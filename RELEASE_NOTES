@@ -1,4 +1,5 @@
 - Improvement: Throw exception when create a person customer to a person already with person customer
+- Bug Fix: Only write ingressionType if it is set in the registration
 
 8.1.1 (09-11-2021)
 - Bug Fix: Align headers in debt reports

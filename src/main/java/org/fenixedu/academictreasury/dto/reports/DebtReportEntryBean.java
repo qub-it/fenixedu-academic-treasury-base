@@ -42,6 +42,7 @@ import java.math.BigDecimal;
 import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.academic.domain.student.Registration;
@@ -568,7 +569,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 academicServices.registrationRegimeType(registration, executionYear) == RegistrationRegimeType.PARTIAL_TIME;
         this.statutes = statutes(registration, executionYear);
         this.agreement = academicServices.registrationProtocol(registration).getDescription();
-        this.ingression = academicServices.ingression(registration).getDescription();
+        IngressionType ingressionType = academicServices.ingression(registration);
+        this.ingression = ingressionType != null ? ingressionType.getDescription() : null;
 
         this.numberOfNormalEnrolments = TuitionServices.normalEnrolmentsIncludingAnnuled(registration, executionYear).size();
         this.numberOfStandaloneEnrolments =
