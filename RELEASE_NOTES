@@ -1,3 +1,5 @@
+- Improvement: Throw exception when create a person customer to a person already with person customer
+
 8.1.1 (09-11-2021)
 - Bug Fix: Align headers in debt reports
 
