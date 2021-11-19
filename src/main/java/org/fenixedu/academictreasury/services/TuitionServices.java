@@ -100,7 +100,7 @@ public class TuitionServices {
     public static boolean isToPayRegistrationTuition(final Registration registration, final ExecutionYear executionYear) {
         final IAcademicTreasuryPlatformDependentServices academicServices =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
-	return Boolean.TRUE.equals(academicServices.registrationProtocol(registration).getPayGratuity());
+        return Boolean.TRUE.equals(academicServices.registrationProtocol(registration).getPayGratuity());
     }
 
     public static AcademicTreasuryEvent findAcademicTreasuryEventTuitionForRegistration(final Registration registration,
@@ -257,18 +257,31 @@ public class TuitionServices {
                     }
                 });
 
+        BigDecimal amountToDiscountTuitionFromOtherEvents = TuitionPaymentPlan
+                .getOtherEventsAmountToDiscountInTuitionFee(registration.getPerson(), tuitionPaymentPlan.getExecutionYear());
+
         final List<TuitionDebitEntryBean> entries = Lists.newArrayList();
-        for (final TuitionInstallmentTariff tuitionInstallmentTariff : tuitionPaymentPlan.getTuitionInstallmentTariffsSet()) {
+        for (final TuitionInstallmentTariff tuitionInstallmentTariff : tuitionPaymentPlan.getTuitionInstallmentTariffsSet()
+                .stream().sorted(TuitionInstallmentTariff.COMPARATOR_BY_INSTALLMENT_NUMBER).collect(Collectors.toList())) {
             final int installmentOrder = tuitionInstallmentTariff.getInstallmentOrder();
             final LocalizedString installmentName = tuitionPaymentPlan.installmentName(registration, tuitionInstallmentTariff);
             final LocalDate dueDate = tuitionInstallmentTariff.dueDate(debtDate);
             final Vat vat = tuitionInstallmentTariff.vat(debtDate);
-            final BigDecimal amount =
+            BigDecimal amountToPay =
                     tuitionInstallmentTariff.amountToPay(registration, enrolledEctsUnits, enrolledCoursesCount, calculatorsMap);
             final Currency currency = tuitionInstallmentTariff.getFinantialEntity().getFinantialInstitution().getCurrency();
 
-            entries.add(
-                    new TuitionDebitEntryBean(installmentOrder, installmentName, dueDate, vat.getTaxRate(), amount, currency));
+            if (TreasuryConstants.isGreaterOrEqualThan(amountToDiscountTuitionFromOtherEvents.subtract(amountToPay),
+                    BigDecimal.ZERO)) {
+                amountToDiscountTuitionFromOtherEvents = amountToDiscountTuitionFromOtherEvents.subtract(amountToPay);
+                continue;
+            } else if (TreasuryConstants.isPositive(amountToDiscountTuitionFromOtherEvents)) {
+                amountToPay = amountToPay.subtract(amountToDiscountTuitionFromOtherEvents);
+                amountToDiscountTuitionFromOtherEvents = BigDecimal.ZERO;
+            }
+
+            entries.add(new TuitionDebitEntryBean(installmentOrder, installmentName, dueDate, vat.getTaxRate(), amountToPay,
+                    currency));
         }
 
         final Comparator<? super TuitionDebitEntryBean> comparator =

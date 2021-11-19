@@ -1,3 +1,9 @@
+- Improvement: Throw exception when create a person customer to a person already with person customer
+- New Fixture: Reservation taxes, which can discount amount from tuition debts
+- Improvement: Allow set interest type in AcademicTreasuryTargetCreateDebtBuilder
+- Bug Fix: Get execution year name from treasury event target
+- Refactor: Predicates in TreasuryEvent to check if it is related with tuition debts, and if the event discount on tuition total amount
+
 8.1.1 (17-11-2021)
 - Refactor: Handler for settlement note payment, equal to declared in AcademicTreasuryBridgeImpl
 

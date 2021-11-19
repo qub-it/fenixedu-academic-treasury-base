@@ -68,7 +68,6 @@ import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
 import org.fenixedu.treasury.dto.AdhocCustomerBean;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
-import org.fenixedu.treasury.util.TreasuryConstants;
 import org.fenixedu.treasury.util.FiscalCodeValidation;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.LocalDate;
@@ -94,6 +93,10 @@ public class PersonCustomer extends PersonCustomer_Base {
         if (!DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber())
                 && find(getPerson(), getFiscalCountry(), getFiscalNumber()).count() > 1) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.person.customer.duplicated");
+        }
+
+        if (person.getPersonCustomer() != null) {
+            throw new AcademicTreasuryDomainException("error.PersonCustomer.person.already.has.person.customer");
         }
 
         setPerson(person);

@@ -245,6 +245,8 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
     }
 
+    private HandleSettlementNotePayment handleSettlementNotePayment = new HandleSettlementNotePayment();
+
     // @formatter:off
     /* ---------------------------------
      * TREASURY INSTITUTION AND PRODUCTS
@@ -633,57 +635,16 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         AcademicDebtGenerationRule.runAllActiveForRegistration(registration, true);
     }
 
-// TODO After the virtual payments going to production, replace Bennu Signals  with settlement note handlers
-// The settlement creation is now in SettlementNote.processSettlementNoteCreation(SettlementNoteBean) except 
-// when TreasurySettings.isRestrictPaymentMixingLegacyInvoices==true . 
-// This handle could be called in SettlementNote.processSettlementNoteCreation(SettlementNoteBean)
-// For now maintain it
+//    // TODO After the virtual payments going to production, replace Bennu Signals  with settlement note handlers
+//    // The settlement creation is now in SettlementNote.processSettlementNoteCreation(SettlementNoteBean) except 
+//    // when TreasurySettings.isRestrictPaymentMixingLegacyInvoices==true . 
+//    // This handle could be called in SettlementNote.processSettlementNoteCreation(SettlementNoteBean)
+//    // For now maintain it
 //    @Subscribe
 //    public void handle(final DomainObjectEvent<SettlementNote> settlementNoteEvent) {
 //        final SettlementNote settlementNote = settlementNoteEvent.getInstance();
 //
-//        // @formatter:off
-//        /* 
-//         * Check if settlementNote was deleted to avoid process of deleted objects in erp integration.
-//         * Unfortunately FenixFramework.isDomainObjectValid is throwing the same ClassCastException
-//         * over settlementNote so is wrapped in try-catch
-//         */
-//        // @formatter:on
-//        boolean toReturn = true;
-//        try {
-//            toReturn = !FenixFramework.isDomainObjectValid(settlementNote);
-//        } catch (Throwable t) {
-//            toReturn = true;
-//        }
-//
-//        if (toReturn) {
-//            return;
-//        }
-//
-//        for (final SettlementEntry s : settlementNote.getSettlemetEntries().collect(Collectors.toSet())) {
-//            final InvoiceEntry invoiceEntry = s.getInvoiceEntry();
-//
-//            if (!(invoiceEntry instanceof DebitEntry)) {
-//                continue;
-//            }
-//
-//            final DebitEntry d = (DebitEntry) invoiceEntry;
-//
-//            if (d.getTreasuryEvent() == null) {
-//                continue;
-//            }
-//
-//            if (!(d.getTreasuryEvent() instanceof AcademicTreasuryEvent)) {
-//                continue;
-//            }
-//
-//            AcademicTreasuryEvent academicTreasuryEvent = (AcademicTreasuryEvent) d.getTreasuryEvent();
-//            if (!academicTreasuryEvent.isForTreasuryEventTarget()) {
-//                continue;
-//            }
-//
-//            ((IAcademicTreasuryTarget) academicTreasuryEvent.getTreasuryEventTarget()).handleSettlement(academicTreasuryEvent);
-//        }
+//        this.handleSettlementNotePayment.handleObject(settlementNote);
 //    }
 //
 
