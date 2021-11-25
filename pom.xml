@@ -82,7 +82,7 @@
 		<dependency>
 			<groupId>com.qubit.solution.qubEdu.module</groupId>
 			<artifactId>fenixedu-treasury-base-iscte</artifactId>
-			<version>8.4.1</version>
+			<version>8.5.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.fenixedu</groupId>
@@ -92,7 +92,7 @@
 		<dependency>
 			<groupId>pt.iscte.fenix-custom</groupId>
 			<artifactId>qubEdu-treasury-api</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.qubit.terra</groupId>
