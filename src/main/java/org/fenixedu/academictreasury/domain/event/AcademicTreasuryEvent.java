@@ -718,32 +718,32 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     // Category code for treasuryEvent propose
-    private int treasuryEventTypeCode() {
+    public AcademicTreasuryEventType getTreasuryEventTypeCode() {
         if (isForAcademicServiceRequest()) {
-            return 0;
+            return AcademicTreasuryEventType.ACADEMIC_SERVICE_REQUEST;
         } else if (isForAcademicTax()) {
-            return 1;
+            return AcademicTreasuryEventType.ACADEMIC_TAX;
         } else if (isForExtracurricularTuition()) {
-            return 2;
+            return AcademicTreasuryEventType.EXTRACURRICULAR_TUITION;
         } else if (isForImprovementTax()) {
-            return 3;
+            return AcademicTreasuryEventType.IMPROVEMENT_TAX;
         } else if (isForRegistrationTuition()) {
-            return 4;
+            return AcademicTreasuryEventType.REGISTRATION_TUITION;
         } else if (isForStandaloneTuition()) {
-            return 5;
+            return AcademicTreasuryEventType.STANDALONE_TUITION;
         } else if (isForTreasuryEventTarget()) {
-            return 6;
+            return AcademicTreasuryEventType.TREASURY_EVENT_TARGET;
         } else if (isLegacy()) {
-            return 7;
+            return AcademicTreasuryEventType.LEGACY;
         } else if (isCustomAcademicDebt()) {
-            return 8;
+            return AcademicTreasuryEventType.CUSTOM_ACADEMIC_DEBT;
         }
 
         throw new AcademicTreasuryDomainException("error.AcademicTreasuryEvent.unkwnown.type");
     }
 
     public void mergeDebitEntriesAndExemptions(final AcademicTreasuryEvent event) {
-        if (this.treasuryEventTypeCode() != event.treasuryEventTypeCode()) {
+        if (this.getTreasuryEventTypeCode() != event.getTreasuryEventTypeCode()) {
             throw new AcademicTreasuryDomainException("error.AcademicTreasuryEvent.cannot.merge.for.different.types");
         }
 
