@@ -1,3 +1,5 @@
+- Improvement: Add academic treasury event type
+
 8.2.0 (19-11-2021)
 - Improvement: Throw exception when create a person customer to a person already with person customer
 - Bug Fix: Only write ingressionType if it is set in the registration
