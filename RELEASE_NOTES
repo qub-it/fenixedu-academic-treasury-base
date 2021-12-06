@@ -1,3 +1,4 @@
+8.2.1 (06-12-2021)
 - Improvement: Add academic treasury event type
 - Bug Fix: Check of AcademicTariff.maximumAmount is not negative
 
