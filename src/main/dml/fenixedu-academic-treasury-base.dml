@@ -782,7 +782,8 @@ class debtGeneration.AcademicDebtGenerationRule {
 			multiplicity *;
 		}
 	}
-	
+
+	// @Deprecated
 	relation AcademicDebtGenerationRuleDebtGenerationRuleRestriction {
 		debtGeneration.DebtGenerationRuleRestriction playsRole debtGenerationRuleRestriction {
 			multiplicity 0..1;

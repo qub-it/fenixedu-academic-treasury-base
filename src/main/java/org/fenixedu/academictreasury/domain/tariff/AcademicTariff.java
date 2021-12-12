@@ -209,6 +209,10 @@ public class AcademicTariff extends AcademicTariff_Base {
             throw new AcademicTreasuryDomainException("error.AcademicTariff.urgencyRate.negative");
         }
 
+        if (getMaximumAmount() != null && isNegative(getMaximumAmount())) {
+            throw new AcademicTreasuryDomainException("error.AcademicTariff.maximumAmount.negative");
+        }
+
         if (AcademicTreasuryConstants.HUNDRED_PERCENT.compareTo(getUrgencyRate()) < 0) {
             throw new AcademicTreasuryDomainException("error.AcademicTariff.urgencyRate.greater.than.hundred");
         }

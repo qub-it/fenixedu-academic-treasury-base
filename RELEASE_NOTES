@@ -1,4 +1,5 @@
 - Improvement: Add academic treasury event type
+- Bug Fix: Check of AcademicTariff.maximumAmount is not negative
 
 8.2.0 (25-11-2021)
 - Improvement: Throw exception when create a person customer to a person already with person customer
