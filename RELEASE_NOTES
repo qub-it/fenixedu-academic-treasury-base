@@ -1,3 +1,5 @@
+- Bug Fix: Fix person fiscal number validation, in person customer creation
+
 8.2.1 (12-12-2021)
 - Improvement: Add academic treasury event type
 - Bug Fix: Check of AcademicTariff.maximumAmount is not negative
