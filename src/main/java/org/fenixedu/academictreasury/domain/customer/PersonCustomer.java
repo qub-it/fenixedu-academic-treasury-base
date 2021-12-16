@@ -107,7 +107,7 @@ public class PersonCustomer extends PersonCustomer_Base {
         super.setFiscalNumber(fiscalNumber);
 
         if (!FiscalCodeValidation.isValidFiscalNumber(getAddressCountryCode(), getFiscalNumber())) {
-            throw new AcademicTreasuryDomainException("error.Customer.fiscal.information.invalid");
+            throw new TreasuryDomainException("error.Customer.fiscal.information.invalid");
         }
 
         checkRules();
