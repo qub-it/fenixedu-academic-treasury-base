@@ -95,7 +95,8 @@ public class PersonCustomer extends PersonCustomer_Base {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.person.customer.duplicated");
         }
 
-        if (person.getPersonCustomer() != null) {
+        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        if (services.personCustomer(person) != null) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.person.already.has.person.customer");
         }
 
@@ -106,7 +107,7 @@ public class PersonCustomer extends PersonCustomer_Base {
         super.setFiscalNumber(fiscalNumber);
 
         if (!FiscalCodeValidation.isValidFiscalNumber(getAddressCountryCode(), getFiscalNumber())) {
-            throw new AcademicTreasuryDomainException("error.Customer.fiscal.information.invalid");
+            throw new TreasuryDomainException("error.Customer.fiscal.information.invalid");
         }
 
         checkRules();
@@ -886,7 +887,7 @@ public class PersonCustomer extends PersonCustomer_Base {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.fiscalAddress.countryOfResidence.required");
         }
 
-        if (!Strings.isNullOrEmpty(person.getSocialSecurityNumber())) {
+        if (Strings.isNullOrEmpty(person.getSocialSecurityNumber())) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.fiscalNumber.required");
         }
         

@@ -200,7 +200,7 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
 
     public static Stream<ReservationTaxEventTarget> find(Person person, Product product,
             DegreeCurricularPlan degreeCurricularPlan, ExecutionYear executionYear) {
-        return person.getReservationTaxEventTargetsSet().stream().filter(r -> r.getProduct() == product)
+        return findAll().filter(t -> t.getPerson() == person).filter(r -> r.getProduct() == product)
                 .filter(r -> r.getDegreeCurricularPlan() == degreeCurricularPlan)
                 .filter(r -> r.getExecutionYear() == executionYear);
     }

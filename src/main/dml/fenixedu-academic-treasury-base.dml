@@ -1679,11 +1679,11 @@ class paymentpenalty.PaymentPenaltyEventTarget {
  */
 
 class reservationtax.ReservationTax {
-	LocalizedString name;
+	LocalizedStringAT name;
 	Boolean discountInTuitionFee;
 	Boolean active;
 	Boolean createPaymentReferenceCode;
-	LocalizedString taxReservationDescription;
+	LocalizedStringAT taxReservationDescription;
 }
 
 	relation ReservationTaxDomainRoot {
@@ -1769,7 +1769,7 @@ class reservationtax.ReservationTaxTariff {
 class reservationtax.ReservationTaxEventTarget {
 	Boolean discountInTuitionFee;
 	LocalDate taxReservationDate;
-	LocalizedString taxReservationDescription;
+	LocalizedStringAT taxReservationDescription;
 }
 
 	relation ReservationTaxEventTargetDomainRoot {
