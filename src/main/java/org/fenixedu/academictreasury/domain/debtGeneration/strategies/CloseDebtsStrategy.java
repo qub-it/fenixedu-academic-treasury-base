@@ -181,6 +181,15 @@ public class CloseDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
                 return Lists.newArrayList();
             }
 
+            if (registration.getStudentCurricularPlan(rule.getExecutionYear()) == null) {
+                return Lists.newArrayList();
+            }
+
+            if (!rule.getDegreeCurricularPlansSet()
+                    .contains(registration.getStudentCurricularPlan(rule.getExecutionYear()).getDegreeCurricularPlan())) {
+                return Lists.newArrayList();
+            }
+
             processDebtsForRegistration(rule, registration);
             result.markProcessingEndDateTime();
         } catch (final AcademicTreasuryDomainException e) {
