@@ -1,3 +1,4 @@
+8.2.3 (06-01-2022)
 - Bug Fix: In close debts academic debt generation rules, check if degree curricular plan, active in registration in the execution year, is in the list of DCPs associated with the rule  
 
 8.2.2 (15-12-2021)
