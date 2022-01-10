@@ -88,6 +88,8 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
         academicTreasuryBundle("label.PaymentReportEntryBean.header.closeDate"),
         academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificationDate"),
         academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificateDocumentReference"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.documentObservations"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.documentTermsAndConditions"),
         
     };
  
@@ -129,6 +131,8 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
     
     private String decimalSeparator;
     
+    private String documentObservations;
+    private String documentTermsAndConditions;
     
     public PaymentReportEntryBean(final PaymentEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
@@ -155,6 +159,9 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
             fillStudentInformation(entry);
             
             fillERPInformation(settlementNote);
+            
+            this.documentObservations = entry.getSettlementNote().getDocumentObservations();
+            this.documentTermsAndConditions = entry.getSettlementNote().getDocumentTermsAndConditions();
             
             this.completed = true;
             
@@ -264,6 +271,9 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
             row.createCell(i++).setCellValue(valueOrEmpty(erpCertificationDate));
             row.createCell(i++).setCellValue(valueOrEmpty(erpCertificateDocumentReference));
             
+            row.createCell(i++).setCellValue(valueOrEmpty(this.documentObservations));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.documentTermsAndConditions));
+
         } catch(final Exception e) {
             e.printStackTrace();
             errorsLog.addError(paymentEntry, e);

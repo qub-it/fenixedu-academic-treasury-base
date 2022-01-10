@@ -101,7 +101,9 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
                     academicTreasuryBundle("label.SettlementReportEntryBean.header.degreeType"),
                     academicTreasuryBundle("label.SettlementReportEntryBean.header.degreeCode"),
                     academicTreasuryBundle("label.SettlementReportEntryBean.header.degreeName"),
-                    academicTreasuryBundle("label.SettlementReportEntryBean.header.executionYear"), };
+                    academicTreasuryBundle("label.SettlementReportEntryBean.header.executionYear"),
+                    academicTreasuryBundle("label.SettlementReportEntryBean.header.documentObservations"),
+                    academicTreasuryBundle("label.SettlementReportEntryBean.header.termsAndConditions"), };
 
     private SettlementEntry settlementEntry;
     private SettlementNote settlementNote;
@@ -450,6 +452,9 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
             row.createCell(i++).setCellValue(valueOrEmpty(this.degreeCode));
             row.createCell(i++).setCellValue(valueOrEmpty(this.degreeName));
             row.createCell(i++).setCellValue(valueOrEmpty(this.executionYear));
+
+            row.createCell(i++).setCellValue(valueOrEmpty(this.documentObservations));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.documentTermsAndConditions));
 
         } catch (final Exception e) {
             e.printStackTrace();
