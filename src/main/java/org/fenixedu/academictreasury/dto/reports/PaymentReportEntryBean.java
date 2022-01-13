@@ -162,7 +162,7 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
             
             this.documentObservations = entry.getSettlementNote().getDocumentObservations();
             this.documentTermsAndConditions = entry.getSettlementNote().getDocumentTermsAndConditions();
-            
+
             this.completed = true;
             
         } catch(final Exception e) {
