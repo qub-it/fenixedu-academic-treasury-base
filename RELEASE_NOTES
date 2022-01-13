@@ -1,6 +1,7 @@
 - Bug Fix: Add missing exception labels
 - Bug Fix: Throw correct exception, to translate the message in presentation
 - Bug Fix: Fix person fiscal number validation, in person customer creation
+- Improvement: Export observations and termsAndConditions fields of settlement note
 
 8.2.2 (04-01-2022)
 - Bug Fix: In close debts academic debt generation rules, check if degree curricular plan, active in registration in the execution year, is in the list of DCPs associated with the rule  
