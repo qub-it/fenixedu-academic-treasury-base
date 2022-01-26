@@ -146,8 +146,8 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
 
         if (!target.isPresent()) {
             target = Optional.of(new ReservationTaxEventTarget(finantialEntity, product, person, degreeCurricularPlan,
-                    executionYear,
-                    Boolean.TRUE.equals(reservationTax.getDiscountInTuitionFee()), taxReservationDate, emolumentDescription));
+                    executionYear, Boolean.TRUE.equals(reservationTax.getDiscountInTuitionFee()), taxReservationDate,
+                    emolumentDescription));
         }
 
         Optional<ReservationTaxTariff> tariff =
@@ -162,9 +162,11 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
         LocalDate dueDate = tariff.get().calculateDueDate(taxReservationDate);
 
         DebtBuilderWithAmountAndDueDate debtBuilder = AcademicTreasuryTargetCreateDebtBuilder.createBuilder()
-                .explicitAmountAndDueDate(finantialEntity, product, target.get(), taxReservationDate).setAmount(amount)
-                .setDueDate(dueDate).setCreatePaymentCode(Boolean.TRUE.equals(reservationTax.getCreatePaymentReferenceCode()))
-                .setInterestType(tariff.get().getInterestType()).setInterestFixedAmount(tariff.get().getInterestFixedAmount())
+                .explicitAmountAndDueDate(finantialEntity, product, target.get(), taxReservationDate) //
+                .setAmount(amount) //
+                .setDueDate(dueDate) //
+                .setCreatePaymentCode(Boolean.TRUE.equals(reservationTax.getCreatePaymentReferenceCode())) //
+                .setInterestType(tariff.get().getInterestType()).setInterestFixedAmount(tariff.get().getInterestFixedAmount()) //
                 .setPaymentCodePool((ISibsPaymentCodePoolService) finantialEntity.getFinantialInstitution()
                         .getDefaultDigitalPaymentPlatform());
 
