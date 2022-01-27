@@ -80,7 +80,9 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
             academicTreasuryBundle("label.ReimbursementReportEntryBean.header.vatNumber"),
             academicTreasuryBundle("label.ReimbursementReportEntryBean.header.email"),
             academicTreasuryBundle("label.ReimbursementReportEntryBean.header.address"),
-            academicTreasuryBundle("label.ReimbursementReportEntryBean.header.studentNumber") };
+            academicTreasuryBundle("label.ReimbursementReportEntryBean.header.studentNumber"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.documentObservations"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.documentTermsAndConditions"), };
 
     private ReimbursementEntry paymentEntry;
     private boolean completed;
@@ -116,6 +118,9 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
     
     private String decimalSeparator;
     
+    private String documentObservations;
+    private String documentTermsAndConditions;
+
     public ReimbursementReportEntryBean(final ReimbursementEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
         this.decimalSeparator = request != null ? request.getDecimalSeparator() : DebtReportRequest.DOT;
@@ -141,6 +146,9 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
 
             fillERPInformation(settlementNote);
             
+            this.documentObservations = entry.getSettlementNote().getDocumentObservations();
+            this.documentTermsAndConditions = entry.getSettlementNote().getDocumentTermsAndConditions();
+
             this.completed = true;
 
         } catch (final Exception e) {
@@ -240,6 +248,9 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
             row.createCell(i++).setCellValue(valueOrEmpty(email));
             row.createCell(i++).setCellValue(valueOrEmpty(address));
             row.createCell(i++).setCellValue(valueOrEmpty(studentNumber));
+
+            row.createCell(i++).setCellValue(valueOrEmpty(this.documentObservations));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.documentTermsAndConditions));
 
         } catch (final Exception e) {
             e.printStackTrace();
@@ -520,6 +531,22 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
 
     public void setDecimalSeparator(String decimalSeparator) {
         this.decimalSeparator = decimalSeparator;
+    }
+
+    public String getDocumentObservations() {
+        return documentObservations;
+    }
+
+    public void setDocumentObservations(String documentObservations) {
+        this.documentObservations = documentObservations;
+    }
+
+    public String getDocumentTermsAndConditions() {
+        return documentTermsAndConditions;
+    }
+
+    public void setDocumentTermsAndConditions(String documentTermsAndConditions) {
+        this.documentTermsAndConditions = documentTermsAndConditions;
     }
 
 }

@@ -1,3 +1,5 @@
+- Improvement: Export documentObservations and documentTermsAndConditions in report
+
 8.2.3 (26-01-2022)
 - Bug Fix: Add missing exception labels
 - Bug Fix: Throw correct exception, to translate the message in presentation
