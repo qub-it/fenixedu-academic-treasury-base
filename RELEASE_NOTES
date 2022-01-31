@@ -1,5 +1,6 @@
 - Bug Fix: Add missing exception labels
 - Bug Fix: Throw correct exception, to translate the message in presentation
+- Bug Fix: Export observations and termsAndConditions for reimbursements also. Fix reimbursement report headers.
 
 8.2.4 (10-01-2022)
 - Improvement: Export observations and termsAndConditions fields of settlement note

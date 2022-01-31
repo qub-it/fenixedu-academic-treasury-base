@@ -54,6 +54,7 @@ import org.fenixedu.academictreasury.dto.reports.DebtReportRequestBean;
 import org.fenixedu.academictreasury.dto.reports.PaymentReferenceCodeEntryBean;
 import org.fenixedu.academictreasury.dto.reports.PaymentReportEntryBean;
 import org.fenixedu.academictreasury.dto.reports.ProductReportEntryBean;
+import org.fenixedu.academictreasury.dto.reports.ReimbursementReportEntryBean;
 import org.fenixedu.academictreasury.dto.reports.SettlementReportEntryBean;
 import org.fenixedu.academictreasury.dto.reports.SibsTransactionDetailEntryBean;
 import org.fenixedu.academictreasury.dto.reports.TreasuryExemptionReportEntryBean;
@@ -265,7 +266,7 @@ public class DebtReportRequest extends DebtReportRequest_Base {
                             ExcelSheet.create(paymentEntriesSheetName(), PaymentReportEntryBean.SPREADSHEET_HEADERS,
                                     DebtReportService.paymentEntriesReport(DebtReportRequest.this, errorsLog)),
 
-                            ExcelSheet.create(reimbursementEntriesSheetName(), PaymentReportEntryBean.SPREADSHEET_HEADERS,
+                            ExcelSheet.create(reimbursementEntriesSheetName(), ReimbursementReportEntryBean.SPREADSHEET_HEADERS,
                                     DebtReportService.reimbursementEntriesReport(DebtReportRequest.this, errorsLog)) };
                 }
 

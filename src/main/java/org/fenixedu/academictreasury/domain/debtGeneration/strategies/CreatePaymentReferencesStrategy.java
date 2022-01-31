@@ -62,6 +62,7 @@ import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependent
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
+import org.fenixedu.treasury.domain.ProductGroup;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
@@ -272,11 +273,14 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
     public static Set<DebitEntry> grabDebitEntries(final AcademicDebtGenerationRule rule, final Registration registration) {
         final Set<DebitEntry> debitEntries = Sets.newHashSet();
 
+        AcademicTreasurySettings academicTreasurySettings = AcademicTreasurySettings.getInstance();
+        ProductGroup tuitionProductGroup = academicTreasurySettings.getTuitionProductGroup();
+
         for (final AcademicDebtGenerationRuleEntry entry : rule.getAcademicDebtGenerationRuleEntriesSet()) {
             final Product product = entry.getProduct();
 
             // Check if the product is tuition kind
-            if (AcademicTreasurySettings.getInstance().getTuitionProductGroup() == product.getProductGroup()) {
+            if (tuitionProductGroup == product.getProductGroup()) {
                 DebitEntry grabbedDebitEntry = grabDebitEntryForTuition(rule, registration, entry);
 
                 if (grabbedDebitEntry != null) {
