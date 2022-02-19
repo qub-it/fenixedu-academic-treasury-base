@@ -95,6 +95,7 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
                     academicTreasuryBundle("label.SettlementReportEntryBean.header.identificationNumber"),
                     academicTreasuryBundle("label.SettlementReportEntryBean.header.vatNumber"),
                     academicTreasuryBundle("label.SettlementReportEntryBean.header.email"),
+                    academicTreasuryBundle("label.SettlementReportEntryBean.header.personalEmail"),
                     academicTreasuryBundle("label.SettlementReportEntryBean.header.address"),
                     academicTreasuryBundle("label.SettlementReportEntryBean.header.studentNumber"),
                     academicTreasuryBundle("label.SettlementReportEntryBean.header.closeDate"),
@@ -444,6 +445,7 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
             row.createCell(i++).setCellValue(valueOrEmpty(identificationNumber));
             row.createCell(i++).setCellValue(valueOrEmpty(vatNumber));
             row.createCell(i++).setCellValue(valueOrEmpty(institutionalOrDefaultEmail));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.personalEmail));
             row.createCell(i++).setCellValue(valueOrEmpty(address));
             row.createCell(i++).setCellValue(valueOrEmpty(studentNumber));
             row.createCell(i++).setCellValue(valueOrEmpty(closeDate));

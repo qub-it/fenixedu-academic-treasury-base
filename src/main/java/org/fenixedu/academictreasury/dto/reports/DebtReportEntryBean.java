@@ -96,6 +96,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     academicTreasuryBundle("label.DebtReportEntryBean.header.identificationNumber"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.vatNumber"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.email"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.personalEmail"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.address"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.studentNumber"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.registrationNumber"),
@@ -151,6 +152,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     academicTreasuryBundle("label.DebtReportEntryBean.header.identificationNumber"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.vatNumber"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.email"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.personalEmail"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.address"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.studentNumber"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.registrationNumber"),
@@ -615,6 +617,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 row.createCell(i++).setCellValue(valueOrEmpty(identificationNumber));
                 row.createCell(i++).setCellValue(valueOrEmpty(vatNumber));
                 row.createCell(i++).setCellValue(valueOrEmpty(institutionalOrDefaultEmail));
+                row.createCell(i++).setCellValue(valueOrEmpty(this.personalEmail));
                 row.createCell(i++).setCellValue(valueOrEmpty(address));
                 row.createCell(i++).setCellValue(valueOrEmpty(studentNumber));
                 row.createCell(i++).setCellValue(valueOrEmpty(registrationNumber));
@@ -705,6 +708,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 row.createCell(i++).setCellValue(valueOrEmpty(identificationNumber));
                 row.createCell(i++).setCellValue(valueOrEmpty(vatNumber));
                 row.createCell(i++).setCellValue(valueOrEmpty(institutionalOrDefaultEmail));
+                row.createCell(i++).setCellValue(valueOrEmpty(this.personalEmail));
                 row.createCell(i++).setCellValue(valueOrEmpty(address));
                 row.createCell(i++).setCellValue(valueOrEmpty(studentNumber));
                 row.createCell(i++).setCellValue(valueOrEmpty(registrationNumber));
