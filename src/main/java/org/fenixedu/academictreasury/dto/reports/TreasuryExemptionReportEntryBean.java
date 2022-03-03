@@ -93,7 +93,7 @@ public class TreasuryExemptionReportEntryBean extends AbstractReportEntryBean {
             this.debitEntryId = treasuryExemption.getDebitEntry().getExternalId();
             this.debitEntryDescription = treasuryExemption.getDebitEntry().getDescription();
             this.exemptedAmount =
-                    treasuryExemption.getDebitEntry().getCurrency().getValueFor(treasuryExemption.getValueToExempt());
+                    treasuryExemption.getDebitEntry().getCurrency().getValueFor(treasuryExemption.getNetAmountToExempt());
             
             if(DebtReportRequest.COMMA.equals(decimalSeparator)) {
                 this.exemptedAmount = this.exemptedAmount.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
