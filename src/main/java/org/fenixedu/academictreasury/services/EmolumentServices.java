@@ -313,7 +313,7 @@ public class EmolumentServices {
         if (academicTresuryEvent.isChargedWithDebitEntry()) {
             //Old amount has the amount plus the credit amount plus the direct exempted amount
             BigDecimal oldtotalAmount = academicTresuryEvent.getAmountToPay().add(academicTresuryEvent.getCreditAmount())
-                    .add(DebitEntry.findActive(academicTresuryEvent).map(l -> l.getExemptedAmount()).reduce((a, b) -> a.add(b))
+                    .add(DebitEntry.findActive(academicTresuryEvent).map(l -> l.getNetExemptedAmount()).reduce((a, b) -> a.add(b))
                             .orElse(BigDecimal.ZERO));
             BigDecimal newTotalAmount = academicTariff.amountToPay(academicTresuryEvent);
             //Do nothing, since the value is the same

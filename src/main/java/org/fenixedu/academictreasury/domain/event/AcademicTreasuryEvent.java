@@ -1483,9 +1483,9 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
         final DebitEntry debitEntry = orderedTuitionDebitEntriesList().get(installmentOrder);
 
-        BigDecimal result = debitEntry.getExemptedAmount();
+        BigDecimal result = debitEntry.getNetExemptedAmount();
         result = result.add(debitEntry.getCreditEntriesSet().stream().filter(l -> l.isFromExemption())
-                .map(l -> l.getAmountWithVat()).reduce((a, b) -> a.add(b)).orElse(BigDecimal.ZERO));
+                .map(l -> l.getNetAmount()).reduce((a, b) -> a.add(b)).orElse(BigDecimal.ZERO));
 
         return result;
     }
