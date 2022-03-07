@@ -54,7 +54,7 @@ public class ExemptionsGenerationRowResult {
     private ExecutionYear executionYear;
     private TreasuryEvent treasuryEvent;
     private DebitEntry debitEntry;
-    private BigDecimal amountToExempt;
+    private BigDecimal netAmountToExempt;
 
     private String reason;
 
@@ -69,7 +69,7 @@ public class ExemptionsGenerationRowResult {
         this.executionYear = executionYear;
         this.treasuryEvent = treasuryEvent;
         this.debitEntry = debitEntry;
-        this.amountToExempt = amountToExempt;
+        this.netAmountToExempt = amountToExempt;
         this.reason = reason;
         this.tuitionInstallmentsOrderSet = tuitionInstallmentsOrderSet;
     }
@@ -116,7 +116,7 @@ public class ExemptionsGenerationRowResult {
     }
     
     private BigDecimal calculateDebitEntryDiscount(final DebitEntry debitEntry) {
-        return amountToExempt;
+        return netAmountToExempt;
     }
 
     // @formatter:off
@@ -152,8 +152,14 @@ public class ExemptionsGenerationRowResult {
         return debitEntry;
     }
 
+    @Deprecated
+    // TODO: Replace by ::getNetAmountToExempt and remove this method
     public BigDecimal getAmountToExempt() {
-        return amountToExempt;
+        return netAmountToExempt;
+    }
+
+    public BigDecimal getNetAmountToExempt() {
+        return getAmountToExempt();
     }
 
     public String getReason() {
