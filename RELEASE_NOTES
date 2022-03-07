@@ -1,3 +1,4 @@
+8.2.5 (07-03-2022)
 - Bug fix: Remove RC module version dependency
 - Refactor: Mark TreasuryExemption::valueToExempt as deprecated and replace with TreasuryExemption.netAmountToExempt
 - Refactor: Mark DebitEntry::exemptedAmount as deprecated and replace with DebitEntry::netExemptedAmount
