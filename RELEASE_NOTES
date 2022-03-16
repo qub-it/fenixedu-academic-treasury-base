@@ -1,3 +1,4 @@
+8.3.0 (16-03-2022)
 - Refactor: Mark ExemptionsGenerationRowResult::exemptedAmount as deprecated and replace with ExemptionsGenerationRowResult::netExemptedAmount
 - Improvement: Global setting to enable/disable academic debt generation rules periodic execution
 - Improvement: Support callbacks for each academic debt generation rule execution. An example of callback is the progress bar to trigger the execution in UI
