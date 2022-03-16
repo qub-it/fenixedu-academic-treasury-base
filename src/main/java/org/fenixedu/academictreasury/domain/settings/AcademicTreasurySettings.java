@@ -65,6 +65,7 @@ public class AcademicTreasurySettings extends AcademicTreasurySettings_Base {
         setImprovementAcademicTax(improvementAcademicTax);
         setCloseServiceRequestEmolumentsWithDebitNote(closeServiceRequestEmolumentsWithDebitNote);
         setRunAcademicDebtGenerationRuleOnNormalEnrolment(runAcademicDebtGenerationRuleOnNormalEnrolment);
+        setDebtGenerationRulesPeriodicExecutionActive(true);
     }
 
     @Atomic
@@ -109,6 +110,18 @@ public class AcademicTreasurySettings extends AcademicTreasurySettings_Base {
         } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void activateDebtGenerationRulesPeriodicExecution() {
+        setDebtGenerationRulesPeriodicExecutionActive(true);
+    }
+
+    public void inactivateDebtGenerationRulesPeriodicExecution() {
+        setDebtGenerationRulesPeriodicExecutionActive(false);
+    }
+
+    public boolean isDebtGenerationRulesPeriodicExecutionActive() {
+        return Boolean.TRUE.equals(getDebtGenerationRulesPeriodicExecutionActive());
     }
 
     // @formatter: off

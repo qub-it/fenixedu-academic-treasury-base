@@ -45,6 +45,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -541,19 +542,35 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     }
 
     public static List<AcademicDebtGenerationProcessingResult> runAllActive(final boolean runOnlyWithBackgroundExecution) {
+        return runAllActive(runOnlyWithBackgroundExecution, null, null, null);
+    }
+
+    public static List<AcademicDebtGenerationProcessingResult> runAllActive(final boolean runOnlyWithBackgroundExecution,
+            Consumer<List<AcademicDebtGenerationProcessingResult>> ruleExecutionCallback,
+            AcademicDebtGenerationRuleType typeArg,
+            ExecutionYear executionYearArg) {
         final List<Future<List<AcademicDebtGenerationProcessingResult>>> futureList = Lists.newArrayList();
 
         final ExecutorService exService = Executors.newSingleThreadExecutor();
         for (final AcademicDebtGenerationRuleType type : AcademicDebtGenerationRuleType.findAll()
                 .sorted(AcademicDebtGenerationRuleType.COMPARE_BY_ORDER_NUMBER).collect(Collectors.toList())) {
+            
+            if(typeArg != null && typeArg != type) {
+                continue;
+            }
+            
             for (final AcademicDebtGenerationRule academicDebtGenerationRule : AcademicDebtGenerationRule.findActiveByType(type)
                     .sorted(COMPARE_BY_ORDER_NUMBER).collect(Collectors.toList())) {
+
+                if (executionYearArg != null && academicDebtGenerationRule.getExecutionYear() != executionYearArg) {
+                    continue;
+                }
 
                 if (runOnlyWithBackgroundExecution && !academicDebtGenerationRule.isBackgroundExecution()) {
                     continue;
                 }
 
-                final RuleCallable exec = new RuleCallable(academicDebtGenerationRule);
+                final RuleCallable exec = new RuleCallable(academicDebtGenerationRule, ruleExecutionCallback);
                 futureList.add(exService.submit(exec));
             }
         }
@@ -585,7 +602,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
                     continue;
                 }
 
-                final RuleCallable exec = new RuleCallable(academicDebtGenerationRule, registration);
+                final RuleCallable exec = new RuleCallable(academicDebtGenerationRule, registration, null);
                 futureList.add(exService.submit(exec));
             }
         }
@@ -621,7 +638,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
                     continue;
                 }
 
-                final RuleCallable exec = new RuleCallable(academicDebtGenerationRule, registration);
+                final RuleCallable exec = new RuleCallable(academicDebtGenerationRule, registration, null);
                 futureList.add(exService.submit(exec));
             }
         }
@@ -648,7 +665,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
 
         final ExecutorService exService = Executors.newSingleThreadExecutor();
 
-        final RuleCallable exec = new RuleCallable(rule);
+        final RuleCallable exec = new RuleCallable(rule, null);
         try {
             return exService.submit(exec).get();
         } catch (InterruptedException | ExecutionException e) {
@@ -675,13 +692,21 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         private String academicDebtGenerationRuleId;
         private String registrationId;
 
-        public RuleCallable(final AcademicDebtGenerationRule rule) {
+        private Consumer<List<AcademicDebtGenerationProcessingResult>> ruleExecutionCallback;
+
+        public RuleCallable(AcademicDebtGenerationRule rule,
+                Consumer<List<AcademicDebtGenerationProcessingResult>> ruleExecutionCallback) {
             this.academicDebtGenerationRuleId = rule.getExternalId();
+
+            this.ruleExecutionCallback = ruleExecutionCallback;
         }
 
-        public RuleCallable(final AcademicDebtGenerationRule rule, final Registration registration) {
+        public RuleCallable(AcademicDebtGenerationRule rule, Registration registration,
+                Consumer<List<AcademicDebtGenerationProcessingResult>> ruleExecutionCallback) {
             this.academicDebtGenerationRuleId = rule.getExternalId();
             this.registrationId = registration.getExternalId();
+
+            this.ruleExecutionCallback = ruleExecutionCallback;
         }
 
         @Override
@@ -709,6 +734,10 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
                 e.printStackTrace();
             }
 
+            if(ruleExecutionCallback != null) {
+                ruleExecutionCallback.accept(result);
+            }
+            
             return result;
         }
     }
