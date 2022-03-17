@@ -42,6 +42,7 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
 import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
@@ -117,9 +118,11 @@ public class IngressionTypeConditionRule extends IngressionTypeConditionRule_Bas
         for (String s : split) {
             IngressionType value =
                     IngressionType.findAllByPredicate(i -> i.getLocalizedName().equals(s)).findFirst().orElse(null);
+
             if (value == null) {
-                throw new IllegalArgumentException();
+                throw new AcademicTreasuryDomainException("error.IngressionTypeConditionRule.ingressionType.invalid", s);
             }
+
             addIngression(value);
         }
     }

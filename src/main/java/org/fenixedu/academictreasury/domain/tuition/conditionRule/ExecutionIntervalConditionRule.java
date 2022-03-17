@@ -43,6 +43,7 @@ import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
@@ -146,9 +147,12 @@ public class ExecutionIntervalConditionRule extends ExecutionIntervalConditionRu
             // For now to compile set ExecutionInterval = null;
 
             ExecutionInterval value = b.getChildIntervals().stream().filter(i -> i.getName().equals(s)).findFirst().orElse(null);
+
             if (value == null) {
-                throw new IllegalArgumentException();
+                throw new AcademicTreasuryDomainException("error.ExecutionIntervalConditionRule.executionInterval.invalid",
+                        s);
             }
+
             addExecutionInterval(value);
         }
     }

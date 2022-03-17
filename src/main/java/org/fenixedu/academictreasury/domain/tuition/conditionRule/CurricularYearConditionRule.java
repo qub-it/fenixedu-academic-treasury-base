@@ -42,6 +42,7 @@ import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
 import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
@@ -116,9 +117,11 @@ public class CurricularYearConditionRule extends CurricularYearConditionRule_Bas
         for (String s : split) {
             CurricularYear readByYear = services.readAllCurricularYearsSet().stream()
                     .filter(c -> c.getYear().toString().equals(s)).findFirst().orElse(null); //CurricularYear.readByYear(Integer.getInteger(s));
+
             if (readByYear == null) {
-                throw new IllegalArgumentException();
+                throw new AcademicTreasuryDomainException("error.CurricularYearConditionRule.curricularYear.invalid", s);
             }
+
             addCurricularYear(readByYear);
         }
     }

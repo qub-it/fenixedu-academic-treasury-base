@@ -45,6 +45,7 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.StatuteType;
+import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
 import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
@@ -134,8 +135,9 @@ public class StatuteTypeConditionRule extends StatuteTypeConditionRule_Base {
             StatuteType value = academicTreasuryServices.readAllStatuteTypesSet().stream()
                     .filter(statute -> academicTreasuryServices.localizedNameOfStatuteType(statute).equals(s)).findFirst()
                     .orElse(null);
+
             if (value == null) {
-                throw new IllegalArgumentException();
+                throw new AcademicTreasuryDomainException("error.StatuteTypeConditionRule.statute.invalid", s);
             }
             addStatuteType(value);
         }

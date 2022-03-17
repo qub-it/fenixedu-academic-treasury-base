@@ -46,6 +46,7 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationRegimeType;
+import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
 import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
@@ -101,10 +102,6 @@ public class RegistrationRegimeTypeConditionRule extends RegistrationRegimeTypeC
         }
         return result;
     }
-
-//    public void setRegistrationRegimeTypes(Set<RegistrationRegimeType> types) {
-//        setRegistrationRegimeTypesSerialized(types.stream().map(type -> type.getName()).collect(Collectors.joining(",")));
-//    }
 
     public void addRegistrationRegimeTypes(RegistrationRegimeType type) {
         Set<RegistrationRegimeType> registrationRegimeTypes = getRegimeTypesConverted();
@@ -176,9 +173,12 @@ public class RegistrationRegimeTypeConditionRule extends RegistrationRegimeTypeC
         for (String s : split) {
             RegistrationRegimeType value = Arrays.asList(RegistrationRegimeType.values()).stream()
                     .filter(r -> r.getLocalizedName().equals(s)).findFirst().orElse(null);
+
             if (value == null) {
-                throw new IllegalArgumentException();
+                throw new AcademicTreasuryDomainException("error.RegistrationRegimeTypeConditionRule.registrationRegime.invalid",
+                        s);
             }
+
             addRegistrationRegimeTypes(value);
         }
     }

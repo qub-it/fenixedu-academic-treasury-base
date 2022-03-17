@@ -45,6 +45,7 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationProtocol;
+import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
 import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
@@ -127,9 +128,12 @@ public class RegistrationProtocolConditionRule extends RegistrationProtocolCondi
         String[] split = string.split("\\|");
         for (String s : split) {
             RegistrationProtocol value = func.apply(s);
+
             if (value == null) {
-                throw new IllegalArgumentException();
+                throw new AcademicTreasuryDomainException("error.RegistrationProtocolConditionRule.registrationProtocol.invalid",
+                        s);
             }
+
             addRegistrationProtocol(value);
         }
     }

@@ -39,6 +39,7 @@ import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionAnnotation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
 import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
@@ -113,7 +114,8 @@ public class FirstTimeStudentConditionRule extends FirstTimeStudentConditionRule
             setFirstTimeStudent(Boolean.FALSE);
             return;
         }
-        throw new IllegalArgumentException();
+
+        throw new AcademicTreasuryDomainException("error.FirstTimeStudentConditionRule.value.invalid", value);
     }
 
 }
