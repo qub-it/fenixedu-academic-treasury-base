@@ -1,3 +1,4 @@
+8.3.1 (17-03-2022)
 - Bug Fix: Throw exception with the error description, when a value cannot be translated in tuition payment plan rule condition
 
 8.3.0 (16-03-2022)
