@@ -1,3 +1,6 @@
+- Improvement: Add reimbursement state in reimbursements report
+- Improvement: Add more fields to treasury exemption reports
+
 8.2.5 (31-01-2022)
 - Bug Fix: Add missing exception labels
 - Bug Fix: Throw correct exception, to translate the message in presentation

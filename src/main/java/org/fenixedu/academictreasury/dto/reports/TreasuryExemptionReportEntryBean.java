@@ -38,14 +38,28 @@ package org.fenixedu.academictreasury.dto.reports;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import org.apache.poi.ss.usermodel.Row;
+import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
+import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
+import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
+import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent.AcademicTreasuryEventKeys;
 import org.fenixedu.academictreasury.domain.reports.DebtReportRequest;
 import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
+import org.fenixedu.academictreasury.domain.serviceRequests.ITreasuryServiceRequest;
+import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
+import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
+import org.fenixedu.treasury.domain.Customer;
+import org.fenixedu.treasury.domain.document.CreditEntry;
+import org.fenixedu.treasury.domain.document.DebitEntry;
+import org.fenixedu.treasury.domain.document.InvoiceEntry;
+import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
 import org.joda.time.DateTime;
+
+import com.google.common.base.Strings;
 
 public class TreasuryExemptionReportEntryBean extends AbstractReportEntryBean {
 
@@ -56,21 +70,53 @@ public class TreasuryExemptionReportEntryBean extends AbstractReportEntryBean {
             academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.customerId"),
             academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.debtAccountId"),
             academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.customerName"),
+            academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.identificationType"),
+            academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.identificationNumber"),
+            academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.vatNumber"),
+            academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.studentNumber"),
+            academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.registrationNumber"),
             academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.debitEntryId"),
+            academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.documentNumber"),
             academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.debitEntryDescription"),
             academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.exemptedAmount"),
-            academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.reason") };
+            academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.exemptionType.code"), 
+            academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.exemptionType.description"), 
+            academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.reason"),
+            academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.degreeType"),
+            academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.degreeCode"),
+            academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.degreeName"),
+            academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.executionYear"),
+            academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.executionSemester"),
+            };
 
     private String identification;
+    
     private String versioningCreator;
     private DateTime creationDate;
+    
     private String customerId;
-    private String customerName;
     private String debtAccountId;
+    private String customerName;    
+    private String identificationType;
+    private String identificationNumber;
+    private String vatNumber;
+    private Integer studentNumber;
+    private Integer registrationNumber;
+    
     private String debitEntryId;
+    private String documentNumber;
     private String debitEntryDescription;
     private String exemptedAmount;
+    
+    private String exemptionTypeCode;
+    private String exemptionTypeDescription;
     private String reason;
+    
+    private String degreeType;
+    private String degreeCode;
+    private String degreeName;
+    private String executionYear;
+    private String executionSemester;
 
     private TreasuryExemption treasuryExemption;
 
@@ -85,13 +131,36 @@ public class TreasuryExemptionReportEntryBean extends AbstractReportEntryBean {
             this.treasuryExemption = treasuryExemption;
 
             this.identification = treasuryExemption.getExternalId();
+            
             this.versioningCreator = treasuryServices.versioningCreatorUsername(treasuryExemption);
             this.creationDate = treasuryServices.versioningCreationDate(treasuryExemption);
+            
             this.customerId = treasuryExemption.getDebitEntry().getDebtAccount().getCustomer().getExternalId();
-            this.customerName = treasuryExemption.getDebitEntry().getDebtAccount().getCustomer().getName();
             this.debtAccountId = treasuryExemption.getDebitEntry().getDebtAccount().getExternalId();
+            this.customerName = treasuryExemption.getDebitEntry().getDebtAccount().getCustomer().getName();
+
+            Customer customer = treasuryExemption.getDebitEntry().getDebtAccount().getCustomer();
+            
+            if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null
+                    && ((PersonCustomer) customer).getAssociatedPerson().getIdDocumentType() != null) {
+                this.identificationType = ((PersonCustomer) customer).getAssociatedPerson().getIdDocumentType().getLocalizedName();
+            }
+
+            this.identificationNumber = customer.getIdentificationNumber();
+            this.vatNumber = customer.getUiFiscalNumber();
+
+            if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null
+                    && ((PersonCustomer) customer).getAssociatedPerson().getStudent() != null) {
+                this.studentNumber = ((PersonCustomer) customer).getAssociatedPerson().getStudent().getNumber();
+            }
+            
             this.debitEntryId = treasuryExemption.getDebitEntry().getExternalId();
             this.debitEntryDescription = treasuryExemption.getDebitEntry().getDescription();
+
+            if (treasuryExemption.getDebitEntry().getFinantialDocument() != null) {
+                this.documentNumber = treasuryExemption.getDebitEntry().getFinantialDocument().getUiDocumentNumber();
+            }
+            
             this.exemptedAmount =
                     treasuryExemption.getDebitEntry().getCurrency().getValueFor(treasuryExemption.getValueToExempt());
             
@@ -99,8 +168,13 @@ public class TreasuryExemptionReportEntryBean extends AbstractReportEntryBean {
                 this.exemptedAmount = this.exemptedAmount.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
             }
             
+            this.exemptionTypeCode = treasuryExemption.getTreasuryExemptionType().getCode();
+            this.exemptionTypeDescription = treasuryExemption.getTreasuryExemptionType().getName().getContent();
+            
             this.reason = treasuryExemption.getReason();
 
+            fillAcademicInformation(treasuryExemption.getDebitEntry());
+            
             this.completed = true;
         } catch (final Exception e) {
             e.printStackTrace();
@@ -108,7 +182,126 @@ public class TreasuryExemptionReportEntryBean extends AbstractReportEntryBean {
         }
 
     }
+    
+    private void fillAcademicInformation(final InvoiceEntry entry) {
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
+        final DebitEntry debitEntry = entry.isDebitNoteEntry() ? (DebitEntry) entry : ((CreditEntry) entry).getDebitEntry();
+
+        if (debitEntry != null) {
+
+            // Degree && ExecutionYear && ExecutionInterval
+            if (debitEntry.getTreasuryEvent() != null && debitEntry.getTreasuryEvent() instanceof AcademicTreasuryEvent) {
+                final AcademicTreasuryEvent academicTreasuryEvent = (AcademicTreasuryEvent) debitEntry.getTreasuryEvent();
+
+                if (academicTreasuryEvent.isForRegistrationTuition()) {
+                    this.registrationNumber = academicTreasuryEvent.getRegistration().getNumber();
+                    this.degreeType = academicTreasuryServices
+                            .localizedNameOfDegreeType(academicTreasuryEvent.getRegistration().getDegree().getDegreeType());
+                    this.degreeCode = academicTreasuryEvent.getRegistration().getDegree().getCode();
+                    this.degreeName = academicTreasuryEvent.getRegistration().getDegree().getPresentationName();
+                    this.executionYear = academicTreasuryEvent.getExecutionYear().getQualifiedName();
+
+                } else if (academicTreasuryEvent.isForStandaloneTuition()
+                        || academicTreasuryEvent.isForExtracurricularTuition()) {
+                    if (debitEntry.getCurricularCourse() != null) {
+                        this.degreeType = academicTreasuryServices
+                                .localizedNameOfDegreeType(debitEntry.getCurricularCourse().getDegree().getDegreeType());
+                        this.degreeCode = debitEntry.getCurricularCourse().getDegree().getCode();
+                        this.degreeName = debitEntry.getCurricularCourse().getDegree().getPresentationName();
+                    }
+
+                    if (debitEntry.getExecutionSemester() != null) {
+                        this.executionYear = academicTreasuryServices().executionYearOfExecutionSemester(debitEntry.getExecutionSemester()).getQualifiedName();
+                        this.executionSemester = debitEntry.getExecutionSemester().getQualifiedName();
+                    }
+
+                } else if (academicTreasuryEvent.isForImprovementTax()) {
+                    if (debitEntry.getCurricularCourse() != null) {
+                        this.degreeType = academicTreasuryServices
+                                .localizedNameOfDegreeType(debitEntry.getCurricularCourse().getDegree().getDegreeType());
+                        this.degreeCode = debitEntry.getCurricularCourse().getDegree().getCode();
+                        this.degreeName = debitEntry.getCurricularCourse().getDegree().getPresentationName();
+                    }
+
+                    if (debitEntry.getExecutionSemester() != null) {
+                        this.executionYear = academicTreasuryServices().executionYearOfExecutionSemester(debitEntry.getExecutionSemester()).getQualifiedName();
+                        this.executionSemester = debitEntry.getExecutionSemester().getQualifiedName();
+                    }
+
+                } else if (academicTreasuryEvent.isForAcademicTax()) {
+
+                    this.registrationNumber = academicTreasuryEvent.getRegistration().getNumber();
+                    this.degreeType = academicTreasuryServices
+                            .localizedNameOfDegreeType(academicTreasuryEvent.getRegistration().getDegree().getDegreeType());
+                    this.degreeCode = academicTreasuryEvent.getRegistration().getDegree().getCode();
+                    this.degreeName = academicTreasuryEvent.getRegistration().getDegree().getPresentationName();
+                    this.executionYear = academicTreasuryEvent.getExecutionYear().getQualifiedName();
+
+
+                } else if (academicTreasuryEvent.isForAcademicServiceRequest()) {
+
+                    final ITreasuryServiceRequest iTreasuryServiceRequest = academicTreasuryEvent.getITreasuryServiceRequest();
+
+                    this.registrationNumber = iTreasuryServiceRequest.getRegistration().getNumber();
+                    this.degreeType = academicTreasuryServices
+                            .localizedNameOfDegreeType(iTreasuryServiceRequest.getRegistration().getDegree().getDegreeType());
+                    this.degreeCode = iTreasuryServiceRequest.getRegistration().getDegree().getCode();
+                    this.degreeName = iTreasuryServiceRequest.getRegistration().getDegree().getPresentationName();
+
+                    if (iTreasuryServiceRequest.hasExecutionYear()) {
+                        this.executionYear = iTreasuryServiceRequest.getExecutionYear().getQualifiedName();
+                    }
+                } else if (academicTreasuryEvent.isForTreasuryEventTarget()) {
+                    final IAcademicTreasuryTarget treasuryEventTarget =
+                            (IAcademicTreasuryTarget) academicTreasuryEvent.getTreasuryEventTarget();
+
+                    if (treasuryEventTarget.getAcademicTreasuryTargetRegistration() != null) {
+                        this.registrationNumber = treasuryEventTarget.getAcademicTreasuryTargetRegistration().getNumber();
+                        this.degreeType = treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree().getDegreeType()
+                                .getName().getContent();
+                        this.degreeCode = treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree().getCode();
+                        this.degreeName =
+                                treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree().getPresentationName();
+                    }
+
+                    if (treasuryEventTarget.getAcademicTreasuryTargetExecutionYear() != null) {
+                        this.executionYear = treasuryEventTarget.getAcademicTreasuryTargetExecutionYear().getQualifiedName();
+                    }
+
+                    if (treasuryEventTarget.getAcademicTreasuryTargetExecutionSemester() != null) {
+                        this.executionSemester =
+                                treasuryEventTarget.getAcademicTreasuryTargetExecutionSemester().getQualifiedName();
+                    }
+                }
+
+            } else if (debitEntry.getTreasuryEvent() != null) {
+                final TreasuryEvent treasuryEvent = debitEntry.getTreasuryEvent();
+
+                if (!Strings.isNullOrEmpty(treasuryEvent.getDegreeCode())) {
+                    this.degreeCode = treasuryEvent.getDegreeCode();
+                }
+
+                if (!Strings.isNullOrEmpty(treasuryEvent.getDegreeName())) {
+                    this.degreeName = treasuryEvent.getDegreeName();
+                }
+
+                if (!Strings.isNullOrEmpty(treasuryEvent.getExecutionYearName())) {
+                    this.executionYear = treasuryEvent.getExecutionYearName();
+                }
+            }
+
+            if (Strings.isNullOrEmpty(this.degreeCode)) {
+                this.degreeCode = debitEntry.getDegreeCode();
+            }
+
+            if (Strings.isNullOrEmpty(this.executionYear)) {
+                this.executionYear = debitEntry.getExecutionYearName();
+            }
+        }
+    }
+    
     @Override
     public void writeCellValues(final Row row, final IErrorsLog ierrorsLog) {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
@@ -125,18 +318,39 @@ public class TreasuryExemptionReportEntryBean extends AbstractReportEntryBean {
 
             row.createCell(i++).setCellValue(valueOrEmpty(versioningCreator));
             row.createCell(i++).setCellValue(valueOrEmpty(creationDate));
+            
             row.createCell(i++).setCellValue(valueOrEmpty(customerId));
             row.createCell(i++).setCellValue(valueOrEmpty(debtAccountId));
             row.createCell(i++).setCellValue(valueOrEmpty(customerName));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.identificationType));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.identificationNumber));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.vatNumber));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.studentNumber));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.registrationNumber));
+            
             row.createCell(i++).setCellValue(valueOrEmpty(debitEntryId));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.documentNumber));
             row.createCell(i++).setCellValue(valueOrEmpty(debitEntryDescription));
             row.createCell(i++).setCellValue(valueOrEmpty(exemptedAmount));
+            
+            row.createCell(i++).setCellValue(valueOrEmpty(this.exemptionTypeCode));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.exemptionTypeDescription));
             row.createCell(i++).setCellValue(valueOrEmpty(reason));
-
+            
+            row.createCell(i++).setCellValue(valueOrEmpty(degreeType));
+            row.createCell(i++).setCellValue(valueOrEmpty(degreeCode));
+            row.createCell(i++).setCellValue(valueOrEmpty(degreeName));
+            row.createCell(i++).setCellValue(valueOrEmpty(executionYear));
+            row.createCell(i++).setCellValue(valueOrEmpty(executionSemester));
+            
         } catch (final Exception e) {
             e.printStackTrace();
             errorsLog.addError(this.treasuryExemption, e);
         }
+    }
+
+    private IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
+        return AcademicTreasuryPlataformDependentServicesFactory.implementation();
     }
 
 }
