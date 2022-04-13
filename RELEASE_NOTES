@@ -1,3 +1,6 @@
+- Refactor: Read label from bundle in static block, to catch and print any errors that might occur (#UL-FC-3159)
+- Refactor: Declare method to get Customer::code attribute from PersonCustomer. This method is just to check that codes are set right 
+
 8.3.1 (17-03-2022)
 - Bug Fix: Throw exception with the error description, when a value cannot be translated in tuition payment plan rule condition
 

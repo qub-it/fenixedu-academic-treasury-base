@@ -167,9 +167,16 @@ public class PersonCustomer extends PersonCustomer_Base {
         }
     }
 
+    // TODO: Remove both ::getCode and ::getCodeFromSuper when all Customer::code are set for PersonCustomer
+    // in all instances
+    
     @Override
     public String getCode() {
         return this.getExternalId();
+    }
+    
+    public String getCodeFromSuper() {
+        return super.getCode();
     }
 
     public Person getAssociatedPerson() {

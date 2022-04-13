@@ -75,28 +75,39 @@ public class AcademicTreasuryConstants {
     // HACK: org.joda.time.Interval does not allow open end dates so use this date in the future
     public static final DateTime INFINITY_DATE = new DateTime().plusYears(500);
 
-    public static final TreasuryTupleDataSourceBean SELECT_OPTION =
-            new TreasuryTupleDataSourceBean("", academicTreasuryBundle("label.TreasuryTupleDataSourceBean.select.description"));
+    public static final TreasuryTupleDataSourceBean SELECT_OPTION;
 
-    
+    static {
+        SELECT_OPTION = new TreasuryTupleDataSourceBean();
+        SELECT_OPTION.setId("");
+        
+        try {
+            SELECT_OPTION.setText(academicTreasuryBundle("label.TreasuryTupleDataSourceBean.select.description"));
+        } catch(Throwable t) {
+            t.printStackTrace();
+            
+            SELECT_OPTION.setText("Select Option");
+        }
+    }
+
     // @formatter:off
     /* *************
      * COUNTRY UTILS
      * *************
      * */
     // @formatter:on
-    
+
     public static final Locale DEFAULT_LANGUAGE = new Locale("PT");
     public static final String DEFAULT_COUNTRY = "PT";
 
     public static final Locale ENGLISH_LANGUAGE = new Locale("EN");
-   
+
     @Deprecated
     // Use TreasuryConstants
     public static boolean isForeignLanguage(final Locale language) {
         return !language.getLanguage().equals(DEFAULT_LANGUAGE.getLanguage());
     }
-    
+
     @Deprecated
     // Use TreasuryConstants
     public static boolean isDefaultCountry(final String country) {
@@ -106,7 +117,7 @@ public class AcademicTreasuryConstants {
 
         return DEFAULT_COUNTRY.equals(country.toUpperCase());
     }
-   
+
     // @formatter: off
     /**************
      * MATH UTILS *
@@ -146,15 +157,16 @@ public class AcademicTreasuryConstants {
     public static String academicTreasuryBundle(final String key, final String... args) {
         return TreasuryPlataformDependentServicesFactory.implementation().bundle(AcademicTreasuryConstants.BUNDLE, key, args);
     }
-    
+
     public static String academicTreasuryBundle(final Locale locale, final String key, final String... args) {
-        return TreasuryPlataformDependentServicesFactory.implementation().bundle(locale, AcademicTreasuryConstants.BUNDLE, key, args);
+        return TreasuryPlataformDependentServicesFactory.implementation().bundle(locale, AcademicTreasuryConstants.BUNDLE, key,
+                args);
     }
 
     public static LocalizedString academicTreasuryBundleI18N(final String key, final String... args) {
         return TreasuryPlataformDependentServicesFactory.implementation().bundleI18N(AcademicTreasuryConstants.BUNDLE, key, args);
     }
-    
+
     public static Set<Locale> supportedLocales() {
         return TreasuryPlataformDependentServicesFactory.implementation().availableLocales();
     }
