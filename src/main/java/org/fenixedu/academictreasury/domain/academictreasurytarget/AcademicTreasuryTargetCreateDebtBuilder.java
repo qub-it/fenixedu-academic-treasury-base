@@ -138,7 +138,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             var documentNumberSeries =
                     DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
             var now = new DateTime();
-            var vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, when.toDateTimeAtStartOfDay()).get();
+            var vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, new DateTime()).get();
             var person = target.getAcademicTreasuryTargetPerson();
 
             var personCustomer = AcademicTreasuryPlataformDependentServicesFactory.implementation().personCustomer(person);
@@ -256,7 +256,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             var documentNumberSeries =
                     DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
             var now = new DateTime();
-            var vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, when.toDateTimeAtStartOfDay()).get();
+            var vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, new DateTime()).get();
             var administrativeOffice = finantialEntity.getAdministrativeOffice();
             var person = target.getAcademicTreasuryTargetPerson();
 

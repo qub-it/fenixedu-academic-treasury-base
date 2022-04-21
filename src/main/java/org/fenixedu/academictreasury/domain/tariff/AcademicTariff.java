@@ -110,12 +110,11 @@ public class AcademicTariff extends AcademicTariff_Base {
     protected void init(final FinantialEntity finantialEntity, final Product product, final AcademicTariffBean bean) {
 
         super.init(finantialEntity, product, bean.getBeginDate().toDateTimeAtStartOfDay(),
-                bean.getEndDate() != null ? bean.getEndDate().toDateTimeAtStartOfDay().plusDays(1).minusSeconds(1) : null, 
-                bean.getDueDateCalculationType(),
-                bean.getFixedDueDate() != null ? bean.getFixedDueDate() : null, bean.getNumberOfDaysAfterCreationForDueDate(),
-                bean.isApplyInterests(), bean.getInterestType(), bean.getNumberOfDaysAfterDueDate(), bean.isApplyInFirstWorkday(),
-                bean.getMaximumDaysToApplyPenalty(), bean.getInterestFixedAmount(),
-                bean.getRate());
+                bean.getEndDate() != null ? bean.getEndDate().toDateTimeAtStartOfDay().plusDays(1).minusSeconds(1) : null,
+                bean.getDueDateCalculationType(), bean.getFixedDueDate() != null ? bean.getFixedDueDate() : null,
+                bean.getNumberOfDaysAfterCreationForDueDate(), bean.isApplyInterests(), bean.getInterestType(),
+                bean.getNumberOfDaysAfterDueDate(), bean.isApplyInFirstWorkday(), bean.getMaximumDaysToApplyPenalty(),
+                bean.getInterestFixedAmount(), bean.getRate());
 
         setBaseAmount(bean.getBaseAmount());
         setUnitsForBase(bean.getUnitsForBase());
@@ -235,35 +234,31 @@ public class AcademicTariff extends AcademicTariff_Base {
          */
 
         if (getCycleType() != null) {
-            if (findInInterval(getFinantialEntity(), getProduct(), getAdministrativeOffice(), getDegreeType(), getDegree(), getCycleType(),
-                    getInterval()).count() > 1) {
+            if (findInInterval(getFinantialEntity(), getProduct(), getAdministrativeOffice(), getDegreeType(), getDegree(),
+                    getCycleType(), getInterval()).count() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.overlaps.with.other",
                         getProduct().getName().getContent());
             } ;
         } else if (getDegree() != null) {
-            if (findInInterval(getFinantialEntity(), getProduct(), getAdministrativeOffice(), getDegreeType(), getDegree(), getInterval())
-                    .filter(t -> t.getCycleType() == null)
-                    .count() > 1) {
+            if (findInInterval(getFinantialEntity(), getProduct(), getAdministrativeOffice(), getDegreeType(), getDegree(),
+                    getInterval()).filter(t -> t.getCycleType() == null).count() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.overlaps.with.other",
                         getProduct().getName().getContent());
             }
         } else if (getDegreeType() != null) {
             if (findInInterval(getFinantialEntity(), getProduct(), getAdministrativeOffice(), getDegreeType(), getInterval())
-                    .filter(t -> t.getDegree() == null)
-                    .count() > 1) {
+                    .filter(t -> t.getDegree() == null).count() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.overlaps.with.other",
                         getProduct().getName().getContent());
             } ;
-        } else if(getAdministrativeOffice() != null) {
+        } else if (getAdministrativeOffice() != null) {
             if (findInInterval(getFinantialEntity(), getProduct(), getAdministrativeOffice(), getInterval())
-                    .filter(t -> t.getDegreeType() == null)
-                    .count() > 1) {
+                    .filter(t -> t.getDegreeType() == null).count() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.overlaps.with.other",
                         getProduct().getName().getContent());
             }
         } else {
-            if (findInInterval(getFinantialEntity(), getProduct(), getInterval())
-                    .filter(t -> t.getAdministrativeOffice() == null)
+            if (findInInterval(getFinantialEntity(), getProduct(), getInterval()).filter(t -> t.getAdministrativeOffice() == null)
                     .count() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.overlaps.with.other",
                         getProduct().getName().getContent());
@@ -278,12 +273,11 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         if (bean.isApplyInterests() && getInterestRate() == null) {
             InterestRate.createForTariff(this, bean.getInterestType(), bean.getNumberOfDaysAfterDueDate(),
-                    bean.isApplyInFirstWorkday(), bean.getMaximumDaysToApplyPenalty(),
-                    bean.getInterestFixedAmount(), bean.getRate());
+                    bean.isApplyInFirstWorkday(), bean.getMaximumDaysToApplyPenalty(), bean.getInterestFixedAmount(),
+                    bean.getRate());
         } else if (bean.isApplyInterests()) {
             getInterestRate().edit(bean.getInterestType(), bean.getNumberOfDaysAfterDueDate(), bean.isApplyInFirstWorkday(),
-                    bean.getMaximumDaysToApplyPenalty(), bean.getInterestFixedAmount(),
-                    bean.getRate());
+                    bean.getMaximumDaysToApplyPenalty(), bean.getInterestFixedAmount(), bean.getRate());
         }
 
         super.setApplyInterests(bean.isApplyInterests());
@@ -305,7 +299,7 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         super.delete();
     }
-    
+
     @Override
     public BigDecimal amountToPay() {
         return getBaseAmount();
@@ -313,10 +307,10 @@ public class AcademicTariff extends AcademicTariff_Base {
 
     public BigDecimal amountToPay(final AcademicTreasuryEvent academicTreasuryEvent) {
         final int numberOfUnits = academicTreasuryEvent.getNumberOfUnits();
-        final int numberOfPages = academicTreasuryEvent.getNumberOfPages(); 
+        final int numberOfPages = academicTreasuryEvent.getNumberOfPages();
         final Locale language = academicTreasuryEvent.getLanguage();
         final boolean urgentRequest = academicTreasuryEvent.isUrgentRequest();
-        
+
         return amountToPay(numberOfUnits, numberOfPages, language, urgentRequest);
     }
 
@@ -329,8 +323,9 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         return amount;
     }
-    
-    public BigDecimal amountToPay(final int numberOfUnits, final int numberOfPages, final Locale language, boolean urgentRequest) {
+
+    public BigDecimal amountToPay(final int numberOfUnits, final int numberOfPages, final Locale language,
+            boolean urgentRequest) {
         BigDecimal amount = amountWithLanguageRate(numberOfUnits, numberOfPages, language);
 
         if (isApplyUrgencyRate() && urgentRequest) {
@@ -343,15 +338,15 @@ public class AcademicTariff extends AcademicTariff_Base {
     public BigDecimal amountForUrgencyRate(int numberOfUnits, int numberOfPages, boolean applyLanguageRate) {
         BigDecimal amount = amountWithLanguageRate(numberOfUnits, numberOfPages, applyLanguageRate);
 
-        return amount.multiply(getUrgencyRate().setScale(20, RoundingMode.HALF_EVEN).divide(AcademicTreasuryConstants.HUNDRED_PERCENT).setScale(2,
-                RoundingMode.HALF_EVEN));
+        return amount.multiply(getUrgencyRate().setScale(20, RoundingMode.HALF_EVEN)
+                .divide(AcademicTreasuryConstants.HUNDRED_PERCENT).setScale(2, RoundingMode.HALF_EVEN));
     }
 
     public BigDecimal amountForUrgencyRate(final int numberOfUnits, final int numberOfPages, final Locale language) {
         BigDecimal amount = amountWithLanguageRate(numberOfUnits, numberOfPages, language);
 
-        return amount.multiply(getUrgencyRate().setScale(20, RoundingMode.HALF_EVEN).divide(AcademicTreasuryConstants.HUNDRED_PERCENT).setScale(2,
-                RoundingMode.HALF_EVEN));
+        return amount.multiply(getUrgencyRate().setScale(20, RoundingMode.HALF_EVEN)
+                .divide(AcademicTreasuryConstants.HUNDRED_PERCENT).setScale(2, RoundingMode.HALF_EVEN));
     }
 
     public BigDecimal amountForLanguageTranslationRate(final int numberOfUnits, final int numberOfPages) {
@@ -430,8 +425,8 @@ public class AcademicTariff extends AcademicTariff_Base {
     }
 
     public Vat vat(final LocalDate when) {
-        return Vat.findActiveUnique(getProduct().getVatType(), getFinantialEntity().getFinantialInstitution(),
-                when.toDateTimeAtStartOfDay()).get();
+        return Vat.findActiveUnique(getProduct().getVatType(), getFinantialEntity().getFinantialInstitution(), new DateTime())
+                .get();
     }
 
     public LocalizedString academicServiceRequestDebitEntryName(final ITreasuryServiceRequest iTreasuryServiceRequest) {
@@ -449,19 +444,22 @@ public class AcademicTariff extends AcademicTariff_Base {
     public static LocalizedString improvementDebitEntryName(final AcademicTax improvementAcademicTax,
             final EnrolmentEvaluation enrolmentEvaluation) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
         final Registration registration = enrolmentEvaluation.getEnrolment().getRegistration();
         final ExecutionYear executionYear = enrolmentEvaluation.getExecutionPeriod().getExecutionYear();
-        
+
         LocalizedString result = new LocalizedString();
 
         for (final Locale locale : treasuryServices.availableLocales()) {
             String enrolmentName = academicTreasuryServices.localizedNameOfEnrolment(enrolmentEvaluation.getEnrolment(), locale);
             String executionIntervalName = enrolmentEvaluation.getExecutionPeriod().getQualifiedName();
-            String academicTreasuryEventDescription = AcademicTreasuryEvent.nameForAcademicTax(improvementAcademicTax, registration, executionYear).getContent(locale);
-            
-            result = result.with(locale, academicTreasuryEventDescription + format(" (%s - %s)", enrolmentName, executionIntervalName));
+            String academicTreasuryEventDescription = AcademicTreasuryEvent
+                    .nameForAcademicTax(improvementAcademicTax, registration, executionYear).getContent(locale);
+
+            result = result.with(locale,
+                    academicTreasuryEventDescription + format(" (%s - %s)", enrolmentName, executionIntervalName));
         }
 
         return result;
@@ -482,7 +480,8 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         final BigDecimal amount = amountToPay(academicTreasuryEvent);
         final LocalDate dueDate = dueDate(when);
-        final LocalizedString debitEntryName = academicServiceRequestDebitEntryName(academicTreasuryEvent.getITreasuryServiceRequest());
+        final LocalizedString debitEntryName =
+                academicServiceRequestDebitEntryName(academicTreasuryEvent.getITreasuryServiceRequest());
         final Vat vat = vat(when);
 
         updatePriceValuesInEvent(academicTreasuryEvent);
@@ -491,8 +490,8 @@ public class AcademicTariff extends AcademicTariff_Base {
                 fillPriceCommonPropertiesForAcademicServiceRequest(debtAccount, academicTreasuryEvent, when);
 
         return DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent, vat, amount, dueDate,
-                fillPriceProperties, getProduct(), debitEntryName.getContent(TreasuryConstants.DEFAULT_LANGUAGE), AcademicTreasuryConstants.DEFAULT_QUANTITY,
-                this.getInterestRate(), when.toDateTimeAtStartOfDay());
+                fillPriceProperties, getProduct(), debitEntryName.getContent(TreasuryConstants.DEFAULT_LANGUAGE),
+                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay());
     }
 
     public DebitEntry createDebitEntryForAcademicTax(final DebtAccount debtAccount,
@@ -519,24 +518,25 @@ public class AcademicTariff extends AcademicTariff_Base {
                 fillPricePropertiesForAcademicTax(debtAccount, academicTreasuryEvent, when);
 
         return DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent, vat, amount, dueDate,
-                fillPriceProperties, getProduct(), debitEntryName.getContent(TreasuryConstants.DEFAULT_LANGUAGE), AcademicTreasuryConstants.DEFAULT_QUANTITY,
-                this.getInterestRate(), when.toDateTimeAtStartOfDay());
+                fillPriceProperties, getProduct(), debitEntryName.getContent(TreasuryConstants.DEFAULT_LANGUAGE),
+                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay());
     }
-    
-    public DebitEntry createDebitEntryForCustomAcademicDebt(final DebtAccount debtAccount, final AcademicTreasuryEvent academicTreasuryEvent, final LocalDate when) {
+
+    public DebitEntry createDebitEntryForCustomAcademicDebt(final DebtAccount debtAccount,
+            final AcademicTreasuryEvent academicTreasuryEvent, final LocalDate when) {
         if (!academicTreasuryEvent.isForCustomAcademicDebt()) {
             throw new RuntimeException("wrong call");
         }
-        
+
         final LocalDate dueDate = dueDate(when);
-        final LocalizedString debitEntryName = AcademicTreasuryEvent
-                .nameForCustomAcademicDebt(academicTreasuryEvent.getProduct(), academicTreasuryEvent.getRegistration(), academicTreasuryEvent.getExecutionYear());
+        final LocalizedString debitEntryName = AcademicTreasuryEvent.nameForCustomAcademicDebt(academicTreasuryEvent.getProduct(),
+                academicTreasuryEvent.getRegistration(), academicTreasuryEvent.getExecutionYear());
         final Vat vat = vat(when);
         final BigDecimal amount = amountToPay(academicTreasuryEvent);
 
         final Map<String, String> fillPriceProperties =
                 fillPricePropertiesForAcademicTax(debtAccount, academicTreasuryEvent, when);
-        
+
         return DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent, vat, amount, dueDate,
                 fillPriceProperties, getProduct(), debitEntryName.getContent(), TreasuryConstants.DEFAULT_QUANTITY,
                 this.getInterestRate(), when.toDateTimeAtStartOfDay());
@@ -556,7 +556,8 @@ public class AcademicTariff extends AcademicTariff_Base {
             throw new RuntimeException("wrong call");
         }
 
-        final LocalizedString debitEntryName = improvementDebitEntryName(academicTreasuryEvent.getAcademicTax(), enrolmentEvaluation);
+        final LocalizedString debitEntryName =
+                improvementDebitEntryName(academicTreasuryEvent.getAcademicTax(), enrolmentEvaluation);
         final LocalDate dueDate = dueDate(when);
         final Vat vat = vat(when);
         final BigDecimal amount = amountToPay(academicTreasuryEvent, enrolmentEvaluation);
@@ -566,8 +567,8 @@ public class AcademicTariff extends AcademicTariff_Base {
         final Map<String, String> fillPriceProperties = fillPriceProperties(academicTreasuryEvent, enrolmentEvaluation);
 
         final DebitEntry debitEntry = DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent, vat,
-                amount, dueDate, fillPriceProperties, getProduct(), debitEntryName.getContent(TreasuryConstants.DEFAULT_LANGUAGE), AcademicTreasuryConstants.DEFAULT_QUANTITY,
-                this.getInterestRate(), new DateTime());
+                amount, dueDate, fillPriceProperties, getProduct(), debitEntryName.getContent(TreasuryConstants.DEFAULT_LANGUAGE),
+                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), new DateTime());
 
         academicTreasuryEvent.associateEnrolmentEvaluation(debitEntry, enrolmentEvaluation);
 
@@ -585,7 +586,7 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         return debitEntry;
     }
-        
+
     @Override
     public boolean isBroadTariffForFinantialEntity() {
         return getDegreeType() == null && getDegree() == null && getCycleType() == null;
@@ -605,8 +606,10 @@ public class AcademicTariff extends AcademicTariff_Base {
         final BigDecimal amountForAdditionalUnits = amountForAdditionalUnits(academicTreasuryEvent.getNumberOfUnits());
         final BigDecimal amountForPages = amountForPages(academicTreasuryEvent.getNumberOfPages());
         final BigDecimal maximumAmount = getMaximumAmount();
-        final BigDecimal amountForLanguageTranslationRate = amountForLanguageTranslationRate(academicTreasuryEvent.getNumberOfUnits(), academicTreasuryEvent.getNumberOfPages());
-        final BigDecimal amountForUrgencyRate = amountForUrgencyRate(academicTreasuryEvent.getNumberOfUnits(), academicTreasuryEvent.getNumberOfPages(), academicTreasuryEvent.getLanguage());
+        final BigDecimal amountForLanguageTranslationRate = amountForLanguageTranslationRate(
+                academicTreasuryEvent.getNumberOfUnits(), academicTreasuryEvent.getNumberOfPages());
+        final BigDecimal amountForUrgencyRate = amountForUrgencyRate(academicTreasuryEvent.getNumberOfUnits(),
+                academicTreasuryEvent.getNumberOfPages(), academicTreasuryEvent.getLanguage());
 
         academicTreasuryEvent.updatePricingFields(baseAmount, amountForAdditionalUnits, amountForPages, maximumAmount,
                 amountForLanguageTranslationRate, amountForUrgencyRate);
@@ -621,7 +624,7 @@ public class AcademicTariff extends AcademicTariff_Base {
         propertiesMap.put(AcademicTreasuryEventKeys.DEGREE.getDescriptionI18N().getContent(),
                 academicTreasuryEvent.getITreasuryServiceRequest().getRegistration().getDegree()
                         .getPresentationName(academicTreasuryEvent.getITreasuryServiceRequest().getExecutionYear()));
-        
+
         propertiesMap.put(AcademicTreasuryEventKeys.DEGREE_CODE.getDescriptionI18N().getContent(),
                 academicTreasuryEvent.getITreasuryServiceRequest().getRegistration().getDegree().getCode());
 
@@ -685,14 +688,18 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.FOREIGN_LANGUAGE_RATE.getDescriptionI18N().getContent(),
                 getLanguageTranslationRate().toString());
-        propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.CALCULATED_FOREIGN_LANGUAGE_RATE.getDescriptionI18N()
-                .getContent(), currency.getValueFor(amountForLanguageTranslationRate(academicTreasuryEvent.getNumberOfUnits(), academicTreasuryEvent.getNumberOfPages())));
+        propertiesMap.put(
+                AcademicTreasuryEvent.AcademicTreasuryEventKeys.CALCULATED_FOREIGN_LANGUAGE_RATE.getDescriptionI18N()
+                        .getContent(),
+                currency.getValueFor(amountForLanguageTranslationRate(academicTreasuryEvent.getNumberOfUnits(),
+                        academicTreasuryEvent.getNumberOfPages())));
 
         propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.URGENT_PERCENTAGE.getDescriptionI18N().getContent(),
                 getUrgencyRate().toString());
         propertiesMap.put(
                 AcademicTreasuryEvent.AcademicTreasuryEventKeys.CALCULATED_URGENT_AMOUNT.getDescriptionI18N().getContent(),
-                currency.getValueFor(amountForUrgencyRate(academicTreasuryEvent.getNumberOfUnits(), academicTreasuryEvent.getNumberOfPages(), academicTreasuryEvent.getLanguage())));
+                currency.getValueFor(amountForUrgencyRate(academicTreasuryEvent.getNumberOfUnits(),
+                        academicTreasuryEvent.getNumberOfPages(), academicTreasuryEvent.getLanguage())));
 
         propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.FINAL_AMOUNT.getDescriptionI18N().getContent(),
                 currency.getValueFor(amountToPay(academicTreasuryEvent)));
@@ -705,7 +712,8 @@ public class AcademicTariff extends AcademicTariff_Base {
 
     private Map<String, String> fillPriceProperties(final AcademicTreasuryEvent academicTreasuryEvent,
             final EnrolmentEvaluation improvementEnrolmentEvaluation) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
         final Map<String, String> propertiesMap = Maps.newHashMap();
 
@@ -727,15 +735,16 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.EXECUTION_SEMESTER.getDescriptionI18N().getContent(),
                 improvementEnrolmentEvaluation.getExecutionPeriod().getQualifiedName());
-	
+
         // TODO Check code Refactor/20210624-MergeWithISCTE
         // For now maintain this
         propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.EVALUATION_SEASON.getDescriptionI18N().getContent(),
-                improvementEnrolmentEvaluation.getEvaluationSeason().getName().getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE));
+                improvementEnrolmentEvaluation.getEvaluationSeason().getName()
+                        .getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE));
 
         return propertiesMap;
     }
-    
+
     private BigDecimal amountWithLanguageRate(int numberOfUnits, int numberOfPages, boolean applyLanguageRate) {
         BigDecimal amount = amountToPayWithoutRates(numberOfUnits, numberOfPages);
 
@@ -784,12 +793,13 @@ public class AcademicTariff extends AcademicTariff_Base {
         return find(product).filter(t -> t.getFinantialEntity() == finantialEntity);
     }
 
-    private static Stream<? extends AcademicTariff> find(final FinantialEntity finantialEntity, final Product product, final AdministrativeOffice administrativeOffice) {
+    private static Stream<? extends AcademicTariff> find(final FinantialEntity finantialEntity, final Product product,
+            final AdministrativeOffice administrativeOffice) {
         return find(finantialEntity, product).filter(i -> administrativeOffice == i.getAdministrativeOffice());
     }
 
-    private static Stream<? extends AcademicTariff> find(final FinantialEntity finantialEntity, final Product product, final AdministrativeOffice administrativeOffice,
-            final DegreeType degreeType) {
+    private static Stream<? extends AcademicTariff> find(final FinantialEntity finantialEntity, final Product product,
+            final AdministrativeOffice administrativeOffice, final DegreeType degreeType) {
         if (degreeType == null) {
             throw new RuntimeException("degree type is null. wrong find call");
         }
@@ -797,8 +807,8 @@ public class AcademicTariff extends AcademicTariff_Base {
         return find(finantialEntity, product, administrativeOffice).filter(i -> degreeType == i.getDegreeType());
     }
 
-    private static Stream<? extends AcademicTariff> find(final FinantialEntity finantialEntity, final Product product, final AdministrativeOffice administrativeOffice,
-            final DegreeType degreeType, final Degree degree) {
+    private static Stream<? extends AcademicTariff> find(final FinantialEntity finantialEntity, final Product product,
+            final AdministrativeOffice administrativeOffice, final DegreeType degreeType, final Degree degree) {
         if (degree == null) {
             throw new RuntimeException("degree is null. wrong find call");
         }
@@ -808,13 +818,15 @@ public class AcademicTariff extends AcademicTariff_Base {
 
     @Deprecated
     // TODO: Remove this method, no school define tariff based on cycle type
-    private static Stream<? extends AcademicTariff> find(final FinantialEntity finantialEntity, final Product product, final AdministrativeOffice administrativeOffice,
-            final DegreeType degreeType, final Degree degree, final CycleType cycleType) {
+    private static Stream<? extends AcademicTariff> find(final FinantialEntity finantialEntity, final Product product,
+            final AdministrativeOffice administrativeOffice, final DegreeType degreeType, final Degree degree,
+            final CycleType cycleType) {
         if (cycleType == null) {
             throw new RuntimeException("cycle is null. wrong find call");
         }
 
-        return find(finantialEntity, product, administrativeOffice, degreeType, degree).filter(t -> t.getCycleType() == cycleType);
+        return find(finantialEntity, product, administrativeOffice, degreeType, degree)
+                .filter(t -> t.getCycleType() == cycleType);
     }
 
     public static Stream<? extends AcademicTariff> findActive(final DateTime when) {
@@ -830,7 +842,8 @@ public class AcademicTariff extends AcademicTariff_Base {
         return find(finantialEntity, product).filter(t -> t.isActive(when));
     }
 
-    public static Stream<? extends AcademicTariff> findActive(final FinantialEntity finantialEntity, final Product product, final AdministrativeOffice administrativeOffice, final DateTime when) {
+    public static Stream<? extends AcademicTariff> findActive(final FinantialEntity finantialEntity, final Product product,
+            final AdministrativeOffice administrativeOffice, final DateTime when) {
         return find(finantialEntity, product, administrativeOffice).filter(t -> t.isActive(when));
     }
 
@@ -867,11 +880,13 @@ public class AcademicTariff extends AcademicTariff_Base {
         return find(finantialEntity, product).filter(t -> t.isActive(interval));
     }
 
-    public static Stream<? extends AcademicTariff> findInInterval(final FinantialEntity finantialEntity, final Product product, final AdministrativeOffice administrativeOffice, final Interval interval) {
+    public static Stream<? extends AcademicTariff> findInInterval(final FinantialEntity finantialEntity, final Product product,
+            final AdministrativeOffice administrativeOffice, final Interval interval) {
         return find(finantialEntity, product, administrativeOffice).filter(t -> t.isActive(interval));
     }
 
-    public static Stream<? extends AcademicTariff> findInInterval(final FinantialEntity finantialEntity, final Product product, final AdministrativeOffice administrativeOffice, final DegreeType degreeType, final Interval interval) {
+    public static Stream<? extends AcademicTariff> findInInterval(final FinantialEntity finantialEntity, final Product product,
+            final AdministrativeOffice administrativeOffice, final DegreeType degreeType, final Interval interval) {
         return find(finantialEntity, product, administrativeOffice, degreeType).filter(t -> t.isActive(interval));
     }
 
@@ -884,7 +899,8 @@ public class AcademicTariff extends AcademicTariff_Base {
     public static Stream<? extends AcademicTariff> findInInterval(final FinantialEntity finantialEntity, final Product product,
             final AdministrativeOffice administrativeOffice, final DegreeType degreeType, final Degree degree,
             final CycleType cycleType, final Interval interval) {
-        return find(finantialEntity, product, administrativeOffice, degreeType, degree, cycleType).filter(t -> t.isActive(interval));
+        return find(finantialEntity, product, administrativeOffice, degreeType, degree, cycleType)
+                .filter(t -> t.isActive(interval));
     }
 
     protected static AcademicTariff findMatch(final FinantialEntity finantialEntity, final Product product, final DateTime when) {
@@ -898,12 +914,9 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         // Fallback to product only in finantial entity
         final Set<? extends AcademicTariff> activeTariffs =
-                findActive(finantialEntity, product, when)
-                .filter(e -> e.getAdministrativeOffice() == null)
-                .filter(e -> e.getDegreeType() == null)
-                .filter(e -> e.getDegree() == null)
-                .filter(e -> e.getCycleType() == null)
-                .collect(Collectors.<AcademicTariff> toSet());
+                findActive(finantialEntity, product, when).filter(e -> e.getAdministrativeOffice() == null)
+                        .filter(e -> e.getDegreeType() == null).filter(e -> e.getDegree() == null)
+                        .filter(e -> e.getCycleType() == null).collect(Collectors.<AcademicTariff> toSet());
 
         if (activeTariffs.size() > 1) {
             throw new AcademicTreasuryDomainException("error.AcademicTariff.findActive.more.than.one");
@@ -915,42 +928,39 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         return null;
     }
-    
-    public static AcademicTariff findMatch(final FinantialEntity finantialEntity, final Product product, final AdministrativeOffice administrativeOffice,
-            final DateTime when) {
+
+    public static AcademicTariff findMatch(final FinantialEntity finantialEntity, final Product product,
+            final AdministrativeOffice administrativeOffice, final DateTime when) {
         if (administrativeOffice == null) {
             throw new RuntimeException("administrative office is null. wrong findMatch call");
         }
-        
+
         // Fallback to administrativeOffice and return
-        final Set<? extends AcademicTariff> activeTariffs =
-                findActive(finantialEntity, product, administrativeOffice, when)
-                .filter(e -> e.getDegreeType() == null)
-                .filter(e -> e.getDegree() == null)
-                .filter(e -> e.getCycleType() == null)
+        final Set<? extends AcademicTariff> activeTariffs = findActive(finantialEntity, product, administrativeOffice, when)
+                .filter(e -> e.getDegreeType() == null).filter(e -> e.getDegree() == null).filter(e -> e.getCycleType() == null)
                 .collect(Collectors.<AcademicTariff> toSet());
 
         if (activeTariffs.size() > 1) {
             throw new AcademicTreasuryDomainException("error.AcademicTariff.findActive.more.than.one");
-        } else if(activeTariffs.size() == 1) {
+        } else if (activeTariffs.size() == 1) {
             return activeTariffs.iterator().next();
         }
 
         return findMatch(finantialEntity, product, when);
     }
-    
-    protected static AcademicTariff findMatch(final FinantialEntity finantialEntity, final Product product, final AdministrativeOffice administrativeOffice, final DegreeType degreeType, final DateTime when) {
-        if(degreeType == null) {
+
+    protected static AcademicTariff findMatch(final FinantialEntity finantialEntity, final Product product,
+            final AdministrativeOffice administrativeOffice, final DegreeType degreeType, final DateTime when) {
+        if (degreeType == null) {
             throw new RuntimeException("degreeType is null. wrong findMatch call");
         }
-        
+
         {
             // Fallback to degreeType
             Set<? extends AcademicTariff> activeTariffs =
                     findActive(finantialEntity, product, administrativeOffice, degreeType, when)
-                    .filter(e -> e.getDegree() == null)
-                    .filter(e -> e.getCycleType() == null)
-                    .collect(Collectors.<AcademicTariff> toSet());
+                            .filter(e -> e.getDegree() == null).filter(e -> e.getCycleType() == null)
+                            .collect(Collectors.<AcademicTariff> toSet());
 
             if (activeTariffs.size() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.findActive.more.than.one");
@@ -958,15 +968,16 @@ public class AcademicTariff extends AcademicTariff_Base {
                 return activeTariffs.iterator().next();
             }
         }
-        
-        if(administrativeOffice != null) {
+
+        if (administrativeOffice != null) {
             return findMatch(finantialEntity, product, administrativeOffice, when);
         }
 
         return findMatch(finantialEntity, product, when);
     }
 
-    public static AcademicTariff findMatch(final FinantialEntity finantialEntity, final Product product, final Degree degree, final DateTime when) {
+    public static AcademicTariff findMatch(final FinantialEntity finantialEntity, final Product product, final Degree degree,
+            final DateTime when) {
         if (degree == null) {
             throw new RuntimeException("degree is null. wrong findMatch call");
         }
@@ -976,29 +987,29 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         {
             // With the most specific conditions tariff was not found. Fallback to degree
-            Set<? extends AcademicTariff> activeTariffs = findActive(finantialEntity, product, administrativeOffice, degreeType, degree, when)
-                    .filter(e -> e.getCycleType() == null)
-                    .collect(Collectors.<AcademicTariff> toSet());
+            Set<? extends AcademicTariff> activeTariffs =
+                    findActive(finantialEntity, product, administrativeOffice, degreeType, degree, when)
+                            .filter(e -> e.getCycleType() == null).collect(Collectors.<AcademicTariff> toSet());
             if (activeTariffs.size() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.findActive.more.than.one");
             } else if (activeTariffs.size() == 1) {
                 return activeTariffs.iterator().next();
             }
         }
-        
-        if(degreeType != null) {
+
+        if (degreeType != null) {
             return findMatch(finantialEntity, product, administrativeOffice, degreeType, when);
-        } else if(administrativeOffice != null) {
+        } else if (administrativeOffice != null) {
             return findMatch(finantialEntity, product, administrativeOffice, when);
         }
-        
+
         return findMatch(finantialEntity, product, when);
     }
 
     @Deprecated
     // TODO: Remove this method, no school define tariff based on cycle type
-    public static AcademicTariff findMatch(final FinantialEntity finantialEntity, final Product product, final Degree degree, final CycleType cycleType,
-            final DateTime when) {
+    public static AcademicTariff findMatch(final FinantialEntity finantialEntity, final Product product, final Degree degree,
+            final CycleType cycleType, final DateTime when) {
         if (degree == null || cycleType == null) {
             throw new RuntimeException("degree or cycle type is null. wrong findMatch call");
         }

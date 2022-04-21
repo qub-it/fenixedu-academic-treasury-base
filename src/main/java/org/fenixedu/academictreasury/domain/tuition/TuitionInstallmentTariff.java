@@ -476,26 +476,27 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
     public DebitEntry createDebitEntryForRegistration(final DebtAccount debtAccount,
             final AcademicTreasuryEvent academicTreasuryEvent, final LocalDate when,
-            Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap, BigDecimal amountToDiscount) {
+            Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap,
+            BigDecimal amountToDiscount) {
 
-        if(amountToDiscount == null) {
+        if (amountToDiscount == null) {
             amountToDiscount = BigDecimal.ZERO;
         }
-        
-        if(TreasuryConstants.isNegative(amountToDiscount)) {
+
+        if (TreasuryConstants.isNegative(amountToDiscount)) {
             throw new RuntimeException("invalid amount to discount");
         }
-        
+
         if (!getTuitionPaymentPlan().getTuitionPaymentPlanGroup().isForRegistration()) {
             throw new RuntimeException("wrong call");
         }
 
         final BigDecimal amount = amountToPay(academicTreasuryEvent, calculatorsMap).subtract(amountToDiscount);
 
-        if(TreasuryConstants.isNegative(amount)) {
+        if (TreasuryConstants.isNegative(amount)) {
             throw new RuntimeException("invalid tuition installment amount");
         }
-        
+
         final LocalDate dueDate = dueDate(when != null ? when : new LocalDate());
 
         updatePriceValuesInEvent(academicTreasuryEvent);
@@ -636,8 +637,8 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
     }
 
     public Vat vat(final LocalDate when) {
-        return Vat.findActiveUnique(getProduct().getVatType(), getFinantialEntity().getFinantialInstitution(),
-                when.toDateTimeAtStartOfDay()).get();
+        return Vat.findActiveUnique(getProduct().getVatType(), getFinantialEntity().getFinantialInstitution(), new DateTime())
+                .get();
     }
 
     private Map<String, String> fillPricePropertiesForStandaloneOrExtracurricular(
