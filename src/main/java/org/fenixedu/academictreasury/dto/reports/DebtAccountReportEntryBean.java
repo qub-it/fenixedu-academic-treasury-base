@@ -62,6 +62,7 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.creationDate"),
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.finantialInstitutionName"),
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.customerId"),
+            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.customerCode"),
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.name"),
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identificationType"),
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identificationNumber"),
@@ -82,6 +83,7 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
     private DateTime creationDate;
     private String finantialInstitutionName;
     private String customerId;
+    private String customerCode;
     private String name;
     private String identificationType;
     private String identificationNumber;
@@ -106,6 +108,7 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             this.creationDate = treasuryServices.versioningCreationDate(debtAccount);
             this.finantialInstitutionName = debtAccount.getFinantialInstitution().getName();
             this.customerId = debtAccount.getCustomer().getExternalId();
+            this.customerCode = debtAccount.getCustomer().getCode();
             this.name = debtAccount.getCustomer().getName();
 
             if (debtAccount.getCustomer().isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPerson() != null
@@ -181,6 +184,7 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             row.createCell(i++).setCellValue(valueOrEmpty(creationDate));
             row.createCell(i++).setCellValue(valueOrEmpty(finantialInstitutionName));
             row.createCell(i++).setCellValue(valueOrEmpty(customerId));
+            row.createCell(i++).setCellValue(valueOrEmpty(customerCode));
             row.createCell(i++).setCellValue(valueOrEmpty(name));
             row.createCell(i++).setCellValue(valueOrEmpty(identificationType));
             row.createCell(i++).setCellValue(valueOrEmpty(identificationNumber));
