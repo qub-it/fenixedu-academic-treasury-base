@@ -62,7 +62,8 @@ import com.google.common.base.Strings;
 
 public class ReimbursementReportEntryBean implements SpreadsheetRow {
 
-    public static String[] SPREADSHEET_HEADERS = { academicTreasuryBundle("label.ReimbursementReportEntryBean.header.identification"),
+    public static String[] SPREADSHEET_HEADERS = { 
+            academicTreasuryBundle("label.ReimbursementReportEntryBean.header.identification"),
             academicTreasuryBundle("label.ReimbursementReportEntryBean.header.creationDate"),
             academicTreasuryBundle("label.ReimbursementReportEntryBean.header.responsible"),
             academicTreasuryBundle("label.ReimbursementReportEntryBean.header.settlementNoteNumber"),
@@ -82,7 +83,8 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
             academicTreasuryBundle("label.ReimbursementReportEntryBean.header.address"),
             academicTreasuryBundle("label.ReimbursementReportEntryBean.header.studentNumber"),
             academicTreasuryBundle("label.PaymentReportEntryBean.header.documentObservations"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.documentTermsAndConditions"), };
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.documentTermsAndConditions"),
+            academicTreasuryBundle("label.ReimbursementReportEntryBean.header.reimbursementState") };
 
     private ReimbursementEntry paymentEntry;
     private boolean completed;
@@ -120,6 +122,8 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
     
     private String documentObservations;
     private String documentTermsAndConditions;
+    
+    private String reimbursementStateDescription;
 
     public ReimbursementReportEntryBean(final ReimbursementEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
@@ -149,6 +153,10 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
             this.documentObservations = entry.getSettlementNote().getDocumentObservations();
             this.documentTermsAndConditions = entry.getSettlementNote().getDocumentTermsAndConditions();
 
+            if(settlementNote.getCurrentReimbursementProcessStatus() != null) {
+                this.reimbursementStateDescription = settlementNote.getCurrentReimbursementProcessStatus().getDescription();
+            }
+            
             this.completed = true;
 
         } catch (final Exception e) {
@@ -252,6 +260,8 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
             row.createCell(i++).setCellValue(valueOrEmpty(this.documentObservations));
             row.createCell(i++).setCellValue(valueOrEmpty(this.documentTermsAndConditions));
 
+            row.createCell(i++).setCellValue(valueOrEmpty(this.reimbursementStateDescription));
+            
         } catch (final Exception e) {
             e.printStackTrace();
             errorsLog.addError(paymentEntry, e);
