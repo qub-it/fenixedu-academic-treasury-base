@@ -206,6 +206,17 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.specify.at.least.one.condition");
         }
 
+        // Ensure that all tuition payment plans are from the same finantial entity.
+        // For now tuition payment plans in different finantial entities are not 
+        // supported
+
+        Set<FinantialEntity> finantialEntities = find(getTuitionPaymentPlanGroup(), getExecutionYear())
+                .map(TuitionPaymentPlan::getFinantialEntity).collect(Collectors.toSet());
+
+        if (finantialEntities.size() > 1) {
+            throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.different.finantial.entities.not.supported");
+        }
+
     }
 
     private boolean existsAtLeastOneTariffCalculatedAmountWithoutRemaining() {
@@ -406,7 +417,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
             }
 
             if (!academicTreasuryEvent.isChargedWithDebitEntry(tariff)) {
-                tariff.createDebitEntryForRegistration(debtAccount, academicTreasuryEvent, when, calculatorsMap, amountToDiscount);
+                tariff.createDebitEntryForRegistration(debtAccount, academicTreasuryEvent, when, calculatorsMap,
+                        amountToDiscount);
                 createdDebitEntries = true;
             }
         }
@@ -648,11 +660,6 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
      */
     // @formatter:on
 
-    protected FinantialEntity finantialEntity() {
-        // TODO ANIL
-        return FinantialEntity.findAll().findFirst().get();
-    }
-
     // To be extended
     public boolean isStudentMustBeEnrolled() {
         return true;
@@ -681,13 +688,17 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         return FenixFramework.getDomainRoot().getTuitionPaymentPlansSet().stream();
     }
 
-    public static Stream<TuitionPaymentPlan> find(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup) {
+    public static Stream<TuitionPaymentPlan> find(TuitionPaymentPlanGroup tuitionPaymentPlanGroup) {
         return tuitionPaymentPlanGroup.getTuitionPaymentPlansSet().stream();
     }
 
-    public static Stream<TuitionPaymentPlan> find(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
-            final FinantialEntity finantialEntity, final ExecutionYear executionYear) {
-        return find(tuitionPaymentPlanGroup).filter(t -> t.finantialEntity() == finantialEntity)
+    public static Stream<TuitionPaymentPlan> find(TuitionPaymentPlanGroup tuitionPaymentPlanGroup, ExecutionYear executionYear) {
+        return find(tuitionPaymentPlanGroup).filter(t -> t.getExecutionYear() == executionYear);
+    }
+
+    public static Stream<TuitionPaymentPlan> find(TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
+            FinantialEntity finantialEntity, ExecutionYear executionYear) {
+        return find(tuitionPaymentPlanGroup).filter(t -> t.getFinantialEntity() == finantialEntity)
                 .filter(t -> t.getExecutionYear() == executionYear);
     }
 
