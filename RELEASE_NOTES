@@ -1,3 +1,5 @@
+- Bug Fix: Fix personal email field in debt report
+
 8.3.4 (02-05-2022)
 - Improvement: Add reimbursement state in reimbursements report
 - Improvement: Add more fields to treasury exemption reports

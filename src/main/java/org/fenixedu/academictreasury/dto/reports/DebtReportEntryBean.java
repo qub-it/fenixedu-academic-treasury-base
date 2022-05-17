@@ -399,8 +399,14 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     static EmailAddress personalEmail(final Person person) {
         IAcademicTreasuryPlatformDependentServices implementation =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        return implementation.pendingOrValidPartyContacts(person, EmailAddress.class).stream().map(EmailAddress.class::cast)
-                .filter(e -> e.getType() == PartyContactType.PERSONAL).findFirst().orElse(null);
+        
+        return implementation.pendingOrValidPartyContacts(person, EmailAddress.class) //
+                    .stream() //
+                    .map(EmailAddress.class::cast) //
+                    .filter(e -> Boolean.TRUE.equals(e.getActive())) //
+                    .filter(e -> e.getType() == PartyContactType.PERSONAL) //
+                    .findFirst() //
+                    .orElse(null);
     }
 
     private void fillAcademicInformation(final InvoiceEntry entry) {
