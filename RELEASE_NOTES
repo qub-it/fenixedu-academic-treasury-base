@@ -1,3 +1,4 @@
+8.3.6 (02-06-2022)
 - Refactor: Return code of PersonCustomer from Customer::getCode instead of externalId
 
 8.3.5 (17-05-2022)
