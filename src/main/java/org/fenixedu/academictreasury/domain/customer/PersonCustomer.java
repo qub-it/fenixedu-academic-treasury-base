@@ -172,7 +172,10 @@ public class PersonCustomer extends PersonCustomer_Base {
     
     @Override
     public String getCode() {
-        return this.getExternalId();
+//        return this.getExternalId();
+        
+        // TODO: Test after deploy in quality that customer code is the same
+        return super.getCode();
     }
     
     public String getCodeFromSuper() {
