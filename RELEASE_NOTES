@@ -1,3 +1,5 @@
+- Bug Fix: Return degreeCode for AcademicTreasuryEvent, for standaloneTuition, extracurricularTuition, improvementTuition and customAcademicDebt
+
 8.3.6 (02-06-2022)
 - Refactor: Return code of PersonCustomer from Customer::getCode instead of externalId
 
