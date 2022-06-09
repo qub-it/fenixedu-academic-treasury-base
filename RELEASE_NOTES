@@ -1,3 +1,5 @@
+- Bug Fix: Return degreeCode for AcademicTreasuryEvent, for standaloneTuition, extracurricularTuition, improvementTuition and customAcademicDebt
+
 8.2.6 (03-04-2022)
 - Improvement: Add reimbursement state in reimbursements report
 - Improvement: Add more fields to treasury exemption reports

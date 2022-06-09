@@ -707,10 +707,18 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         if (isForRegistrationTuition() && getRegistration() != null) {
             degree = getRegistration().getDegree();
         } else if (isForStandaloneTuition() || isForExtracurricularTuition()) {
+            if(getRegistration() != null) {
+                degree = getRegistration().getDegree();
+            }
         } else if (isForImprovementTax()) {
+            if(getRegistration() != null) {
+                degree = getRegistration().getDegree();
+            }
         } else if (isForAcademicTax() && getRegistration() != null) {
             degree = getRegistration().getDegree();
         } else if (isForAcademicServiceRequest() && getRegistration() != null) {
+            degree = getRegistration().getDegree();
+        } else if(isForCustomAcademicDebt() && getRegistration() != null) {
             degree = getRegistration().getDegree();
         }
 
