@@ -1,3 +1,4 @@
+8.3.7 (18-06-2022)
 - Bug Fix: Return degreeCode for AcademicTreasuryEvent, for standaloneTuition, extracurricularTuition, improvementTuition and customAcademicDebt
 
 8.3.6 (02-06-2022)
