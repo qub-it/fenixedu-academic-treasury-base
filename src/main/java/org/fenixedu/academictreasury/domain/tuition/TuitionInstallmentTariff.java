@@ -266,10 +266,22 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         // getEctsCalculationType() != null and getTuitionTariffCalculatedAmountType() != null
         // should not be necessary
 
-        return !((isTuitionCalculationByEctsOrUnits() && getEctsCalculationType() != null
-                && getEctsCalculationType().isDependentOnDefaultPaymentPlan())
-                || (getTuitionCalculationType().isCalculatedAmount() && getTuitionTariffCalculatedAmountType() != null
-                        && !getTuitionTariffCalculatedAmountType().isCaptive()));
+        if(isTuitionCalculationByEctsOrUnits() && getEctsCalculationType() != null
+                && getEctsCalculationType().isDependentOnDefaultPaymentPlan()) {
+            return false;
+        }
+        
+        if(getTuitionCalculationType().isCalculatedAmount() && getTuitionTariffCalculatedAmountType() != null) {
+            if(getTuitionTariffCalculatedAmountType().isPercentage()) {
+                return false;
+            }
+            
+            if(getTuitionTariffCalculatedAmountType().isRemaining()) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     private boolean isTuitionCalculationByEctsOrUnits() {

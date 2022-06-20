@@ -189,6 +189,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     private Map<Class<? extends TuitionConditionRule>, String> importerMap;
 
     public TuitionPaymentPlanBean() {
+        this.importerMap = new HashMap<Class<? extends TuitionConditionRule>, String>();
     }
 
     public TuitionPaymentPlanBean(final Product product, final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
@@ -216,7 +217,9 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this.defaultPaymentPlan = tuitionPaymentPlan.isDefaultPaymentPlan();
 
         this.payorDebtAccount = tuitionPaymentPlan.getPayorDebtAccount();
-        this.name = tuitionPaymentPlan.getCustomizedName().getContent();
+        if(tuitionPaymentPlan.getCustomizedName() != null) {
+            this.name = tuitionPaymentPlan.getCustomizedName().getContent();
+        }
 
         this.conditionRules = new HashSet<>(tuitionPaymentPlan.getTuitionConditionRulesSet());
 
