@@ -157,7 +157,7 @@ public class AcademicTariff extends AcademicTariff_Base {
     }
 
     @Override
-    protected void checkRules() {
+    public void checkRules() {
         super.checkRules();
 
         if (getCycleType() != null && getDegree() == null) {
@@ -252,13 +252,13 @@ public class AcademicTariff extends AcademicTariff_Base {
                         getProduct().getName().getContent());
             } ;
         } else if (getAdministrativeOffice() != null) {
-            if (findInInterval(getFinantialEntity(), getProduct(), getAdministrativeOffice(), getInterval())
+            if (findInInterval(getFinantialEntity(), getProduct(), getInterval())
                     .filter(t -> t.getDegreeType() == null).count() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.overlaps.with.other",
                         getProduct().getName().getContent());
             }
         } else {
-            if (findInInterval(getFinantialEntity(), getProduct(), getInterval()).filter(t -> t.getAdministrativeOffice() == null)
+            if (findInInterval(getFinantialEntity(), getProduct(), getInterval()).filter(t -> t.getDegreeType() == null)
                     .count() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.overlaps.with.other",
                         getProduct().getName().getContent());
@@ -817,7 +817,8 @@ public class AcademicTariff extends AcademicTariff_Base {
     }
 
     @Deprecated
-    // TODO: Remove this method, no school define tariff based on cycle type
+    // TODO: FFUL still distinguish the cycle in one case. Instead of removing this, remove the cycle type from
+    // the academic tariff creation
     private static Stream<? extends AcademicTariff> find(final FinantialEntity finantialEntity, final Product product,
             final AdministrativeOffice administrativeOffice, final DegreeType degreeType, final Degree degree,
             final CycleType cycleType) {
@@ -859,7 +860,8 @@ public class AcademicTariff extends AcademicTariff_Base {
     }
 
     @Deprecated
-    // TODO: Remove this method, no school define tariff based on cycle type
+    // TODO: FFUL still distinguish the cycle in one case. Instead of removing this, remove the cycle type from
+    // the academic tariff creation
     public static Stream<? extends AcademicTariff> findActive(final FinantialEntity finantialEntity, final Product product,
             final AdministrativeOffice administrativeOffice, final DegreeType degreeType, final Degree degree,
             final CycleType cycleType, final DateTime when) {
@@ -887,19 +889,33 @@ public class AcademicTariff extends AcademicTariff_Base {
 
     public static Stream<? extends AcademicTariff> findInInterval(final FinantialEntity finantialEntity, final Product product,
             final AdministrativeOffice administrativeOffice, final DegreeType degreeType, final Interval interval) {
-        return find(finantialEntity, product, administrativeOffice, degreeType).filter(t -> t.isActive(interval));
+        return //
+                AcademicTariff.find(finantialEntity, product) //
+//              .filter(i -> administrativeOffice == i.getAdministrativeOffice()) //
+              .filter(i -> degreeType == i.getDegreeType()) //
+                .filter(t -> t.isActive(interval));
     }
 
     public static Stream<? extends AcademicTariff> findInInterval(final FinantialEntity finantialEntity, final Product product,
             final AdministrativeOffice administrativeOffice, final DegreeType degreeType, final Degree degree,
             final Interval interval) {
-        return find(finantialEntity, product, administrativeOffice, degreeType, degree).filter(t -> t.isActive(interval));
+        return //
+                AcademicTariff.find(finantialEntity, product) //
+//              .filter(i -> administrativeOffice == i.getAdministrativeOffice()) //
+              .filter(i -> degreeType == i.getDegreeType()) //
+              .filter(t -> t.getDegree() == degree) //
+                .filter(t -> t.isActive(interval));
     }
 
     public static Stream<? extends AcademicTariff> findInInterval(final FinantialEntity finantialEntity, final Product product,
             final AdministrativeOffice administrativeOffice, final DegreeType degreeType, final Degree degree,
             final CycleType cycleType, final Interval interval) {
-        return find(finantialEntity, product, administrativeOffice, degreeType, degree, cycleType)
+        return //
+                AcademicTariff.find(finantialEntity, product) //
+//                .filter(i -> administrativeOffice == i.getAdministrativeOffice()) //
+                .filter(i -> degreeType == i.getDegreeType()) //
+                .filter(t -> t.getDegree() == degree) //
+                .filter(t -> t.getCycleType() == cycleType) //
                 .filter(t -> t.isActive(interval));
     }
 
@@ -957,11 +973,22 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         {
             // Fallback to degreeType
-            Set<? extends AcademicTariff> activeTariffs =
-                    findActive(finantialEntity, product, administrativeOffice, degreeType, when)
-                            .filter(e -> e.getDegree() == null).filter(e -> e.getCycleType() == null)
-                            .collect(Collectors.<AcademicTariff> toSet());
+//            Set<? extends AcademicTariff> activeTariffs =
+//                    findActive(finantialEntity, product, administrativeOffice, degreeType, when)
+//                            .filter(e -> e.getDegree() == null).filter(e -> e.getCycleType() == null)
+//                            .collect(Collectors.<AcademicTariff> toSet());
 
+            // TODO: Before removing tariffs associated with AdministrativeOffice, ignore AdministrativeOffice for 
+            // search with CycleType, Degree and Degree Type
+            
+            Set<? extends AcademicTariff> activeTariffs =
+                    find(finantialEntity, product)
+                .filter(t -> degreeType == t.getDegreeType())                    
+                .filter(t -> t.getDegree() == null)                    
+                .filter(t -> t.getCycleType() == null)            
+                .filter(t -> t.isActive(when))
+                .collect(Collectors.<AcademicTariff> toSet());
+            
             if (activeTariffs.size() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.findActive.more.than.one");
             } else if (activeTariffs.size() == 1) {
@@ -987,9 +1014,22 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         {
             // With the most specific conditions tariff was not found. Fallback to degree
+
+            // TODO: Before removing tariffs associated with AdministrativeOffice, ignore AdministrativeOffice for 
+            // search with CycleType, Degree and Degree Type
+            
+//            Set<? extends AcademicTariff> activeTariffs =
+//                    findActive(finantialEntity, product, administrativeOffice, degreeType, degree, when)
+//                            .filter(e -> e.getCycleType() == null).collect(Collectors.<AcademicTariff> toSet());
+            
             Set<? extends AcademicTariff> activeTariffs =
-                    findActive(finantialEntity, product, administrativeOffice, degreeType, degree, when)
-                            .filter(e -> e.getCycleType() == null).collect(Collectors.<AcademicTariff> toSet());
+                    find(finantialEntity, product)
+                .filter(t -> degreeType == t.getDegreeType())                    
+                .filter(t -> t.getDegree() == degree)                    
+                .filter(t -> t.getCycleType() == null)            
+                .filter(t -> t.isActive(when))
+                .collect(Collectors.<AcademicTariff> toSet());
+            
             if (activeTariffs.size() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.findActive.more.than.one");
             } else if (activeTariffs.size() == 1) {
@@ -997,17 +1037,12 @@ public class AcademicTariff extends AcademicTariff_Base {
             }
         }
 
-        if (degreeType != null) {
-            return findMatch(finantialEntity, product, administrativeOffice, degreeType, when);
-        } else if (administrativeOffice != null) {
-            return findMatch(finantialEntity, product, administrativeOffice, when);
-        }
-
-        return findMatch(finantialEntity, product, when);
+        return findMatch(finantialEntity, product, administrativeOffice, degreeType, when);
     }
 
     @Deprecated
-    // TODO: Remove this method, no school define tariff based on cycle type
+    // TODO: FFUL still distinguish the cycle in one case. Instead of removing this, remove the cycle type from
+    // the academic tariff creation
     public static AcademicTariff findMatch(final FinantialEntity finantialEntity, final Product product, final Degree degree,
             final CycleType cycleType, final DateTime when) {
         if (degree == null || cycleType == null) {
@@ -1018,10 +1053,21 @@ public class AcademicTariff extends AcademicTariff_Base {
         final DegreeType degreeType = degree.getDegreeType();
 
         {
-            Set<? extends AcademicTariff> activeTariffs =
-                    findActive(finantialEntity, product, administrativeOffice, degreeType, degree, cycleType, when)
-                            .collect(Collectors.<AcademicTariff> toSet());
+            // TODO: Before removing tariffs associated with AdministrativeOffice, ignore AdministrativeOffice for 
+            // search with CycleType, Degree and Degree Type
+            
+//            Set<? extends AcademicTariff> activeTariffs =
+//                    findActive(finantialEntity, product, administrativeOffice, degreeType, degree, cycleType, when)
+//                            .collect(Collectors.<AcademicTariff> toSet());
 
+            Set<? extends AcademicTariff> activeTariffs =
+                    find(finantialEntity, product)
+                .filter(t -> degreeType == t.getDegreeType())                    
+                .filter(t -> t.getDegree() == degree)                    
+                .filter(t -> t.getCycleType() == cycleType)            
+                .filter(t -> t.isActive(when))
+                .collect(Collectors.<AcademicTariff> toSet());
+            
             if (activeTariffs.size() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.findActive.more.than.one");
             } else if (activeTariffs.size() == 1) {

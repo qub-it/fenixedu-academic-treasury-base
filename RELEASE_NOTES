@@ -1,3 +1,6 @@
+- Refactor: When creating consider academic tariffs with AdministrativeOffice or without AdministrativeOffice as the same, when checking if there is a overlapping tariffs
+- Refactor: Find match of academic tariffs for degreeType, degree or cycle type with or without AdministrativeOffice
+
 8.3.8 (21-06-2022)
 - Bug Fix: Fix condition in check rules for requirement of TuitionInstallmentTariff fixedAmount
 - Bug Fix: Check if TuitionPaymentPlan.customizedName is not null before filling it in TuitionPaymentPlanBean
