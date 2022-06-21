@@ -1,3 +1,4 @@
+8.3.8 (21-06-2022)
 - Bug Fix: Fix condition in check rules for requirement of TuitionInstallmentTariff fixedAmount
 - Bug Fix: Check if TuitionPaymentPlan.customizedName is not null before filling it in TuitionPaymentPlanBean
 - Bug Fix: Intialize map between condition and values in TuitionPaymentPlanBean
