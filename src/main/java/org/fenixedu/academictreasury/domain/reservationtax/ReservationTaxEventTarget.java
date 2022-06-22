@@ -36,7 +36,7 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
     }
 
     protected ReservationTaxEventTarget(FinantialEntity finantialEntity, Product product, Person person,
-            DegreeCurricularPlan degreeCurricularPlan, ExecutionYear executionYear, boolean discountInTuitionFee,
+            DegreeCurricularPlan degreeCurricularPlan, ExecutionInterval executionInterval, boolean discountInTuitionFee,
             LocalDate taxReservationDate, LocalizedString taxReservationDescription) {
         this();
 
@@ -44,7 +44,7 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
         super.setProduct(product);
         super.setPerson(person);
         super.setDegreeCurricularPlan(degreeCurricularPlan);
-        super.setExecutionYear(executionYear);
+        super.setExecutionInterval(executionInterval);
         super.setDiscountInTuitionFee(discountInTuitionFee);
         super.setTaxReservationDate(taxReservationDate);
         super.setTaxReservationDescription(taxReservationDescription);
@@ -69,8 +69,8 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
             throw new AcademicTreasuryDomainException("error.ReservationTaxEventTarget.degreeCurricularPlan.required");
         }
 
-        if (getExecutionYear() == null) {
-            throw new AcademicTreasuryDomainException("error.ReservationTaxEventTarget.executionYear.required");
+        if (getExecutionInterval() == null) {
+            throw new AcademicTreasuryDomainException("error.ReservationTaxEventTarget.executionInterval.required");
         }
 
         if (getDiscountInTuitionFee() == null) {
@@ -87,14 +87,14 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
     }
 
     public static ReservationTaxEventTarget createReservationTaxDebt(ReservationTax reservationTax, Person person,
-            DegreeCurricularPlan degreeCurricularPlan, ExecutionYear executionYear, LocalDate taxReservationDate) {
-        return createReservationTaxDebt(reservationTax, person, degreeCurricularPlan, executionYear, taxReservationDate, null);
+            DegreeCurricularPlan degreeCurricularPlan, ExecutionInterval executionInterval, LocalDate taxReservationDate) {
+        return createReservationTaxDebt(reservationTax, person, degreeCurricularPlan, executionInterval, taxReservationDate, null);
     }
 
     public static ReservationTaxEventTarget createReservationTaxDebt(ReservationTax reservationTax, Person person,
-            DegreeCurricularPlan degreeCurricularPlan, ExecutionYear executionYear, LocalDate taxReservationDate,
+            DegreeCurricularPlan degreeCurricularPlan, ExecutionInterval executionInterval, LocalDate taxReservationDate,
             LocalizedString additionalDescription) {
-        LocalizedString emolumentDescription = reservationTax.buildEmolumentDescription(executionYear);
+        LocalizedString emolumentDescription = reservationTax.buildEmolumentDescription(executionInterval);
 
         if (additionalDescription != null) {
             for (Locale locale : TreasuryPlataformDependentServicesFactory.implementation().availableLocales()) {
@@ -107,20 +107,20 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
         Product product = reservationTax.getProduct();
 
         Optional<ReservationTaxEventTarget> target =
-                ReservationTaxEventTarget.findUnique(person, product, degreeCurricularPlan, executionYear);
+                ReservationTaxEventTarget.findUnique(person, product, degreeCurricularPlan, executionInterval);
 
         if (!target.isPresent()) {
             target = Optional.of(new ReservationTaxEventTarget(finantialEntity, product, person, degreeCurricularPlan,
-                    executionYear,
+                    executionInterval,
                     Boolean.TRUE.equals(reservationTax.getDiscountInTuitionFee()), taxReservationDate, emolumentDescription));
         }
 
         Optional<ReservationTaxTariff> tariff =
-                ReservationTaxTariff.findUniqueTariff(reservationTax, degreeCurricularPlan.getDegree(), executionYear);
+                ReservationTaxTariff.findUniqueTariff(reservationTax, degreeCurricularPlan.getDegree(), executionInterval);
 
         if (!tariff.isPresent()) {
             throw new AcademicTreasuryDomainException("error.ReservationTaxEventTarget.createReservationTaxDebt.tariff.not.found",
-                    degreeCurricularPlan.getDegree().getPresentationName(), executionYear.getQualifiedName());
+                    degreeCurricularPlan.getDegree().getPresentationName(), executionInterval.getQualifiedName());
         }
 
         BigDecimal amount = tariff.get().getBaseAmount();
@@ -160,7 +160,11 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
 
     @Override
     public ExecutionYear getAcademicTreasuryTargetExecutionYear() {
-        return super.getExecutionYear();
+        if(getExecutionInterval() instanceof ExecutionYear) {
+            return (ExecutionYear) getExecutionInterval();
+        }
+        
+        return super.getExecutionInterval().getExecutionYear();
     }
 
     @Override
@@ -199,15 +203,15 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
     }
 
     public static Stream<ReservationTaxEventTarget> find(Person person, Product product,
-            DegreeCurricularPlan degreeCurricularPlan, ExecutionYear executionYear) {
+            DegreeCurricularPlan degreeCurricularPlan, ExecutionInterval executionInterval) {
         return findAll().filter(t -> t.getPerson() == person).filter(r -> r.getProduct() == product)
                 .filter(r -> r.getDegreeCurricularPlan() == degreeCurricularPlan)
-                .filter(r -> r.getExecutionYear() == executionYear);
+                .filter(r -> r.getExecutionInterval() == executionInterval);
     }
 
     private static Optional<ReservationTaxEventTarget> findUnique(Person person, Product product,
-            DegreeCurricularPlan degreeCurricularPlan, ExecutionYear executionYear) {
-        return find(person, product, degreeCurricularPlan, executionYear).findFirst();
+            DegreeCurricularPlan degreeCurricularPlan, ExecutionInterval executionInterval) {
+        return find(person, product, degreeCurricularPlan, executionInterval).findFirst();
     }
 
 }

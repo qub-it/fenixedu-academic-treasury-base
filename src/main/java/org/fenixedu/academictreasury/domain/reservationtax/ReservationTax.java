@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang.text.StrSubstitutor;
-import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.FinantialEntity;
@@ -86,11 +86,11 @@ public class ReservationTax extends ReservationTax_Base {
         checkRules();
     }
 
-    public LocalizedString buildEmolumentDescription(ExecutionYear executionYear) {
+    public LocalizedString buildEmolumentDescription(ExecutionInterval executionInterval) {
         LocalizedString result = new LocalizedString();
         for (Locale locale : TreasuryPlataformDependentServicesFactory.implementation().availableLocales()) {
             Map<String, String> valueMap = new HashMap<String, String>();
-            valueMap.put("executionYear", executionYear.getQualifiedName());
+            valueMap.put("executionInterval", executionInterval.getQualifiedName());
             valueMap.put("productName", getProduct().getName().getContent(locale));
 
             result = result.with(locale, StrSubstitutor.replace(getTaxReservationDescription().getContent(locale), valueMap));
