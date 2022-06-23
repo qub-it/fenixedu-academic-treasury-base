@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang.text.StrSubstitutor;
+import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.commons.i18n.LocalizedString;
@@ -86,12 +87,16 @@ public class ReservationTax extends ReservationTax_Base {
         checkRules();
     }
 
-    public LocalizedString buildEmolumentDescription(ExecutionInterval executionInterval) {
+    public LocalizedString buildEmolumentDescription(DegreeCurricularPlan degreeCurricularPlan,
+            ExecutionInterval executionInterval) {
         LocalizedString result = new LocalizedString();
         for (Locale locale : TreasuryPlataformDependentServicesFactory.implementation().availableLocales()) {
             Map<String, String> valueMap = new HashMap<String, String>();
             valueMap.put("executionInterval", executionInterval.getQualifiedName());
             valueMap.put("productName", getProduct().getName().getContent(locale));
+            valueMap.put("degreeCurricularPlanName",
+                    degreeCurricularPlan.getPresentationName(executionInterval.getExecutionYear(), locale));
+            valueMap.put("degreeName", degreeCurricularPlan.getDegree().getPresentationName(executionInterval.getExecutionYear(), locale));
 
             result = result.with(locale, StrSubstitutor.replace(getTaxReservationDescription().getContent(locale), valueMap));
         }
