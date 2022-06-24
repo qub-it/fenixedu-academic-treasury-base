@@ -1,3 +1,4 @@
+8.4.0 (24-06-2022)
 - Refactor: Change relation between ReservationTaxEventTarget and ExecutionInterval, instead of ExecutionYear
 - Improvement: Support consumers when invoking ReservationTaxEventTarget::handleTotalPayment
 - Bug Fix: Various bug fixes and improvements in ReservationTax
