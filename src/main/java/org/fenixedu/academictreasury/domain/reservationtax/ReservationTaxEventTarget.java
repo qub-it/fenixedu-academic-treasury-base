@@ -141,8 +141,7 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
                     emolumentDescription));
         }
 
-        var api = TreasuryBridgeAPIFactory.implementation();
-        var treasuryEvent = (AcademicTreasuryEvent) api.getAcademicTreasuryEventForTarget(target.get());
+        var treasuryEvent = (AcademicTreasuryEvent) target.get().getReservationTaxAcademicTreasuryEvent();
 
         if (treasuryEvent != null && treasuryEvent.isCharged()) {
             return target.get();
@@ -227,11 +226,16 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
     public boolean isEventDiscountInTuitionFee() {
         return Boolean.TRUE.equals(super.getDiscountInTuitionFee());
     }
-
-    public BigDecimal getAmountToPay() {
+    
+    public IAcademicTreasuryEvent getReservationTaxAcademicTreasuryEvent() {
         var api = TreasuryBridgeAPIFactory.implementation();
 
-        IAcademicTreasuryEvent academicTreasuryEvent = api.getAcademicTreasuryEventForTarget(this);
+        return api.getAcademicTreasuryEventForTarget(this);
+    }
+
+    public BigDecimal getAmountToPay() {
+        IAcademicTreasuryEvent academicTreasuryEvent = getReservationTaxAcademicTreasuryEvent();
+
         if (academicTreasuryEvent != null) {
             academicTreasuryEvent.getAmountToPay();
         }
