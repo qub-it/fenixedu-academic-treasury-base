@@ -1,3 +1,7 @@
+- Refactor: Change relation between ReservationTaxEventTarget and ExecutionInterval, instead of ExecutionYear
+- Improvement: Support consumers when invoking ReservationTaxEventTarget::handleTotalPayment
+- Bug Fix: Various bug fixes and improvements in ReservationTax
+
 8.3.9 (21-06-2022)
 - Refactor: When creating consider academic tariffs with AdministrativeOffice or without AdministrativeOffice as the same, when checking if there is a overlapping tariffs
 - Refactor: Find match of academic tariffs for degreeType, degree or cycle type with or without AdministrativeOffice

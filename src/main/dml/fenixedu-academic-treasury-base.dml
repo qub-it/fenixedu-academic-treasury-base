@@ -1748,7 +1748,7 @@ class reservationtax.ReservationTaxTariff {
 	}
 	
 	relation ReservationTaxTariffExecutionYear {
-		.org.fenixedu.academic.domain.ExecutionYear playsRole executionYear {
+		.org.fenixedu.academic.domain.ExecutionInterval playsRole executionInterval {
 			multiplicity 1..1;
 		}
 	
@@ -1814,7 +1814,7 @@ class reservationtax.ReservationTaxEventTarget {
 	}
 	
 	relation ReservationTaxEventTargetExecutionYear {
-		.org.fenixedu.academic.domain.ExecutionYear playsRole executionYear {
+		.org.fenixedu.academic.domain.ExecutionInterval playsRole executionInterval {
 			multiplicity 1..1;
 		}
 	
