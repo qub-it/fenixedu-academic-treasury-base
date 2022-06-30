@@ -1,3 +1,4 @@
+8.4.1 (30-06-2022)
 - Bug Fix: Fix the missing return from calculating the tariff when the academic service request has the cycle type
 
 8.4.0 (24-06-2022)
