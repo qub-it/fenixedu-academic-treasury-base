@@ -1,3 +1,5 @@
+- Bug Fix: Fix the missing return from calculating the tariff when the academic service request has the cycle type
+
 8.4.0 (24-06-2022)
 - Refactor: Change relation between ReservationTaxEventTarget and ExecutionInterval, instead of ExecutionYear
 - Improvement: Support consumers when invoking ReservationTaxEventTarget::handleTotalPayment

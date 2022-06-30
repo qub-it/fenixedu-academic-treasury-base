@@ -155,7 +155,7 @@ public class EmolumentServices {
         final Product product = ServiceRequestMapEntry.findProduct(iTreasuryServiceRequest);
 
         if (iTreasuryServiceRequest.hasCycleType()) {
-            AcademicTariff.findMatch(finantialEntity, product, degree, cycleType, when.toDateTimeAtStartOfDay());
+            return AcademicTariff.findMatch(finantialEntity, product, degree, cycleType, when.toDateTimeAtStartOfDay());
         }
 
         return AcademicTariff.findMatch(finantialEntity, product, degree, when.toDateTimeAtStartOfDay());
