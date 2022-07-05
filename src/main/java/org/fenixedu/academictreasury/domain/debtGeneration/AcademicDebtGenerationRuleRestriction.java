@@ -86,6 +86,24 @@ public abstract class AcademicDebtGenerationRuleRestriction extends AcademicDebt
         
         super.deleteDomainObject();
     }
+
+    /* TODO: Transform this method as abstract method
+     * 
+     * For now this method throws an exception instead of being abstract, due to many subclasses in various modules.
+     * To not risk errors due to unimplemented method, throw an exception until all subclasses of various modules are covered
+     */
+    public String exportDataAsJson() {
+        throw new UnsupportedOperationException("This operation must be implemented by subclass");
+    }
+    
+    /* TODO: Transform this method as abstract method
+     * 
+     * For now this method throws an exception instead of being abstract, due to many subclasses in various modules.
+     * To not risk errors due to unimplemented method, throw an exception until all subclasses of various modules are covered
+     */
+    public void fillDataFromJsonSerializedObject(String jsonSerializedObject) {
+        throw new UnsupportedOperationException("This operation must be implemented by subclass");
+    }
     
     /*
      * ********
