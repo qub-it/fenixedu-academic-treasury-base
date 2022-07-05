@@ -51,7 +51,7 @@ public class FirstTimeFirstYearRestriction extends FirstTimeFirstYearRestriction
         super();
     }
     
-    protected FirstTimeFirstYearRestriction(AcademicDebtGenerationRule rule) {
+    public FirstTimeFirstYearRestriction(AcademicDebtGenerationRule rule) {
         this();
         super.init(rule);
     }

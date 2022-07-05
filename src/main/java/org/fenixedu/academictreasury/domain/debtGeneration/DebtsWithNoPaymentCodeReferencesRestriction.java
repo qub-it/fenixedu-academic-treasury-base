@@ -53,7 +53,7 @@ public class DebtsWithNoPaymentCodeReferencesRestriction extends DebtsWithNoPaym
         super();
     }
     
-    protected DebtsWithNoPaymentCodeReferencesRestriction(AcademicDebtGenerationRule rule) {
+    public DebtsWithNoPaymentCodeReferencesRestriction(AcademicDebtGenerationRule rule) {
         this();
         super.init(rule);
     }

@@ -89,7 +89,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         return c != 0 ? c : o1.getExternalId().compareTo(o2.getExternalId());
     };
 
-    protected AcademicDebtGenerationRule() {
+    public AcademicDebtGenerationRule() {
         super();
         setDomainRoot(FenixFramework.getDomainRoot());
     }
@@ -186,7 +186,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         checkRules();
     }
 
-    private void checkRules() {
+    public void checkRules() {
         if (getDomainRoot() == null) {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.bennu.required");
         }
