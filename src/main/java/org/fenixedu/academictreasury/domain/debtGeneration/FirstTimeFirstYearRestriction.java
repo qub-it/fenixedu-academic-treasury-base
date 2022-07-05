@@ -43,6 +43,7 @@ import java.util.List;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.treasury.util.TreasuryConstants;
 
 public class FirstTimeFirstYearRestriction extends FirstTimeFirstYearRestriction_Base {
     
@@ -77,6 +78,16 @@ public class FirstTimeFirstYearRestriction extends FirstTimeFirstYearRestriction
     @Override
     public FirstTimeFirstYearRestriction makeCopy(AcademicDebtGenerationRule ruleToCreate) {
         return create(ruleToCreate);
+    }
+    
+    @Override
+    public String exportDataAsJson() {
+        return TreasuryConstants.propertiesMapToJson(Collections.emptyMap());
+    }
+
+    @Override
+    public void fillDataFromJsonSerializedObject(String jsonSerializedObject) {
+        // No properties to fill. Do nothing
     }
     
     /*

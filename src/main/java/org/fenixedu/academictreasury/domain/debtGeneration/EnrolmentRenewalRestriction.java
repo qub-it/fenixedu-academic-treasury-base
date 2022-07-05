@@ -43,6 +43,7 @@ import java.util.List;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.commons.i18n.LocalizedString;
+import org.fenixedu.treasury.util.TreasuryConstants;
 
 public class EnrolmentRenewalRestriction extends EnrolmentRenewalRestriction_Base {
 
@@ -79,6 +80,16 @@ public class EnrolmentRenewalRestriction extends EnrolmentRenewalRestriction_Bas
         return create(ruleToCreate);
     }
 
+    @Override
+    public String exportDataAsJson() {
+        return TreasuryConstants.propertiesMapToJson(Collections.emptyMap());
+    }
+
+    @Override
+    public void fillDataFromJsonSerializedObject(String jsonSerializedObject) {
+        // No properties to fill. Do nothing
+    }
+    
     /*
      * ********
      * SERVICES
@@ -92,4 +103,5 @@ public class EnrolmentRenewalRestriction extends EnrolmentRenewalRestriction_Bas
     public static LocalizedString RESTRICTION_NAME() {
         return academicTreasuryBundleI18N("label.EnrolmentRenewalRestriction.restrictionName");
     }
+
 }

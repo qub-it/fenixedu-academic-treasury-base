@@ -1,3 +1,5 @@
+- Refactor: Implement import and export operations for AcademicDebtGenerationRuleRestriction class and subclasses, in order to be able to migrate from other systems
+
 8.2.7 (22-06-2022)
 - Bug Fix: Return degreeCode for AcademicTreasuryEvent, for standaloneTuition, extracurricularTuition, improvementTuition and customAcademicDebt
 

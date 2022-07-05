@@ -45,6 +45,7 @@ import org.fenixedu.academictreasury.domain.debtGeneration.strategies.CreatePaym
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
+import org.fenixedu.treasury.util.TreasuryConstants;
 
 public class DebtsWithNoPaymentCodeReferencesRestriction extends DebtsWithNoPaymentCodeReferencesRestriction_Base {
     
@@ -87,6 +88,16 @@ public class DebtsWithNoPaymentCodeReferencesRestriction extends DebtsWithNoPaym
         return create(ruleToCreate);
     }
     
+    @Override
+    public String exportDataAsJson() {
+        return TreasuryConstants.propertiesMapToJson(Collections.emptyMap());
+    }
+
+    @Override
+    public void fillDataFromJsonSerializedObject(String jsonSerializedObject) {
+        // No properties to fill. Do nothing
+    }
+    
     /*
      * ********
      * SERVICES
@@ -100,5 +111,5 @@ public class DebtsWithNoPaymentCodeReferencesRestriction extends DebtsWithNoPaym
     public static LocalizedString RESTRICTION_NAME() {
         return academicTreasuryBundleI18N("label.DebtsWithNoPaymentCodeReferences.restrictionName");
     }
-    
+
 }
