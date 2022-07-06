@@ -87,19 +87,6 @@ public class PaymentPenaltySettings extends PaymentPenaltySettings_Base {
         }
     }
 
-    public LocalizedString buildEmolumentDescription(PaymentPenaltyEventTarget target) {
-        LocalizedString result = new LocalizedString();
-        for (Locale locale : TreasuryPlataformDependentServicesFactory.implementation().availableLocales()) {
-            Map<String, String> valueMap = new HashMap<String, String>();
-            valueMap.put("debitEntryDescription", target.getOriginDebitEntry().getDescription());
-            valueMap.put("penaltyProductName", getPenaltyProduct().getName().getContent(locale));
-
-            result = result.with(locale, StrSubstitutor.replace(getEmolumentDescription().getContent(locale), valueMap));
-        }
-
-        return result;
-    }
-
     @Atomic
     public void delete() {
         setDomainRoot(null);

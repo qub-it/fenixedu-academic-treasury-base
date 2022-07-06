@@ -1649,30 +1649,7 @@ class paymentpenalty.PaymentPenaltySettings {
 		}
 	}
 	
-// Deprecated 
-class paymentpenalty.PaymentPenaltyEventTarget {
-}
-
-	relation PaymentPenaltyEventTargetDomainRoot {
-		.pt.ist.fenixframework.DomainRoot playsRole domainRoot {
-			multiplicity 1..1;
-		}
-	
-		paymentpenalty.PaymentPenaltyEventTarget playsRole paymentPenaltyEventTargets {
-			multiplicity *;
-		}
-	}
-	
-	relation PaymentPenaltyEventTargetDebitEntry {
-		.org.fenixedu.treasury.domain.document.DebitEntry playsRole originDebitEntry {
-			multiplicity 1..1;
-		}
-		
-		paymentpenalty.PaymentPenaltyEventTarget playsRole paymentPenaltyEventTarget {
-			multiplicity 0..1;
-		}
-	}
-
+// Deprecated
 	
 /* ***************
  * Reservation Tax
