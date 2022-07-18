@@ -1,4 +1,5 @@
 - Refactor: Remove deprecated PaymentPenaltyEventTarget entity
+- Refactor: Do not mark AcademicTariff::findMatch by CycleType as not deprecated
 
 8.4.2 (05-07-2022)
 - Refactor: Implement import and export operations for AcademicDebtGenerationRuleRestriction class and subclasses, in order to be able to migrate from other systems

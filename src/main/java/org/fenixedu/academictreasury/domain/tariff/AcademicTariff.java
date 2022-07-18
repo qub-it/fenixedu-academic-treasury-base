@@ -816,9 +816,7 @@ public class AcademicTariff extends AcademicTariff_Base {
         return find(finantialEntity, product, administrativeOffice, degreeType).filter(t -> t.getDegree() == degree);
     }
 
-    @Deprecated
-    // TODO: FFUL still distinguish the cycle in one case. Instead of removing this, remove the cycle type from
-    // the academic tariff creation
+    // FFUL still distinguish the cycle in one case. So this method is not deprecated
     private static Stream<? extends AcademicTariff> find(final FinantialEntity finantialEntity, final Product product,
             final AdministrativeOffice administrativeOffice, final DegreeType degreeType, final Degree degree,
             final CycleType cycleType) {
@@ -859,9 +857,7 @@ public class AcademicTariff extends AcademicTariff_Base {
         return find(finantialEntity, product, administrativeOffice, degreeType, degree).filter(t -> t.isActive(when));
     }
 
-    @Deprecated
-    // TODO: FFUL still distinguish the cycle in one case. Instead of removing this, remove the cycle type from
-    // the academic tariff creation
+    // FFUL still distinguish the cycle in one case. So this method is not deprecated
     public static Stream<? extends AcademicTariff> findActive(final FinantialEntity finantialEntity, final Product product,
             final AdministrativeOffice administrativeOffice, final DegreeType degreeType, final Degree degree,
             final CycleType cycleType, final DateTime when) {
@@ -1040,9 +1036,7 @@ public class AcademicTariff extends AcademicTariff_Base {
         return findMatch(finantialEntity, product, administrativeOffice, degreeType, when);
     }
 
-    @Deprecated
-    // TODO: FFUL still distinguish the cycle in one case. Instead of removing this, remove the cycle type from
-    // the academic tariff creation
+    // FFUL still distinguish the cycle in one case. So this method is not deprecated
     public static AcademicTariff findMatch(final FinantialEntity finantialEntity, final Product product, final Degree degree,
             final CycleType cycleType, final DateTime when) {
         if (degree == null || cycleType == null) {
