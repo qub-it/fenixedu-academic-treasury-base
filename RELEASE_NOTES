@@ -1,3 +1,4 @@
+8.4.3 (19-07-2022)
 - Refactor: Remove deprecated PaymentPenaltyEventTarget entity
 - Refactor: Do not mark AcademicTariff::findMatch by CycleType as not deprecated
 - Refactor: Do not register the AdministrativeOffice in the AcademicTariff entity
