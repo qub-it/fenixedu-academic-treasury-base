@@ -124,7 +124,6 @@ public class AcademicTariff extends AcademicTariff_Base {
         setUrgencyRate(bean.getUrgencyRate());
         setLanguageTranslationRate(bean.getLanguageTranslationRate());
 
-        setAdministrativeOffice(bean.getAdministrativeOffice());
         setDegreeType(bean.getDegreeType());
         setDegree(bean.getDegree());
         setCycleType(bean.getCycleType());
