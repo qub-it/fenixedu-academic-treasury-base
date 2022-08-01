@@ -1,3 +1,4 @@
+8.4.4 (01-08-2022)
 - Bug Fix: In finding the best academic tariff, if the administrative office is null then return the tariff for finantial entity
 
 8.4.3 (19-07-2022)
