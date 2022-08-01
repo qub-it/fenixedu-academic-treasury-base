@@ -943,7 +943,7 @@ public class AcademicTariff extends AcademicTariff_Base {
     public static AcademicTariff findMatch(final FinantialEntity finantialEntity, final Product product,
             final AdministrativeOffice administrativeOffice, final DateTime when) {
         if (administrativeOffice == null) {
-            throw new RuntimeException("administrative office is null. wrong findMatch call");
+            return findMatch(finantialEntity, product, when);
         }
 
         // Fallback to administrativeOffice and return
