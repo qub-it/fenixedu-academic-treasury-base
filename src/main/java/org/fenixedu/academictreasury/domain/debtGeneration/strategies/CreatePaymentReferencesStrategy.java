@@ -67,6 +67,8 @@ import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
+import org.fenixedu.treasury.domain.paymentcodes.integration.SibsPaymentCodePool;
+import org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform;
 import org.fenixedu.treasury.domain.settings.TreasurySettings;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.LocalDate;
@@ -247,9 +249,17 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
                     debitEntryWithoutDebitNote.getDescription());
         }
 
-        if (SibsPaymentRequest.findRequestedByDebitEntriesSet(debitEntries).count() > 0
-                || SibsPaymentRequest.findCreatedByDebitEntriesSet(debitEntries).count() > 0) {
-            return;
+        DebtAccount debtAccount = debitEntries.iterator().next().getDebtAccount();
+        DigitalPaymentPlatform defaultDigitalPaymentPlatform = debtAccount.getFinantialInstitution().getDefaultDigitalPaymentPlatform();
+        boolean isSibsPaymentCodePool = defaultDigitalPaymentPlatform instanceof SibsPaymentCodePool;
+        
+        // Avoid duplicated check made in SibsPaymentCodePool to verify if there is an active 
+        // reference code for debitEntries
+        if(!isSibsPaymentCodePool) {
+            if (SibsPaymentRequest.findRequestedByDebitEntriesSet(debitEntries).count() > 0
+                    || SibsPaymentRequest.findCreatedByDebitEntriesSet(debitEntries).count() > 0) {
+                return;
+            }
         }
 
         final BigDecimal amount =
@@ -261,7 +271,6 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
                     "error.CreatePaymentReferencesStrategy.amount.is.less.than.minimumAmountForPaymentCode");
         }
 
-        DebtAccount debtAccount = debitEntries.iterator().next().getDebtAccount();
         debtAccount.getFinantialInstitution().getDefaultDigitalPaymentPlatform().castToSibsPaymentCodePoolService()
                 .createSibsPaymentRequest(debtAccount, debitEntries, Collections.emptySet());
 
