@@ -664,16 +664,16 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         final String fiscalNumber = PersonCustomer.fiscalNumber(person);
 
         if (Strings.isNullOrEmpty(fiscalCountryCode) || Strings.isNullOrEmpty(fiscalNumber)) {
-            AcademicTreasuryDomainException exception = new AcademicTreasuryDomainException(
-                    "error.RegistrationServices.createPersonCustomer.fiscalInformation.required", person.getName());
-            logger.warn(exception.getLocalizedMessage());
-
-            throw exception;
+            // 2022-09-21: Remove the restriction of fiscal information requirement in
+            // creating a registration. The caller decide whether to throw exception or not
+            // Simply return false and delegate the customer creation requirement by the caller
+            return false;
         }
 
         final Optional<? extends PersonCustomer> findUnique = PersonCustomer.findUnique(person, fiscalCountryCode, fiscalNumber);
         if (findUnique.isPresent()) {
-            return false;
+            // If it is present return true, to inform that customer is created
+            return true;
         }
 
         PersonCustomer.create(person, fiscalCountryCode, fiscalNumber);

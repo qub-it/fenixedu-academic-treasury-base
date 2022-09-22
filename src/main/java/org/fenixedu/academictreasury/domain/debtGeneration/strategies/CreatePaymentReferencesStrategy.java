@@ -38,9 +38,11 @@ package org.fenixedu.academictreasury.domain.debtGeneration.strategies;
 import static org.fenixedu.academictreasury.domain.debtGeneration.IAcademicDebtGenerationRuleStrategy.findActiveDebitEntries;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,6 +58,7 @@ import org.fenixedu.academictreasury.domain.emoluments.AcademicTax;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
+import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
 import org.fenixedu.academictreasury.services.AcademicTaxServices;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
@@ -228,10 +231,8 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
         // For each product try to grab or create if requested
         final Set<DebitEntry> debitEntries = grabDebitEntries(rule, registration);
 
-        if (!Sets
-                .difference(rule.getAcademicDebtGenerationRuleEntriesSet().stream().map(e -> e.getProduct())
-                        .collect(Collectors.toSet()), debitEntries.stream().map(d -> d.getProduct()).collect(Collectors.toSet()))
-                .isEmpty()) {
+        if (!isGrabbedDebitEntriesMatchAllProductsReferencedInRule(rule, debitEntries)) {
+            // There is a mismatch, do nothing
             return;
         }
 
@@ -247,6 +248,7 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
                     debitEntryWithoutDebitNote.getDescription());
         }
 
+        // Check if grabbed debit entries has already an active SIBS payment request
         if (SibsPaymentRequest.findRequestedByDebitEntriesSet(debitEntries).count() > 0
                 || SibsPaymentRequest.findCreatedByDebitEntriesSet(debitEntries).count() > 0) {
             return;
@@ -270,6 +272,15 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
         }
     }
 
+    private boolean isGrabbedDebitEntriesMatchAllProductsReferencedInRule(final AcademicDebtGenerationRule rule,
+            final Set<DebitEntry> grabbedDebitEntries) {
+        Set<Product> productsFromRuleSet =
+                rule.getAcademicDebtGenerationRuleEntriesSet().stream().map(e -> e.getProduct()).collect(Collectors.toSet());
+        Set<Product> productsFromGrabbedDebitEntries = grabbedDebitEntries.stream().map(d -> d.getProduct()).collect(Collectors.toSet());
+        
+        return Sets.difference(productsFromRuleSet, productsFromGrabbedDebitEntries).isEmpty();
+    }
+
     public static Set<DebitEntry> grabDebitEntries(final AcademicDebtGenerationRule rule, final Registration registration) {
         final Set<DebitEntry> debitEntries = Sets.newHashSet();
 
@@ -281,11 +292,26 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
 
             // Check if the product is tuition kind
             if (tuitionProductGroup == product.getProductGroup()) {
-                DebitEntry grabbedDebitEntry = grabDebitEntryForTuition(rule, registration, entry);
+                Optional<TuitionPaymentPlanGroup> groupForExtracurricular =
+                        TuitionPaymentPlanGroup.findUniqueDefaultGroupForExtracurricular();
+                Optional<TuitionPaymentPlanGroup> groupForStandalone =
+                        TuitionPaymentPlanGroup.findUniqueDefaultGroupForStandalone();
 
-                if (grabbedDebitEntry != null) {
-                    debitEntries.add(grabbedDebitEntry);
+                if (groupForExtracurricular.isPresent() && groupForExtracurricular.get().getCurrentProduct() == product) {
+                    debitEntries.addAll(grabDebitEntriesForNonCurricularGroupGroupTuition(rule, registration, entry,
+                            groupForExtracurricular.get()));
+                } else if (groupForStandalone.isPresent() && groupForStandalone.get().getCurrentProduct() == product) {
+                    debitEntries.addAll(grabDebitEntriesForNonCurricularGroupGroupTuition(rule, registration, entry,
+                            groupForStandalone.get()));
+                } else {
+                    // Registration tuition
+                    DebitEntry grabbedDebitEntry = grabDebitEntryForRegistrationTuition(rule, registration, entry);
+
+                    if (grabbedDebitEntry != null) {
+                        debitEntries.add(grabbedDebitEntry);
+                    }
                 }
+
             } else if (AcademicTax.findUnique(product).isPresent()) {
                 // Check if the product is an academic tax
                 DebitEntry grabbedDebitEntry = grabDebitEntryForAcademicTax(rule, registration, entry);
@@ -299,6 +325,33 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
         }
 
         return debitEntries;
+    }
+
+    private static Collection<? extends DebitEntry> grabDebitEntriesForNonCurricularGroupGroupTuition(
+            AcademicDebtGenerationRule rule, Registration registration, AcademicDebtGenerationRuleEntry entry,
+            TuitionPaymentPlanGroup tuitionPaymentPlanGroup) {
+        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        PersonCustomer customer = services.personCustomer(registration.getPerson());
+
+        if (customer == null) {
+            return null;
+        }
+
+        final Product product = entry.getProduct();
+        final ExecutionYear executionYear = rule.getExecutionYear();
+
+        AcademicTreasuryEvent t = null;
+
+        if (tuitionPaymentPlanGroup.isForExtracurricular()) {
+            t = TuitionServices.findAcademicTreasuryEventTuitionForExtracurricular(registration, executionYear);
+        } else if (tuitionPaymentPlanGroup.isForStandalone()) {
+            t = TuitionServices.findAcademicTreasuryEventTuitionForStandalone(registration, executionYear);
+        }
+
+        return findActiveDebitEntries(customer, t, product).filter(d -> d.isInDebt())
+                .filter(d -> SibsPaymentRequest.findCreatedByDebitEntry(d).count() == 0
+                        && SibsPaymentRequest.findRequestedByDebitEntry(d).count() == 0)
+                .collect(Collectors.toSet());
     }
 
     private static DebitEntry grabDebitEntryForAcademicTax(final AcademicDebtGenerationRule rule, final Registration registration,
@@ -323,8 +376,8 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
         return null;
     }
 
-    private static DebitEntry grabDebitEntryForTuition(final AcademicDebtGenerationRule rule, final Registration registration,
-            final AcademicDebtGenerationRuleEntry entry) {
+    private static DebitEntry grabDebitEntryForRegistrationTuition(final AcademicDebtGenerationRule rule,
+            final Registration registration, final AcademicDebtGenerationRuleEntry entry) {
         IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
         PersonCustomer customer = services.personCustomer(registration.getPerson());
 

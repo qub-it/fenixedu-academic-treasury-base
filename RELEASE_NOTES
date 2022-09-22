@@ -1,3 +1,6 @@
+- Refactor: Do not throw exception in service to create customer if it is missing, instead return false if it is not created. The callers decide if exception is thrown or not. If exists return true.
+- Improvement: Support creation of sibs payment references for extracurricular or standalone tuition debts, in academic debt generation rule.
+
 8.4.4 (01-08-2022)
 - Bug Fix: In finding the best academic tariff, if the administrative office is null then return the tariff for finantial entity
 
