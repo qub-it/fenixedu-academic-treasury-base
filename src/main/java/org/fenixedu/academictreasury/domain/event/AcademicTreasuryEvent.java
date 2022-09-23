@@ -55,8 +55,10 @@ import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.serviceRequests.AcademicServiceRequest;
+import org.fenixedu.academic.domain.serviceRequests.AcademicServiceRequestSituationType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationDataByExecutionYear;
+import org.fenixedu.academic.domain.student.registrationStates.RegistrationStateType;
 import org.fenixedu.academic.domain.treasury.AcademicTreasuryEventPayment;
 import org.fenixedu.academic.domain.treasury.IAcademicServiceRequestAndAcademicTaxTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEvent;
@@ -89,6 +91,8 @@ import org.fenixedu.treasury.domain.tariff.Tariff;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -98,6 +102,8 @@ import pt.ist.fenixframework.core.AbstractDomainObject;
 
 public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements IAcademicTreasuryEvent, ITuitionTreasuryEvent,
         IImprovementTreasuryEvent, IAcademicServiceRequestAndAcademicTaxTreasuryEvent {
+
+    private static Logger logger = LoggerFactory.getLogger(AcademicTreasuryEvent.class);
 
     public AcademicTreasuryEvent() {
         super();
@@ -707,18 +713,18 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         if (isForRegistrationTuition() && getRegistration() != null) {
             degree = getRegistration().getDegree();
         } else if (isForStandaloneTuition() || isForExtracurricularTuition()) {
-            if(getRegistration() != null) {
+            if (getRegistration() != null) {
                 degree = getRegistration().getDegree();
             }
         } else if (isForImprovementTax()) {
-            if(getRegistration() != null) {
+            if (getRegistration() != null) {
                 degree = getRegistration().getDegree();
             }
         } else if (isForAcademicTax() && getRegistration() != null) {
             degree = getRegistration().getDegree();
         } else if (isForAcademicServiceRequest() && getRegistration() != null) {
             degree = getRegistration().getDegree();
-        } else if(isForCustomAcademicDebt() && getRegistration() != null) {
+        } else if (isForCustomAcademicDebt() && getRegistration() != null) {
             degree = getRegistration().getDegree();
         }
 
@@ -1492,8 +1498,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         final DebitEntry debitEntry = orderedTuitionDebitEntriesList().get(installmentOrder);
 
         BigDecimal result = debitEntry.getNetExemptedAmount();
-        result = result.add(debitEntry.getCreditEntriesSet().stream().filter(l -> l.isFromExemption())
-                .map(l -> l.getNetAmount()).reduce((a, b) -> a.add(b)).orElse(BigDecimal.ZERO));
+        result = result.add(debitEntry.getCreditEntriesSet().stream().filter(l -> l.isFromExemption()).map(l -> l.getNetAmount())
+                .reduce((a, b) -> a.add(b)).orElse(BigDecimal.ZERO));
 
         return result;
     }
@@ -1705,6 +1711,78 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         }
         return "{\"" + AcademicTreasuryEventKeys.DEGREE_CODE + "\":\"" + degreeCode + "\",\""
                 + AcademicTreasuryEventKeys.EXECUTION_YEAR + "\":\"" + executionYear + "\"}";
+    }
+
+    @Override
+    public LocalizedString getEventTargetCurrentState() {
+        ITreasuryPlatformDependentServices platformServices = TreasuryPlataformDependentServicesFactory.implementation();
+        // Catch the exception and log only, to prevent an error
+        // that will deny access to the debt account and
+        // execution of treasury operations
+        
+        try {
+
+            if (isForAcademicServiceRequest()) {
+                return getAcademicRequestStateDescription(platformServices);
+            } else if (isForAcademicTax()) {
+                return registrationStateDescription(platformServices);
+            } else if (isForExtracurricularTuition()) {
+                return registrationStateDescription(platformServices);
+            } else if (isForImprovementTax()) {
+                return registrationStateDescription(platformServices);
+            } else if (isForRegistrationTuition()) {
+                return registrationStateDescription(platformServices);
+            } else if (isForStandaloneTuition()) {
+                return registrationStateDescription(platformServices);
+            } else if (isForTreasuryEventTarget()) {
+                IAcademicTreasuryTarget target = (IAcademicTreasuryTarget) getTreasuryEventTarget();
+                
+                return target.getEventTargetCurrentState();
+            } else if (isLegacy()) {
+                return new LocalizedString();
+            } else if (isCustomAcademicDebt()) {
+                return registrationStateDescription(platformServices);
+            }
+        } catch (Exception e) {
+            logger.error(e.getLocalizedMessage(), e);
+        }
+
+        return new LocalizedString();
+    }
+
+    private LocalizedString getAcademicRequestStateDescription(ITreasuryPlatformDependentServices platformServices) {
+        ITreasuryServiceRequest request = getITreasuryServiceRequest();
+        AcademicServiceRequest serviceRequest = (AcademicServiceRequest) request;
+
+        AcademicServiceRequestSituationType currentSituationType = serviceRequest.getAcademicServiceRequestSituationType();
+        
+        if(currentSituationType != null) {
+            LocalizedString ls = new LocalizedString();
+            for (Locale locale : platformServices.availableLocales()) {
+                ls = ls.with(locale, currentSituationType.getLocalizedName(locale));
+            }
+            
+            return ls;
+        }
+        
+        return new LocalizedString();
+    }
+
+    private LocalizedString registrationStateDescription(ITreasuryPlatformDependentServices platformServices) {
+        Registration registration = getRegistration();
+        
+        RegistrationStateType lastStateType = registration.getLastStateType();
+        
+        if(lastStateType != null) {
+            LocalizedString ls = new LocalizedString();
+            for (Locale locale : platformServices.availableLocales()) {
+                ls = ls.with(locale, lastStateType.getDescription());
+            }
+            
+            return ls;
+        }
+        
+        return new LocalizedString();
     }
 
     /**

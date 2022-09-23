@@ -1,3 +1,5 @@
+- Refactor: Declare AcademicTreasuryEvent::getEventTargetCurrentState to retrieve to current state of the process associated with treasury event
+
 8.4.5 (22-09-2022)
 - Refactor: Do not throw exception in service to create customer if it is missing, instead return false if it is not created. The callers decide if exception is thrown or not. If exists return true.
 - Improvement: Support creation of sibs payment references for extracurricular or standalone tuition debts, in academic debt generation rule.
