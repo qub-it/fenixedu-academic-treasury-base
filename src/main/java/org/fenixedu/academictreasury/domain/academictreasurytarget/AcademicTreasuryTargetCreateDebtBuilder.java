@@ -257,7 +257,6 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
                     DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
             var now = new DateTime();
             var vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, new DateTime()).get();
-            var administrativeOffice = finantialEntity.getAdministrativeOffice();
             var person = target.getAcademicTreasuryTargetPerson();
 
             var personCustomer = AcademicTreasuryPlataformDependentServicesFactory.implementation().personCustomer(person);
@@ -283,8 +282,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
                 academicTariff = AcademicTariff.findMatch(finantialEntity, product, target.getAcademicTreasuryTargetDegree(),
                         when.toDateTimeAtStartOfDay());
             } else {
-                academicTariff =
-                        AcademicTariff.findMatch(finantialEntity, product, administrativeOffice, when.toDateTimeAtStartOfDay());
+                academicTariff = AcademicTariff.findMatch(finantialEntity, product, when.toDateTimeAtStartOfDay());
             }
 
             if (academicTariff == null) {
@@ -333,8 +331,8 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
     }
 
     private SibsPaymentRequest createPaymentReferenceCode(DebitEntry debitEntry, LocalDate dueDate) {
-        return paymentCodePool
-                .createSibsPaymentRequest(debitEntry.getDebtAccount(), Collections.singleton(debitEntry), Collections.emptySet());
+        return paymentCodePool.createSibsPaymentRequest(debitEntry.getDebtAccount(), Collections.singleton(debitEntry),
+                Collections.emptySet());
     }
 
     public static AcademicTreasuryTargetCreateDebtBuilder createBuilder() {

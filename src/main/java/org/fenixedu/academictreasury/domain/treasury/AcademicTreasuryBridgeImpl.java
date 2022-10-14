@@ -436,7 +436,6 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
                 DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
         final DateTime now = new DateTime();
         final Vat vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, new DateTime()).get();
-        final AdministrativeOffice administrativeOffice = finantialEntity.getAdministrativeOffice();
         final Person person = target.getAcademicTreasuryTargetPerson();
 
         PersonCustomer personCustomer = implementation.personCustomer(person);
@@ -465,7 +464,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
                     when.toDateTimeAtStartOfDay());
         } else {
             academicTariff =
-                    AcademicTariff.findMatch(finantialEntity, product, administrativeOffice, when.toDateTimeAtStartOfDay());
+                    AcademicTariff.findMatch(finantialEntity, product, when.toDateTimeAtStartOfDay());
         }
 
         if (academicTariff == null) {

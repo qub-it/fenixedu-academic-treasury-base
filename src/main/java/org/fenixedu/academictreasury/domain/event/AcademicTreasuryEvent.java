@@ -853,8 +853,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
                     .ofNullable(AcademicTariff.findMatch(finantialEntity, product, getDegree(), when.toDateTimeAtStartOfDay()));
         }
 
-        return Optional.ofNullable(AcademicTariff.findMatch(finantialEntity, product, finantialEntity.getAdministrativeOffice(),
-                when.toDateTimeAtStartOfDay()));
+        return Optional.ofNullable(AcademicTariff.findMatch(finantialEntity, product, when.toDateTimeAtStartOfDay()));
     }
 
     @Override
@@ -1719,7 +1718,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         // Catch the exception and log only, to prevent an error
         // that will deny access to the debt account and
         // execution of treasury operations
-        
+
         try {
 
             if (isForAcademicServiceRequest()) {
@@ -1736,7 +1735,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
                 return registrationStateDescription(platformServices);
             } else if (isForTreasuryEventTarget()) {
                 IAcademicTreasuryTarget target = (IAcademicTreasuryTarget) getTreasuryEventTarget();
-                
+
                 return target.getEventTargetCurrentState();
             } else if (isLegacy()) {
                 return new LocalizedString();
@@ -1755,33 +1754,33 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         AcademicServiceRequest serviceRequest = (AcademicServiceRequest) request;
 
         AcademicServiceRequestSituationType currentSituationType = serviceRequest.getAcademicServiceRequestSituationType();
-        
-        if(currentSituationType != null) {
+
+        if (currentSituationType != null) {
             LocalizedString ls = new LocalizedString();
             for (Locale locale : platformServices.availableLocales()) {
                 ls = ls.with(locale, currentSituationType.getLocalizedName(locale));
             }
-            
+
             return ls;
         }
-        
+
         return new LocalizedString();
     }
 
     private LocalizedString registrationStateDescription(ITreasuryPlatformDependentServices platformServices) {
         Registration registration = getRegistration();
-        
+
         RegistrationStateType lastStateType = registration.getLastStateType();
-        
-        if(lastStateType != null) {
+
+        if (lastStateType != null) {
             LocalizedString ls = new LocalizedString();
             for (Locale locale : platformServices.availableLocales()) {
                 ls = ls.with(locale, lastStateType.getDescription());
             }
-            
+
             return ls;
         }
-        
+
         return new LocalizedString();
     }
 
