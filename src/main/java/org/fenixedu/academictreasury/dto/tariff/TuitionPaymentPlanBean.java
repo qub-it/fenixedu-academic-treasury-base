@@ -377,10 +377,6 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
             errorMessages.add("error.TuitionPaymentPlan.interestFixedAmount.required");
         }
 
-        if (this.applyInterests && this.interestType != null && this.interestType.isDaily() && this.rate == null) {
-            errorMessages.add("error.TuitionPaymentPlan.interestRate.required");
-        }
-
         if (getTuitionInstallmentBeans().stream().filter(l -> l.getTuitionInstallmentProduct() == getTuitionInstallmentProduct())
                 .count() > 0) {
             errorMessages.add("error.TuitionPaymentPlan.installment.already.with.product");

@@ -40,7 +40,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.fenixedu.academic.domain.Degree;
-import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
 import org.fenixedu.academictreasury.domain.tariff.AcademicTariff;
@@ -79,7 +78,6 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
     private BigDecimal rate;
 
     /* AcademicTariff */
-    private AdministrativeOffice administrativeOffice;
     private DegreeType degreeType;
     private Degree degree;
     private CycleType cycleType;
@@ -135,14 +133,13 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         setNumberOfDaysAfterCreationForDueDate(0);
         setApplyInterests(false);
 
-        setInterestType(InterestType.DAILY);
+        setInterestType(InterestType.GLOBAL_RATE);
         setNumberOfDaysAfterDueDate(0);
         setApplyInFirstWorkday(false);
         setMaximumDaysToApplyPenalty(0);
         setInterestFixedAmount(BigDecimal.ZERO);
         setRate(BigDecimal.ZERO);
 
-        setAdministrativeOffice(null);
         setDegreeType(null);
         setDegree(null);
         setCycleType(null);
@@ -185,7 +182,6 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
                 academicTariff.isApplyInterests() ? academicTariff.getInterestRate().getInterestFixedAmount() : null);
         setRate(academicTariff.isApplyInterests() ? academicTariff.getInterestRate().getRate() : null);
 
-        setAdministrativeOffice(academicTariff.getAdministrativeOffice());
         setDegreeType(academicTariff.getDegreeType());
         setDegree(academicTariff.getDegree());
         setCycleType(academicTariff.getCycleType());
@@ -265,9 +261,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
             setRate(BigDecimal.ZERO);
         }
 
-        if (getInterestType() == null || !getInterestType().isDaily()) {
-            setMaximumDaysToApplyPenalty(0);
-        }
+        setMaximumDaysToApplyPenalty(0);
 
         if (getInterestType() == null || !getInterestType().isFixedAmount()) {
             setInterestFixedAmount(BigDecimal.ZERO);
@@ -389,14 +383,6 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
     public void setApplyInFirstWorkday(boolean applyInFirstWorkday) {
         this.applyInFirstWorkday = applyInFirstWorkday;
-    }
-
-    public AdministrativeOffice getAdministrativeOffice() {
-        return administrativeOffice;
-    }
-
-    public void setAdministrativeOffice(AdministrativeOffice administrativeOffice) {
-        this.administrativeOffice = administrativeOffice;
     }
 
     public DegreeType getDegreeType() {
