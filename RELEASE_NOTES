@@ -1,3 +1,5 @@
+- Improvement: Allow the creation of individual tuition payment plan installments
+
 8.4.8 (20-10-2022)
 - Refactor: Remove references of AdministrativeOffice in AcademicTariff and FinantialEntity
 

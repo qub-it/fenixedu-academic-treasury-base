@@ -68,6 +68,7 @@ import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCustomCalculato
 import org.fenixedu.academictreasury.dto.tuition.TuitionDebitEntryBean;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Currency;
+import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.Vat;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.document.DebitEntry;
@@ -122,13 +123,20 @@ public class TuitionServices {
     @Atomic
     public static boolean createInferedTuitionForRegistration(final Registration registration, final ExecutionYear executionYear,
             final LocalDate when, final boolean forceCreationIfNotEnrolled) {
-        return createTuitionForRegistration(registration, executionYear, when, forceCreationIfNotEnrolled, null, true);
+        return createTuitionForRegistration(registration, executionYear, when, forceCreationIfNotEnrolled, null, true, null, false);
     }
 
     @Atomic
+    public static boolean createTuitionForRegistration(Registration registration, ExecutionYear executionYear,
+            LocalDate debtDate, boolean forceCreationIfNotEnrolled, TuitionPaymentPlan tuitionPaymentPlan,
+            boolean applyTuitionServiceExtensions) {
+        return createTuitionForRegistration(registration, executionYear, debtDate, forceCreationIfNotEnrolled, tuitionPaymentPlan, true, null, false);
+    }
+    
     public static boolean createTuitionForRegistration(final Registration registration, final ExecutionYear executionYear,
             final LocalDate debtDate, final boolean forceCreationIfNotEnrolled, TuitionPaymentPlan tuitionPaymentPlan,
-            final boolean applyTuitionServiceExtensions) {
+            final boolean applyTuitionServiceExtensions, Set<Product> restrictCreationToInstallments, 
+            boolean forceEvenTreasuryEventIsCharged) {
 
         if (!isToPayRegistrationTuition(registration, executionYear) && !forceCreationIfNotEnrolled) {
             return false;
@@ -158,7 +166,7 @@ public class TuitionServices {
 
         final PersonCustomer personCustomer = PersonCustomer.findUnique(person, addressFiscalCountryCode, fiscalNumber).get();
         if (!personCustomer.isActive()) {
-            throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active", addressFiscalCountryCode, fiscalNumber);
+            throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active", personCustomer.getBusinessIdentification(), personCustomer.getName());
         }
 
         if (tuitionPaymentPlan == null) {
@@ -189,7 +197,8 @@ public class TuitionServices {
         final AcademicTreasuryEvent academicTreasuryEvent =
                 AcademicTreasuryEvent.findUniqueForRegistrationTuition(registration, executionYear).get();
 
-        return tuitionPaymentPlan.createDebitEntriesForRegistration(debtAccount, academicTreasuryEvent, debtDate);
+        return tuitionPaymentPlan.createDebitEntriesForRegistration(debtAccount, academicTreasuryEvent, 
+                debtDate, restrictCreationToInstallments, forceEvenTreasuryEventIsCharged);
     }
 
     public static TuitionPaymentPlan usedPaymentPlan(final Registration registration, final ExecutionYear executionYear,

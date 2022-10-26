@@ -67,6 +67,7 @@ import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.academictreasury.util.LocalizedStringUtil;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.FinantialEntity;
+import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.DebitNote;
@@ -364,12 +365,17 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     public boolean createDebitEntriesForRegistration(DebtAccount debtAccount, AcademicTreasuryEvent academicTreasuryEvent,
             LocalDate when) {
+        return createDebitEntriesForRegistration(debtAccount, academicTreasuryEvent, when, null, false);
+    }
+
+    public boolean createDebitEntriesForRegistration(DebtAccount debtAccount, AcademicTreasuryEvent academicTreasuryEvent,
+            LocalDate when, Set<Product> restrictCreationToInstallments, boolean forceEvenTreasuryEventIsCharged) {
 
         if (!getTuitionPaymentPlanGroup().isForRegistration()) {
             throw new RuntimeException("wrong call");
         }
 
-        if (academicTreasuryEvent.isCharged()) {
+        if (!forceEvenTreasuryEventIsCharged && academicTreasuryEvent.isCharged()) {
             return false;
         }
 
@@ -416,7 +422,10 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                 amountToDiscountTuitionFromOtherEvents = BigDecimal.ZERO;
             }
 
-            if (!academicTreasuryEvent.isChargedWithDebitEntry(tariff)) {
+            boolean allowToCreateTheInstallment =
+                    restrictCreationToInstallments == null || restrictCreationToInstallments.contains(tariff.getProduct());
+
+            if (allowToCreateTheInstallment && !academicTreasuryEvent.isChargedWithDebitEntry(tariff)) {
                 tariff.createDebitEntryForRegistration(debtAccount, academicTreasuryEvent, when, calculatorsMap,
                         amountToDiscount);
                 createdDebitEntries = true;
