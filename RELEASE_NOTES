@@ -1,3 +1,4 @@
+8.4.9 (03-11-2022)
 - Improvement: Allow the creation of individual tuition payment plan installments
 - Refactor: Replace references of RegistrationStateType for RegistrationStateTypeEnum
 - Refactor: Method to create custom academic debts for default finantial entity
