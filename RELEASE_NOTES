@@ -1,4 +1,6 @@
 - Improvement: Allow the creation of individual tuition payment plan installments
+- Refactor: Replace references of RegistrationStateType for RegistrationStateTypeEnum
+- Refactor: Method to create custom academic debts for default finantial entity
 
 8.4.8 (20-10-2022)
 - Refactor: Remove references of AdministrativeOffice in AcademicTariff and FinantialEntity

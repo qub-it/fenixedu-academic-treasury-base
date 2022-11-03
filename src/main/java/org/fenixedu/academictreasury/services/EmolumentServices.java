@@ -92,7 +92,7 @@ public class EmolumentServices {
     }
 
     @Subscribe
-	// Consider remove Bennu Signals
+    // Consider remove Bennu Signals
     public void newAcademicServiceRequestSituationEvent(final DomainObjectEvent<AcademicServiceRequest> event) {
         newAcademicServiceRequestSituationEvent(event.getInstance());
     }
@@ -444,9 +444,17 @@ public class EmolumentServices {
         return new AcademicDebitEntryBean(debitEntryName, dueDate, vat.getTaxRate(), amount);
     }
 
-    public static boolean createCustomAcademicDebt(final FinantialEntity finantialEntity, final Product product,
-            final Registration registration, final ExecutionYear executionYear, final int numberOfUnits, final int numberOfPages,
-            boolean urgentRequest, final LocalDate when) {
+    public static boolean createCustomAcademicDebtForDefaultFinantialEntity(Product product, Registration registration,
+            ExecutionYear executionYear, int numberOfUnits, int numberOfPages, boolean urgentRequest, LocalDate when) {
+        FinantialEntity finantialEntity = AcademicTreasuryPlataformDependentServicesFactory.implementation()
+                .finantialEntityOfDegree(registration.getDegree(), when);
+
+        return createCustomAcademicDebt(finantialEntity, product, registration, executionYear, numberOfUnits, numberOfPages,
+                urgentRequest, when);
+    }
+
+    public static boolean createCustomAcademicDebt(FinantialEntity finantialEntity, Product product, Registration registration,
+            ExecutionYear executionYear, int numberOfUnits, int numberOfPages, boolean urgentRequest, LocalDate when) {
 
         final Person person = registration.getPerson();
         final String addressFiscalCountryCode = PersonCustomer.addressCountryCode(person);

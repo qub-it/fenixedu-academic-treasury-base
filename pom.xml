@@ -26,12 +26,12 @@
 		<dependency>
 			<groupId>com.qubit.solution.fenixedu</groupId>
 			<artifactId>fenixedu-academic-core</artifactId>
-			<version>39.0.1</version>
+			<version>39.1.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.fenixedu</groupId>
 			<artifactId>fenixedu-treasury-base</artifactId>
-			<version>9.6.3</version>
+			<version>9.6.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.fenixedu</groupId>

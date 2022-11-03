@@ -58,7 +58,7 @@ import org.fenixedu.academic.domain.serviceRequests.AcademicServiceRequest;
 import org.fenixedu.academic.domain.serviceRequests.AcademicServiceRequestSituationType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationDataByExecutionYear;
-import org.fenixedu.academic.domain.student.registrationStates.RegistrationStateType;
+import org.fenixedu.academic.domain.student.registrationStates.RegistrationStateTypeEnum;
 import org.fenixedu.academic.domain.treasury.AcademicTreasuryEventPayment;
 import org.fenixedu.academic.domain.treasury.IAcademicServiceRequestAndAcademicTaxTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEvent;
@@ -1770,7 +1770,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     private LocalizedString registrationStateDescription(ITreasuryPlatformDependentServices platformServices) {
         Registration registration = getRegistration();
 
-        RegistrationStateType lastStateType = registration.getLastStateType();
+        RegistrationStateTypeEnum lastStateType = registration.getLastStateTypeEnum();
 
         if (lastStateType != null) {
             LocalizedString ls = new LocalizedString();
