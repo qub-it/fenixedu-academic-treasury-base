@@ -216,7 +216,6 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this.customized = tuitionPaymentPlan.isCustomized();
         this.defaultPaymentPlan = tuitionPaymentPlan.isDefaultPaymentPlan();
 
-        this.payorDebtAccount = tuitionPaymentPlan.getPayorDebtAccount();
         if(tuitionPaymentPlan.getCustomizedName() != null) {
             this.name = tuitionPaymentPlan.getCustomizedName().getContent();
         }
@@ -227,6 +226,8 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     private void fillWithInstallments(final TuitionPaymentPlan tuitionPaymentPlan) {
+        DebtAccount tuitionPaymentPlanDebtAccount = this.payorDebtAccount;
+        
         for (final TuitionInstallmentTariff tuitionInstallmentTariff : tuitionPaymentPlan.getOrderedTuitionInstallmentTariffs()) {
 
             this.tuitionInstallmentProduct = tuitionInstallmentTariff.getProduct();
@@ -256,8 +257,11 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
             this.blockAcademicActsOnDebt = tuitionInstallmentTariff.getBlockAcademicActsOnDebt();
             this.tuitionTariffCalculatedAmountType = tuitionInstallmentTariff.getTuitionTariffCalculatedAmountType();
             this.tuitionTariffCustomCalculator = tuitionInstallmentTariff.getTuitionTariffCustomCalculator();
+            this.payorDebtAccount = tuitionInstallmentTariff.getPayorDebtAccount();
             addInstallment();
         }
+        
+        this.payorDebtAccount = tuitionPaymentPlanDebtAccount;
     }
 
     public void updateData() {
@@ -425,6 +429,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         installmentBean.setMaximumAmount(this.maximumAmount);
         installmentBean.setAcademicalActBlockingOn(this.academicalActBlockingOn);
         installmentBean.setBlockAcademicActsOnDebt(this.blockAcademicActsOnDebt);
+        installmentBean.setPayorDebtAccount(this.payorDebtAccount);
 
         this.tuitionInstallmentBeans.add(installmentBean);
 

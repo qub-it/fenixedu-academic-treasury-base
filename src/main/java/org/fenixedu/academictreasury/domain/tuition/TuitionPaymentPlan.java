@@ -104,7 +104,6 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         setExecutionYear(toExecutionYear);
 
         setDefaultPaymentPlan(tuitionPaymentPlanToCopy.isDefaultPaymentPlan());
-        setPayorDebtAccount(tuitionPaymentPlanToCopy.getPayorDebtAccount());
         setCustomized(tuitionPaymentPlanToCopy.isCustomized());
 
         setCustomizedName(tuitionPaymentPlanToCopy.getCustomizedName());
@@ -128,7 +127,6 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         setProduct(tuitionPaymentPlanBean.getTuitionPaymentPlanGroup().getCurrentProduct());
         setExecutionYear(tuitionPaymentPlanBean.getExecutionYear());
         setDefaultPaymentPlan(tuitionPaymentPlanBean.isDefaultPaymentPlan());
-        setPayorDebtAccount(tuitionPaymentPlanBean.getPayorDebtAccount());
         setCustomized(tuitionPaymentPlanBean.isCustomized());
 
         LocalizedString mls = new LocalizedString();
@@ -673,9 +671,22 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
     public boolean isStudentMustBeEnrolled() {
         return true;
     }
-
-    public boolean isPayorDebtAccountDefined() {
-        return getPayorDebtAccount() != null;
+    
+    @Override
+    @Deprecated
+    // TODO: Remove the relation payorDebtAccount of TuitionPaymentPlan. 
+    // It will be replaced by payorDebtAccount of TuitionInstallmentTariff
+    public DebtAccount getPayorDebtAccount() {
+        // TODO Auto-generated method stub
+        return super.getPayorDebtAccount();
+    }
+    
+    @Override
+    // TODO: Remove the relation payorDebtAccount of TuitionPaymentPlan. 
+    // It will be replaced by payorDebtAccount of TuitionInstallmentTariff
+    public void setPayorDebtAccount(DebtAccount payorDebtAccount) {
+        // TODO Auto-generated method stub
+        super.setPayorDebtAccount(payorDebtAccount);
     }
 
     public boolean isCopyFromOtherExistingTuitionPaymentPlan() {

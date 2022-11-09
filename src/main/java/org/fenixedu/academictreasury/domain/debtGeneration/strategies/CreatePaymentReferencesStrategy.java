@@ -63,6 +63,7 @@ import org.fenixedu.academictreasury.services.AcademicTaxServices;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
+import org.fenixedu.treasury.domain.Customer;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.ProductGroup;
@@ -254,6 +255,11 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
             return;
         }
 
+        // Check that the references are for the same customer to pay
+        if (referencedCustomers(debitEntries).size() > 1) {
+            throw new AcademicTreasuryDomainException("error.CreatePaymentReferencesStrategy.more.than.one.referenced.customers");
+        }
+
         final BigDecimal amount =
                 debitEntries.stream().map(d -> d.getOpenAmount()).reduce((a, c) -> a.add(c)).orElse(BigDecimal.ZERO);
 
@@ -272,12 +278,19 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
         }
     }
 
+    private Set<Customer> referencedCustomers(Set<DebitEntry> debitEntries) {
+        return debitEntries.stream().map(DebitEntry::getDebitNote).map(
+                d -> d.getPayorDebtAccount() != null ? d.getPayorDebtAccount().getCustomer() : d.getDebtAccount().getCustomer())
+                .collect(Collectors.toSet());
+    }
+
     private boolean isGrabbedDebitEntriesMatchAllProductsReferencedInRule(final AcademicDebtGenerationRule rule,
             final Set<DebitEntry> grabbedDebitEntries) {
         Set<Product> productsFromRuleSet =
                 rule.getAcademicDebtGenerationRuleEntriesSet().stream().map(e -> e.getProduct()).collect(Collectors.toSet());
-        Set<Product> productsFromGrabbedDebitEntries = grabbedDebitEntries.stream().map(d -> d.getProduct()).collect(Collectors.toSet());
-        
+        Set<Product> productsFromGrabbedDebitEntries =
+                grabbedDebitEntries.stream().map(d -> d.getProduct()).collect(Collectors.toSet());
+
         return Sets.difference(productsFromRuleSet, productsFromGrabbedDebitEntries).isEmpty();
     }
 

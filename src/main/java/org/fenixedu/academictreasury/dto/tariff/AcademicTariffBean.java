@@ -51,6 +51,7 @@ import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCustomCalculato
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
+import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
 import org.fenixedu.treasury.domain.tariff.InterestType;
 import org.fenixedu.treasury.dto.ITreasuryBean;
@@ -124,6 +125,9 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
     private Class<? extends TuitionTariffCustomCalculator> tuitionTariffCustomCalculator;
 
+    /* Payor debt account */
+    private DebtAccount payorDebtAccount;
+    
     public AcademicTariffBean() {
         setBeginDate(new LocalDate());
         setEndDate(new LocalDate().plusYears(1));
@@ -243,6 +247,8 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         this.tuitionInstallmentProductDataSource = TuitionPaymentPlanBean.tuitionInstallmentProductDataSource(
                 tuitionInstallmentTariff.getTuitionPaymentPlan().getTuitionPaymentPlanGroup(),
                 tuitionInstallmentTariff.getProduct().getTuitionInstallmentOrder());
+        
+       this.setPayorDebtAccount(tuitionInstallmentTariff.getPayorDebtAccount()); 
     }
 
     public void resetFields() {
@@ -643,22 +649,25 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
     public void setTuitionTariffCalculatedAmountType(TuitionTariffCalculatedAmountType tuitionTariffCalculatedAmountType) {
         this.tuitionTariffCalculatedAmountType = tuitionTariffCalculatedAmountType;
-
     }
 
     public TuitionTariffCalculatedAmountType getTuitionTariffCalculatedAmountType() {
         return tuitionTariffCalculatedAmountType;
-
     }
 
     public void setTuitionTariffCustomCalculator(Class<? extends TuitionTariffCustomCalculator> tuitionTariffCustomCalculator) {
         this.tuitionTariffCustomCalculator = tuitionTariffCustomCalculator;
-
     }
 
     public Class<? extends TuitionTariffCustomCalculator> getTuitionTariffCustomCalculator() {
         return tuitionTariffCustomCalculator;
-
     }
 
+    public DebtAccount getPayorDebtAccount() {
+        return payorDebtAccount;
+    }
+    
+    public void setPayorDebtAccount(DebtAccount payorDebtAccount) {
+        this.payorDebtAccount = payorDebtAccount;
+    }
 }

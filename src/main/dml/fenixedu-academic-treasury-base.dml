@@ -485,6 +485,16 @@ class tuition.TuitionInstallmentTariff extends .org.fenixedu.treasury.domain.tar
 			multiplicity *;
 		}
 	}
+	
+	relation TuitionInstallmentTariffPayorDebtAccount {
+		.org.fenixedu.treasury.domain.debt.DebtAccount playsRole payorDebtAccount {
+			multiplicity 0..1;
+		}
+		
+		tuition.TuitionInstallmentTariff playsRole tuitionInstallmentTariffs {
+			multiplicity *;
+		}
+	}
 
 class tuition.TuitionConditionRule {
 }
