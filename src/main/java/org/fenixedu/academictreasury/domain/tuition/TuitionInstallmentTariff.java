@@ -149,6 +149,8 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
             this.setMaximumAmount(BigDecimal.ZERO);
         }
 
+        super.setPayorDebtAccount(bean.getPayorDebtAccount());
+
         checkRules();
     }
 
@@ -184,6 +186,7 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         super.setAcademicalActBlockingOff(tariff.isAcademicalActBlockingOff());
         super.setBlockAcademicActsOnDebt(tariff.isBlockAcademicActsOnDebt());
         super.setMaximumAmount(tariff.getMaximumAmount());
+        super.setPayorDebtAccount(tariff.getPayorDebtAccount());
 
         checkRules();
     }
@@ -266,21 +269,21 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         // getEctsCalculationType() != null and getTuitionTariffCalculatedAmountType() != null
         // should not be necessary
 
-        if(isTuitionCalculationByEctsOrUnits() && getEctsCalculationType() != null
+        if (isTuitionCalculationByEctsOrUnits() && getEctsCalculationType() != null
                 && getEctsCalculationType().isDependentOnDefaultPaymentPlan()) {
             return false;
         }
-        
-        if(getTuitionCalculationType().isCalculatedAmount() && getTuitionTariffCalculatedAmountType() != null) {
-            if(getTuitionTariffCalculatedAmountType().isPercentage()) {
+
+        if (getTuitionCalculationType().isCalculatedAmount() && getTuitionTariffCalculatedAmountType() != null) {
+            if (getTuitionTariffCalculatedAmountType().isPercentage()) {
                 return false;
             }
-            
-            if(getTuitionTariffCalculatedAmountType().isRemaining()) {
+
+            if (getTuitionTariffCalculatedAmountType().isRemaining()) {
                 return false;
             }
         }
-        
+
         return true;
     }
 
@@ -529,9 +532,7 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
             debitEntry.markBlockAcademicActsOnDebt();
         }
 
-        if (getTuitionPaymentPlan().isPayorDebtAccountDefined()) {
-            debitEntry.setPayorDebtAccount(getTuitionPaymentPlan().getPayorDebtAccount());
-        }
+        debitEntry.setPayorDebtAccount(getPayorDebtAccount());
 
         return debitEntry;
     }
@@ -797,10 +798,10 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
                 AcademicTreasuryEvent.AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN_CONDITIONS.getDescriptionI18N().getContent(),
                 getTuitionPaymentPlan().getConditionsDescription());
 
-        if (getTuitionPaymentPlan().getPayorDebtAccount() != null) {
+        if (getPayorDebtAccount() != null) {
             propertiesMap.put(
                     AcademicTreasuryEvent.AcademicTreasuryEventKeys.TUITION_PAYOR_DEBT_ACCOUNT.getDescriptionI18N().getContent(),
-                    getTuitionPaymentPlan().getPayorDebtAccount().getCustomer().getUiFiscalNumber());
+                    getPayorDebtAccount().getCustomer().getUiFiscalNumber());
         }
 
         final TuitionPaymentPlanGroup tuitionPaymentPlanGroup = event.getTuitionPaymentPlanGroup();
@@ -928,12 +929,15 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
             this.setMaximumAmount(BigDecimal.ZERO);
         }
 
+        super.setPayorDebtAccount(bean.getPayorDebtAccount());
+
         checkRules();
     }
 
     @Override
     public void delete() {
         super.setTuitionPaymentPlan(null);
+        super.setPayorDebtAccount(null);
 
         super.delete();
     }
