@@ -273,7 +273,7 @@ public class TuitionAcademicTaxGenerationStrategy implements IMassiveDebtGenerat
             final Degree degree, final String dcpName, final int rowNum) {
         Registration result = null;
         for (final Registration registration : Registration.readByNumber(registrationNumber)) {
-            if (registration.getLastStateType() == null || !registration.getLastStateType().isActive()) {
+            if (registration.getLastStateTypeEnum() == null || !registration.getLastStateTypeEnum().isActive()) {
                 continue;
             }
 

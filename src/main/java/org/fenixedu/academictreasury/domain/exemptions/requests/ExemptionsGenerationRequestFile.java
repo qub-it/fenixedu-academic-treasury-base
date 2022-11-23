@@ -481,7 +481,7 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
 
         Registration result = null;
         for (final Registration registration : Registration.readByNumber(registrationNumber)) {
-            if (registration.getLastStateType() == null || !registration.getLastStateType().isActive()) {
+            if (registration.getLastStateTypeEnum() == null || !registration.getLastStateTypeEnum().isActive()) {
                 continue;
             }
 
