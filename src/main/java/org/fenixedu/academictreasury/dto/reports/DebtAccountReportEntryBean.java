@@ -62,7 +62,8 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.creationDate"),
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.finantialInstitutionName"),
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.customerId"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.customerCode"),
+            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.code"),
+            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.customerActive"),
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.name"),
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identificationType"),
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identificationNumber"),
@@ -84,6 +85,7 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
     private String finantialInstitutionName;
     private String customerId;
     private String customerCode;
+    private boolean customerActive;
     private String name;
     private String identificationType;
     private String identificationNumber;
@@ -109,6 +111,7 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             this.finantialInstitutionName = debtAccount.getFinantialInstitution().getName();
             this.customerId = debtAccount.getCustomer().getExternalId();
             this.customerCode = debtAccount.getCustomer().getCode();
+            this.customerActive = debtAccount.getCustomer().isActive();
             this.name = debtAccount.getCustomer().getName();
 
             if (debtAccount.getCustomer().isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPerson() != null
@@ -171,30 +174,31 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
 
         try {
-            row.createCell(0).setCellValue(identification);
+            row.createCell(0).setCellValue(this.identification);
 
-            if (!completed) {
+            if (!this.completed) {
                 row.createCell(1).setCellValue(academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            row.createCell(i++).setCellValue(versioningCreator);
-            row.createCell(i++).setCellValue(valueOrEmpty(creationDate));
-            row.createCell(i++).setCellValue(valueOrEmpty(finantialInstitutionName));
-            row.createCell(i++).setCellValue(valueOrEmpty(customerId));
-            row.createCell(i++).setCellValue(valueOrEmpty(customerCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(name));
-            row.createCell(i++).setCellValue(valueOrEmpty(identificationType));
-            row.createCell(i++).setCellValue(valueOrEmpty(identificationNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(vatNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(email));
-            row.createCell(i++).setCellValue(valueOrEmpty(address));
-            row.createCell(i++).setCellValue(valueOrEmpty(addressCountryCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(studentNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(vatNumberValid));
-            row.createCell(i++).setCellValue(totalInDebt.toString());
+            row.createCell(i++).setCellValue(this.versioningCreator);
+            row.createCell(i++).setCellValue(valueOrEmpty(this.creationDate));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.finantialInstitutionName));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.customerId));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.customerCode));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.customerActive));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.name));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.identificationType));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.identificationNumber));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.vatNumber));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.email));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.address));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.addressCountryCode));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.studentNumber));
+            row.createCell(i++).setCellValue(valueOrEmpty(this.vatNumberValid));
+            row.createCell(i++).setCellValue(this.totalInDebt.toString());
 
         } catch (final Exception e) {
             e.printStackTrace();

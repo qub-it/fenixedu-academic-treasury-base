@@ -1,3 +1,5 @@
+- Bug Fix: Protect with try-catch for NPE, the customer identification and name retrieval in getting the error description, in the debt report
+
 8.5.1 (23-11-2022)
 - Refactor: Replace references of RegistrationStateType for RegistrationStateTypeEnum
 

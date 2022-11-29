@@ -102,8 +102,13 @@ public class ErrorsLog implements IErrorsLog {
     public void addError(final DebtAccount debtAccount, final Exception e) {
         synchronized (this) {
             final String oid = debtAccount.getExternalId();
-            final String identification = debtAccount.getCustomer().getIdentificationNumber();
-            final String name = debtAccount.getCustomer().getName();
+            String identification = "N/A";
+            String name = "N/A";
+            try {
+                identification = debtAccount.getCustomer().getIdentificationNumber();
+                name = debtAccount.getCustomer().getName();
+            } catch(Exception e2) {
+            }
 
             sb.append(String.format("[%s/%s] - %s\n", oid, identification, name));
             sb.append(ExceptionUtils.getFullStackTrace(e)).append("\n\n");
