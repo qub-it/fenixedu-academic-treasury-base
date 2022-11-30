@@ -37,6 +37,8 @@ package org.fenixedu.academictreasury.dto.reports;
 
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
+import java.math.BigDecimal;
+
 import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.reports.DebtReportRequest;
@@ -62,6 +64,8 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.creationDate"),
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.finantialInstitutionName"),
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.customerId"),
+            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.customerCode"),
+            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.customerActive"),
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.name"),
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identificationType"),
             academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identificationNumber"),
@@ -82,6 +86,8 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
     private DateTime creationDate;
     private String finantialInstitutionName;
     private String customerId;
+    private String customerCode;
+    private boolean customerActive;
     private String name;
     private String identificationType;
     private String identificationNumber;
@@ -106,6 +112,8 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             this.creationDate = treasuryServices.versioningCreationDate(debtAccount);
             this.finantialInstitutionName = debtAccount.getFinantialInstitution().getName();
             this.customerId = debtAccount.getCustomer().getExternalId();
+            this.customerCode = debtAccount.getCustomer().getCode();
+            this.customerActive = debtAccount.getCustomer().isActive();
             this.name = debtAccount.getCustomer().getName();
 
             if (debtAccount.getCustomer().isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPerson() != null
@@ -149,12 +157,14 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             this.vatNumberValid = FiscalCodeValidation.isValidFiscalNumber(debtAccount.getCustomer().getFiscalCountry(),
                     debtAccount.getCustomer().getFiscalNumber());
 
-            this.totalInDebt = debtAccount.getFinantialInstitution().getCurrency().getValueWithScale(debtAccount.getTotalInDebt())
-                    .toString();
-
-            if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
-                this.totalInDebt = this.totalInDebt.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
-            }
+            this.totalInDebt = BigDecimal.ZERO.toString();
+//            this.totalInDebt = debtAccount.getFinantialInstitution().getCurrency().getValueWithScale(debtAccount.getTotalInDebt())
+//                    .toString();
+//
+//            if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
+//                this.totalInDebt = this.totalInDebt.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
+//            }
+            
 
             this.completed = true;
         } catch (final Exception e) {
@@ -181,6 +191,8 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             row.createCell(i++).setCellValue(valueOrEmpty(creationDate));
             row.createCell(i++).setCellValue(valueOrEmpty(finantialInstitutionName));
             row.createCell(i++).setCellValue(valueOrEmpty(customerId));
+            row.createCell(i++).setCellValue(valueOrEmpty(customerCode));
+            row.createCell(i++).setCellValue(valueOrEmpty(customerActive));
             row.createCell(i++).setCellValue(valueOrEmpty(name));
             row.createCell(i++).setCellValue(valueOrEmpty(identificationType));
             row.createCell(i++).setCellValue(valueOrEmpty(identificationNumber));

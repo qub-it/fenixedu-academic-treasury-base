@@ -1,3 +1,5 @@
+- Improvement: Print in debt account report, the customer code and customer active
+
 8.2.8 (05-07-2022)
 - Refactor: Implement import and export operations for AcademicDebtGenerationRuleRestriction class and subclasses, in order to be able to migrate from other systems
 
