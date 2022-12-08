@@ -1,3 +1,4 @@
+8.5.2 (08-12-2022)
 - Bug Fix: Protect with try-catch for NPE, the customer identification and name retrieval in getting the error description, in the debt report
 - Improvement: Discount tuition amount from other treasury events with exemption
 
