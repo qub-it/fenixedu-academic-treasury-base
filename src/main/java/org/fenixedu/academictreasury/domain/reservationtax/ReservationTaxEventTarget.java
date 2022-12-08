@@ -51,20 +51,18 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
         setDomainRoot(FenixFramework.getDomainRoot());
     }
 
-    protected ReservationTaxEventTarget(FinantialEntity finantialEntity, Product product, Person person,
+    protected ReservationTaxEventTarget(ReservationTax reservationTax, Person person,
             DegreeCurricularPlan degreeCurricularPlan, ExecutionInterval executionInterval, boolean discountInTuitionFee,
             LocalDate taxReservationDate, LocalizedString taxReservationDescription) {
         this();
 
-        super.setFinantialEntity(finantialEntity);
-        super.setProduct(product);
+        super.setReservationTax(reservationTax);
         super.setPerson(person);
         super.setDegreeCurricularPlan(degreeCurricularPlan);
         super.setExecutionInterval(executionInterval);
-        super.setDiscountInTuitionFee(discountInTuitionFee);
         super.setTaxReservationDate(taxReservationDate);
         super.setTaxReservationDescription(taxReservationDescription);
-
+        
         checkRules();
     }
 
@@ -73,8 +71,8 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
             throw new AcademicTreasuryDomainException("error.ReservationTaxEventTarget.domainRoot.required");
         }
 
-        if (getProduct() == null) {
-            throw new AcademicTreasuryDomainException("error.ReservationTaxEventTarget.product.required");
+        if (getReservationTax() == null) {
+            throw new AcademicTreasuryDomainException("error.ReservationTaxEventTarget.reservationTax.required");
         }
 
         if (getPerson() == null) {
@@ -87,10 +85,6 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
 
         if (getExecutionInterval() == null) {
             throw new AcademicTreasuryDomainException("error.ReservationTaxEventTarget.executionInterval.required");
-        }
-
-        if (getDiscountInTuitionFee() == null) {
-            throw new AcademicTreasuryDomainException("error.ReservationTaxEventTarget.discountInTuitionFee.required");
         }
 
         if (getTaxReservationDate() == null) {
@@ -129,14 +123,11 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
             }
         }
 
-        FinantialEntity finantialEntity = reservationTax.getFinantialEntity();
-        Product product = reservationTax.getProduct();
-
         Optional<ReservationTaxEventTarget> target =
-                ReservationTaxEventTarget.findUnique(person, product, degreeCurricularPlan, executionInterval);
+                ReservationTaxEventTarget.findUnique(person, reservationTax, degreeCurricularPlan, executionInterval);
 
         if (!target.isPresent()) {
-            target = Optional.of(new ReservationTaxEventTarget(finantialEntity, product, person, degreeCurricularPlan,
+            target = Optional.of(new ReservationTaxEventTarget(reservationTax, person, degreeCurricularPlan,
                     executionInterval, Boolean.TRUE.equals(reservationTax.getDiscountInTuitionFee()), taxReservationDate,
                     emolumentDescription));
         }
@@ -159,6 +150,9 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
         BigDecimal amount = tariff.get().getBaseAmount();
         LocalDate dueDate = tariff.get().calculateDueDate(taxReservationDate);
 
+        FinantialEntity finantialEntity = reservationTax.getFinantialEntity();
+        Product product = reservationTax.getProduct();
+        
         DebtBuilderWithAmountAndDueDate debtBuilder = AcademicTreasuryTargetCreateDebtBuilder.createBuilder()
                 .explicitAmountAndDueDate(finantialEntity, product, target.get(), taxReservationDate) //
                 .setAmount(amount) //
@@ -224,7 +218,30 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
 
     @Override
     public boolean isEventDiscountInTuitionFee() {
-        return Boolean.TRUE.equals(super.getDiscountInTuitionFee());
+        return Boolean.TRUE.equals(getReservationTax().getDiscountInTuitionFee());
+    }
+    
+    @Override
+    @Deprecated
+    /*
+     * Use getReservationTax().getProduct()
+     */
+    public Product getProduct() {
+        return super.getProduct();
+    }
+    
+    @Override
+    @Deprecated
+    /*
+     * Use getReservationTax().getFinantialEntity()
+     */
+    public FinantialEntity getFinantialEntity() {
+        // TODO Auto-generated method stub
+        return super.getFinantialEntity();
+    }
+
+    public boolean isEventDiscountInTuitionFeeWithTreasuryExemption() {
+        return getReservationTax().getTreasuryExemptionType() != null;
     }
     
     public IAcademicTreasuryEvent getReservationTaxAcademicTreasuryEvent() {
@@ -237,7 +254,7 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
         IAcademicTreasuryEvent academicTreasuryEvent = getReservationTaxAcademicTreasuryEvent();
 
         if (academicTreasuryEvent != null) {
-            academicTreasuryEvent.getAmountToPay();
+            return academicTreasuryEvent.getAmountToPay();
         }
 
         return BigDecimal.ZERO;
@@ -254,16 +271,17 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
         return FenixFramework.getDomainRoot().getReservationTaxEventTargetsSet().stream();
     }
 
-    public static Stream<ReservationTaxEventTarget> find(Person person, Product product,
+    public static Stream<ReservationTaxEventTarget> find(Person person, ReservationTax reservationTax,
             DegreeCurricularPlan degreeCurricularPlan, ExecutionInterval executionInterval) {
-        return findAll().filter(t -> t.getPerson() == person).filter(r -> r.getProduct() == product)
-                .filter(r -> r.getDegreeCurricularPlan() == degreeCurricularPlan)
+        return findAll().filter(t -> t.getPerson() == person) //
+                .filter(r -> r.getReservationTax() == reservationTax) //
+                .filter(r -> r.getDegreeCurricularPlan() == degreeCurricularPlan) //
                 .filter(r -> r.getExecutionInterval() == executionInterval);
     }
 
-    private static Optional<ReservationTaxEventTarget> findUnique(Person person, Product product,
+    private static Optional<ReservationTaxEventTarget> findUnique(Person person, ReservationTax reservationTax,
             DegreeCurricularPlan degreeCurricularPlan, ExecutionInterval executionInterval) {
-        return find(person, product, degreeCurricularPlan, executionInterval).findFirst();
+        return find(person, reservationTax, degreeCurricularPlan, executionInterval).findFirst();
     }
 
 }

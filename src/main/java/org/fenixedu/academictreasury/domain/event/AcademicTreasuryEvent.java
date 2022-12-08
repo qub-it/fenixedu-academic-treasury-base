@@ -70,6 +70,7 @@ import org.fenixedu.academic.domain.treasury.ITuitionTreasuryEvent;
 import org.fenixedu.academictreasury.domain.emoluments.AcademicTax;
 import org.fenixedu.academictreasury.domain.emoluments.ServiceRequestMapEntry;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
+import org.fenixedu.academictreasury.domain.reservationtax.ReservationTaxEventTarget;
 import org.fenixedu.academictreasury.domain.serviceRequests.ITreasuryServiceRequest;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.domain.tariff.AcademicTariff;
@@ -87,6 +88,7 @@ import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
+import org.fenixedu.treasury.domain.exemption.TreasuryExemptionType;
 import org.fenixedu.treasury.domain.tariff.Tariff;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
@@ -872,6 +874,24 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         }
 
         return false;
+    }
+
+    @Override
+    public boolean isEventDiscountInTuitionFeeWithTreasuryExemption() {
+        if (isForTreasuryEventTarget() && (getTreasuryEventTarget() instanceof ReservationTaxEventTarget)) {
+            return ((ReservationTaxEventTarget) getTreasuryEventTarget()).isEventDiscountInTuitionFeeWithTreasuryExemption();
+        }
+
+        return false;
+    }
+
+    @Override
+    public TreasuryExemptionType getTreasuryExemptionToApplyInEventDiscountInTuitionFee() {
+        if (isForTreasuryEventTarget() && (getTreasuryEventTarget() instanceof ReservationTaxEventTarget)) {
+            return ((ReservationTaxEventTarget) getTreasuryEventTarget()).getReservationTax().getTreasuryExemptionType();
+        }
+
+        return null;
     }
 
     // @formatter: off

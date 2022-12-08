@@ -61,6 +61,7 @@ import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
+import org.fenixedu.academictreasury.domain.tuition.DiscountTuitionInstallmentsHelper;
 import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
@@ -123,19 +124,20 @@ public class TuitionServices {
     @Atomic
     public static boolean createInferedTuitionForRegistration(final Registration registration, final ExecutionYear executionYear,
             final LocalDate when, final boolean forceCreationIfNotEnrolled) {
-        return createTuitionForRegistration(registration, executionYear, when, forceCreationIfNotEnrolled, null, true, null, false);
+        return createTuitionForRegistration(registration, executionYear, when, forceCreationIfNotEnrolled, null, true, null,
+                false);
     }
 
     @Atomic
-    public static boolean createTuitionForRegistration(Registration registration, ExecutionYear executionYear,
-            LocalDate debtDate, boolean forceCreationIfNotEnrolled, TuitionPaymentPlan tuitionPaymentPlan,
-            boolean applyTuitionServiceExtensions) {
-        return createTuitionForRegistration(registration, executionYear, debtDate, forceCreationIfNotEnrolled, tuitionPaymentPlan, true, null, false);
+    public static boolean createTuitionForRegistration(Registration registration, ExecutionYear executionYear, LocalDate debtDate,
+            boolean forceCreationIfNotEnrolled, TuitionPaymentPlan tuitionPaymentPlan, boolean applyTuitionServiceExtensions) {
+        return createTuitionForRegistration(registration, executionYear, debtDate, forceCreationIfNotEnrolled, tuitionPaymentPlan,
+                true, null, false);
     }
-    
+
     public static boolean createTuitionForRegistration(final Registration registration, final ExecutionYear executionYear,
             final LocalDate debtDate, final boolean forceCreationIfNotEnrolled, TuitionPaymentPlan tuitionPaymentPlan,
-            final boolean applyTuitionServiceExtensions, Set<Product> restrictCreationToInstallments, 
+            final boolean applyTuitionServiceExtensions, Set<Product> restrictCreationToInstallments,
             boolean forceEvenTreasuryEventIsCharged) {
 
         if (!isToPayRegistrationTuition(registration, executionYear) && !forceCreationIfNotEnrolled) {
@@ -166,7 +168,8 @@ public class TuitionServices {
 
         final PersonCustomer personCustomer = PersonCustomer.findUnique(person, addressFiscalCountryCode, fiscalNumber).get();
         if (!personCustomer.isActive()) {
-            throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active", personCustomer.getBusinessIdentification(), personCustomer.getName());
+            throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active",
+                    personCustomer.getBusinessIdentification(), personCustomer.getName());
         }
 
         if (tuitionPaymentPlan == null) {
@@ -197,8 +200,8 @@ public class TuitionServices {
         final AcademicTreasuryEvent academicTreasuryEvent =
                 AcademicTreasuryEvent.findUniqueForRegistrationTuition(registration, executionYear).get();
 
-        return tuitionPaymentPlan.createDebitEntriesForRegistration(debtAccount, academicTreasuryEvent, 
-                debtDate, restrictCreationToInstallments, forceEvenTreasuryEventIsCharged);
+        return tuitionPaymentPlan.createDebitEntriesForRegistration(debtAccount, academicTreasuryEvent, debtDate,
+                restrictCreationToInstallments, forceEvenTreasuryEventIsCharged);
     }
 
     public static TuitionPaymentPlan usedPaymentPlan(final Registration registration, final ExecutionYear executionYear,
@@ -266,31 +269,17 @@ public class TuitionServices {
                     }
                 });
 
-        BigDecimal amountToDiscountTuitionFromOtherEvents = TuitionPaymentPlan
-                .getOtherEventsAmountToDiscountInTuitionFee(registration.getPerson(), tuitionPaymentPlan.getExecutionYear());
+        DiscountTuitionInstallmentsHelper discountMapHelper = new DiscountTuitionInstallmentsHelper(registration,
+                tuitionPaymentPlan, debtDate, enrolledEctsUnits, enrolledCoursesCount, calculatorsMap);
 
         final List<TuitionDebitEntryBean> entries = Lists.newArrayList();
         for (final TuitionInstallmentTariff tuitionInstallmentTariff : tuitionPaymentPlan.getTuitionInstallmentTariffsSet()
                 .stream().sorted(TuitionInstallmentTariff.COMPARATOR_BY_INSTALLMENT_NUMBER).collect(Collectors.toList())) {
-            final int installmentOrder = tuitionInstallmentTariff.getInstallmentOrder();
-            final LocalizedString installmentName = tuitionPaymentPlan.installmentName(registration, tuitionInstallmentTariff);
-            final LocalDate dueDate = tuitionInstallmentTariff.dueDate(debtDate);
-            final Vat vat = tuitionInstallmentTariff.vat(debtDate);
-            BigDecimal amountToPay =
-                    tuitionInstallmentTariff.amountToPay(registration, enrolledEctsUnits, enrolledCoursesCount, calculatorsMap);
-            final Currency currency = tuitionInstallmentTariff.getFinantialEntity().getFinantialInstitution().getCurrency();
-
-            if (TreasuryConstants.isGreaterOrEqualThan(amountToDiscountTuitionFromOtherEvents.subtract(amountToPay),
-                    BigDecimal.ZERO)) {
-                amountToDiscountTuitionFromOtherEvents = amountToDiscountTuitionFromOtherEvents.subtract(amountToPay);
-                continue;
-            } else if (TreasuryConstants.isPositive(amountToDiscountTuitionFromOtherEvents)) {
-                amountToPay = amountToPay.subtract(amountToDiscountTuitionFromOtherEvents);
-                amountToDiscountTuitionFromOtherEvents = BigDecimal.ZERO;
+            TuitionDebitEntryBean bean = discountMapHelper.buildInstallmentDebitEntryBeanWithDiscount(tuitionInstallmentTariff);
+            
+            if(bean != null) {
+                entries.add(bean);
             }
-
-            entries.add(new TuitionDebitEntryBean(installmentOrder, installmentName, dueDate, vat.getTaxRate(), amountToPay,
-                    currency));
         }
 
         final Comparator<? super TuitionDebitEntryBean> comparator =

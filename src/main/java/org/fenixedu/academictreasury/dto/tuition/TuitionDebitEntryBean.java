@@ -48,6 +48,7 @@ public class TuitionDebitEntryBean {
     private LocalDate dueDate;
     private BigDecimal vatRate;
     private BigDecimal amount;
+    private BigDecimal exemptedAmount;
     private Currency currency;
 
     public TuitionDebitEntryBean(final int installmentOrder, final LocalizedString description, final LocalDate dueDate,
@@ -61,6 +62,12 @@ public class TuitionDebitEntryBean {
         this.currency = currency;
     }
 
+    public TuitionDebitEntryBean(int installmentOrder, LocalizedString description, LocalDate dueDate,
+            BigDecimal vatRate, BigDecimal amount, BigDecimal exemptedAmount, Currency currency) {
+        this(installmentOrder, description, dueDate, vatRate, amount, currency);
+        this.exemptedAmount = exemptedAmount;
+    }
+    
     public int getInstallmentOrder() {
         return installmentOrder;
     }
@@ -99,6 +106,14 @@ public class TuitionDebitEntryBean {
     
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+    
+    public BigDecimal getExemptedAmount() {
+        return exemptedAmount;
+    }
+    
+    public void setExemptedAmount(BigDecimal exemptedAmount) {
+        this.exemptedAmount = exemptedAmount;
     }
     
     public Currency getCurrency() {

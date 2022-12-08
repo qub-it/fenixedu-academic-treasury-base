@@ -1667,6 +1667,7 @@ class paymentpenalty.PaymentPenaltySettings {
  */
 
 class reservationtax.ReservationTax {
+	String code;
 	LocalizedStringAT name;
 	Boolean discountInTuitionFee;
 	Boolean active;
@@ -1699,6 +1700,16 @@ class reservationtax.ReservationTax {
 			multiplicity 1..1;
 		}
 		
+		reservationtax.ReservationTax playsRole reservationTaxes {
+			multiplicity *;
+		}
+	}
+	
+	relation ReservationTaxTreasuryExemptionType {
+		.org.fenixedu.treasury.domain.exemption.TreasuryExemptionType playsRole treasuryExemptionType {
+			multiplicity 0..1;
+		}
+				
 		reservationtax.ReservationTax playsRole reservationTaxes {
 			multiplicity *;
 		}
@@ -1755,7 +1766,6 @@ class reservationtax.ReservationTaxTariff {
 	}
 
 class reservationtax.ReservationTaxEventTarget {
-	Boolean discountInTuitionFee;
 	LocalDate taxReservationDate;
 	LocalizedStringAT taxReservationDescription;
 }
@@ -1770,9 +1780,19 @@ class reservationtax.ReservationTaxEventTarget {
 		}
 	}
 	
+	relation ReservationTaxEventTargetReservationTax {
+		reservationtax.ReservationTax playsRole reservationTax {
+			multiplicity 1..1;
+		}
+		
+		reservationtax.ReservationTaxEventTarget playsRole reservationTaxEventTargets {
+			multiplicity *;
+		}
+	}
+	
 	relation ReservationTaxEventTargetFinantialEntity {
 		.org.fenixedu.treasury.domain.FinantialEntity playsRole FinantialEntity {
-			multiplicity 1..1;
+			multiplicity 0..1;
 		}
 		
 		reservationtax.ReservationTaxEventTarget playsRole reservationTaxEventTargets {
@@ -1782,7 +1802,7 @@ class reservationtax.ReservationTaxEventTarget {
 	
 	relation ReservationTaxEventTargetProduct {
 		.org.fenixedu.treasury.domain.Product playsRole product {
-			multiplicity 1..1;
+			multiplicity 0..1;
 		}
 		
 		reservationtax.ReservationTaxEventTarget playsRole reservationTaxEventTargets {
