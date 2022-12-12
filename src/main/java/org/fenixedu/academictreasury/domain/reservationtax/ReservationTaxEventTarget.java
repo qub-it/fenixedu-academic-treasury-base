@@ -221,25 +221,6 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
         return Boolean.TRUE.equals(getReservationTax().getDiscountInTuitionFee());
     }
     
-    @Override
-    @Deprecated
-    /*
-     * Use getReservationTax().getProduct()
-     */
-    public Product getProduct() {
-        return super.getProduct();
-    }
-    
-    @Override
-    @Deprecated
-    /*
-     * Use getReservationTax().getFinantialEntity()
-     */
-    public FinantialEntity getFinantialEntity() {
-        // TODO Auto-generated method stub
-        return super.getFinantialEntity();
-    }
-
     public boolean isEventDiscountInTuitionFeeWithTreasuryExemption() {
         return getReservationTax().getTreasuryExemptionType() != null;
     }

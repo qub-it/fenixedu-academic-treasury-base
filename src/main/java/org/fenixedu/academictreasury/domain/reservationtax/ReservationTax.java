@@ -115,6 +115,23 @@ public class ReservationTax extends ReservationTax_Base {
 
         return result;
     }
+    
+    public void delete() {
+        if(!getReservationTaxEventTargetsSet().isEmpty()) {
+            throw new AcademicTreasuryDomainException("error.ReservationTax.delete.not.possible.due.to.existing.eventTargets");
+        }
+        
+        if(!getReservationTaxTariffsSet().isEmpty()) {
+            throw new AcademicTreasuryDomainException("error.ReservationTax.delete.not.possible.due.to.existing.tariffs");
+        }
+        
+        super.setDomainRoot(null);
+        super.setFinantialEntity(null);
+        super.setProduct(null);
+        super.setTreasuryExemptionType(null);
+        
+        super.deleteDomainObject();
+    }
 
     // @formatter:off
     /* ********

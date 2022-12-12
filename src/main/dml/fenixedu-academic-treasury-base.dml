@@ -1790,26 +1790,6 @@ class reservationtax.ReservationTaxEventTarget {
 		}
 	}
 	
-	relation ReservationTaxEventTargetFinantialEntity {
-		.org.fenixedu.treasury.domain.FinantialEntity playsRole FinantialEntity {
-			multiplicity 0..1;
-		}
-		
-		reservationtax.ReservationTaxEventTarget playsRole reservationTaxEventTargets {
-			multiplicity *;
-		}
-	}
-	
-	relation ReservationTaxEventTargetProduct {
-		.org.fenixedu.treasury.domain.Product playsRole product {
-			multiplicity 0..1;
-		}
-		
-		reservationtax.ReservationTaxEventTarget playsRole reservationTaxEventTargets {
-			multiplicity *;
-		}
-	}
-	
 	relation ReservationTaxEventTargetPerson {
 		.org.fenixedu.academic.domain.Person playsRole person {
 			multiplicity 1..1;
