@@ -1,3 +1,5 @@
+- Improvement: Check if there is already an active customer with the same fiscal number, only within the instances of the subclasses AdhocCustomer and PersonCustomer
+
 8.5.3 (12-12-2022)
 - Bug Fix: Support delete reservation tax
 - Refactor: Remove association of product and finantial entity with the reservation tax event target

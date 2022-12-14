@@ -72,6 +72,7 @@ import org.fenixedu.treasury.util.FiscalCodeValidation;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.LocalDate;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
 
@@ -159,6 +160,22 @@ public class PersonCustomer extends PersonCustomer_Base {
                     "error.PersonCustomer.default.fiscal.number.applied.only.to.default.country");
         }
 
+        if (!TreasuryConstants.isDefaultCountry(getFiscalCountry()) || !DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber())) {
+            final Set<Customer> customers = findByFiscalInformation(getFiscalCountry(), getFiscalNumber()) //
+                    .filter(c -> c.isPersonCustomer()) //
+                    .filter(c -> c.isActive()) //
+                    .collect(Collectors.<Customer> toSet());
+
+            if (customers.size() > 1) {
+                final Customer self = this;
+                final Set<String> otherCustomers =
+                        customers.stream().filter(c -> c != self).map(c -> c.getName()).collect(Collectors.<String> toSet());
+
+                throw new TreasuryDomainException("error.Customer.customer.with.fiscal.information.exists",
+                        Joiner.on(", ").join(otherCustomers));
+            }
+        }
+        
         final Person person = isActive() ? getPerson() : getPersonForInactivePersonCustomer();
 
         if (!DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber())
