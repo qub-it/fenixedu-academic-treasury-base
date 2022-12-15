@@ -1,4 +1,5 @@
 - Improvement: Check if there is already an active customer with the same fiscal number, only within the instances of the subclasses AdhocCustomer and PersonCustomer
+- Improvement: Allow set code in Reservation Tax, in creation and edition
 
 8.5.3 (12-12-2022)
 - Bug Fix: Support delete reservation tax

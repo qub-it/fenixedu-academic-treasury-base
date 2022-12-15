@@ -26,12 +26,12 @@ public class ReservationTax extends ReservationTax_Base {
         setDomainRoot(FenixFramework.getDomainRoot());
     }
 
-    protected ReservationTax(LocalizedString name, FinantialEntity finantialEntity, Product product, boolean discountInTuitionFee,
+    protected ReservationTax(String code, LocalizedString name, FinantialEntity finantialEntity, Product product, boolean discountInTuitionFee,
             boolean active, boolean createPaymentReferenceCode, LocalizedString taxReservationDescription,
             TreasuryExemptionType treasuryExemptionType) {
         this();
 
-        super.setCode(UUID.randomUUID().toString());
+        super.setCode(code);
         super.setName(name);
         super.setFinantialEntity(finantialEntity);
         super.setProduct(product);
@@ -51,6 +51,10 @@ public class ReservationTax extends ReservationTax_Base {
 
         if (getFinantialEntity() == null) {
             throw new AcademicTreasuryDomainException("error.ReservationTax.finantialEntity.required");
+        }
+        
+        if(getCode() == null) {
+            throw new AcademicTreasuryDomainException("error.ReservationTax.code.required");
         }
 
         if (getName() == null) {
@@ -78,10 +82,11 @@ public class ReservationTax extends ReservationTax_Base {
         }
     }
 
-    public void edit(LocalizedString name, FinantialEntity finantialEntity, Product product, boolean discountInTuitionFee,
+    public void edit(String code, LocalizedString name, FinantialEntity finantialEntity, Product product, boolean discountInTuitionFee,
             boolean active, boolean createPaymentReferenceCode, LocalizedString taxReservationDescription,
             TreasuryExemptionType treasuryExemptionType) {
 
+        super.setCode(code);
         super.setName(name);
         
         if(getReservationTaxEventTargetsSet().isEmpty()) {
@@ -144,10 +149,10 @@ public class ReservationTax extends ReservationTax_Base {
         return FenixFramework.getDomainRoot().getReservationTaxesSet().stream();
     }
 
-    public static ReservationTax create(LocalizedString name, FinantialEntity finantialEntity, Product product,
+    public static ReservationTax create(String code, LocalizedString name, FinantialEntity finantialEntity, Product product,
             boolean discountInTuitionFee, boolean active, boolean createPaymentReferenceCode,
             LocalizedString taxReservationDescription, TreasuryExemptionType treasuryExemptionType) {
-        return new ReservationTax(name, finantialEntity, product, discountInTuitionFee, active, createPaymentReferenceCode,
+        return new ReservationTax(code, name, finantialEntity, product, discountInTuitionFee, active, createPaymentReferenceCode,
                 taxReservationDescription, treasuryExemptionType);
     }
 
