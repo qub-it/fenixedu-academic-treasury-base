@@ -1,3 +1,5 @@
+- New Feature: Course cost function map management UI
+
 8.6.0 (04-01-2023)
 - Refactor: Split TreasuryEvent::invokeSettlementCallbacks method in two, one receiving the settlement note and other the treasury exemption
 

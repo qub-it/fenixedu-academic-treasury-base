@@ -920,7 +920,6 @@ class academicalAct.AcademicActBlockingSuspension {
  * --------------------
  */
 
-// Refactor move to customers-ulisboa
 class coursefunctioncost.CourseFunctionCost {
 	BigDecimalAT functionCost;
 }

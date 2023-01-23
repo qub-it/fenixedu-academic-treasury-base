@@ -98,6 +98,12 @@ public class CourseFunctionCost extends CourseFunctionCost_Base {
 
         deleteDomainObject();
     }
+    
+    public void edit(final BigDecimal functionCost) {
+        setFunctionCost(functionCost);
+        
+        checkRules();
+    }
 
     public static Stream<CourseFunctionCost> findAll() {
         return FenixFramework.getDomainRoot().getCourseFunctionCostsSet().stream();
