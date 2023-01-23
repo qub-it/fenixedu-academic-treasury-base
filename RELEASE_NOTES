@@ -1,4 +1,4 @@
-- New Feature: Course cost function map management UI
+- Refactor: method to edit course cost function
 
 8.6.0 (04-01-2023)
 - Refactor: Split TreasuryEvent::invokeSettlementCallbacks method in two, one receiving the settlement note and other the treasury exemption
