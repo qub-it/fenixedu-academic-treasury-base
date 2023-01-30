@@ -68,6 +68,8 @@ import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
 import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.settings.TreasurySettings;
+import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
+import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -81,6 +83,9 @@ import pt.ist.fenixframework.Atomic.TxMode;
 
 public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
 
+    // ANIL 2023-01-30: Please read the comment where this constant is used
+    private static final LocalDate FROM_DATE_TO_CONSIDER_TOTALLY_EXEMPTED_AMOUNTS = new LocalDate(2023, 1, 30);
+    
     private static Logger logger = LoggerFactory.getLogger(CreateDebtsStrategy.class);
 
     @Override
@@ -266,7 +271,7 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
             if (debitEntry.getFinantialDocument() == null) {
                 DebitNote debitNote = debitNotesMap.get(debitEntry.getPayorDebtAccount() != null ? debitEntry
                         .getPayorDebtAccount() : debitEntry.getDebtAccount());
-                debitEntry.setFinantialDocument(debitNote);
+                debitEntry.addToFinantialDocument(debitNote);
             }
 
             if (debitEntry.getDebtAccount() != debitEntry.getFinantialDocument().getDebtAccount()) {
@@ -420,7 +425,31 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
             return null;
         }
 
-        return findActiveDebitEntries(customer, t, product).filter(d -> d.isInDebt()).findFirst().orElse(null);
+        return findActiveDebitEntries(customer, t, product)
+                .filter(d -> {
+                    if(d.isInDebt()) {
+                        return true;
+                    }
+                    
+                    // ANIL 2023-01-30
+                    //
+                    // Initially this active debit entry was considered if it was in debt
+                    // But now with the reservations taxes, the debit entry might be totally exempted
+                    // and should be considered, in order to not abort this execution of rule
+                    //
+                    // But... there are instances with debit entries totally exempted without
+                    // debit note. Considering all debit entries exempted, will trigger the
+                    // creation of debit notes and will be closed. The institutions will
+                    // get a massive generation of invoices, for debit entries issued in the
+                    // previous years
+                    
+                    LocalDate debitEntryCreationDate = TreasuryPlataformDependentServicesFactory.implementation().versioningCreationDate(d).toLocalDate();
+                    if(!FROM_DATE_TO_CONSIDER_TOTALLY_EXEMPTED_AMOUNTS.isAfter(debitEntryCreationDate)) {
+                        return d.isTotallyExempted();
+                    }
+
+                    return false;
+                }).findFirst().orElse(null);
     }
 
     private Map<DebtAccount, DebitNote> grabPreparingOrCreateDebitNotes(final Set<DebitEntry> debitEntries) {
@@ -451,10 +480,11 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                 }
             }
         }
-        
+
         // Ensure all debit notes are in preparing state
-        if(!result.values().stream().allMatch(d -> d.isPreparing())) {
-            throw new RuntimeException("error.CreateDebtsStrategy.grabPreparingOrCreateDebitNotes.debitNote.preparing.state.failed");
+        if (!result.values().stream().allMatch(d -> d.isPreparing())) {
+            throw new RuntimeException(
+                    "error.CreateDebtsStrategy.grabPreparingOrCreateDebitNotes.debitNote.preparing.state.failed");
         }
 
         return result;

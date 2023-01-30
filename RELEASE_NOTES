@@ -1,3 +1,6 @@
+- Refactor: Replace reference for FinantialDocumentEntry::setFinantialDocument by FinantialDocumentEntry::addToFinantialDocument
+- Bug Fix: Consider totally exempted debit entries, created in CreateDebtsStrategy, which might be exempted due to reservation taxes
+
 8.6.1 (26-01-2023)
 - Refactor: method to edit course cost function
 
