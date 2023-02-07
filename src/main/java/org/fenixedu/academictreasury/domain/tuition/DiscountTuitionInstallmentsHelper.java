@@ -10,8 +10,10 @@ import java.util.stream.Collectors;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
@@ -218,19 +220,24 @@ public class DiscountTuitionInstallmentsHelper {
             return o1.getExternalId().compareTo(o2.getExternalId());
         };
 
+        StudentCurricularPlan studentCurricularPlan = this.registration.getStudentCurricularPlan(this.executionYear);
+        DegreeCurricularPlan degreeCurricularPlan = studentCurricularPlan.getDegreeCurricularPlan();
+
         TreeMap<TreasuryEvent, BigDecimal> result = new TreeMap<>(TREASURY_EVENT_COMPARATOR);
-        getOtherEventsToDiscountInTuitionFee(this.person, this.executionYear)
+        getOtherEventsToDiscountInTuitionFee(this.person, this.executionYear, degreeCurricularPlan)
                 .forEach(ev -> result.put(ev, ev.getAmountToPay()));
 
         return result;
     }
 
-    private static List<TreasuryEvent> getOtherEventsToDiscountInTuitionFee(Person person, ExecutionYear executionYear) {
+    private static List<TreasuryEvent> getOtherEventsToDiscountInTuitionFee(Person person, ExecutionYear executionYear,
+            DegreeCurricularPlan degreeCurricularPlan) {
         return TreasuryBridgeAPIFactory.implementation().getAllAcademicTreasuryEventsList(person) //
                 .stream() //
                 .map(TreasuryEvent.class::cast) //
                 .filter(t -> t.isEventDiscountInTuitionFee()) //
                 .filter(t -> executionYear.getQualifiedName().equals(t.getExecutionYearName())) //
+                .filter(t -> degreeCurricularPlan.getDegree().getCode().equals(t.getDegreeCode())) //
                 .collect(Collectors.toList());
     }
 
