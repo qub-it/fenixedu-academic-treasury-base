@@ -1,3 +1,4 @@
+8.6.4 (09-02-2023)
 - Bug Fix: Fix NPE in creating tuitions for registration, specifically in calculating the discounts table
 
 8.6.3 (07-02-2023)
