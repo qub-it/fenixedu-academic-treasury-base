@@ -66,6 +66,7 @@ public class DiscountTuitionInstallmentsHelper {
 
         this.person = tuitionAcademicTreasuryEvent.getPerson();
         this.executionYear = tuitionAcademicTreasuryEvent.getExecutionYear();
+        this.registration = tuitionAcademicTreasuryEvent.getRegistration();
 
         this.discountMap = buildDiscountMap();
     }
@@ -75,7 +76,6 @@ public class DiscountTuitionInstallmentsHelper {
             BigDecimal enrolledEctsUnits, BigDecimal enrolledCoursesCount,
             Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap) {
 
-        this.registration = registration;
         this.tuitionPaymentPlan = tuitionPaymentPlan;
         this.debtDate = debtDate;
         this.enrolledEctsUnits = enrolledEctsUnits;
@@ -84,6 +84,7 @@ public class DiscountTuitionInstallmentsHelper {
 
         this.person = registration.getPerson();
         this.executionYear = tuitionPaymentPlan.getExecutionYear();
+        this.registration = registration;
 
         this.discountMap = buildDiscountMap();
     }

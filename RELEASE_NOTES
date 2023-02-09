@@ -1,3 +1,5 @@
+- Bug Fix: Fix NPE in creating tuitions for registration, specifically in calculating the discounts table
+
 8.6.3 (07-02-2023)
 - Bug Fix: In exempting tuition installments, when creating tuition debts, consider only treasury events of the same degree as the registration
 
