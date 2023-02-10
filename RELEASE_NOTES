@@ -1,3 +1,5 @@
+- Refactor: Remove method Customer::getFiscalCountry and other related methods of similar name. This method cause some confusion and is replaced by Customer::getAddressCountryCode
+
 8.6.4 (09-02-2023)
 - Bug Fix: Fix NPE in creating tuitions for registration, specifically in calculating the discounts table
 

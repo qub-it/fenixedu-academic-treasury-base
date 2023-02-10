@@ -208,7 +208,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         @Override
         @Deprecated
         public String getFiscalCountry() {
-            return personCustomer.getFiscalCountry();
+            return personCustomer.getAddressCountryCode();
         }
 
         @Override

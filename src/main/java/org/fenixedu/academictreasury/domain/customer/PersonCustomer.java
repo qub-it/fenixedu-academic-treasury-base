@@ -92,7 +92,7 @@ public class PersonCustomer extends PersonCustomer_Base {
 
         // TODO: CHECK IF THIS CODE DO ANYTHING
         if (!DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber())
-                && find(getPerson(), getFiscalCountry(), getFiscalNumber()).count() > 1) {
+                && find(getPerson(), getAddressCountryCode(), getFiscalNumber()).count() > 1) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.person.customer.duplicated");
         }
 
@@ -155,13 +155,13 @@ public class PersonCustomer extends PersonCustomer_Base {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.countryOfResidence.is.not.equal.of.customer");
         }
 
-        if (DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber()) && !TreasuryConstants.isDefaultCountry(getFiscalCountry())) {
+        if (DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber()) && !TreasuryConstants.isDefaultCountry(getAddressCountryCode())) {
             throw new AcademicTreasuryDomainException(
                     "error.PersonCustomer.default.fiscal.number.applied.only.to.default.country");
         }
 
-        if (!TreasuryConstants.isDefaultCountry(getFiscalCountry()) || !DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber())) {
-            final Set<Customer> customers = findByFiscalInformation(getFiscalCountry(), getFiscalNumber()) //
+        if (!TreasuryConstants.isDefaultCountry(getAddressCountryCode()) || !DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber())) {
+            final Set<Customer> customers = findByFiscalInformation(getAddressCountryCode(), getFiscalNumber()) //
                     .filter(c -> c.isPersonCustomer()) //
                     .filter(c -> c.isActive()) //
                     .collect(Collectors.<Customer> toSet());
@@ -179,7 +179,7 @@ public class PersonCustomer extends PersonCustomer_Base {
         final Person person = isActive() ? getPerson() : getPersonForInactivePersonCustomer();
 
         if (!DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber())
-                && find(person, getFiscalCountry(), getFiscalNumber()).filter(pc -> !pc.isFromPersonMerge()).count() > 1) {
+                && find(person, getAddressCountryCode(), getFiscalNumber()).filter(pc -> !pc.isFromPersonMerge()).count() > 1) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.person.customer.duplicated");
         }
     }
@@ -467,11 +467,6 @@ public class PersonCustomer extends PersonCustomer_Base {
         }
 
         return this.getIdentificationNumber();
-    }
-
-    @Override
-    public String getFiscalCountry() {
-        return getAddressCountryCode();
     }
 
     @Override
@@ -881,8 +876,8 @@ public class PersonCustomer extends PersonCustomer_Base {
 
     public static Stream<? extends PersonCustomer> find(final Person person, final String fiscalCountryCode,
             final String fiscalNumber) {
-        return find(person).filter(pc -> !Strings.isNullOrEmpty(pc.getFiscalCountry())
-                && TreasuryConstants.isSameCountryCode(pc.getFiscalCountry(), fiscalCountryCode)
+        return find(person).filter(pc -> !Strings.isNullOrEmpty(pc.getAddressCountryCode())
+                && TreasuryConstants.isSameCountryCode(pc.getAddressCountryCode(), fiscalCountryCode)
                 && !Strings.isNullOrEmpty(pc.getFiscalNumber()) && pc.getFiscalNumber().equals(fiscalNumber));
     }
 

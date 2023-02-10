@@ -152,7 +152,7 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
                         .getStudent().getNumber();
             }
 
-            this.vatNumberValid = FiscalCodeValidation.isValidFiscalNumber(debtAccount.getCustomer().getFiscalCountry(),
+            this.vatNumberValid = FiscalCodeValidation.isValidFiscalNumber(debtAccount.getCustomer().getAddressCountryCode(),
                     debtAccount.getCustomer().getFiscalNumber());
 
             this.totalInDebt = debtAccount.getFinantialInstitution().getCurrency().getValueWithScale(debtAccount.getTotalInDebt())
