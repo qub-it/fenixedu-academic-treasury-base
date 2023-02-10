@@ -1,3 +1,4 @@
+8.6.5 (10-02-2023)
 - Refactor: Remove method Customer::getFiscalCountry and other related methods of similar name. This method cause some confusion and is replaced by Customer::getAddressCountryCode
 
 8.6.4 (09-02-2023)
