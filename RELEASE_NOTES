@@ -1,3 +1,5 @@
+- Improvement: Do not check if a finantial document maybe be integrated with success
+
 8.6.5 (10-02-2023)
 - Refactor: Remove method Customer::getFiscalCountry and other related methods of similar name. This method cause some confusion and is replaced by Customer::getAddressCountryCode
 

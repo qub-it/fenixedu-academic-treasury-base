@@ -638,7 +638,7 @@ public class PersonCustomer extends PersonCustomer_Base {
     }
 
     @Atomic
-    public void changeFiscalNumber(final AdhocCustomerBean bean, final PhysicalAddress fiscalAddress) {
+    public void changeFiscalNumber(AdhocCustomerBean bean, PhysicalAddress fiscalAddress) {
         IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
         if (!Strings.isNullOrEmpty(getErpCustomerId())) {
@@ -650,7 +650,14 @@ public class PersonCustomer extends PersonCustomer_Base {
 
         final boolean changeFiscalNumberConfirmed = bean.isChangeFiscalNumberConfirmed();
         final boolean withFinantialDocumentsIntegratedInERP = isWithFinantialDocumentsIntegratedInERP();
-        final boolean customerInformationMaybeIntegratedWithSuccess = isCustomerInformationMaybeIntegratedWithSuccess();
+        
+        // 2023-02-12 ANIL: The platform no longer check if there are logs with ERP client
+        // This was removed because it hinders the tests in quality or development servers, due to
+        // lack of log files
+        //
+        // Checking if there is an operation with success should be enough
+        final boolean customerInformationMaybeIntegratedWithSuccess = false;
+        
         final boolean customerWithFinantialDocumentsIntegratedInPreviousERP =
                 isCustomerWithFinantialDocumentsIntegratedInPreviousERP();
 
@@ -676,10 +683,6 @@ public class PersonCustomer extends PersonCustomer_Base {
 
         if (isFiscalValidated() && isFiscalCodeValid()) {
             throw new TreasuryDomainException("error.Customer.changeFiscalNumber.already.valid");
-        }
-
-        if (customerInformationMaybeIntegratedWithSuccess) {
-            throw new TreasuryDomainException("warning.Customer.changeFiscalNumber.maybe.integrated.in.erp");
         }
 
         if (withFinantialDocumentsIntegratedInERP) {
