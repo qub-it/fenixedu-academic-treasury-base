@@ -1,3 +1,5 @@
+- Bug Fix: Apply fix for debt date for academic tax, when student is not enrolled in curricular units
+
 8.6.6 (15-02-2023)
 - Improvement: Do not check if a finantial document maybe be integrated with success
 

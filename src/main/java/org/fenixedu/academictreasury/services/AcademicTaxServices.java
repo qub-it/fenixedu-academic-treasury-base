@@ -163,7 +163,14 @@ public class AcademicTaxServices {
             return data.getEnrolmentDate();
         }
 
-        return executionYear.getBeginLocalDate();
+        // TODO ANIL 2023-02-16: This is applied with a temporary fix flag
+        //
+        // Remove as soon as everyone accepts the fix
+        if(AcademicTreasurySettings.getInstance().getFixAcademicTaxEmolumentEnrolmentDate()) {
+            return new LocalDate();
+        } else {
+            return executionYear.getBeginLocalDate();
+        }
     }
 
     @Atomic

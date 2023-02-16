@@ -993,6 +993,9 @@ class settings.AcademicTreasurySettings {
 	boolean runAcademicDebtGenerationRuleOnNormalEnrolment;
 	String academicTreasuryAccountUrlImpl;
 	Boolean debtGenerationRulesPeriodicExecutionActive;
+	
+	// ANIL 2023-02-16: Temporary fix flag
+	boolean fixAcademicTaxEmolumentEnrolmentDate;
 }
 
 	relation AcademicTreasurySettingsBennu {
