@@ -36,7 +36,7 @@
 package org.fenixedu.academictreasury.domain.tuition.conditionRule;
 
 import org.fenixedu.academic.domain.Enrolment;
-import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
@@ -64,8 +64,8 @@ public class FirstTimeStudentConditionRule extends FirstTimeStudentConditionRule
     }
 
     @Override
-    public boolean isValidTo(Registration registration, ExecutionYear executionYear, Enrolment enrolment) {
-        boolean registrationFirstTime = registration.isFirstTime(executionYear);
+    public boolean isValidTo(Registration registration, ExecutionInterval executionYear, Enrolment enrolment) {
+        boolean registrationFirstTime = registration.isFirstTime(executionYear.getExecutionYear());
         return Boolean.logicalAnd(getFirstTimeStudent(), registrationFirstTime);
     }
 

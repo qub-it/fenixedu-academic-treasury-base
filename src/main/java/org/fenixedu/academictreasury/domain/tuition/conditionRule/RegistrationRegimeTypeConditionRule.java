@@ -42,7 +42,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.Enrolment;
-import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationRegimeType;
@@ -73,7 +73,7 @@ public class RegistrationRegimeTypeConditionRule extends RegistrationRegimeTypeC
     }
 
     @Override
-    public boolean isValidTo(Registration registration, ExecutionYear executionYear, Enrolment enrolment) {
+    public boolean isValidTo(Registration registration, ExecutionInterval executionYear, Enrolment enrolment) {
         final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
         RegistrationRegimeType registrationRegimeType =

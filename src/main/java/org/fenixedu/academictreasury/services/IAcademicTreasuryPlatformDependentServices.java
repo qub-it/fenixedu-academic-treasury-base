@@ -77,7 +77,7 @@ public interface IAcademicTreasuryPlatformDependentServices {
 
     Set<DegreeCurricularPlan> readAllDegreeCurricularPlansSet();
 
-    Set<DegreeCurricularPlan> readDegreeCurricularPlansWithExecutionDegree(final ExecutionYear executionYear,
+    Set<DegreeCurricularPlan> readDegreeCurricularPlansWithExecutionDegree(final ExecutionInterval executionYear,
             final DegreeType degreeType);
 
     Set<CurricularYear> readAllCurricularYearsSet();
@@ -197,13 +197,13 @@ public interface IAcademicTreasuryPlatformDependentServices {
      * Student & Registration
      * ********************** */
 
-    RegistrationDataByExecutionYear findRegistrationDataByExecutionYear(Registration registration, ExecutionYear executionYear);
+    RegistrationDataByExecutionYear findRegistrationDataByExecutionYear(Registration registration, ExecutionInterval executionYear);
 
     IngressionType ingression(Registration registration);
 
     RegistrationProtocol registrationProtocol(Registration registration);
 
-    RegistrationRegimeType registrationRegimeType(Registration registration, ExecutionYear executionYear);
+    RegistrationRegimeType registrationRegimeType(Registration registration, ExecutionInterval executionYear);
 
     Set<StatuteType> statutesTypesValidOnAnyExecutionSemesterFor(Registration registration, ExecutionInterval executionInterval);
 

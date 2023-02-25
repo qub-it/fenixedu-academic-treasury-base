@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 
@@ -193,7 +194,7 @@ public class TuitionPaymentPlanOrder extends TuitionPaymentPlanOrder_Base {
 
     public static Stream<TuitionPaymentPlanOrder> findSortedByPaymentPlanOrder(
             final TuitionPaymentPlanGroup tuitionPaymentPlanGroup, final DegreeCurricularPlan degreeCurricularPlan,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return find(degreeCurricularPlan)
                 .filter(o -> o.getTuitionPaymentPlan().getTuitionPaymentPlanGroup() == tuitionPaymentPlanGroup
                         && o.getTuitionPaymentPlan().getExecutionYear() == executionYear)
@@ -218,7 +219,7 @@ public class TuitionPaymentPlanOrder extends TuitionPaymentPlanOrder_Base {
                 .collect(Collectors.toList()).get(getPaymentPlanOrder());
     }
 
-    private ExecutionYear getExecutionYear() {
+    private ExecutionInterval getExecutionYear() {
         return getTuitionPaymentPlan().getExecutionYear();
     }
 

@@ -52,6 +52,7 @@ import org.apache.commons.lang.text.StrSubstitutor;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.EnrolmentEvaluation;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.serviceRequests.AcademicServiceRequest;
@@ -120,7 +121,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     protected AcademicTreasuryEvent(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup, final Product product,
-            final Registration registration, final ExecutionYear executionYear) {
+            final Registration registration, final ExecutionInterval executionYear) {
         this();
         init(tuitionPaymentPlanGroup, product, registration, executionYear);
 
@@ -128,7 +129,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     protected AcademicTreasuryEvent(final AcademicTax academicTax, final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         this();
         init(academicTax, registration, executionYear);
 
@@ -142,7 +143,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         checkRules();
     }
 
-    protected AcademicTreasuryEvent(final Product product, final Registration registration, final ExecutionYear executionYear,
+    protected AcademicTreasuryEvent(final Product product, final Registration registration, final ExecutionInterval executionYear,
             final int customAcademicDebtNumberOfUnits, final int customAcademicDebtNumberOfPages,
             final boolean customAcademicDebtUrgent, final LocalDate customAcademicDebtEventDate) {
         init(product, registration, executionYear, customAcademicDebtNumberOfUnits, customAcademicDebtNumberOfPages,
@@ -209,7 +210,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     protected void init(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup, final Product product,
-            final Registration registration, final ExecutionYear executionYear) {
+            final Registration registration, final ExecutionInterval executionYear) {
         super.init(product, nameForTuition(product, registration, executionYear));
 
         setPerson(registration.getPerson());
@@ -222,13 +223,13 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     private LocalizedString nameForTuition(final Product product, final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
         LocalizedString result = new LocalizedString();
 
         for (final Locale locale : treasuryServices.availableLocales()) {
             final String name = String.format("%s [%s - %s]", product.getName().getContent(locale),
-                    registration.getDegree().getPresentationName(executionYear, locale), executionYear.getQualifiedName());
+                    registration.getDegree().getPresentationName(executionYear.getExecutionYear(), locale), executionYear.getQualifiedName());
 
             result = result.with(locale, name);
         }
@@ -236,7 +237,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         return result;
     }
 
-    protected void init(final AcademicTax academicTax, final Registration registration, final ExecutionYear executionYear) {
+    protected void init(final AcademicTax academicTax, final Registration registration, final ExecutionInterval executionYear) {
         super.init(academicTax.getProduct(), nameForAcademicTax(academicTax, registration, executionYear));
 
         setAcademicTax(academicTax);
@@ -249,7 +250,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     public static LocalizedString nameForAcademicTax(final AcademicTax academicTax, final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
 
         LocalizedString result = new LocalizedString();
@@ -257,7 +258,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
             String name = null;
             if (academicTax.isAppliedOnRegistration()) {
                 name = String.format("%s [%s - %s]", academicTax.getProduct().getName().getContent(locale),
-                        registration.getDegree().getPresentationName(executionYear, locale), executionYear.getQualifiedName());
+                        registration.getDegree().getPresentationName(executionYear.getExecutionYear(), locale), executionYear.getQualifiedName());
             } else {
                 name = String.format("%s [%s]", academicTax.getProduct().getName().getContent(locale),
                         executionYear.getQualifiedName());
@@ -280,7 +281,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         setTreasuryEventTarget((AbstractDomainObject) target);
     }
 
-    protected void init(final Product product, final Registration registration, final ExecutionYear executionYear,
+    protected void init(final Product product, final Registration registration, final ExecutionInterval executionYear,
             final int customAcademicDebtNumberOfUnits, final int customAcademicDebtNumberOfPages,
             final boolean customAcademicDebtUrgent, final LocalDate customAcademicDebtEventDate) {
         super.init(product, nameForCustomAcademicDebt(product, registration, executionYear));
@@ -297,13 +298,13 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     public static LocalizedString nameForCustomAcademicDebt(final Product product, final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
 
         LocalizedString result = new LocalizedString();
         for (final Locale locale : treasuryServices.availableLocales()) {
             final String name = String.format("%s [%s - %s]", product.getName().getContent(),
-                    registration.getDegree().getPresentationName(executionYear, locale), executionYear.getQualifiedName());
+                    registration.getDegree().getPresentationName(executionYear.getExecutionYear(), locale), executionYear.getQualifiedName());
 
             result = result.with(locale, name);
         }
@@ -691,7 +692,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         }
 
         if (getExecutionYear() != null) {
-            return degree().getPresentationName(getExecutionYear());
+            return degree().getPresentationName(getExecutionYear().getExecutionYear());
         }
 
         return degree().getPresentationName();
@@ -915,7 +916,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         return findAll().filter(e -> e.getExecutionYear() == executionYear);
     }
 
-    public static Stream<? extends AcademicTreasuryEvent> find(Registration registration, ExecutionYear executionYear) {
+    public static Stream<? extends AcademicTreasuryEvent> find(Registration registration, ExecutionInterval executionYear) {
         return find(registration.getPerson()).filter(e -> e.getRegistration() == registration)
                 .filter(l -> l.getExecutionYear() == executionYear);
     }
@@ -949,17 +950,17 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     /* For Registration */
 
     protected static Stream<? extends AcademicTreasuryEvent> findForRegistrationTuition(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return find(registration, executionYear).filter(e -> e.isForRegistrationTuition());
     }
 
     public static Optional<? extends AcademicTreasuryEvent> findUniqueForRegistrationTuition(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return findForRegistrationTuition(registration, executionYear).findFirst();
     }
 
     public static AcademicTreasuryEvent createForRegistrationTuition(final Product product, final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return new AcademicTreasuryEvent(TuitionPaymentPlanGroup.findUniqueDefaultGroupForRegistration().get(), product,
                 registration, executionYear);
     }
@@ -967,17 +968,17 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     /* For Standalone */
 
     protected static Stream<? extends AcademicTreasuryEvent> findForStandaloneTuition(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return find(registration, executionYear).filter(e -> e.isForStandaloneTuition());
     }
 
     public static Optional<? extends AcademicTreasuryEvent> findUniqueForStandaloneTuition(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return findForStandaloneTuition(registration, executionYear).findFirst();
     }
 
     public static AcademicTreasuryEvent createForStandaloneTuition(final Product product, final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return new AcademicTreasuryEvent(TuitionPaymentPlanGroup.findUniqueDefaultGroupForStandalone().get(), product,
                 registration, executionYear);
     }
@@ -985,17 +986,17 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     /* For Extracurricular */
 
     protected static Stream<? extends AcademicTreasuryEvent> findForExtracurricularTuition(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return find(registration, executionYear).filter(e -> e.isForExtracurricularTuition());
     }
 
     public static Optional<? extends AcademicTreasuryEvent> findUniqueForExtracurricularTuition(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return findForExtracurricularTuition(registration, executionYear).findFirst();
     }
 
     public static AcademicTreasuryEvent createForExtracurricularTuition(final Product product, final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return new AcademicTreasuryEvent(TuitionPaymentPlanGroup.findUniqueDefaultGroupForExtracurricular().get(), product,
                 registration, executionYear);
     }
@@ -1003,17 +1004,17 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     /* For Improvement */
 
     protected static Stream<? extends AcademicTreasuryEvent> findForImprovementTuition(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return find(registration, executionYear).filter(e -> e.isForImprovementTax());
     }
 
     public static Optional<? extends AcademicTreasuryEvent> findUniqueForImprovementTuition(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return findForImprovementTuition(registration, executionYear).findFirst();
     }
 
     public static AcademicTreasuryEvent createForImprovementTuition(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return new AcademicTreasuryEvent(AcademicTreasurySettings.getInstance().getImprovementAcademicTax(), registration,
                 executionYear);
     }
@@ -1026,7 +1027,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     // @formatter: on
 
     public static Stream<? extends AcademicTreasuryEvent> findAllForAcademicTax(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         final Set<AcademicTreasuryEvent> result = Sets.newHashSet();
 
         for (final AcademicTax academicTax : AcademicTax.findAll().collect(Collectors.toSet())) {
@@ -1038,7 +1039,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     public static Stream<? extends AcademicTreasuryEvent> findForAcademicTax(final Registration registration,
-            final ExecutionYear executionYear, final AcademicTax academicTax) {
+            final ExecutionInterval executionYear, final AcademicTax academicTax) {
         return find(registration.getPerson())
                 .filter(e -> e.isForAcademicTax() && e.getAcademicTax() == academicTax && e.getExecutionYear() == executionYear
                         && (!e.getAcademicTax().isAppliedOnRegistration() && e.getPerson() == registration.getPerson()
@@ -1046,7 +1047,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     public static Optional<? extends AcademicTreasuryEvent> findUniqueForAcademicTax(final Registration registration,
-            final ExecutionYear executionYear, final AcademicTax academicTax) {
+            final ExecutionInterval executionYear, final AcademicTax academicTax) {
         return findForAcademicTax(registration, executionYear, academicTax).findFirst();
     }
 
@@ -1062,7 +1063,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     public static AcademicTreasuryEvent createForAcademicTax(final AcademicTax academicTax, final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return new AcademicTreasuryEvent(academicTax, registration, executionYear);
     }
 
@@ -1079,7 +1080,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     // @formatter: on
 
     public static AcademicTreasuryEvent createForCustomAcademicDebt(final Product product, final Registration registration,
-            final ExecutionYear executionYear, final int customAcademicDebtNumberOfUnits,
+            final ExecutionInterval executionYear, final int customAcademicDebtNumberOfUnits,
             final int customAcademicDebtNumberOfPages, final boolean customAcademicDebtUrgent,
             final LocalDate customAcademicDebtEventDate) {
         return new AcademicTreasuryEvent(product, registration, executionYear, customAcademicDebtNumberOfUnits,
@@ -1087,7 +1088,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     public static Stream<? extends AcademicTreasuryEvent> findForCustomAcademicDebt(final Product product,
-            final Registration registration, final ExecutionYear executionYear) {
+            final Registration registration, final ExecutionInterval executionYear) {
 
         return find(registration.getPerson()).filter(e -> e.getExecutionYear() == executionYear)
                 .filter(e -> e.isCustomAcademicDebt()).filter(e -> e.getProduct() == product);
@@ -1259,7 +1260,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
             propertiesMap.put(AcademicTreasuryEventKeys.EXECUTION_YEAR.getDescriptionI18N().getContent(),
                     getExecutionYear().getQualifiedName());
             propertiesMap.put(AcademicTreasuryEventKeys.DEGREE.getDescriptionI18N().getContent(),
-                    getRegistration().getDegree().getPresentationName(getExecutionYear()));
+                    getRegistration().getDegree().getPresentationName(getExecutionYear().getExecutionYear()));
             propertiesMap.put(AcademicTreasuryEventKeys.DEGREE_CURRICULAR_PLAN.getDescriptionI18N().getContent(),
                     getRegistration().getDegreeCurricularPlanName());
             propertiesMap.put(AcademicTreasuryEventKeys.DEGREE_CODE.getDescriptionI18N().getContent(),
@@ -1274,7 +1275,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     public static BigDecimal getEnrolledEctsUnits(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
-            final Registration registration, final ExecutionYear executionYear) {
+            final Registration registration, final ExecutionInterval executionYear) {
 
         if (tuitionPaymentPlanGroup.isForRegistration()) {
 
@@ -1300,7 +1301,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     public static BigDecimal getEnrolledCoursesCount(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
-            final Registration registration, final ExecutionYear executionYear) {
+            final Registration registration, final ExecutionInterval executionYear) {
         if (tuitionPaymentPlanGroup.isForRegistration()) {
             return new BigDecimal(TuitionServices.normalEnrolmentsWithoutAnnuled(registration, executionYear).size());
         } else if (tuitionPaymentPlanGroup.isForStandalone()) {

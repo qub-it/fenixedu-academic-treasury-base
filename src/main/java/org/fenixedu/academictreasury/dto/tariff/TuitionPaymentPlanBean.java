@@ -100,7 +100,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
     private Product product;
     private TuitionPaymentPlanGroup tuitionPaymentPlanGroup;
-    private ExecutionYear executionYear;
+    private ExecutionInterval executionYear;
 
     private DegreeType degreeType;
     private Set<DegreeCurricularPlan> degreeCurricularPlans = Sets.newHashSet();
@@ -181,7 +181,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     // @formatter:on
 
     // To be used on copy tuition payment plan
-    private ExecutionYear copiedExecutionYear;
+    private ExecutionInterval copiedExecutionYear;
 
     // Named in tuition importation
     private String sheetName;
@@ -193,7 +193,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     public TuitionPaymentPlanBean(final Product product, final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
-            final FinantialEntity finantialEntity, final ExecutionYear executionYear) {
+            final FinantialEntity finantialEntity, final ExecutionInterval executionYear) {
         this.showAllDcps = false;
         this.product = product;
         this.tuitionPaymentPlanGroup = tuitionPaymentPlanGroup;
@@ -524,11 +524,11 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this.tuitionPaymentPlanGroup = tuitionPaymentPlanGroup;
     }
 
-    public ExecutionYear getExecutionYear() {
+    public ExecutionInterval getExecutionYear() {
         return executionYear;
     }
 
-    public void setExecutionYear(ExecutionYear executionYear) {
+    public void setExecutionYear(ExecutionInterval executionYear) {
         this.executionYear = executionYear;
     }
 
@@ -979,13 +979,13 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
             result.addAll(academicTreasuryServices.readAllDegreeCurricularPlansSet().stream()
                     .filter(dcp -> dcp.getDegreeType() == getDegreeType())
                     .map((dcp) -> new TreasuryTupleDataSourceBean(dcp.getExternalId(),
-                            "[" + dcp.getDegree().getCode() + "] " + dcp.getPresentationName(getExecutionYear())))
+                            "[" + dcp.getDegree().getCode() + "] " + dcp.getPresentationName(getExecutionYear().getExecutionYear())))
                     .collect(Collectors.toList()));
         } else {
             result.addAll(academicTreasuryServices
-                    .readDegreeCurricularPlansWithExecutionDegree(getExecutionYear(), getDegreeType()).stream()
+                    .readDegreeCurricularPlansWithExecutionDegree(getExecutionYear().getExecutionYear(), getDegreeType()).stream()
                     .map((dcp) -> new TreasuryTupleDataSourceBean(dcp.getExternalId(),
-                            "[" + dcp.getDegree().getCode() + "] " + dcp.getPresentationName(getExecutionYear())))
+                            "[" + dcp.getDegree().getCode() + "] " + dcp.getPresentationName(getExecutionYear().getExecutionYear())))
                     .collect(Collectors.toList()));
         }
 
@@ -993,14 +993,15 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     private List<TreasuryTupleDataSourceBean> semesterDataSource() {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         if (getExecutionYear() == null) {
             return Lists.newArrayList();
         }
+        
+        if(!getExecutionYear().isAggregator()) {
+            return Lists.newArrayList();
+        }
 
-        final List<TreasuryTupleDataSourceBean> result = getExecutionYear().getExecutionPeriodsSet().stream()
+        final List<TreasuryTupleDataSourceBean> result = getExecutionYear().getExecutionYear().getExecutionPeriodsSet().stream()
                 .map((cs) -> new TreasuryTupleDataSourceBean(cs.getExternalId(), cs.getQualifiedName()))
                 .collect(Collectors.toList());
 

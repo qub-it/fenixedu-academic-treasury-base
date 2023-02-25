@@ -158,7 +158,7 @@ public class DebtReportService {
             return null;
         }
         
-        return ((AcademicTreasuryEvent) debitEntry.getTreasuryEvent()).getExecutionYear();
+        return ((AcademicTreasuryEvent) debitEntry.getTreasuryEvent()).getExecutionYear().getExecutionYear();
     }
 
     private static DegreeType degreeType(final DebitEntry debitEntry) {

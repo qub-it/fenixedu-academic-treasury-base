@@ -45,6 +45,7 @@ import java.util.stream.Stream;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.Enrolment;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.coursefunctioncost.CourseFunctionCost;
@@ -157,8 +158,8 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
     protected void init(TuitionInstallmentTariff tariff) {
         FinantialEntity finantialEntity = tariff.getFinantialEntity();
         Product product = tariff.getProduct();
-        ExecutionYear executionYear = getTuitionPaymentPlan().getExecutionYear();
-        ExecutionYear copiedExecutionYear = tariff.getTuitionPaymentPlan().getExecutionYear();
+        ExecutionInterval executionYear = getTuitionPaymentPlan().getExecutionYear();
+        ExecutionInterval copiedExecutionYear = tariff.getTuitionPaymentPlan().getExecutionYear();
 
         int executionYearInterval = executionYear.getAcademicInterval().getStart().getYear()
                 - copiedExecutionYear.getAcademicInterval().getStart().getYear();
@@ -806,7 +807,7 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
         final TuitionPaymentPlanGroup tuitionPaymentPlanGroup = event.getTuitionPaymentPlanGroup();
         final Registration registration = event.getRegistration();
-        final ExecutionYear executionYear = event.getExecutionYear();
+        final ExecutionInterval executionYear = event.getExecutionYear();
 
         if (getTuitionCalculationType().isFixedAmount()) {
             propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.FIXED_AMOUNT.getDescriptionI18N().getContent(),
@@ -867,7 +868,7 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         propertiesMap.put(AcademicTreasuryEventKeys.DEGREE_CODE.getDescriptionI18N().getContent(),
                 event.getRegistration().getDegree().getCode());
         propertiesMap.put(AcademicTreasuryEventKeys.DEGREE.getDescriptionI18N().getContent(),
-                event.getRegistration().getDegree().getPresentationName(event.getExecutionYear()));
+                event.getRegistration().getDegree().getPresentationName(event.getExecutionYear().getExecutionYear()));
         propertiesMap.put(AcademicTreasuryEventKeys.DEGREE_CURRICULAR_PLAN.getDescriptionI18N().getContent(),
                 event.getRegistration().getDegreeCurricularPlanName());
 

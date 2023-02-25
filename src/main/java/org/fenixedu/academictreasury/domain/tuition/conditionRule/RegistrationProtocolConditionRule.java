@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.Enrolment;
-import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationProtocol;
@@ -77,7 +77,7 @@ public class RegistrationProtocolConditionRule extends RegistrationProtocolCondi
     }
 
     @Override
-    public boolean isValidTo(Registration registration, ExecutionYear executionYear, Enrolment enrolment) {
+    public boolean isValidTo(Registration registration, ExecutionInterval executionYear, Enrolment enrolment) {
         IAcademicTreasuryPlatformDependentServices implementation =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
         return getRegistrationProtocolSet().contains(implementation.registrationProtocol(registration));

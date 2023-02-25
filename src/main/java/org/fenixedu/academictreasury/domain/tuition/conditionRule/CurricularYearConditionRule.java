@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.CurricularYear;
 import org.fenixedu.academic.domain.Enrolment;
-import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
@@ -69,8 +69,8 @@ public class CurricularYearConditionRule extends CurricularYearConditionRule_Bas
     }
 
     @Override
-    public boolean isValidTo(Registration registration, ExecutionYear executionYear, Enrolment enrolment) {
-        return getCurricularYearSet().contains(CurricularYear.readByYear(registration.getCurricularYear(executionYear)));
+    public boolean isValidTo(Registration registration, ExecutionInterval executionYear, Enrolment enrolment) {
+        return getCurricularYearSet().contains(CurricularYear.readByYear(registration.getCurricularYear(executionYear.getExecutionYear())));
     }
 
     @Override

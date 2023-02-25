@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.Enrolment;
-import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.exceptions.DomainException;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.StatuteType;
@@ -79,7 +79,7 @@ public class StatuteTypeConditionRule extends StatuteTypeConditionRule_Base {
     }
 
     @Override
-    public boolean isValidTo(Registration registration, ExecutionYear executionYear, Enrolment enrolment) {
+    public boolean isValidTo(Registration registration, ExecutionInterval executionYear, Enrolment enrolment) {
         final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
         Set<StatuteType> statutesTypesValidOnAnyExecutionSemesterFor =

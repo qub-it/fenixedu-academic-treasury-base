@@ -138,7 +138,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         checkRules();
     }
 
-    public AcademicDebtGenerationRule(AcademicDebtGenerationRule ruleToCopy, ExecutionYear executionYear) {
+    public AcademicDebtGenerationRule(AcademicDebtGenerationRule ruleToCopy, ExecutionInterval executionYear) {
         this();
 
         setActive(ruleToCopy.isActive());
@@ -505,7 +505,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     }
 
     public static Stream<AcademicDebtGenerationRule> find(AcademicDebtGenerationRuleType type,
-            ExecutionYear executionYear) {
+            ExecutionInterval executionYear) {
         return findAll()
                 .filter(r -> r.getExecutionYear() == executionYear)
                 .filter(r -> r.getAcademicDebtGenerationRuleType() == type);
@@ -533,7 +533,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     }
 
     @Atomic
-    public static AcademicDebtGenerationRule copy(final AcademicDebtGenerationRule rule, ExecutionYear executionYear) {
+    public static AcademicDebtGenerationRule copy(final AcademicDebtGenerationRule rule, ExecutionInterval executionYear) {
         if (executionYear == rule.getExecutionYear()) {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.copy.same.executionYear");
         }
@@ -548,7 +548,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     public static List<AcademicDebtGenerationProcessingResult> runAllActive(final boolean runOnlyWithBackgroundExecution,
             Consumer<List<AcademicDebtGenerationProcessingResult>> ruleExecutionCallback,
             AcademicDebtGenerationRuleType typeArg,
-            ExecutionYear executionYearArg) {
+            ExecutionInterval executionYearArg) {
         final List<Future<List<AcademicDebtGenerationProcessingResult>>> futureList = Lists.newArrayList();
 
         final ExecutorService exService = Executors.newSingleThreadExecutor();
@@ -621,7 +621,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     }
 
     public static List<AcademicDebtGenerationProcessingResult> runAllActiveForRegistrationAndExecutionYear(
-            final Registration registration, final ExecutionYear executionYear, final boolean runOnlyWithBackgroundExecution) {
+            final Registration registration, final ExecutionInterval executionYear, final boolean runOnlyWithBackgroundExecution) {
         final List<Future<List<AcademicDebtGenerationProcessingResult>>> futureList = Lists.newArrayList();
 
         final ExecutorService exService = Executors.newSingleThreadExecutor();

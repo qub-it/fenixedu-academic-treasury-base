@@ -71,7 +71,7 @@ public class ExecutionIntervalConditionRule extends ExecutionIntervalConditionRu
     }
 
     @Override
-    public boolean isValidTo(Registration registration, ExecutionYear executionYear, Enrolment enrolment) {
+    public boolean isValidTo(Registration registration, ExecutionInterval executionYear, Enrolment enrolment) {
         Set<ExecutionInterval> collect = registration.getEnrolments(executionYear).stream()
                 .map(e -> academicTreasuryServices().executionSemester(e)).collect(Collectors.toSet());
         if (collect.size() != 1) {
@@ -119,9 +119,11 @@ public class ExecutionIntervalConditionRule extends ExecutionIntervalConditionRu
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
         ExecutionIntervalConditionRule result = new ExecutionIntervalConditionRule();
         result.setTuitionPaymentPlan(tuitionPaymentPlan);
-        Set<ExecutionInterval> executionIntervalOfTuitionPaymentPlanExecutionYear = getExecutionIntervalSet().stream().map(
-                c -> tuitionPaymentPlan.getExecutionYear().getExecutionSemesterFor(implementation.executionIntervalChildOrder(c)))
-                .collect(Collectors.toSet());
+        Set<ExecutionInterval> executionIntervalOfTuitionPaymentPlanExecutionYear =
+                getExecutionIntervalSet().stream()
+                        .map(c -> tuitionPaymentPlan.getExecutionYear().getExecutionYear()
+                                .getExecutionSemesterFor(implementation.executionIntervalChildOrder(c)))
+                        .collect(Collectors.toSet());
 
         result.getExecutionIntervalSet().addAll(executionIntervalOfTuitionPaymentPlanExecutionYear);
         return result;
@@ -139,18 +141,17 @@ public class ExecutionIntervalConditionRule extends ExecutionIntervalConditionRu
         String string = bean.getImporterRules().get(this.getClass());
         String[] split = string.split("\\|");
         for (String s : split) {
-            ExecutionYear b = bean.getExecutionYear();
+            ExecutionInterval b = bean.getExecutionYear();
 
             // TODO Check code Refactor/20210624-MergeWithISCTE
             //
             // ExecutionInterval.getChildIntervals() is not available in qubEdu-ISCTE
             // For now to compile set ExecutionInterval = null;
 
-            ExecutionInterval value = b.getChildIntervals().stream().filter(i -> i.getName().equals(s)).findFirst().orElse(null);
+            ExecutionInterval value = b.getExecutionYear().getChildIntervals().stream().filter(i -> i.getName().equals(s)).findFirst().orElse(null);
 
             if (value == null) {
-                throw new AcademicTreasuryDomainException("error.ExecutionIntervalConditionRule.executionInterval.invalid",
-                        s);
+                throw new AcademicTreasuryDomainException("error.ExecutionIntervalConditionRule.executionInterval.invalid", s);
             }
 
             addExecutionInterval(value);

@@ -44,6 +44,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.student.Registration;
@@ -69,7 +70,6 @@ import org.fenixedu.treasury.domain.document.FinantialDocumentType;
 import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.settings.TreasurySettings;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
-import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -203,7 +203,7 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
             return true;
         }
 
-        final ExecutionYear year = rule.getExecutionYear();
+        final ExecutionInterval year = rule.getExecutionYear();
         final StudentCurricularPlan scp = registration.getStudentCurricularPlan(year);
         if (scp == null) {
             return true;
@@ -214,11 +214,11 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
         }
 
         // Discard registrations not active and with no enrolments
-        if (!registration.hasAnyActiveState(year)) {
+        if (!registration.hasAnyActiveState(year.getExecutionYear())) {
             return true;
         }
 
-        if (registration.getRegistrationDataByExecutionYearSet().stream().noneMatch(i -> i.getExecutionYear() == year)) {
+        if (registration.getRegistrationDataByExecutionYearSet().stream().noneMatch(i -> i.getExecutionYear() == year.getExecutionYear())) {
 
             // only return is this rule has not entry that forces creation
             if (!isRuleWithOneEntryForcingCreation(rule)) {
@@ -331,7 +331,7 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
     private DebitEntry grabOrCreateDebitEntryForAcademicTax(final AcademicDebtGenerationRule rule,
             final Registration registration, final AcademicDebtGenerationRuleEntry entry) {
         final Product product = entry.getProduct();
-        final ExecutionYear executionYear = rule.getExecutionYear();
+        final ExecutionInterval executionYear = rule.getExecutionYear();
         final AcademicTax academicTax = AcademicTax.findUnique(product).get();
 
         {
@@ -342,9 +342,9 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                 }
 
                 boolean forceCreation = entry.isCreateDebt() && entry.isForceCreation()
-                        && registration.getLastRegistrationState(executionYear) != null
-                        && registration.getLastRegistrationState(executionYear).isActive()
-                        && (!entry.isLimitToRegisteredOnExecutionYear() || registration.isFirstTime(rule.getExecutionYear()));
+                        && registration.getLastRegistrationState(executionYear.getExecutionYear()) != null
+                        && registration.getLastRegistrationState(executionYear.getExecutionYear()).isActive()
+                        && (!entry.isLimitToRegisteredOnExecutionYear() || registration.isFirstTime(rule.getExecutionYear().getExecutionYear()));
 
                 AcademicTaxServices.createAcademicTaxForEnrolmentDateAndDefaultFinantialEntity(registration, executionYear,
                         academicTax, forceCreation);
@@ -370,7 +370,7 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
     private DebitEntry grabOrCreateDebitEntryForTuition(final AcademicDebtGenerationRule rule, final Registration registration,
             final AcademicDebtGenerationRuleEntry entry) {
         final Product product = entry.getProduct();
-        final ExecutionYear executionYear = rule.getExecutionYear();
+        final ExecutionInterval executionYear = rule.getExecutionYear();
 
         // Is of tuition kind try to catch the tuition event
         {
@@ -384,12 +384,12 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                 }
 
                 boolean forceCreation = entry.isCreateDebt() && entry.isForceCreation()
-                        && registration.getLastRegistrationState(executionYear) != null
-                        && registration.getLastRegistrationState(executionYear).isActive()
-                        && (!entry.isLimitToRegisteredOnExecutionYear() || registration.isFirstTime(rule.getExecutionYear()));
+                        && registration.getLastRegistrationState(executionYear.getExecutionYear()) != null
+                        && registration.getLastRegistrationState(executionYear.getExecutionYear()).isActive()
+                        && (!entry.isLimitToRegisteredOnExecutionYear() || registration.isFirstTime(rule.getExecutionYear().getExecutionYear()));
 
                 if (entry.isToCreateAfterLastRegistrationStateDate()) {
-                    final LocalDate lastRegisteredStateDate = TuitionServices.lastRegisteredDate(registration, executionYear);
+                    final LocalDate lastRegisteredStateDate = TuitionServices.lastRegisteredDate(registration, executionYear.getExecutionYear());
                     if (lastRegisteredStateDate == null) {
                         return null;
                     } else if (lastRegisteredStateDate.isAfter(new LocalDate())) {

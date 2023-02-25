@@ -47,6 +47,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
@@ -351,7 +352,7 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
         }
 
         final Product product = entry.getProduct();
-        final ExecutionYear executionYear = rule.getExecutionYear();
+        final ExecutionInterval executionYear = rule.getExecutionYear();
 
         AcademicTreasuryEvent t = null;
 
@@ -377,7 +378,7 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
         }
 
         final Product product = entry.getProduct();
-        final ExecutionYear executionYear = rule.getExecutionYear();
+        final ExecutionInterval executionYear = rule.getExecutionYear();
         final AcademicTax academicTax = AcademicTax.findUnique(product).get();
 
         final AcademicTreasuryEvent t = AcademicTaxServices.findAcademicTreasuryEvent(registration, executionYear, academicTax);
@@ -399,7 +400,7 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
         }
 
         final Product product = entry.getProduct();
-        final ExecutionYear executionYear = rule.getExecutionYear();
+        final ExecutionInterval executionYear = rule.getExecutionYear();
 
         if (TuitionServices.findAcademicTreasuryEventTuitionForRegistration(registration, executionYear) == null) {
             // Did not create exit with nothing

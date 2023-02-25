@@ -43,6 +43,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.Enrolment;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.student.Registration;
@@ -68,7 +69,7 @@ public class TuitionDebtCreationBean implements Serializable, ITreasuryBean {
     private static final long serialVersionUID = 1L;
 
     private LocalDate debtDate;
-    private ExecutionYear executionYear;
+    private ExecutionInterval executionYear;
     private Registration registration;
     private TuitionPaymentPlan tuitionPaymentPlan;
     private Enrolment enrolment;
@@ -102,7 +103,6 @@ public class TuitionDebtCreationBean implements Serializable, ITreasuryBean {
         updateData();
     }
 
-    @Atomic
     public void updateData() {
         if (executionYear != null && (registration == null || !possibleExecutionYears().contains(executionYear))) {
             executionYear = null;
@@ -169,7 +169,7 @@ public class TuitionDebtCreationBean implements Serializable, ITreasuryBean {
         registrationDataSource =
                 ((PersonCustomer) debtAccount.getCustomer()).getPerson().getStudent().getRegistrationsSet().stream().map(r -> {
                     final String degreeCode = r.getDegree().getCode();
-                    final String degreePresentationName = r.getDegree().getPresentationName(getExecutionYear());
+                    final String degreePresentationName = r.getDegree().getPresentationName(getExecutionYear() != null ? getExecutionYear().getExecutionYear() : null);
                     final String registrationDate = r.getStartDate() != null ? r.getStartDate().toString("yyyy-MM-dd") : "";
                     final String agreement =
                             services.registrationProtocol(r) != null ? services.registrationProtocol(r).getDescription().getContent() : "";
@@ -390,11 +390,11 @@ public class TuitionDebtCreationBean implements Serializable, ITreasuryBean {
         this.debtDate = debtDate;
     }
 
-    public ExecutionYear getExecutionYear() {
+    public ExecutionInterval getExecutionYear() {
         return executionYear;
     }
 
-    public void setExecutionYear(ExecutionYear executionYear) {
+    public void setExecutionYear(ExecutionInterval executionYear) {
         this.executionYear = executionYear;
     }
 

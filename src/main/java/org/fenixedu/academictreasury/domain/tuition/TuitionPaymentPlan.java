@@ -94,7 +94,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         setDomainRoot(FenixFramework.getDomainRoot());
     }
 
-    protected TuitionPaymentPlan(final TuitionPaymentPlan tuitionPaymentPlanToCopy, final ExecutionYear toExecutionYear) {
+    protected TuitionPaymentPlan(final TuitionPaymentPlan tuitionPaymentPlanToCopy, final ExecutionInterval toExecutionYear) {
         this();
 
         setFinantialEntity(tuitionPaymentPlanToCopy.getFinantialEntity());
@@ -343,7 +343,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         for (final Locale locale : treasuryServices.availableLocales()) {
             final String installmentName = AcademicTreasuryConstants.academicTreasuryBundle(locale, label,
                     String.valueOf(installmentTariff.getInstallmentOrder()),
-                    degreeCurricularPlan.getDegree().getPresentationName(getExecutionYear(), locale),
+                    degreeCurricularPlan.getDegree().getPresentationName(getExecutionYear().getExecutionYear(), locale),
                     getExecutionYear().getQualifiedName());
 
             result = result.with(locale, installmentName);
@@ -675,19 +675,19 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         return tuitionPaymentPlanGroup.getTuitionPaymentPlansSet().stream();
     }
 
-    public static Stream<TuitionPaymentPlan> find(TuitionPaymentPlanGroup tuitionPaymentPlanGroup, ExecutionYear executionYear) {
+    public static Stream<TuitionPaymentPlan> find(TuitionPaymentPlanGroup tuitionPaymentPlanGroup, ExecutionInterval executionYear) {
         return find(tuitionPaymentPlanGroup).filter(t -> t.getExecutionYear() == executionYear);
     }
 
     public static Stream<TuitionPaymentPlan> find(TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
-            FinantialEntity finantialEntity, ExecutionYear executionYear) {
+            FinantialEntity finantialEntity, ExecutionInterval executionYear) {
         return find(tuitionPaymentPlanGroup).filter(t -> t.getFinantialEntity() == finantialEntity)
                 .filter(t -> t.getExecutionYear() == executionYear);
     }
 
     @Deprecated
     public static Stream<TuitionPaymentPlan> find(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
-            final DegreeCurricularPlan degreeCurricularPlan, final ExecutionYear executionYear) {
+            final DegreeCurricularPlan degreeCurricularPlan, final ExecutionInterval executionYear) {
 
         return find(tuitionPaymentPlanGroup)
                 .filter(t -> t.getExecutionYear() == executionYear && t.getTuitionPaymentPlanOrdersSet().stream()
@@ -696,29 +696,29 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     @Deprecated
     public static Stream<TuitionPaymentPlan> findSortedByPaymentPlanOrder(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup,
-            final DegreeCurricularPlan degreeCurricularPlan, final ExecutionYear executionYear) {
+            final DegreeCurricularPlan degreeCurricularPlan, final ExecutionInterval executionYear) {
         return TuitionPaymentPlanOrder.findSortedByPaymentPlanOrder(tuitionPaymentPlanGroup, degreeCurricularPlan, executionYear)
                 .map(order -> order.getTuitionPaymentPlan());
     }
 
     private static Stream<TuitionPaymentPlan> findDefaultPaymentPlans(final DegreeCurricularPlan degreeCurricularPlan,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return find(TuitionPaymentPlanGroup.findUniqueDefaultGroupForRegistration().get(), degreeCurricularPlan, executionYear)
                 .filter(t -> t.isDefaultPaymentPlan());
     }
 
     public static Optional<TuitionPaymentPlan> findUniqueDefaultPaymentPlan(final DegreeCurricularPlan degreeCurricularPlan,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return findDefaultPaymentPlans(degreeCurricularPlan, executionYear).findFirst();
     }
 
     public static boolean isDefaultPaymentPlanDefined(final DegreeCurricularPlan degreeCurricularPlan,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return findUniqueDefaultPaymentPlan(degreeCurricularPlan, executionYear).isPresent();
     }
 
     public static TuitionPaymentPlan inferTuitionPaymentPlanForRegistration(final DegreeCurricularPlan degreeCurricularPlan,
-            final ExecutionYear executionYear, Predicate<? super TuitionPaymentPlan> predicate) {
+            final ExecutionInterval executionYear, Predicate<? super TuitionPaymentPlan> predicate) {
 
         final List<TuitionPaymentPlan> plans = TuitionPaymentPlan
                 .findSortedByPaymentPlanOrder(TuitionPaymentPlanGroup.findUniqueDefaultGroupForRegistration().get(),
@@ -729,7 +729,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
     }
 
     public static TuitionPaymentPlan inferTuitionPaymentPlanForRegistration(final Registration registration,
-            final ExecutionYear executionYear, Predicate<? super TuitionPaymentPlan> predicate) {
+            final ExecutionInterval executionYear, Predicate<? super TuitionPaymentPlan> predicate) {
         final StudentCurricularPlan studentCurricularPlan = registration.getStudentCurricularPlan(executionYear);
 
         if (studentCurricularPlan == null) {
@@ -742,7 +742,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
     }
 
     public static TuitionPaymentPlan inferTuitionPaymentPlanForRegistration(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
 
         final StudentCurricularPlan studentCurricularPlan = registration.getStudentCurricularPlan(executionYear);
 
@@ -757,7 +757,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
     }
 
     public static TuitionPaymentPlan inferTuitionPaymentPlanForStandaloneEnrolment(final Registration registration,
-            final ExecutionYear executionYear, final Enrolment enrolment) {
+            final ExecutionInterval executionYear, final Enrolment enrolment) {
 
         if (!enrolment.isStandalone()) {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.enrolment.is.not.standalone");
@@ -776,7 +776,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
     }
 
     public static TuitionPaymentPlan inferTuitionPaymentPlanForExtracurricularEnrolment(final Registration registration,
-            final ExecutionYear executionYear, final Enrolment enrolment) {
+            final ExecutionInterval executionYear, final Enrolment enrolment) {
 
         if (!enrolment.isExtraCurricular()) {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.enrolment.is.not.extracurricular");
@@ -793,21 +793,21 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                 .findFirst().orElse(null);
     }
 
-    public boolean isValidTo(Registration registration, ExecutionYear executionYear, Enrolment enrolment,
+    public boolean isValidTo(Registration registration, ExecutionInterval executionYear, Enrolment enrolment,
             Set<Class<? extends TuitionConditionRule>> exclude) {
         return isCustomized() || isDefaultPaymentPlan() || getTuitionConditionRulesSet().stream()
                 .allMatch(c -> !exclude.contains(c.getClass()) && c.isValidTo(registration, executionYear, enrolment));
     }
 
-    public static boolean firstTimeStudent(final Registration registration, final ExecutionYear executionYear) {
-        return registration.isFirstTime(executionYear);
+    public static boolean firstTimeStudent(final Registration registration, final ExecutionInterval executionYear) {
+        return registration.isFirstTime(executionYear.getExecutionYear());
     }
 
-    public static Integer curricularYear(final Registration registration, final ExecutionYear executionYear) {
-        return registration.getCurricularYear(executionYear);
+    public static Integer curricularYear(final Registration registration, final ExecutionInterval executionYear) {
+        return registration.getCurricularYear(executionYear.getExecutionYear());
     }
 
-    public static Set<Integer> semestersWithEnrolments(final Registration registration, final ExecutionYear executionYear) {
+    public static Set<Integer> semestersWithEnrolments(final Registration registration, final ExecutionInterval executionYear) {
         IAcademicTreasuryPlatformDependentServices implementation =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
@@ -821,7 +821,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
     }
 
     public static TuitionPaymentPlan copy(final TuitionPaymentPlan tuitionPaymentPlanToCopy,
-            final ExecutionYear toExecutionYear) {
+            final ExecutionInterval toExecutionYear) {
         return new TuitionPaymentPlan(tuitionPaymentPlanToCopy, toExecutionYear);
     }
 

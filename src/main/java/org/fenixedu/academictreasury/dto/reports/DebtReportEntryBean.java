@@ -40,14 +40,14 @@ import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.acade
 import java.math.BigDecimal;
 
 import org.apache.poi.ss.usermodel.Row;
-import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
 import org.fenixedu.academic.domain.student.RegistrationRegimeType;
+import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent.AcademicTreasuryEventKeys;
@@ -568,11 +568,11 @@ public class DebtReportEntryBean implements SpreadsheetRow {
         return null;
     }
 
-    private void fillStudentConditionsInformation(final Registration registration, final ExecutionYear executionYear) {
+    private void fillStudentConditionsInformation(final Registration registration, final ExecutionInterval executionYear) {
         final IAcademicTreasuryPlatformDependentServices academicServices =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
-        this.firstTimeStudent = registration.isFirstTime(executionYear);
+        this.firstTimeStudent = registration.isFirstTime(executionYear.getExecutionYear());
         this.partialRegime =
                 academicServices.registrationRegimeType(registration, executionYear) == RegistrationRegimeType.PARTIAL_TIME;
         this.statutes = statutes(registration, executionYear);
@@ -587,7 +587,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 TuitionServices.extracurricularEnrolmentsIncludingAnnuled(registration, executionYear).size();
     }
 
-    private String statutes(final Registration registration, final ExecutionYear executionYear) {
+    private String statutes(final Registration registration, final ExecutionInterval executionYear) {
         final IAcademicTreasuryPlatformDependentServices services =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
 

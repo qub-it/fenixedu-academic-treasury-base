@@ -6,11 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
@@ -49,7 +50,7 @@ public class DiscountTuitionInstallmentsHelper {
     // This field is common to both cases
     private Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap;
     private Person person;
-    private ExecutionYear executionYear;
+    private ExecutionInterval executionYear;
 
     private TreeMap<TreasuryEvent, BigDecimal> discountMap;
 
@@ -231,7 +232,7 @@ public class DiscountTuitionInstallmentsHelper {
         return result;
     }
 
-    private static List<TreasuryEvent> getOtherEventsToDiscountInTuitionFee(Person person, ExecutionYear executionYear,
+    private static List<TreasuryEvent> getOtherEventsToDiscountInTuitionFee(Person person, ExecutionInterval executionYear,
             DegreeCurricularPlan degreeCurricularPlan) {
         return TreasuryBridgeAPIFactory.implementation().getAllAcademicTreasuryEventsList(person) //
                 .stream() //

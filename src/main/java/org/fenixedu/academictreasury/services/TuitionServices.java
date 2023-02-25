@@ -99,18 +99,18 @@ public class TuitionServices {
         TUITION_SERVICE_EXTENSIONS.add(extension);
     }
 
-    public static boolean isToPayRegistrationTuition(final Registration registration, final ExecutionYear executionYear) {
+    public static boolean isToPayRegistrationTuition(final Registration registration, final ExecutionInterval executionYear) {
         final IAcademicTreasuryPlatformDependentServices academicServices =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
         return Boolean.TRUE.equals(academicServices.registrationProtocol(registration).getPayGratuity());
     }
 
     public static AcademicTreasuryEvent findAcademicTreasuryEventTuitionForRegistration(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return AcademicTreasuryEvent.findUniqueForRegistrationTuition(registration, executionYear).orElse(null);
     }
 
-    public static boolean isTuitionForRegistrationCharged(final Registration registration, final ExecutionYear executionYear) {
+    public static boolean isTuitionForRegistrationCharged(final Registration registration, final ExecutionInterval executionYear) {
         if (!AcademicTreasuryEvent.findUniqueForRegistrationTuition(registration, executionYear).isPresent()) {
             return false;
         }
@@ -122,20 +122,20 @@ public class TuitionServices {
     }
 
     @Atomic
-    public static boolean createInferedTuitionForRegistration(final Registration registration, final ExecutionYear executionYear,
+    public static boolean createInferedTuitionForRegistration(final Registration registration, final ExecutionInterval executionYear,
             final LocalDate when, final boolean forceCreationIfNotEnrolled) {
         return createTuitionForRegistration(registration, executionYear, when, forceCreationIfNotEnrolled, null, true, null,
                 false);
     }
 
     @Atomic
-    public static boolean createTuitionForRegistration(Registration registration, ExecutionYear executionYear, LocalDate debtDate,
+    public static boolean createTuitionForRegistration(Registration registration, ExecutionInterval executionYear, LocalDate debtDate,
             boolean forceCreationIfNotEnrolled, TuitionPaymentPlan tuitionPaymentPlan, boolean applyTuitionServiceExtensions) {
         return createTuitionForRegistration(registration, executionYear, debtDate, forceCreationIfNotEnrolled, tuitionPaymentPlan,
                 true, null, false);
     }
 
-    public static boolean createTuitionForRegistration(final Registration registration, final ExecutionYear executionYear,
+    public static boolean createTuitionForRegistration(final Registration registration, final ExecutionInterval executionYear,
             final LocalDate debtDate, final boolean forceCreationIfNotEnrolled, TuitionPaymentPlan tuitionPaymentPlan,
             final boolean applyTuitionServiceExtensions, Set<Product> restrictCreationToInstallments,
             boolean forceEvenTreasuryEventIsCharged) {
@@ -204,12 +204,12 @@ public class TuitionServices {
                 restrictCreationToInstallments, forceEvenTreasuryEventIsCharged);
     }
 
-    public static TuitionPaymentPlan usedPaymentPlan(final Registration registration, final ExecutionYear executionYear,
+    public static TuitionPaymentPlan usedPaymentPlan(final Registration registration, final ExecutionInterval executionYear,
             final LocalDate debtDate) {
         return usedPaymentPlan(registration, executionYear, debtDate, null);
     }
 
-    public static TuitionPaymentPlan usedPaymentPlan(final Registration registration, final ExecutionYear executionYear,
+    public static TuitionPaymentPlan usedPaymentPlan(final Registration registration, final ExecutionInterval executionYear,
             final LocalDate debtDate, final TuitionPaymentPlan tuitionPaymentPlan) {
         if (tuitionPaymentPlan != null) {
             return tuitionPaymentPlan;
@@ -220,12 +220,12 @@ public class TuitionServices {
 
     @Atomic
     public static List<TuitionDebitEntryBean> calculateInstallmentDebitEntryBeans(final Registration registration,
-            final ExecutionYear executionYear, final LocalDate debtDate) {
+            final ExecutionInterval executionYear, final LocalDate debtDate) {
         return calculateInstallmentDebitEntryBeans(registration, executionYear, debtDate, null, true);
     }
 
     public static List<TuitionDebitEntryBean> calculateInstallmentDebitEntryBeans(final Registration registration,
-            final ExecutionYear executionYear, final LocalDate debtDate, TuitionPaymentPlan tuitionPaymentPlan,
+            final ExecutionInterval executionYear, final LocalDate debtDate, TuitionPaymentPlan tuitionPaymentPlan,
             final boolean applyTuitionServiceExtensions) {
 
         if (applyTuitionServiceExtensions) {
@@ -294,11 +294,11 @@ public class TuitionServices {
      */
 
     public static AcademicTreasuryEvent findAcademicTreasuryEventTuitionForStandalone(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return AcademicTreasuryEvent.findUniqueForStandaloneTuition(registration, executionYear).orElse(null);
     }
 
-    public static boolean isTuitionForStandaloneCharged(final Registration registration, final ExecutionYear executionYear,
+    public static boolean isTuitionForStandaloneCharged(final Registration registration, final ExecutionInterval executionYear,
             final Enrolment enrolment) {
         if (findAcademicTreasuryEventTuitionForStandalone(registration, executionYear) == null) {
             return false;
@@ -435,12 +435,12 @@ public class TuitionServices {
     }
 
     public static TuitionPaymentPlan usedPaymentPlanForStandalone(final Registration registration,
-            final ExecutionYear executionYear, final Enrolment enrolment, final LocalDate debtDate) {
+            final ExecutionInterval executionYear, final Enrolment enrolment, final LocalDate debtDate) {
         return usedPaymentPlanForStandalone(registration, executionYear, enrolment, debtDate, null);
     }
 
     public static TuitionPaymentPlan usedPaymentPlanForStandalone(final Registration registration,
-            final ExecutionYear executionYear, final Enrolment enrolment, final LocalDate debtDate,
+            final ExecutionInterval executionYear, final Enrolment enrolment, final LocalDate debtDate,
             final TuitionPaymentPlan tuitionPaymentPlan) {
         if (tuitionPaymentPlan != null) {
             return tuitionPaymentPlan;
@@ -451,13 +451,13 @@ public class TuitionServices {
 
     @Atomic
     public static List<TuitionDebitEntryBean> calculateInstallmentDebitEntryBeansForStandalone(final Registration registration,
-            final ExecutionYear executionYear, final LocalDate debtDate, final Set<Enrolment> enrolments) {
+            final ExecutionInterval executionYear, final LocalDate debtDate, final Set<Enrolment> enrolments) {
         return calculateInstallmentDebitEntryBeansForStandalone(registration, executionYear, debtDate, null, enrolments);
     }
 
     @Atomic
     public static List<TuitionDebitEntryBean> calculateInstallmentDebitEntryBeansForStandalone(final Registration registration,
-            final ExecutionYear executionYear, final LocalDate debtDate, TuitionPaymentPlan tuitionPaymentPlan,
+            final ExecutionInterval executionYear, final LocalDate debtDate, TuitionPaymentPlan tuitionPaymentPlan,
             final Set<Enrolment> enrolments) {
 
         final Person person = registration.getPerson();
@@ -568,11 +568,11 @@ public class TuitionServices {
      */
 
     public static AcademicTreasuryEvent findAcademicTreasuryEventTuitionForExtracurricular(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return AcademicTreasuryEvent.findUniqueForExtracurricularTuition(registration, executionYear).orElse(null);
     }
 
-    public static boolean isTuitionForExtracurricularCharged(final Registration registration, final ExecutionYear executionYear,
+    public static boolean isTuitionForExtracurricularCharged(final Registration registration, final ExecutionInterval executionYear,
             final Enrolment enrolment) {
         if (findAcademicTreasuryEventTuitionForExtracurricular(registration, executionYear) == null) {
             return false;
@@ -710,12 +710,12 @@ public class TuitionServices {
     }
 
     public static TuitionPaymentPlan usedPaymentPlanForExtracurricular(final Registration registration,
-            final ExecutionYear executionYear, final Enrolment enrolment, final LocalDate debtDate) {
+            final ExecutionInterval executionYear, final Enrolment enrolment, final LocalDate debtDate) {
         return usedPaymentPlanForExtracurricular(registration, executionYear, enrolment, debtDate, null);
     }
 
     public static TuitionPaymentPlan usedPaymentPlanForExtracurricular(final Registration registration,
-            final ExecutionYear executionYear, final Enrolment enrolment, final LocalDate debtDate,
+            final ExecutionInterval executionYear, final Enrolment enrolment, final LocalDate debtDate,
             final TuitionPaymentPlan tuitionPaymentPlan) {
         if (tuitionPaymentPlan != null) {
             return tuitionPaymentPlan;
@@ -726,14 +726,14 @@ public class TuitionServices {
 
     @Atomic
     public static List<TuitionDebitEntryBean> calculateInstallmentDebitEntryBeansForExtracurricular(
-            final Registration registration, final ExecutionYear executionYear, final LocalDate debtDate,
+            final Registration registration, final ExecutionInterval executionYear, final LocalDate debtDate,
             final Set<Enrolment> enrolments) {
         return calculateInstallmentDebitEntryBeansForExtracurricular(registration, executionYear, debtDate, null, enrolments);
     }
 
     @Atomic
     public static List<TuitionDebitEntryBean> calculateInstallmentDebitEntryBeansForExtracurricular(
-            final Registration registration, final ExecutionYear executionYear, final LocalDate debtDate,
+            final Registration registration, final ExecutionInterval executionYear, final LocalDate debtDate,
             TuitionPaymentPlan tuitionPaymentPlan, final Set<Enrolment> enrolments) {
 
         final Person person = registration.getPerson();
@@ -841,11 +841,11 @@ public class TuitionServices {
      * ----------
      */
 
-    public static LocalDate enrolmentDate(final Registration registration, final ExecutionYear executionYear,
+    public static LocalDate enrolmentDate(final Registration registration, final ExecutionInterval executionYear,
             final boolean isToForceCreation) {
         for (final RegistrationDataByExecutionYear registrationDataByExecutionYear : registration
                 .getRegistrationDataByExecutionYearSet()) {
-            if (registrationDataByExecutionYear.getExecutionYear() == executionYear
+            if (registrationDataByExecutionYear.getExecutionYear() == executionYear.getExecutionYear()
                     && registrationDataByExecutionYear.getEnrolmentDate() != null) {
                 return registrationDataByExecutionYear.getEnrolmentDate();
             }
@@ -855,7 +855,7 @@ public class TuitionServices {
             // Search the enrolment dates for most recent years in which the student was enrolled
 
             int i = 0;
-            for (ExecutionYear it = executionYear.getPreviousExecutionYear(); it != null; it =
+            for (ExecutionYear it = executionYear.getExecutionYear().getPreviousExecutionYear(); it != null; it =
                     it.getPreviousExecutionYear(), i++) {
                 if (registrationDataByExecutionYear(registration, it) != null
                         && registrationDataByExecutionYear(registration, it).getEnrolmentDate() != null) {
@@ -915,7 +915,7 @@ public class TuitionServices {
 
     // The result includes annuled enrolments
     public static Set<Enrolment> normalEnrolmentsIncludingAnnuled(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         final StudentCurricularPlan studentCurricularPlan = registration.getStudentCurricularPlan(executionYear);
 
         if (studentCurricularPlan == null) {
@@ -935,13 +935,13 @@ public class TuitionServices {
     }
 
     public static Set<Enrolment> normalEnrolmentsWithoutAnnuled(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return normalEnrolmentsIncludingAnnuled(registration, executionYear).stream().filter(e -> !e.isAnnulled())
                 .collect(Collectors.toSet());
     }
 
     public static Set<Enrolment> standaloneEnrolmentsIncludingAnnuled(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         final StudentCurricularPlan studentCurricularPlan = registration.getStudentCurricularPlan(executionYear);
 
         if (studentCurricularPlan == null) {
@@ -956,13 +956,13 @@ public class TuitionServices {
     }
 
     public static Set<Enrolment> standaloneEnrolmentsWithoutAnnuled(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return standaloneEnrolmentsIncludingAnnuled(registration, executionYear).stream().filter(e -> !e.isAnnulled())
                 .collect(Collectors.toSet());
     }
 
     public static Set<Enrolment> extracurricularEnrolmentsIncludingAnnuled(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         final StudentCurricularPlan studentCurricularPlan = registration.getStudentCurricularPlan(executionYear);
 
         if (studentCurricularPlan == null) {
@@ -975,17 +975,17 @@ public class TuitionServices {
     }
 
     public static Set<Enrolment> extracurricularEnrolmentsWithoutAnnuled(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return extracurricularEnrolmentsIncludingAnnuled(registration, executionYear).stream().filter(e -> !e.isAnnulled())
                 .collect(Collectors.toSet());
     }
 
-    private static Predicate<? super CurriculumLine> enrolmentInExecutionYearTest(final ExecutionYear executionYear) {
+    private static Predicate<? super CurriculumLine> enrolmentInExecutionYearTest(final ExecutionInterval executionYear) {
         return l -> l.getExecutionYear() == executionYear && l.isEnrolment();
     }
 
     public static Set<EnrolmentEvaluation> improvementEnrolments(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
 
         final Set<EnrolmentEvaluation> result = Sets.newHashSet();
 
@@ -995,9 +995,7 @@ public class TuitionServices {
             return result;
         }
 
-        for (final ExecutionInterval executionSemester : executionYear.getExecutionPeriodsSet()) {
-            result.addAll(studentCurricularPlan.getEnroledImprovements(executionSemester));
-        }
+        result.addAll(studentCurricularPlan.getEnroledImprovements(executionYear));
 
         return result;
     }

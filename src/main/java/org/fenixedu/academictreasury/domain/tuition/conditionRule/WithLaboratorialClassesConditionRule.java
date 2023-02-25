@@ -69,7 +69,7 @@ public class WithLaboratorialClassesConditionRule extends WithLaboratorialClasse
     }
 
     @Override
-    public boolean isValidTo(Registration registration, ExecutionYear executionYear, Enrolment enrolment) {
+    public boolean isValidTo(Registration registration, ExecutionInterval executionYear, Enrolment enrolment) {
         if (enrolment == null) {
             return false;
         }

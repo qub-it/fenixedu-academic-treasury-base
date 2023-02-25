@@ -638,7 +638,7 @@ public class AcademicTariff extends AcademicTariff_Base {
                 academicTreasuryEvent.getExecutionYear().getQualifiedName());
 
         propertiesMap.put(AcademicTreasuryEventKeys.DEGREE.getDescriptionI18N().getContent(), academicTreasuryEvent
-                .getRegistration().getDegree().getPresentationName(academicTreasuryEvent.getExecutionYear()));
+                .getRegistration().getDegree().getPresentationName(academicTreasuryEvent.getExecutionYear().getExecutionYear()));
         propertiesMap.put(AcademicTreasuryEventKeys.DEGREE_CURRICULAR_PLAN.getDescriptionI18N().getContent(),
                 academicTreasuryEvent.getRegistration().getDegreeCurricularPlanName());
 

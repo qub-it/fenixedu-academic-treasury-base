@@ -41,8 +41,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.EnrolmentEvaluation;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.student.Registration;
@@ -73,13 +73,13 @@ import pt.ist.fenixframework.Atomic;
 public class AcademicTaxServices {
 
     public static List<IAcademicTreasuryEvent> findAllTreasuryEventsForAcademicTaxes(final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return AcademicTreasuryEvent.findAllForAcademicTax(registration, executionYear)
                 .collect(Collectors.<IAcademicTreasuryEvent> toList());
     }
 
     public static AcademicTreasuryEvent findAcademicTreasuryEvent(final Registration registration,
-            final ExecutionYear executionYear, final AcademicTax academicTax) {
+            final ExecutionInterval executionYear, final AcademicTax academicTax) {
         return AcademicTreasuryEvent.findUniqueForAcademicTax(registration, executionYear, academicTax).orElse(null);
     }
 
@@ -95,7 +95,7 @@ public class AcademicTaxServices {
     }
 
     public static AcademicDebitEntryBean calculateAcademicTaxForDefaultFinantialEntity(
-            final Registration registration, final ExecutionYear executionYear, final AcademicTax academicTax,
+            final Registration registration, final ExecutionInterval executionYear, final AcademicTax academicTax,
             final LocalDate debtDate, final boolean forceCreation) {
         final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
         
@@ -105,7 +105,7 @@ public class AcademicTaxServices {
     }
     
     public static AcademicDebitEntryBean calculateAcademicTax(final FinantialEntity finantialEntity,
-            final Registration registration, final ExecutionYear executionYear, final AcademicTax academicTax,
+            final Registration registration, final ExecutionInterval executionYear, final AcademicTax academicTax,
             final LocalDate debtDate, final boolean forceCreation) {
 
         if (!forceCreation && TuitionServices.normalEnrolmentsIncludingAnnuled(registration, executionYear).isEmpty()) {
@@ -146,7 +146,7 @@ public class AcademicTaxServices {
 
     @Atomic
     public static boolean createAcademicTaxForEnrolmentDateAndDefaultFinantialEntity(final Registration registration,
-            final ExecutionYear executionYear, final AcademicTax academicTax, final boolean forceCreation) {
+            final ExecutionInterval executionYear, final AcademicTax academicTax, final boolean forceCreation) {
         final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
         final LocalDate enrolmentDate = possibleEnrolmentDate(registration, executionYear);
@@ -155,7 +155,7 @@ public class AcademicTaxServices {
         return createAcademicTax(finantialEntity, registration, executionYear, academicTax, enrolmentDate, forceCreation);
     }
 
-    private static LocalDate possibleEnrolmentDate(Registration registration, ExecutionYear executionYear) {
+    private static LocalDate possibleEnrolmentDate(Registration registration, ExecutionInterval executionYear) {
         final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
         final RegistrationDataByExecutionYear data = academicTreasuryServices.findRegistrationDataByExecutionYear(registration, executionYear);
 
@@ -175,7 +175,7 @@ public class AcademicTaxServices {
 
     @Atomic
     public static boolean createAcademicTaxForDefaultFinantialEntity(final Registration registration,
-            final ExecutionYear executionYear, final AcademicTax academicTax, final LocalDate when, final boolean forceCreation) {
+            final ExecutionInterval executionYear, final AcademicTax academicTax, final LocalDate when, final boolean forceCreation) {
         final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
@@ -185,7 +185,7 @@ public class AcademicTaxServices {
 
     @Atomic
     public static boolean createAcademicTax(final FinantialEntity finantialEntity, final Registration registration,
-            final ExecutionYear executionYear, final AcademicTax academicTax, final LocalDate when, final boolean forceCreation) {
+            final ExecutionInterval executionYear, final AcademicTax academicTax, final LocalDate when, final boolean forceCreation) {
         if (!forceCreation && TuitionServices.normalEnrolmentsIncludingAnnuled(registration, executionYear).isEmpty()) {
             return false;
         }
@@ -242,16 +242,16 @@ public class AcademicTaxServices {
         return true;
     }
 
-    public static boolean isRegistrationFirstYear(final Registration registration, final ExecutionYear executionYear) {
+    public static boolean isRegistrationFirstYear(final Registration registration, final ExecutionInterval executionYear) {
         return registration.getRegistrationYear() == executionYear;
     }
 
-    public static boolean isRegistrationSubsequentYear(final Registration registration, final ExecutionYear executionYear) {
+    public static boolean isRegistrationSubsequentYear(final Registration registration, final ExecutionInterval executionYear) {
         return registration.getRegistrationYear().isBefore(executionYear);
     }
 
     public static boolean isAppliableOnRegistration(final AcademicTax academicTax, final Registration registration,
-            final ExecutionYear executionYear) {
+            final ExecutionInterval executionYear) {
         return (isRegistrationFirstYear(registration, executionYear) && academicTax.isAppliedOnRegistrationFirstYear())
                 || (isRegistrationSubsequentYear(registration, executionYear)
                         && academicTax.isAppliedOnRegistrationSubsequentYears());

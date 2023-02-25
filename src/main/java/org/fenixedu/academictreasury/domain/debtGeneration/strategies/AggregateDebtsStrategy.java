@@ -42,7 +42,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
-import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.debtGeneration.AcademicDebtGenerationProcessingResult;
@@ -289,7 +289,7 @@ public class AggregateDebtsStrategy implements IAcademicDebtGenerationRuleStrate
         }
 
         final Product product = entry.getProduct();
-        final ExecutionYear executionYear = rule.getExecutionYear();
+        final ExecutionInterval executionYear = rule.getExecutionYear();
         final AcademicTax academicTax = AcademicTax.findUnique(product).get();
 
         AcademicTreasuryEvent t = AcademicTaxServices.findAcademicTreasuryEvent(registration, executionYear, academicTax);
@@ -314,7 +314,7 @@ public class AggregateDebtsStrategy implements IAcademicDebtGenerationRuleStrate
         }
 
         final Product product = entry.getProduct();
-        final ExecutionYear executionYear = rule.getExecutionYear();
+        final ExecutionInterval executionYear = rule.getExecutionYear();
 
         // Is of tuition kind try to catch the tuition event
         final AcademicTreasuryEvent t =

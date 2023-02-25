@@ -38,7 +38,7 @@ package org.fenixedu.academictreasury.domain.tuition;
 import java.util.Comparator;
 
 import org.fenixedu.academic.domain.Enrolment;
-import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
@@ -58,7 +58,7 @@ public abstract class TuitionConditionRule extends TuitionConditionRule_Base {
 
     public abstract boolean containsRule(TuitionConditionRule tuitionConditionRule);
 
-    public boolean isValidTo(final Registration registration, final ExecutionYear executionYear) {
+    public boolean isValidTo(final Registration registration, final ExecutionInterval executionYear) {
         return isValidTo(registration, executionYear, null);
     }
 
@@ -70,7 +70,7 @@ public abstract class TuitionConditionRule extends TuitionConditionRule_Base {
 
     public abstract void delete();
 
-    public abstract boolean isValidTo(final Registration registration, final ExecutionYear executionYear,
+    public abstract boolean isValidTo(final Registration registration, final ExecutionInterval executionYear,
             final Enrolment enrolment);
 
     protected abstract String getBundle();
