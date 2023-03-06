@@ -526,6 +526,10 @@ public class AcademicTariff extends AcademicTariff_Base {
         final Vat vat = vat(when);
         final BigDecimal amount = amountToPay(academicTreasuryEvent);
 
+        if(!TreasuryConstants.isPositive(amount)) {
+            throw new AcademicTreasuryDomainException("error.AcademicTariff.createDebitEntryForCustomAcademicDebt.amount.to.pay.not.positive");
+        }
+        
         final Map<String, String> fillPriceProperties =
                 fillPricePropertiesForAcademicTax(debtAccount, academicTreasuryEvent, when);
 

@@ -579,6 +579,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
             return getExecutionYear().getBeginLocalDate();
         } else if (isForTreasuryEventTarget()) {
             return ((IAcademicTreasuryTarget) getTreasuryEventTarget()).getAcademicTreasuryTargetEventDate();
+        } else if(isForCustomAcademicDebt()) {
+            return getCustomAcademicDebtEventDate();
         }
 
         throw new RuntimeException("dont know how to handle this!");
