@@ -137,7 +137,7 @@ public class CloseDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
 
         final List<AcademicDebtGenerationProcessingResult> resultList = Lists.newArrayList();
         for (final DegreeCurricularPlan degreeCurricularPlan : rule.getDegreeCurricularPlansSet()) {
-            for (final Registration registration : degreeCurricularPlan.getRegistrations()) {
+            for (final Registration registration : getRegistrations(degreeCurricularPlan)) {
 
                 if (!rule.isRuleToApply(registration)) {
                     continue;
@@ -161,6 +161,11 @@ public class CloseDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
         }
 
         return resultList;
+    }
+
+    private Set<Registration> getRegistrations(DegreeCurricularPlan degreeCurricularPlan) {
+        return degreeCurricularPlan.getStudentCurricularPlansSet().stream().map(s -> s.getRegistration())
+                .collect(Collectors.toSet());
     }
 
     @Override
