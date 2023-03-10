@@ -8,6 +8,7 @@ enum org.fenixedu.academictreasury.domain.reports.DebtReportRequestType         
 enum org.fenixedu.academictreasury.domain.debtGeneration.AcademicTaxDueDateAlignmentType                as AcademicTaxDueDateAlignmentType;
 enum org.fenixedu.academictreasury.domain.tuition.TuitionTariffCalculatedAmountType						as TuitionTariffCalculatedAmountType;
 enum org.fenixedu.academic.domain.degreeStructure.CycleType                                             as CycleTypeAT;
+enum org.fenixedu.academictreasury.domain.debtGeneration.AcademicDebtEntriesAggregationInDebitNoteType  as AcademicDebtEntriesAggregationInDebitNoteType;
 
 valueType java.math.BigDecimal as BigDecimalAT
 {
@@ -736,8 +737,6 @@ class debtGeneration.DebtGenerationRuleRestriction {
 			multiplicity *;
 		}
 	}
-	
-
 
 class debtGeneration.AcademicDebtGenerationRule {
 	boolean active;
@@ -752,6 +751,7 @@ class debtGeneration.AcademicDebtGenerationRule {
 	int orderNumber;
 	AcademicTaxDueDateAlignmentType academicTaxDueDateAlignmentType;
 	BigDecimalAT minimumAmountForPaymentCode;
+	AcademicDebtEntriesAggregationInDebitNoteType entriesAggregationInDebitNoteType;
 }
 
 	relation AcademicDebtGenerationRuleGenerationRuleType {

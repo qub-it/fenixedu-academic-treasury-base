@@ -53,6 +53,10 @@ public interface IAcademicDebtGenerationRuleStrategy {
     public boolean isAppliedOnOtherDebitEntries();
 
     public boolean isToCreateDebitEntries();
+    
+    default boolean isToApplyEventDebitEntriesMustEqualRuleProducts() {
+        return isToCreateDebitEntries();
+    }
 
     public boolean isToAggregateDebitEntries();
 
@@ -63,6 +67,14 @@ public interface IAcademicDebtGenerationRuleStrategy {
     public boolean isEntriesRequired();
 
     public boolean isToAlignAcademicTaxesDueDate();
+    
+    default boolean isToApplyOptionForEntriesAggregationInDebitNote() {
+        return false;
+    }
+    
+    default boolean isAggregateAllOrNothingDefaultValue() {
+        return true;
+    }
 
     public List<AcademicDebtGenerationProcessingResult> process(final AcademicDebtGenerationRule rule);
 

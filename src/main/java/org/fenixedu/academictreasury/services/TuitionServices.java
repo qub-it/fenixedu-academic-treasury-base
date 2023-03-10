@@ -135,6 +135,15 @@ public class TuitionServices {
                 true, null, false);
     }
 
+    public static boolean createInferedTuitionForRegistration(Registration registration, ExecutionYear executionYear,
+            LocalDate debtDate, boolean forceCreationIfNotEnrolled, boolean applyTuitionServiceExtensions,
+            Set<Product> restrictCreationToInstallments, boolean forceEvenTreasuryEventIsCharged) {
+        var inferedTuitionPaymentPlan = TuitionPaymentPlan.inferTuitionPaymentPlanForRegistration(registration, executionYear);
+
+        return createTuitionForRegistration(registration, executionYear, debtDate, forceCreationIfNotEnrolled, inferedTuitionPaymentPlan,
+                applyTuitionServiceExtensions, restrictCreationToInstallments, forceEvenTreasuryEventIsCharged);
+    }
+
     public static boolean createTuitionForRegistration(final Registration registration, final ExecutionYear executionYear,
             final LocalDate debtDate, final boolean forceCreationIfNotEnrolled, TuitionPaymentPlan tuitionPaymentPlan,
             final boolean applyTuitionServiceExtensions, Set<Product> restrictCreationToInstallments,
@@ -276,8 +285,8 @@ public class TuitionServices {
         for (final TuitionInstallmentTariff tuitionInstallmentTariff : tuitionPaymentPlan.getTuitionInstallmentTariffsSet()
                 .stream().sorted(TuitionInstallmentTariff.COMPARATOR_BY_INSTALLMENT_NUMBER).collect(Collectors.toList())) {
             TuitionDebitEntryBean bean = discountMapHelper.buildInstallmentDebitEntryBeanWithDiscount(tuitionInstallmentTariff);
-            
-            if(bean != null) {
+
+            if (bean != null) {
                 entries.add(bean);
             }
         }

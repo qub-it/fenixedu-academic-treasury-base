@@ -103,6 +103,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         setAcademicDebtGenerationRuleType(bean.getType());
         setExecutionYear(bean.getExecutionYear());
         setAggregateOnDebitNote(bean.isAggregateOnDebitNote());
+        setEntriesAggregationInDebitNoteType(bean.getEntriesAggregationInDebitNoteType());
         setAggregateAllOrNothing(bean.isAggregateAllOrNothing());
         setEventDebitEntriesMustEqualRuleProducts(bean.isEventDebitEntriesMustEqualRuleProducts());
         setCloseDebitNote(false);
@@ -147,6 +148,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         setAcademicDebtGenerationRuleType(ruleToCopy.getAcademicDebtGenerationRuleType());
         setExecutionYear(executionYear);
         setAggregateOnDebitNote(ruleToCopy.isAggregateOnDebitNote());
+        setEntriesAggregationInDebitNoteType(ruleToCopy.getEntriesAggregationInDebitNoteType());
         setAggregateAllOrNothing(ruleToCopy.isAggregateAllOrNothing());
         setEventDebitEntriesMustEqualRuleProducts(ruleToCopy.isEventDebitEntriesMustEqualRuleProducts());
         setCloseDebitNote(ruleToCopy.isCloseDebitNote());
@@ -457,6 +459,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         getDegreeCurricularPlansSet().addAll(degreeCurricularPlans);
 
         setAggregateOnDebitNote(bean.isAggregateOnDebitNote());
+        setEntriesAggregationInDebitNoteType(bean.getEntriesAggregationInDebitNoteType());
         setAggregateAllOrNothing(bean.isAggregateAllOrNothing());
         setEventDebitEntriesMustEqualRuleProducts(bean.isEventDebitEntriesMustEqualRuleProducts());
         setCloseDebitNote(false);

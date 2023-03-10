@@ -1,3 +1,5 @@
+- New Feature: New academic debt generation rule strategy to create tuition installments and academic debts
+
 8.6.9 (08-03-2023)
 - Bug Fix: Consider all registrations of degree curricular plan, and not only registrations with active curricular plan
 
@@ -153,7 +155,7 @@
 - Improvement: Throw exception when create a person customer to a person already with person customer
 - Bug Fix: Only write ingressionType if it is set in the registration
 - Refactor: Handler for settlement note payment, equal to declared in AcademicTreasuryBridgeImpl
-- New Fixture: Reservation taxes, which can discount amount from tuition debts
+- New Feature: Reservation taxes, which can discount amount from tuition debts
 - Improvement: Allow set interest type in AcademicTreasuryTargetCreateDebtBuilder
 - Bug Fix: Get execution year name from treasury event target
 - Refactor: Predicates in TreasuryEvent to check if it is related with tuition debts, and if the event discount on tuition total amount
@@ -205,7 +207,7 @@
 - Refactor: Use TuitionPaymentPlanOrder to find a tuition payment plan by degree curricular plan
 
 7.1.0 (07-06-2021)
-- New Fixture: Shared tuition payment plan between curricular plans, check if payment plan is reachable, tuition conditions, tuition installments custom calculators
+- New Feature: Shared tuition payment plan between curricular plans, check if payment plan is reachable, tuition conditions, tuition installments custom calculators
 - Improvement: Use default payment platform to Automatic rules and Academic services
 - Improvement: Add settlement note ERP certification date
 - Refactor: Refactor payment penalty from fenixedu-academic-treasury-base to fenixedu-treasury
@@ -222,7 +224,7 @@
 - Bug Fix: Validate that debt report request's endDate is not before beginDate
 
 7.0.0 (10-04-2021)
-- New Fixture: Digital Payment Platforms
+- New Feature: Digital Payment Platforms
 
 6.3.0 (10-04-2021)
 - Refactor: Digital Payment Platform domain model
@@ -237,7 +239,7 @@
 - Refactor: Builder class to create academic treasury target debts
 
 6.0.0 (01-03-2021)
-- New Fixture: Payment plans for debit entries
+- New Feature: Payment plans for debit entries
 
 5.3.3 (31-01-2021)
 - Refactor: Added messages translation used by 3D Secure address select page (jsp) 
@@ -264,14 +266,14 @@
 - Refactor: Disable excludeifMatches for now to evaluate if it is necessary
 
 5.2.0 (14-07-2020)
-- New Fixture: Support multiple restrictions in academic debt generation rule
+- New Feature: Support multiple restrictions in academic debt generation rule
 
 5.1.1 (08-07-2020)
 - Bug Fix: On copy tuition payment plans, set correct dates in installments regarding the new execution interval
 
 5.1.0 (07-07-2020)
-- New Fixture: Copy academic debt generation rules between execution intervals
-- New Fixture: Copy tuition payment plans between execution intervals
+- New Feature: Copy academic debt generation rules between execution intervals
+- New Feature: Copy tuition payment plans between execution intervals
 - Refactor: Retrieve student's statutes in execution year by his registration
 
 5.0.4 (25-05-2020)
@@ -339,7 +341,7 @@
 - Refactor: updated academic-core module dependency
 
 4.4.0 (04-12-2019)
-- New Fixture: MBWay payments interface
+- New Feature: MBWay payments interface
 
 4.3.1 (04-11-2019)
 - Improvement: Create SAFT address as non default physical address
@@ -354,7 +356,7 @@
 - Refactor: upgraded fenixedu-academic-core
 
 4.1.0 (18-09-2019)
-- New Fixture: Create payment reference code for interest debit entries
+- New Feature: Create payment reference code for interest debit entries
 
 4.0.5 (18-09-2019)
 - Refactor: Add isSuccess() to return getSuccess() of type boolean
