@@ -65,7 +65,6 @@ import org.fenixedu.academictreasury.domain.tuition.DiscountTuitionInstallmentsH
 import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
-import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCustomCalculator;
 import org.fenixedu.academictreasury.dto.tuition.TuitionDebitEntryBean;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Currency;
@@ -267,19 +266,8 @@ public class TuitionServices {
             final TuitionPaymentPlan tuitionPaymentPlan, final LocalDate debtDate, final BigDecimal enrolledEctsUnits,
             final BigDecimal enrolledCoursesCount) {
 
-        Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap = new HashMap<>();
-
-        tuitionPaymentPlan.getTuitionInstallmentTariffsSet().stream().map(tariff -> tariff.getTuitionTariffCustomCalculator())
-                .collect(Collectors.toSet()).forEach(clazz -> {
-                    if (clazz != null) {
-                        TuitionTariffCustomCalculator newInstanceFor =
-                                TuitionTariffCustomCalculator.getNewInstanceFor(clazz, registration, tuitionPaymentPlan);
-                        calculatorsMap.put(clazz, newInstanceFor);
-                    }
-                });
-
         DiscountTuitionInstallmentsHelper discountMapHelper = new DiscountTuitionInstallmentsHelper(registration,
-                tuitionPaymentPlan, debtDate, enrolledEctsUnits, enrolledCoursesCount, calculatorsMap);
+                tuitionPaymentPlan, debtDate, enrolledEctsUnits, enrolledCoursesCount);
 
         final List<TuitionDebitEntryBean> entries = Lists.newArrayList();
         for (final TuitionInstallmentTariff tuitionInstallmentTariff : tuitionPaymentPlan.getTuitionInstallmentTariffsSet()
@@ -512,24 +500,12 @@ public class TuitionServices {
             final AcademicTreasuryEvent academicTreasuryEvent =
                     AcademicTreasuryEvent.findUniqueForStandaloneTuition(registration, executionYear).get();
 
-            Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap = new HashMap<>();
-
-            TuitionPaymentPlan tuitionPaymentPlanToCalculator = tuitionPaymentPlan;
-            tuitionPaymentPlan.getTuitionInstallmentTariffsSet().stream().map(tariff -> tariff.getTuitionTariffCustomCalculator())
-                    .collect(Collectors.toSet()).forEach(clazz -> {
-                        if (clazz != null) {
-                            TuitionTariffCustomCalculator newInstanceFor = TuitionTariffCustomCalculator.getNewInstanceFor(clazz,
-                                    registration, tuitionPaymentPlanToCalculator, enrolment);
-                            calculatorsMap.put(clazz, newInstanceFor);
-                        }
-                    });
-
             final TuitionInstallmentTariff tuitionInstallmentTariff = tuitionPaymentPlan.getStandaloneTuitionInstallmentTariff();
             final int installmentOrder = tuitionInstallmentTariff.getInstallmentOrder();
             final LocalizedString installmentName = tuitionInstallmentTariff.standaloneDebitEntryName(enrolment);
             final LocalDate dueDate = tuitionInstallmentTariff.dueDate(debtDate);
             final Vat vat = tuitionInstallmentTariff.vat(debtDate);
-            final BigDecimal amount = tuitionInstallmentTariff.amountToPay(academicTreasuryEvent, enrolment, calculatorsMap);
+            final BigDecimal amount = tuitionInstallmentTariff.amountToPay(academicTreasuryEvent, enrolment);
             final Currency currency = tuitionInstallmentTariff.getFinantialEntity().getFinantialInstitution().getCurrency();
 
             entries.add(
@@ -786,25 +762,13 @@ public class TuitionServices {
             final AcademicTreasuryEvent academicTreasuryEvent =
                     AcademicTreasuryEvent.findUniqueForExtracurricularTuition(registration, executionYear).get();
 
-            Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap = new HashMap<>();
-
-            TuitionPaymentPlan tuitionPaymentPlanToCalculator = tuitionPaymentPlan;
-            tuitionPaymentPlan.getTuitionInstallmentTariffsSet().stream().map(tariff -> tariff.getTuitionTariffCustomCalculator())
-                    .collect(Collectors.toSet()).forEach(clazz -> {
-                        if (clazz != null) {
-                            TuitionTariffCustomCalculator newInstanceFor = TuitionTariffCustomCalculator.getNewInstanceFor(clazz,
-                                    registration, tuitionPaymentPlanToCalculator, enrolment);
-                            calculatorsMap.put(clazz, newInstanceFor);
-                        }
-                    });
-
             final TuitionInstallmentTariff tuitionInstallmentTariff =
                     tuitionPaymentPlan.getExtracurricularTuitionInstallmentTariff();
             final int installmentOrder = tuitionInstallmentTariff.getInstallmentOrder();
             final LocalizedString installmentName = tuitionInstallmentTariff.extracurricularDebitEntryName(enrolment);
             final LocalDate dueDate = tuitionInstallmentTariff.dueDate(debtDate);
             final Vat vat = tuitionInstallmentTariff.vat(debtDate);
-            final BigDecimal amount = tuitionInstallmentTariff.amountToPay(academicTreasuryEvent, enrolment, calculatorsMap);
+            final BigDecimal amount = tuitionInstallmentTariff.amountToPay(academicTreasuryEvent, enrolment);
             final Currency currency = tuitionInstallmentTariff.getFinantialEntity().getFinantialInstitution().getCurrency();
 
             entries.add(

@@ -37,6 +37,7 @@ package org.fenixedu.academictreasury.dto.tariff;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -67,7 +68,7 @@ import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
 import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCalculatedAmountType;
-import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCustomCalculator;
+import org.fenixedu.academictreasury.domain.tuition.calculators.TuitionPaymentPlanCalculator;
 import org.fenixedu.academictreasury.domain.tuition.conditionRule.CurricularYearConditionRule;
 import org.fenixedu.academictreasury.domain.tuition.conditionRule.ExecutionIntervalConditionRule;
 import org.fenixedu.academictreasury.domain.tuition.conditionRule.FirstTimeStudentConditionRule;
@@ -110,7 +111,6 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     private boolean customized;
     private DebtAccount payorDebtAccount;
 
-    
     Set<TuitionConditionRule> conditionRules;
 
     // TODO: Anil Use LocalizedString when web component is compatible with AngularJS
@@ -171,7 +171,10 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     private boolean academicalActBlockingOn;
     private boolean blockAcademicActsOnDebt;
     private TuitionTariffCalculatedAmountType tuitionTariffCalculatedAmountType;
-    private Class<? extends TuitionTariffCustomCalculator> tuitionTariffCustomCalculator;
+
+    private TuitionPaymentPlanCalculator tuitionPaymentPlanCalculator;
+
+    private List<TuitionPaymentPlanCalculator> tuitionPaymentPlanCalculatorList = new ArrayList<>();
 
     // @formatter:off
     /*---------------------
@@ -216,18 +219,20 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this.customized = tuitionPaymentPlan.isCustomized();
         this.defaultPaymentPlan = tuitionPaymentPlan.isDefaultPaymentPlan();
 
-        if(tuitionPaymentPlan.getCustomizedName() != null) {
+        if (tuitionPaymentPlan.getCustomizedName() != null) {
             this.name = tuitionPaymentPlan.getCustomizedName().getContent();
         }
 
         this.conditionRules = new HashSet<>(tuitionPaymentPlan.getTuitionConditionRulesSet());
 
         fillWithInstallments(tuitionPaymentPlan);
+
+        this.tuitionPaymentPlanCalculatorList.addAll(tuitionPaymentPlan.getTuitionPaymentPlanCalculatorSet());
     }
 
     private void fillWithInstallments(final TuitionPaymentPlan tuitionPaymentPlan) {
         DebtAccount tuitionPaymentPlanDebtAccount = this.payorDebtAccount;
-        
+
         for (final TuitionInstallmentTariff tuitionInstallmentTariff : tuitionPaymentPlan.getOrderedTuitionInstallmentTariffs()) {
 
             this.tuitionInstallmentProduct = tuitionInstallmentTariff.getProduct();
@@ -255,12 +260,14 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
             this.maximumAmount = tuitionInstallmentTariff.getMaximumAmount();
             this.academicalActBlockingOn = !tuitionInstallmentTariff.getAcademicalActBlockingOff();
             this.blockAcademicActsOnDebt = tuitionInstallmentTariff.getBlockAcademicActsOnDebt();
+
+            this.tuitionPaymentPlanCalculator = tuitionInstallmentTariff.getTuitionPaymentPlanCalculator();
             this.tuitionTariffCalculatedAmountType = tuitionInstallmentTariff.getTuitionTariffCalculatedAmountType();
-            this.tuitionTariffCustomCalculator = tuitionInstallmentTariff.getTuitionTariffCustomCalculator();
             this.payorDebtAccount = tuitionInstallmentTariff.getPayorDebtAccount();
+
             addInstallment();
         }
-        
+
         this.payorDebtAccount = tuitionPaymentPlanDebtAccount;
     }
 
@@ -420,7 +427,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         installmentBean.setTuitionInstallmentProduct(getTuitionInstallmentProduct());
         installmentBean.setTuitionCalculationType(this.tuitionCalculationType);
         installmentBean.setTuitionTariffCalculatedAmountType(this.tuitionTariffCalculatedAmountType);
-        installmentBean.setTuitionTariffCustomCalculator(this.tuitionTariffCustomCalculator);
+        installmentBean.setTuitionPaymentPlanCalculator(this.tuitionPaymentPlanCalculator);
         installmentBean.setFixedAmount(this.fixedAmount);
         installmentBean.setEctsCalculationType(this.ectsCalculationType);
         installmentBean.setFactor(this.factor);
@@ -565,28 +572,29 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     public void addOrReplaceConditionRules(TuitionConditionRule tuitionConditionRule) {
-        TuitionConditionRule rule = conditionRules.stream().filter(c -> c.getClass().isAssignableFrom(tuitionConditionRule.getClass()))
-                .findFirst().orElse(null);
+        TuitionConditionRule rule = conditionRules.stream()
+                .filter(c -> c.getClass().isAssignableFrom(tuitionConditionRule.getClass())).findFirst().orElse(null);
         if (rule != null) {
             conditionRules.remove(rule);
         }
-        
+
         conditionRules.add(tuitionConditionRule);
     }
 
     public void addConditionRules(TuitionConditionRule tuitionConditionRule) {
-        TuitionConditionRule rule = conditionRules.stream().filter(c -> c.getClass().isAssignableFrom(tuitionConditionRule.getClass()))
-                .findFirst().orElse(null);
+        TuitionConditionRule rule = conditionRules.stream()
+                .filter(c -> c.getClass().isAssignableFrom(tuitionConditionRule.getClass())).findFirst().orElse(null);
         if (rule != null) {
             throw new DomainException(TreasuryPlataformDependentServicesFactory.implementation()
                     .bundle(AcademicTreasuryConstants.BUNDLE, "error.TuitionPaymentPlan.conditionRule.duplicated"));
         }
-        
+
         conditionRules.add(tuitionConditionRule);
     }
 
     public void removeConditionRule(Class<? extends TuitionConditionRule> clazz) {
-        TuitionConditionRule rule = conditionRules.stream().filter(c -> clazz.isAssignableFrom(c.getClass())).findFirst().orElse(null);
+        TuitionConditionRule rule =
+                conditionRules.stream().filter(c -> clazz.isAssignableFrom(c.getClass())).findFirst().orElse(null);
         if (rule != null) {
             conditionRules.remove(rule);
         }
@@ -1152,7 +1160,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
     public List<String> validateStudentConditions() {
         List<String> result = Lists.newArrayList();
-        if (getTuitionPaymentPlanGroup().isForRegistration() &&  !hasAtLeastOneConditionSpecified()) {
+        if (getTuitionPaymentPlanGroup().isForRegistration() && !hasAtLeastOneConditionSpecified()) {
             result.add("error.TuitionPaymentPlan.specify.at.least.one.condition");
         }
 
@@ -1195,6 +1203,22 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
     public void addAllDegreeCurricularPlans(Set<DegreeCurricularPlan> degreeCurricularPlans) {
         degreeCurricularPlans.addAll(degreeCurricularPlans);
+    }
+
+    public TuitionPaymentPlanCalculator getTuitionPaymentPlanCalculatorBean() {
+        return tuitionPaymentPlanCalculator;
+    }
+
+    public void setTuitionPaymentPlanCalculatorBean(TuitionPaymentPlanCalculator tuitionPaymentPlanCalculator) {
+        this.tuitionPaymentPlanCalculator = tuitionPaymentPlanCalculator;
+    }
+
+    public List<TuitionPaymentPlanCalculator> getTuitionPaymentPlanCalculatorList() {
+        return tuitionPaymentPlanCalculatorList;
+    }
+
+    public void setTuitionPaymentPlanCalculatorList(List<TuitionPaymentPlanCalculator> tuitionPaymentPlanCalculatorList) {
+        this.tuitionPaymentPlanCalculatorList = tuitionPaymentPlanCalculatorList;
     }
 
 }

@@ -47,7 +47,6 @@ public class DiscountTuitionInstallmentsHelper {
     private BigDecimal enrolledCoursesCount;
 
     // This field is common to both cases
-    private Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap;
     private Person person;
     private ExecutionYear executionYear;
 
@@ -55,14 +54,12 @@ public class DiscountTuitionInstallmentsHelper {
 
     // Used to create the tuition payment plan into debt account
     public DiscountTuitionInstallmentsHelper(DebtAccount debtAccount, AcademicTreasuryEvent tuitionAcademicTreasuryEvent,
-            Set<Product> restrictCreationToInstallments, LocalDate when,
-            Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap) {
+            Set<Product> restrictCreationToInstallments, LocalDate when) {
 
         this.debtAccount = debtAccount;
         this.tuitionAcademicTreasuryEvent = tuitionAcademicTreasuryEvent;
         this.restrictCreationToInstallments = restrictCreationToInstallments;
         this.when = when;
-        this.calculatorsMap = calculatorsMap;
 
         this.person = tuitionAcademicTreasuryEvent.getPerson();
         this.executionYear = tuitionAcademicTreasuryEvent.getExecutionYear();
@@ -73,14 +70,12 @@ public class DiscountTuitionInstallmentsHelper {
 
     // Used to calculate the installments to preview
     public DiscountTuitionInstallmentsHelper(Registration registration, TuitionPaymentPlan tuitionPaymentPlan, LocalDate debtDate,
-            BigDecimal enrolledEctsUnits, BigDecimal enrolledCoursesCount,
-            Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap) {
+            BigDecimal enrolledEctsUnits, BigDecimal enrolledCoursesCount) {
 
         this.tuitionPaymentPlan = tuitionPaymentPlan;
         this.debtDate = debtDate;
         this.enrolledEctsUnits = enrolledEctsUnits;
         this.enrolledCoursesCount = enrolledCoursesCount;
-        this.calculatorsMap = calculatorsMap;
 
         this.person = registration.getPerson();
         this.executionYear = tuitionPaymentPlan.getExecutionYear();
@@ -91,7 +86,7 @@ public class DiscountTuitionInstallmentsHelper {
 
     public boolean createInstallmentAndDiscountInstallment(TuitionInstallmentTariff tariff) {
         final BigDecimal tuitionInstallmentAmountToPay =
-                tariff.amountToPay(this.tuitionAcademicTreasuryEvent, this.calculatorsMap);
+                tariff.amountToPay(this.tuitionAcademicTreasuryEvent);
 
         BigDecimal amountToSubtractFromAmountToPay = BigDecimal.ZERO;
         Map<TreasuryExemptionType, BigDecimal> exemptionsToApplyMap = new HashMap<>();
@@ -133,7 +128,7 @@ public class DiscountTuitionInstallmentsHelper {
 
         if (allowToCreateTheInstallment && !this.tuitionAcademicTreasuryEvent.isChargedWithDebitEntry(tariff)) {
             DebitEntry installmentDebitEntry = tariff.createDebitEntryForRegistration(this.debtAccount,
-                    this.tuitionAcademicTreasuryEvent, this.when, calculatorsMap, amountToSubtractFromAmountToPay);
+                    this.tuitionAcademicTreasuryEvent, this.when, amountToSubtractFromAmountToPay);
 
             for (Entry<TreasuryExemptionType, BigDecimal> entry : exemptionsToApplyMap.entrySet()) {
                 TreasuryExemptionType treasuryExemptionType = entry.getKey();
@@ -154,11 +149,11 @@ public class DiscountTuitionInstallmentsHelper {
     public TuitionDebitEntryBean buildInstallmentDebitEntryBeanWithDiscount(TuitionInstallmentTariff tuitionInstallmentTariff) {
 
         final int installmentOrder = tuitionInstallmentTariff.getInstallmentOrder();
-        final LocalizedString installmentName = tuitionPaymentPlan.installmentName(registration, tuitionInstallmentTariff);
-        final LocalDate dueDate = tuitionInstallmentTariff.dueDate(debtDate);
-        final Vat vat = tuitionInstallmentTariff.vat(debtDate);
+        final LocalizedString installmentName = this.tuitionPaymentPlan.installmentName(this.registration, tuitionInstallmentTariff);
+        final LocalDate dueDate = tuitionInstallmentTariff.dueDate(this.debtDate);
+        final Vat vat = tuitionInstallmentTariff.vat(this.debtDate);
         BigDecimal tuitionInstallmentAmountToPay =
-                tuitionInstallmentTariff.amountToPay(registration, enrolledEctsUnits, enrolledCoursesCount, this.calculatorsMap);
+                tuitionInstallmentTariff.amountToPay(this.registration, this.enrolledEctsUnits, this.enrolledCoursesCount);
         final Currency currency = tuitionInstallmentTariff.getFinantialEntity().getFinantialInstitution().getCurrency();
 
         BigDecimal amountToSubtractFromAmountToPay = BigDecimal.ZERO;

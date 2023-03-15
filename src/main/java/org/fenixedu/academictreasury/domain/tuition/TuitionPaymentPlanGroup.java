@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
+import org.fenixedu.academictreasury.domain.tuition.calculators.TuitionPaymentPlanCalculator;
 import org.fenixedu.academictreasury.util.LocalizedStringUtil;
 import org.fenixedu.commons.StringNormalizer;
 import org.fenixedu.commons.i18n.LocalizedString;
@@ -113,7 +114,8 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
 
     @Atomic
     public void edit(final String code, final LocalizedString name, final boolean forRegistration, final boolean forStandalone,
-            final boolean forExtracurricular, final Product currentProduct, boolean bypassInstallmentNameIfSingleInstallmentApplied) {
+            final boolean forExtracurricular, final Product currentProduct,
+            boolean bypassInstallmentNameIfSingleInstallmentApplied) {
         setCode(code);
         setName(name);
         setForRegistration(forRegistration);
@@ -140,7 +142,7 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
     public boolean isForImprovement() {
         return getForImprovement();
     }
-    
+
     public boolean isBypassInstallmentNameIfSingleInstallmentApplied() {
         return getBypassInstallmentNameIfSingleInstallmentApplied();
     }
@@ -236,15 +238,16 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
         setAllowedConditionRulesSerialized(classes.stream().map(t -> t.getName()).collect(Collectors.joining(",")));
     }
 
-    public Set<Class<? extends TuitionTariffCustomCalculator>> getAllowedCalculatedAmountCalculators() {
+    public Set<Class<? extends TuitionPaymentPlanCalculator>> getAllowedCalculatedAmountCalculators() {
         if (getAllowedCalculatedAmountCalculatorsSerialized() == null) {
             return new HashSet<>();
         }
+
         String[] allowedCalculatedAmountCalculatorsSerialized = getAllowedCalculatedAmountCalculatorsSerialized().split(",");
-        Set<Class<? extends TuitionTariffCustomCalculator>> result = new HashSet<>();
+        Set<Class<? extends TuitionPaymentPlanCalculator>> result = new HashSet<>();
         for (String allowedCalculatedAmountCalculators : allowedCalculatedAmountCalculatorsSerialized) {
             try {
-                result.add((Class<? extends TuitionTariffCustomCalculator>) Class.forName(allowedCalculatedAmountCalculators));
+                result.add((Class<? extends TuitionPaymentPlanCalculator>) Class.forName(allowedCalculatedAmountCalculators));
             } catch (ClassNotFoundException e) {
                 continue;
             }
@@ -253,16 +256,16 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
     }
 
     public void addAllowedCalculatedAmountCalculators(
-            Class<? extends TuitionTariffCustomCalculator> allowedCalculatedAmountCalculators) {
-        Set<Class<? extends TuitionTariffCustomCalculator>> classes = getAllowedCalculatedAmountCalculators();
+            Class<? extends TuitionPaymentPlanCalculator> allowedCalculatedAmountCalculators) {
+        Set<Class<? extends TuitionPaymentPlanCalculator>> classes = getAllowedCalculatedAmountCalculators();
         classes.add(allowedCalculatedAmountCalculators);
         setAllowedCalculatedAmountCalculatorsSerialized(
                 classes.stream().map(clazz -> clazz.getName()).collect(Collectors.joining(",")));
     }
 
     public void removeAllowedCalculatedAmountCalculators(
-            Class<? extends TuitionTariffCustomCalculator> allowedCalculatedAmountCalculators) {
-        Set<Class<? extends TuitionTariffCustomCalculator>> classes = getAllowedCalculatedAmountCalculators();
+            Class<? extends TuitionPaymentPlanCalculator> allowedCalculatedAmountCalculators) {
+        Set<Class<? extends TuitionPaymentPlanCalculator>> classes = getAllowedCalculatedAmountCalculators();
         classes.remove(allowedCalculatedAmountCalculators);
         setAllowedCalculatedAmountCalculatorsSerialized(classes.stream().map(t -> t.getName()).collect(Collectors.joining(",")));
     }
