@@ -238,6 +238,9 @@ class tuition.TuitionPaymentPlanGroup {
 	String allowedConditionRulesSerialized;
 	String allowedCalculatedAmountCalculatorsSerialized;
 	boolean bypassInstallmentNameIfSingleInstallmentApplied;
+	boolean useCustomDebitEntryDescriptionFormat;
+	LocalizedString installmentDebitEntryDescriptionFormat;
+	LocalizedString oneInstallmentDebitEntryDescriptionFormat;
 }
 
 	relation TuitionPaymentPlanGroupBennu {
@@ -466,6 +469,7 @@ class tuition.TuitionPaymentPlanOrder{
 
 
 class tuition.calculators.TuitionPaymentPlanCalculator {
+	LocalizedString name;
 }
 
 	relation TuitionPaymentPlanCalculatorDomainRoot {

@@ -327,36 +327,9 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         return getTuitionConditionRulesSet().stream().filter(c -> c.getClass().equals(clazz)).findFirst().orElse(null);
     }
 
-    public LocalizedString installmentName(Registration registration, final TuitionInstallmentTariff installmentTariff) {
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-        String label = "label.TuitionInstallmentTariff.debitEntry.name.";
-
-        if (getTuitionPaymentPlanGroup().isForRegistration()) {
-            if (getTuitionInstallmentTariffsSet().size() == 1
-                    && getTuitionPaymentPlanGroup().isBypassInstallmentNameIfSingleInstallmentApplied()) {
-                label += "registration.one.installment";
-            } else {
-                label += "registration";
-            }
-        } else if (getTuitionPaymentPlanGroup().isForStandalone()) {
-            label += "standalone";
-        } else if (getTuitionPaymentPlanGroup().isForExtracurricular()) {
-            label += "extracurricular";
-        }
-        DegreeCurricularPlan degreeCurricularPlan =
-                registration.getStudentCurricularPlan(getExecutionYear()).getDegreeCurricularPlan();
-
-        LocalizedString result = new LocalizedString();
-        for (final Locale locale : treasuryServices.availableLocales()) {
-            final String installmentName = AcademicTreasuryConstants.academicTreasuryBundle(locale, label,
-                    String.valueOf(installmentTariff.getInstallmentOrder()),
-                    degreeCurricularPlan.getDegree().getPresentationName(getExecutionYear(), locale),
-                    getExecutionYear().getQualifiedName());
-
-            result = result.with(locale, installmentName);
-        }
-
-        return result;
+    public LocalizedString installmentName(Registration registration, TuitionInstallmentTariff installmentTariff) {
+        return installmentTariff.getTuitionPaymentPlan().getTuitionPaymentPlanGroup()
+                .buildDebitEntryDescription(installmentTariff, registration, getExecutionYear());
     }
 
     public boolean isCustomized() {
@@ -591,9 +564,9 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         while (!getTuitionInstallmentTariffsSet().isEmpty()) {
             getTuitionInstallmentTariffsSet().iterator().next().delete();
         }
-        
+
         getTuitionPaymentPlanCalculatorSet().forEach(c -> c.delete());
-        
+
         super.getTuitionConditionRulesSet().forEach(rule -> rule.delete());
         super.setTuitionPaymentPlanGroup(null);
         super.setExecutionYear(null);

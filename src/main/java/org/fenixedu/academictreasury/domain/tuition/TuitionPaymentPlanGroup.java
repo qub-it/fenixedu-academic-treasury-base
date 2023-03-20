@@ -36,18 +36,29 @@
 package org.fenixedu.academictreasury.domain.tuition;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrSubstitutor;
+import org.fenixedu.academic.domain.DegreeCurricularPlan;
+import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.tuition.calculators.TuitionPaymentPlanCalculator;
+import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.academictreasury.util.LocalizedStringUtil;
 import org.fenixedu.commons.StringNormalizer;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Product;
+import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
+import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 
 import com.google.common.base.Strings;
 
@@ -113,16 +124,23 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
     }
 
     @Atomic
-    public void edit(final String code, final LocalizedString name, final boolean forRegistration, final boolean forStandalone,
-            final boolean forExtracurricular, final Product currentProduct,
-            boolean bypassInstallmentNameIfSingleInstallmentApplied) {
-        setCode(code);
-        setName(name);
-        setForRegistration(forRegistration);
-        setForStandalone(forStandalone);
-        setForExtracurricular(forExtracurricular);
-        setCurrentProduct(currentProduct);
-        setBypassInstallmentNameIfSingleInstallmentApplied(bypassInstallmentNameIfSingleInstallmentApplied);
+    public void edit(String code, LocalizedString name, boolean forRegistration, boolean forStandalone,
+            boolean forExtracurricular, Product currentProduct,
+            boolean bypassInstallmentNameIfSingleInstallmentApplied, 
+            boolean useCustomDebitEntryDescriptionFormat,
+            LocalizedString installmentDebitEntryDescriptionFormat,
+            LocalizedString oneInstallmentDebitEntryDescriptionFormat) {
+
+        super.setCode(code);
+        super.setName(name);
+        super.setForRegistration(forRegistration);
+        super.setForStandalone(forStandalone);
+        super.setForExtracurricular(forExtracurricular);
+        super.setCurrentProduct(currentProduct);
+        super.setBypassInstallmentNameIfSingleInstallmentApplied(bypassInstallmentNameIfSingleInstallmentApplied);
+        super.setUseCustomDebitEntryDescriptionFormat(useCustomDebitEntryDescriptionFormat);
+        super.setInstallmentDebitEntryDescriptionFormat(installmentDebitEntryDescriptionFormat);
+        super.setOneInstallmentDebitEntryDescriptionFormat(oneInstallmentDebitEntryDescriptionFormat);
 
         checkRules();
     }
@@ -268,6 +286,90 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
         Set<Class<? extends TuitionPaymentPlanCalculator>> classes = getAllowedCalculatedAmountCalculators();
         classes.remove(allowedCalculatedAmountCalculators);
         setAllowedCalculatedAmountCalculatorsSerialized(classes.stream().map(t -> t.getName()).collect(Collectors.joining(",")));
+    }
+
+    public LocalizedString buildDebitEntryDescription(TuitionInstallmentTariff installmentTariff, Registration registration,
+            ExecutionYear executionYear) {
+        if (getUseCustomDebitEntryDescriptionFormat()) {
+            return formatInstallmentName(installmentTariff, registration, executionYear);
+        } else {
+            return defaultInstallmentName(installmentTariff, registration, executionYear);
+        }
+    }
+
+    private LocalizedString formatInstallmentName(TuitionInstallmentTariff installmentTariff, Registration registration,
+            ExecutionYear executionYear) {
+        LocalizedString formatToUse = installmentFormatToUse(installmentTariff);
+
+        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
+
+        DegreeCurricularPlan degreeCurricularPlan =
+                registration.getStudentCurricularPlan(executionYear).getDegreeCurricularPlan();
+
+        LocalizedString productName = installmentTariff.getProduct().getName();
+        String degreeCode = registration.getDegree().getCode();
+
+        String executionYearQualifiedName = executionYear.getQualifiedName();
+
+        LocalizedString result = treasuryServices.availableLocales().stream().map(locale -> {
+            Map<String, String> valueMap = new HashMap<String, String>();
+            String degreeName = degreeCurricularPlan.getDegree().getPresentationName(executionYear, locale);
+
+            valueMap.put("productName", StringUtils.isNotEmpty(productName.getContent(locale)) ? productName
+                    .getContent(locale) : productName.getContent());
+            valueMap.put("degreCode", degreeCode);
+            valueMap.put("degreeName", degreeName);
+            valueMap.put("executionYearName", executionYearQualifiedName);
+
+            return new LocalizedString(locale, StrSubstitutor.replace(formatToUse.getContent(locale), valueMap));
+        }).reduce((a, c) -> a.append(c)).get();
+
+        return result;
+    }
+
+    private LocalizedString installmentFormatToUse(TuitionInstallmentTariff installmentTariff) {
+        LocalizedString formatToUse = getInstallmentDebitEntryDescriptionFormat();
+
+        if (getBypassInstallmentNameIfSingleInstallmentApplied()
+                && installmentTariff.getTuitionPaymentPlan().getTuitionInstallmentTariffsSet().size() == 1) {
+            formatToUse = getOneInstallmentDebitEntryDescriptionFormat();
+        }
+        return formatToUse;
+    }
+
+    private LocalizedString defaultInstallmentName(TuitionInstallmentTariff installmentTariff, Registration registration,
+            ExecutionYear executionYear) {
+        TuitionPaymentPlan tuitionPaymentPlan = installmentTariff.getTuitionPaymentPlan();
+
+        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
+        String label = "label.TuitionInstallmentTariff.debitEntry.name.";
+
+        if (isForRegistration()) {
+            if (tuitionPaymentPlan.getTuitionInstallmentTariffsSet().size() == 1
+                    && isBypassInstallmentNameIfSingleInstallmentApplied()) {
+                label += "registration.one.installment";
+            } else {
+                label += "registration";
+            }
+        } else if (isForStandalone()) {
+            label += "standalone";
+        } else if (isForExtracurricular()) {
+            label += "extracurricular";
+        }
+        DegreeCurricularPlan degreeCurricularPlan =
+                registration.getStudentCurricularPlan(executionYear).getDegreeCurricularPlan();
+
+        LocalizedString result = new LocalizedString();
+        for (final Locale locale : treasuryServices.availableLocales()) {
+            final String installmentName = AcademicTreasuryConstants.academicTreasuryBundle(locale, label,
+                    String.valueOf(installmentTariff.getInstallmentOrder()),
+                    degreeCurricularPlan.getDegree().getPresentationName(executionYear, locale),
+                    executionYear.getQualifiedName());
+
+            result = result.with(locale, installmentName);
+        }
+
+        return result;
     }
 
 }

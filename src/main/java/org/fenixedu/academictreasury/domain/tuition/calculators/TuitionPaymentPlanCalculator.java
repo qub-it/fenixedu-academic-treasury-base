@@ -17,6 +17,8 @@ abstract public class TuitionPaymentPlanCalculator extends TuitionPaymentPlanCal
         super();
         setDomainRoot(FenixFramework.getDomainRoot());
     }
+    
+    public abstract boolean isValid();
 
     public abstract BigDecimal getTotalAmount(Registration registration);
 
@@ -26,7 +28,7 @@ abstract public class TuitionPaymentPlanCalculator extends TuitionPaymentPlanCal
 
     public abstract String getCalculationDescription(Enrolment enrolment);
     
-    public abstract LocalizedString getName();
+    public abstract LocalizedString getParametersDescription();
     
     public abstract TuitionPaymentPlanCalculator copyTo(TuitionPaymentPlan tuitionPaymentPlanTarget);
     

@@ -269,6 +269,12 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
                     "error.TuitionInstallmentTariff.cannot.suspend.and.also.block.academical.acts.on.debt.detailed",
                     getProduct().getName().getContent());
         }
+
+        if (getTuitionPaymentPlanCalculator() != null
+                && !getTuitionPaymentPlan().getTuitionPaymentPlanCalculatorSet().contains(getTuitionPaymentPlanCalculator())) {
+            throw new AcademicTreasuryDomainException(
+                    "error.TuitionInstallmentTariff.tuitionPaymentPlanCalculator.not.in.tuition.payment.plan");
+        }
     }
 
     private boolean isFixedAmountRequired() {

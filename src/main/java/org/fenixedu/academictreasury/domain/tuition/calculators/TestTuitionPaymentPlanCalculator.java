@@ -5,6 +5,7 @@ import java.util.Locale;
 
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
@@ -19,32 +20,34 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
         super();
     }
 
-    public TestTuitionPaymentPlanCalculator(BigDecimal amount) {
+    public TestTuitionPaymentPlanCalculator(LocalizedString name) {
         this();
 
-        setAmount(amount);
-
+        super.setName(name);
+        
         checkRules();
     }
 
     private void checkRules() {
-        if (getAmount() == null) {
-            throw new IllegalStateException("amount required");
-        }
-
-        if (!TreasuryConstants.isPositive(getAmount())) {
-            throw new IllegalStateException("amount must be positive");
-        }
     }
 
-    public void edit(BigDecimal amount) {
+    public void edit(LocalizedString name, BigDecimal amount) {
+        super.setName(name);
         super.setAmount(amount);
 
         checkRules();
     }
+    
+    public boolean isValid() {
+        return getAmount() != null && TreasuryConstants.isPositive(getAmount());
+    }
 
     @Override
     public BigDecimal getTotalAmount(Registration registration) {
+        if(!isValid()) {
+            throw new AcademicTreasuryDomainException("error.TuitionPaymentPlanCalculator.not.valid");
+        }
+        
         BigDecimal normalEnrolmentsEcts =
                 TuitionServices.normalEnrolmentsIncludingAnnuled(registration, getTuitionPaymentPlan().getExecutionYear())
                         .stream().map(e -> e.getEctsCreditsForCurriculum()).reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -82,12 +85,12 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
     }
 
     @Override
-    public LocalizedString getName() {
+    public LocalizedString getParametersDescription() {
         ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
 
         LocalizedString result = services.availableLocales().stream()
                 .map(locale -> new LocalizedString(locale, services.bundle(locale, AcademicTreasuryConstants.BUNDLE,
-                        "label.TestTuitionPaymentPlanCalculator.name", getAmount().toString())))
+                        "label.TestTuitionPaymentPlanCalculator.parametersDescription", getAmount() != null ? getAmount().toString() : "N/A")))
                 .reduce((a, c) -> a.append(c)).get();
 
         return result;
@@ -117,8 +120,8 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
         super.delete();
     }
 
-    public static TestTuitionPaymentPlanCalculator create(BigDecimal amount) {
-        return new TestTuitionPaymentPlanCalculator(amount);
+    public static TestTuitionPaymentPlanCalculator create(LocalizedString name) {
+        return new TestTuitionPaymentPlanCalculator(name);
     }
 
 }
