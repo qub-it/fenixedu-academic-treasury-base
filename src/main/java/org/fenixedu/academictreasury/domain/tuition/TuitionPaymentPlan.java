@@ -347,6 +347,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     public boolean createDebitEntriesForRegistration(DebtAccount debtAccount, AcademicTreasuryEvent tuitionAcademicTreasuryEvent,
             LocalDate when, Set<Product> restrictCreationToInstallments, boolean forceEvenTreasuryEventIsCharged) {
+        ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
         Registration registration = tuitionAcademicTreasuryEvent.getRegistration();
 
         if (!getTuitionPaymentPlanGroup().isForRegistration()) {
@@ -363,7 +364,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                 .filter(tariff -> tariff.getTuitionPaymentPlanCalculator() != null) //
                 .map(tariff -> tariff.getTuitionPaymentPlanCalculator()) //
                 .collect(Collectors.toSet()).forEach(calculator -> {
-                    strBuilder.append(calculator.getName()).append(" (")
+                    strBuilder.append(calculator.getName().getContent(services.defaultLocale())).append(" (")
                             .append(tuitionAcademicTreasuryEvent.formatMoney(calculator.getTotalAmount(registration)))
                             .append("): \n");
                     String description = calculator.getCalculationDescription(registration);
@@ -395,6 +396,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     public boolean createDebitEntriesForStandalone(final DebtAccount debtAccount,
             final AcademicTreasuryEvent academicTreasuryEvent, final Enrolment standaloneEnrolment, final LocalDate when) {
+        ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
         Registration registration = academicTreasuryEvent.getRegistration();
 
         if (!getTuitionPaymentPlanGroup().isForStandalone()) {
@@ -409,7 +411,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
         getTuitionInstallmentTariffsSet().stream().filter(tariff -> tariff.getTuitionPaymentPlanCalculator() != null)
                 .map(tariff -> tariff.getTuitionPaymentPlanCalculator()).collect(Collectors.toSet()).forEach(calculator -> {
-                    strBuilder.append(calculator.getName()).append(" (")
+                    strBuilder.append(calculator.getName().getContent(services.defaultLocale())).append(" (")
                             .append(academicTreasuryEvent.formatMoney(calculator.getTotalAmount(registration))).append("): \n");
                     String description = calculator.getCalculationDescription(registration);
                     strBuilder.append(description).append("\n");
