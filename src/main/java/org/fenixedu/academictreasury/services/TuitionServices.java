@@ -162,6 +162,19 @@ public class TuitionServices {
             }
         }
 
+        if (tuitionPaymentPlan == null) {
+            tuitionPaymentPlan = TuitionPaymentPlan.inferTuitionPaymentPlanForRegistration(registration, executionYear);
+        }
+
+        if (tuitionPaymentPlan == null) {
+            return false;
+        }
+
+        if (!forceCreationIfNotEnrolled && tuitionPaymentPlan.isStudentMustBeEnrolled()
+                && normalEnrolmentsIncludingAnnuled(registration, executionYear).isEmpty()) {
+            return false;
+        }
+
         final Person person = registration.getPerson();
         final String addressFiscalCountryCode = PersonCustomer.addressCountryCode(person);
         final String fiscalNumber = PersonCustomer.fiscalNumber(person);
@@ -179,19 +192,6 @@ public class TuitionServices {
         if (!personCustomer.isActive()) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active",
                     personCustomer.getBusinessIdentification(), personCustomer.getName());
-        }
-
-        if (tuitionPaymentPlan == null) {
-            tuitionPaymentPlan = TuitionPaymentPlan.inferTuitionPaymentPlanForRegistration(registration, executionYear);
-        }
-
-        if (tuitionPaymentPlan == null) {
-            return false;
-        }
-
-        if (!forceCreationIfNotEnrolled && tuitionPaymentPlan.isStudentMustBeEnrolled()
-                && normalEnrolmentsIncludingAnnuled(registration, executionYear).isEmpty()) {
-            return false;
         }
 
         if (!DebtAccount.findUnique(tuitionPaymentPlan.getFinantialEntity().getFinantialInstitution(), personCustomer)
