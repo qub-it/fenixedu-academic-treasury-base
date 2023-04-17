@@ -1,3 +1,5 @@
+- Bug Fix: Add temporary trigger to fix labels of due date calculation type #UL-REIT-3144
+
 8.7.1 (12-04-2023)
 - Improvement: In the process of creating registration tuition debts, check if tuition will be created before check if the person has fiscal data properly filled
 
