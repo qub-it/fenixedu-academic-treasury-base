@@ -237,7 +237,12 @@ class tuition.TuitionPaymentPlanGroup {
 	boolean forImprovement;
 	String allowedConditionRulesSerialized;
 	String allowedCalculatedAmountCalculatorsSerialized;
+	String allowedTuitionPaymentPlanCalculatorsSerialized;
 	boolean bypassInstallmentNameIfSingleInstallmentApplied;
+	boolean useCustomDebitEntryDescriptionFormat;
+	LocalizedString installmentDebitEntryDescriptionFormat;
+	LocalizedString oneInstallmentDebitEntryDescriptionFormat;
+	Boolean applyDomainObjectCalculators;
 }
 
 	relation TuitionPaymentPlanGroupBennu {
@@ -428,9 +433,11 @@ class tuition.TuitionPaymentPlan {
 			multiplicity *;
 		}
 	}
+	
 class tuition.TuitionPaymentPlanOrder{
 	int paymentPlanOrder;
 }
+
 	relation TuitionPaymentPlanOrderBennu {
 		.pt.ist.fenixframework.DomainRoot playsRole domainRoot {
 			multiplicity 1..1;
@@ -463,6 +470,34 @@ class tuition.TuitionPaymentPlanOrder{
 	}
 
 
+class tuition.calculators.TuitionPaymentPlanCalculator {
+	LocalizedString name;
+}
+
+	relation TuitionPaymentPlanCalculatorDomainRoot {
+		.pt.ist.fenixframework.DomainRoot playsRole domainRoot {
+			multiplicity 1..1;
+		}
+	
+		tuition.calculators.TuitionPaymentPlanCalculator playsRole tuitionPaymentPlanCalculator {
+			multiplicity *;
+		}
+	}
+	
+	relation TuitionPaymentPlanCalculatorTuitionPaymentPlan {
+		tuition.TuitionPaymentPlan playsRole tuitionPaymentPlan {
+			multiplicity 0..1;
+		}
+	
+		tuition.calculators.TuitionPaymentPlanCalculator playsRole tuitionPaymentPlanCalculator {
+			multiplicity *;
+		}
+	}
+	
+	class tuition.calculators.TestTuitionPaymentPlanCalculator extends tuition.calculators.TuitionPaymentPlanCalculator {
+		BigDecimal amount;
+	}
+	
 class tuition.TuitionInstallmentTariff extends .org.fenixedu.treasury.domain.tariff.Tariff {
 	int installmentOrder;
 	TuitionCalculationType tuitionCalculationType;
@@ -496,9 +531,20 @@ class tuition.TuitionInstallmentTariff extends .org.fenixedu.treasury.domain.tar
 			multiplicity *;
 		}
 	}
+	
+	relation TuitionInstallmentTariffTuitionPaymentPlanCalculator {
+		tuition.calculators.TuitionPaymentPlanCalculator playsRole tuitionPaymentPlanCalculator {
+			multiplicity 0..1;
+		}
+
+		tuition.TuitionInstallmentTariff playsRole tuitionInstallmentTariffs {
+			multiplicity *;
+		}
+	}
 
 class tuition.TuitionConditionRule {
 }
+
 	relation TuitionConditionRuleBennu {
 		.pt.ist.fenixframework.DomainRoot playsRole domainRoot {
 			multiplicity 1..1;
@@ -589,7 +635,7 @@ class tuition.TuitionConditionRule {
 	class tuition.conditionRule.WithLaboratorialClassesConditionRule extends tuition.TuitionConditionRule {
 		Boolean withLaboratorialClasses;
 	}
-	
+
 /*----------------------
  * AcademicTreasuryEvent
  *---------------------- */

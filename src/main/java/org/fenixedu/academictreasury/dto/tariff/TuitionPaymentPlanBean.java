@@ -37,6 +37,7 @@ package org.fenixedu.academictreasury.dto.tariff;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -68,6 +69,7 @@ import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
 import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCalculatedAmountType;
 import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCustomCalculator;
+import org.fenixedu.academictreasury.domain.tuition.calculators.TuitionPaymentPlanCalculator;
 import org.fenixedu.academictreasury.domain.tuition.conditionRule.CurricularYearConditionRule;
 import org.fenixedu.academictreasury.domain.tuition.conditionRule.ExecutionIntervalConditionRule;
 import org.fenixedu.academictreasury.domain.tuition.conditionRule.FirstTimeStudentConditionRule;
@@ -173,6 +175,10 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     private TuitionTariffCalculatedAmountType tuitionTariffCalculatedAmountType;
     private Class<? extends TuitionTariffCustomCalculator> tuitionTariffCustomCalculator;
 
+    private TuitionPaymentPlanCalculator tuitionPaymentPlanCalculator;
+
+    private List<TuitionPaymentPlanCalculator> tuitionPaymentPlanCalculatorList = new ArrayList<>();
+
     // @formatter:off
     /*---------------------
      * END OF TARIFF FIELDS
@@ -223,6 +229,8 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this.conditionRules = new HashSet<>(tuitionPaymentPlan.getTuitionConditionRulesSet());
 
         fillWithInstallments(tuitionPaymentPlan);
+
+        this.tuitionPaymentPlanCalculatorList.addAll(tuitionPaymentPlan.getTuitionPaymentPlanCalculatorSet());
     }
 
     private void fillWithInstallments(final TuitionPaymentPlan tuitionPaymentPlan) {
@@ -255,9 +263,12 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
             this.maximumAmount = tuitionInstallmentTariff.getMaximumAmount();
             this.academicalActBlockingOn = !tuitionInstallmentTariff.getAcademicalActBlockingOff();
             this.blockAcademicActsOnDebt = tuitionInstallmentTariff.getBlockAcademicActsOnDebt();
+
+            this.tuitionPaymentPlanCalculator = tuitionInstallmentTariff.getTuitionPaymentPlanCalculator();
             this.tuitionTariffCalculatedAmountType = tuitionInstallmentTariff.getTuitionTariffCalculatedAmountType();
             this.tuitionTariffCustomCalculator = tuitionInstallmentTariff.getTuitionTariffCustomCalculator();
             this.payorDebtAccount = tuitionInstallmentTariff.getPayorDebtAccount();
+
             addInstallment();
         }
 
@@ -420,6 +431,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         installmentBean.setTuitionInstallmentProduct(getTuitionInstallmentProduct());
         installmentBean.setTuitionCalculationType(this.tuitionCalculationType);
         installmentBean.setTuitionTariffCalculatedAmountType(this.tuitionTariffCalculatedAmountType);
+        installmentBean.setTuitionPaymentPlanCalculator(this.tuitionPaymentPlanCalculator);
         installmentBean.setTuitionTariffCustomCalculator(this.tuitionTariffCustomCalculator);
         installmentBean.setFixedAmount(this.fixedAmount);
         installmentBean.setEctsCalculationType(this.ectsCalculationType);
@@ -1196,6 +1208,22 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
     public void addAllDegreeCurricularPlans(Set<DegreeCurricularPlan> degreeCurricularPlans) {
         degreeCurricularPlans.addAll(degreeCurricularPlans);
+    }
+
+    public TuitionPaymentPlanCalculator getTuitionPaymentPlanCalculatorBean() {
+        return tuitionPaymentPlanCalculator;
+    }
+
+    public void setTuitionPaymentPlanCalculatorBean(TuitionPaymentPlanCalculator tuitionPaymentPlanCalculator) {
+        this.tuitionPaymentPlanCalculator = tuitionPaymentPlanCalculator;
+    }
+
+    public List<TuitionPaymentPlanCalculator> getTuitionPaymentPlanCalculatorList() {
+        return tuitionPaymentPlanCalculatorList;
+    }
+
+    public void setTuitionPaymentPlanCalculatorList(List<TuitionPaymentPlanCalculator> tuitionPaymentPlanCalculatorList) {
+        this.tuitionPaymentPlanCalculatorList = tuitionPaymentPlanCalculatorList;
     }
 
 }

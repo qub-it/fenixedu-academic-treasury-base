@@ -48,6 +48,7 @@ import org.fenixedu.academictreasury.domain.tuition.TuitionCalculationType;
 import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCalculatedAmountType;
 import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCustomCalculator;
+import org.fenixedu.academictreasury.domain.tuition.calculators.TuitionPaymentPlanCalculator;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
@@ -124,8 +125,10 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
     private TuitionTariffCalculatedAmountType tuitionTariffCalculatedAmountType;
 
+    private TuitionPaymentPlanCalculator tuitionPaymentPlanCalculator;
+    
     private Class<? extends TuitionTariffCustomCalculator> tuitionTariffCustomCalculator;
-
+    
     /* Payor debt account */
     private DebtAccount payorDebtAccount;
 
@@ -232,6 +235,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         this.setTuitionInstallmentProduct(tuitionInstallmentTariff.getProduct());
         this.setInstallmentOrder(tuitionInstallmentTariff.getInstallmentOrder());
         this.setTuitionCalculationType(tuitionInstallmentTariff.getTuitionCalculationType());
+        this.setTuitionPaymentPlanCalculator(tuitionInstallmentTariff.getTuitionPaymentPlanCalculator());
         this.setFixedAmount(tuitionInstallmentTariff.getFixedAmount());
         this.setEctsCalculationType(tuitionInstallmentTariff.getEctsCalculationType());
         this.setAcademicalActBlockingOn(!tuitionInstallmentTariff.getAcademicalActBlockingOff());
@@ -656,6 +660,14 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         return tuitionTariffCalculatedAmountType;
     }
 
+    public TuitionPaymentPlanCalculator getTuitionPaymentPlanCalculator() {
+        return tuitionPaymentPlanCalculator;
+    }
+    
+    public void setTuitionPaymentPlanCalculator(TuitionPaymentPlanCalculator tuitionPaymentPlanCalculator) {
+        this.tuitionPaymentPlanCalculator = tuitionPaymentPlanCalculator;
+    }
+    
     public void setTuitionTariffCustomCalculator(Class<? extends TuitionTariffCustomCalculator> tuitionTariffCustomCalculator) {
         this.tuitionTariffCustomCalculator = tuitionTariffCustomCalculator;
     }
