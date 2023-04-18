@@ -32,6 +32,10 @@ abstract public class TuitionPaymentPlanCalculator extends TuitionPaymentPlanCal
     
     public abstract TuitionPaymentPlanCalculator copyTo(TuitionPaymentPlan tuitionPaymentPlanTarget);
     
+    public void editName(LocalizedString name) {
+        super.setName(name);
+    }
+    
     public void delete() {
         super.setDomainRoot(null);
         super.setTuitionPaymentPlan(null);
