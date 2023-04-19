@@ -43,6 +43,10 @@ abstract public class TuitionPaymentPlanCalculator extends TuitionPaymentPlanCal
         super.deleteDomainObject();
     }
     
+    public LocalizedString getCalculatorImplementationName() {
+        return getPresentationNameFor(getClass());
+    }
+    
     public static LocalizedString getPresentationNameFor(Class<? extends TuitionPaymentPlanCalculator> tuitionPaymentPlanCalculatorClass) {
         try {
             final Method method = tuitionPaymentPlanCalculatorClass.getMethod("getCalculatorPresentationName", new Class[] {});
