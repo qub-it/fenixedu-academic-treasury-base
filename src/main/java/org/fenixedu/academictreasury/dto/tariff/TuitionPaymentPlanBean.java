@@ -82,7 +82,9 @@ import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
+import org.fenixedu.treasury.domain.settings.TreasurySettings;
 import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
+import org.fenixedu.treasury.domain.tariff.InterestRateType;
 import org.fenixedu.treasury.domain.tariff.InterestType;
 import org.fenixedu.treasury.dto.ITreasuryBean;
 import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
@@ -151,7 +153,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
     /* InterestRate */
     private boolean applyInterests;
-    private InterestType interestType;
+    private InterestRateType interestRateType;
     private int numberOfDaysAfterDueDate;
     private boolean applyInFirstWorkday;
     private int maximumDaysToApplyPenalty;
@@ -238,7 +240,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
             this.applyInterests = tuitionInstallmentTariff.getApplyInterests();
             if (this.applyInterests) {
-                this.interestType = tuitionInstallmentTariff.getInterestRate().getInterestType();
+                this.interestRateType = tuitionInstallmentTariff.getInterestRate().getInterestRateType();
                 this.numberOfDaysAfterDueDate = tuitionInstallmentTariff.getNumberOfDaysAfterCreationForDueDate();
                 this.applyInFirstWorkday = tuitionInstallmentTariff.getInterestRate().isApplyInFirstWorkday();
                 this.maximumDaysToApplyPenalty = tuitionInstallmentTariff.getInterestRate().getMaximumDaysToApplyPenalty();
@@ -372,11 +374,11 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
             errorMessages.add("error.TuitionPaymentPlan.fixedDueDate.required");
         }
 
-        if (this.applyInterests && this.interestType == null) {
+        if (this.applyInterests && this.interestRateType == null) {
             errorMessages.add("error.TuitionPaymentPlan.interestType.required");
         }
 
-        if (this.applyInterests && this.interestType != null && this.interestType.isFixedAmount()
+        if (this.applyInterests && this.interestRateType != null && Boolean.TRUE.equals(this.interestRateType.getRequiresInterestFixedAmount())
                 && this.interestFixedAmount == null) {
             errorMessages.add("error.TuitionPaymentPlan.interestFixedAmount.required");
         }
@@ -410,7 +412,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         installmentBean.setNumberOfDaysAfterCreationForDueDate(this.numberOfDaysAfterCreationForDueDate);
 
         installmentBean.setApplyInterests(this.applyInterests);
-        installmentBean.setInterestType(this.interestType);
+        installmentBean.setInterestRateType(this.interestRateType);
         installmentBean.setNumberOfDaysAfterDueDate(this.numberOfDaysAfterDueDate);
         installmentBean.setApplyInFirstWorkday(this.applyInFirstWorkday);
         installmentBean.setMaximumDaysToApplyPenalty(this.maximumDaysToApplyPenalty);
@@ -477,7 +479,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this.numberOfDaysAfterCreationForDueDate = 0;
 
         this.applyInterests = true;
-        this.interestType = InterestType.GLOBAL_RATE;
+        this.interestRateType = TreasurySettings.getInstance().getDefaultInterestRateType();
         this.numberOfDaysAfterDueDate = 1;
         this.applyInFirstWorkday = false;
         this.maximumDaysToApplyPenalty = 0;
@@ -779,12 +781,12 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
     /* InterestRate */
 
-    public InterestType getInterestType() {
-        return interestType;
+    public InterestRateType getInterestRateType() {
+        return interestRateType;
     }
 
-    public void setInterestType(InterestType interestType) {
-        this.interestType = interestType;
+    public void setInterestRateType(InterestRateType interestRateType) {
+        this.interestRateType = interestRateType;
     }
 
     public int getNumberOfDaysAfterDueDate() {
