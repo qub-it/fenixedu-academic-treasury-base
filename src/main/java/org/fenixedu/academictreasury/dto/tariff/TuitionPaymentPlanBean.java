@@ -85,7 +85,6 @@ import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.settings.TreasurySettings;
 import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
 import org.fenixedu.treasury.domain.tariff.InterestRateType;
-import org.fenixedu.treasury.domain.tariff.InterestType;
 import org.fenixedu.treasury.dto.ITreasuryBean;
 import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
@@ -1061,8 +1060,9 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     public static List<TreasuryTupleDataSourceBean> interestTypeDataSource() {
-        List<TreasuryTupleDataSourceBean> result = InterestType.findAll().stream()
-                .map((it) -> new TreasuryTupleDataSourceBean(it.name(), it.getDescriptionI18N().getContent()))
+        List<TreasuryTupleDataSourceBean> result = TreasurySettings.getInstance().getAvailableInterestRateTypesSet().stream()
+                .sorted(InterestRateType.COMPARE_BY_NAME)
+                .map(it -> new TreasuryTupleDataSourceBean(it.getExternalId(), it.getDescription().getContent()))
                 .collect(Collectors.toList());
 
         result.add(AcademicTreasuryConstants.SELECT_OPTION);

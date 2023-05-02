@@ -1723,7 +1723,7 @@ class reservationtax.ReservationTaxTariff {
 	int numberOfDaysAfterCreationForDueDate;
 	LocalDate fixedDueDate;	
 	Boolean applyInterests;
-	InterestType interestType;
+	//InterestType interestType;
 	BigDecimalT interestFixedAmount;
 }
 
@@ -1763,6 +1763,16 @@ class reservationtax.ReservationTaxTariff {
 		}
 		
 		.org.fenixedu.academic.domain.Degree playsRole degrees {
+			multiplicity *;
+		}
+	}
+	
+	relation ReservationTaxTariffInterestRateType {
+		.org.fenixedu.treasury.domain.tariff.InterestRateType playsRole interestRateType {
+			multiplicity 0..1;
+		}
+		
+		reservationtax.ReservationTaxTariff playsRole reservationTaxTariffs {
 			multiplicity *;
 		}
 	}
