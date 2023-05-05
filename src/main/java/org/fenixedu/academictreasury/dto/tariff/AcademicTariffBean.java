@@ -128,7 +128,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
     /* Payor debt account */
     private DebtAccount payorDebtAccount;
-    
+
     public AcademicTariffBean() {
         setBeginDate(new LocalDate());
         setEndDate(new LocalDate().plusYears(1));
@@ -138,7 +138,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         setNumberOfDaysAfterCreationForDueDate(0);
         setApplyInterests(false);
 
-        setInterestRateType(TreasurySettings.getInstance().getDefaultInterestRateType());
+        setInterestRateType(InterestRateType.getDefaultInterestRateType());
         setNumberOfDaysAfterDueDate(0);
         setApplyInFirstWorkday(false);
         setMaximumDaysToApplyPenalty(0);
@@ -248,8 +248,8 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         this.tuitionInstallmentProductDataSource = TuitionPaymentPlanBean.tuitionInstallmentProductDataSource(
                 tuitionInstallmentTariff.getTuitionPaymentPlan().getTuitionPaymentPlanGroup(),
                 tuitionInstallmentTariff.getProduct().getTuitionInstallmentOrder());
-        
-       this.setPayorDebtAccount(tuitionInstallmentTariff.getPayorDebtAccount()); 
+
+        this.setPayorDebtAccount(tuitionInstallmentTariff.getPayorDebtAccount());
     }
 
     public void resetFields() {
@@ -270,7 +270,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
         setMaximumDaysToApplyPenalty(0);
 
-        if (getInterestRateType() == null || !Boolean.TRUE.equals(getInterestRateType().getRequiresInterestFixedAmount())) {
+        if (getInterestRateType() == null || !getInterestRateType().isInterestFixedAmountRequired()) {
             setInterestFixedAmount(BigDecimal.ZERO);
         }
 
@@ -667,7 +667,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
     public DebtAccount getPayorDebtAccount() {
         return payorDebtAccount;
     }
-    
+
     public void setPayorDebtAccount(DebtAccount payorDebtAccount) {
         this.payorDebtAccount = payorDebtAccount;
     }

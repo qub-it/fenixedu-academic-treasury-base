@@ -158,7 +158,7 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
                 .setAmount(amount) //
                 .setDueDate(dueDate) //
                 .setCreatePaymentCode(Boolean.TRUE.equals(reservationTax.getCreatePaymentReferenceCode())) //
-                .setInterestType(tariff.get().getInterestRateType()).setInterestFixedAmount(tariff.get().getInterestFixedAmount()) //
+                .setInterestRateType(tariff.get().getInterestRateType()).setInterestFixedAmount(tariff.get().getInterestFixedAmount()) //
                 .setPaymentCodePool((ISibsPaymentCodePoolService) finantialEntity.getFinantialInstitution()
                         .getDefaultDigitalPaymentPlatform());
 

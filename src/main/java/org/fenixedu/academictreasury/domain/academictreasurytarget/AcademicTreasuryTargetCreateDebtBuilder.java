@@ -119,7 +119,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             return this;
         }
 
-        public DebtBuilderWithAmountAndDueDate setInterestType(InterestRateType interestRateType) {
+        public DebtBuilderWithAmountAndDueDate setInterestRateType(InterestRateType interestRateType) {
             this.interestRateType = interestRateType;
             return this;
         }
