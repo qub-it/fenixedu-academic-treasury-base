@@ -881,6 +881,7 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
     @Atomic
     public void edit(final AcademicTariffBean bean) {
+        super.setApplyInterests(bean.isApplyInterests());
         if (getInterestRate() == null && bean.isApplyInterests()) {
             setInterestRate(InterestRate.createForTariff(this, bean.getInterestRateType(),
                     bean.getNumberOfDaysAfterCreationForDueDate(), bean.isApplyInFirstWorkday(),
@@ -895,22 +896,18 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         super.setBeginDate(bean.getBeginDate().toDateTimeAtStartOfDay());
         super.setEndDate(bean.getEndDate() != null ? bean.getEndDate().toDateTimeAtStartOfDay() : null);
 
-        // TODO Check code Refactor/20210624-MergeWithISCTE
-        // Check why super.setTuitionCalculationType(bean.getTuitionCalculationType()); is not called
-
+        super.setTuitionCalculationType(bean.getTuitionCalculationType());
         super.setTuitionTariffCalculatedAmountType(bean.getTuitionTariffCalculatedAmountType());
 
         super.setTuitionTariffCustomCalculatorClassName(
                 bean.getTuitionTariffCustomCalculator() != null ? bean.getTuitionTariffCustomCalculator().getName() : null);
 
-        setDueDateCalculationType(bean.getDueDateCalculationType());
+        this.setDueDateCalculationType(bean.getDueDateCalculationType());
 
-        setFixedDueDate(bean.getFixedDueDate());
+        this.setFixedDueDate(bean.getFixedDueDate());
 
         super.setNumberOfDaysAfterCreationForDueDate(bean.getNumberOfDaysAfterCreationForDueDate());
-        super.setApplyInterests(bean.isApplyInterests());
 
-        super.setTuitionCalculationType(bean.getTuitionCalculationType());
         super.setFixedAmount(bean.getFixedAmount());
         super.setEctsCalculationType(bean.getEctsCalculationType());
         super.setFactor(bean.getFactor());

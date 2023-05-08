@@ -273,6 +273,10 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         super.setApplyInterests(bean.isApplyInterests());
 
+        if(!getApplyInterests() && getInterestRate() != null) {
+            getInterestRate().delete();
+        }
+        
         checkRules();
     }
 

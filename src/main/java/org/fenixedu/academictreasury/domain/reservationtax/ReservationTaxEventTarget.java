@@ -51,9 +51,9 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
         setDomainRoot(FenixFramework.getDomainRoot());
     }
 
-    protected ReservationTaxEventTarget(ReservationTax reservationTax, Person person,
-            DegreeCurricularPlan degreeCurricularPlan, ExecutionInterval executionInterval, boolean discountInTuitionFee,
-            LocalDate taxReservationDate, LocalizedString taxReservationDescription) {
+    protected ReservationTaxEventTarget(ReservationTax reservationTax, Person person, DegreeCurricularPlan degreeCurricularPlan,
+            ExecutionInterval executionInterval, boolean discountInTuitionFee, LocalDate taxReservationDate,
+            LocalizedString taxReservationDescription) {
         this();
 
         super.setReservationTax(reservationTax);
@@ -62,7 +62,7 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
         super.setExecutionInterval(executionInterval);
         super.setTaxReservationDate(taxReservationDate);
         super.setTaxReservationDescription(taxReservationDescription);
-        
+
         checkRules();
     }
 
@@ -127,9 +127,8 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
                 ReservationTaxEventTarget.findUnique(person, reservationTax, degreeCurricularPlan, executionInterval);
 
         if (!target.isPresent()) {
-            target = Optional.of(new ReservationTaxEventTarget(reservationTax, person, degreeCurricularPlan,
-                    executionInterval, Boolean.TRUE.equals(reservationTax.getDiscountInTuitionFee()), taxReservationDate,
-                    emolumentDescription));
+            target = Optional.of(new ReservationTaxEventTarget(reservationTax, person, degreeCurricularPlan, executionInterval,
+                    Boolean.TRUE.equals(reservationTax.getDiscountInTuitionFee()), taxReservationDate, emolumentDescription));
         }
 
         var treasuryEvent = (AcademicTreasuryEvent) target.get().getReservationTaxAcademicTreasuryEvent();
@@ -152,15 +151,19 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
 
         FinantialEntity finantialEntity = reservationTax.getFinantialEntity();
         Product product = reservationTax.getProduct();
-        
+
         DebtBuilderWithAmountAndDueDate debtBuilder = AcademicTreasuryTargetCreateDebtBuilder.createBuilder()
                 .explicitAmountAndDueDate(finantialEntity, product, target.get(), taxReservationDate) //
                 .setAmount(amount) //
                 .setDueDate(dueDate) //
                 .setCreatePaymentCode(Boolean.TRUE.equals(reservationTax.getCreatePaymentReferenceCode())) //
-                .setInterestRateType(tariff.get().getInterestRateType()).setInterestFixedAmount(tariff.get().getInterestFixedAmount()) //
                 .setPaymentCodePool((ISibsPaymentCodePoolService) finantialEntity.getFinantialInstitution()
                         .getDefaultDigitalPaymentPlatform());
+
+        if (Boolean.TRUE.equals(tariff.get().getApplyInterests())) {
+            debtBuilder = debtBuilder.setInterestRateType(tariff.get().getInterestRateType()) //
+                    .setInterestFixedAmount(tariff.get().getInterestFixedAmount());
+        }
 
         debtBuilder.createDebt();
 
@@ -220,11 +223,11 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
     public boolean isEventDiscountInTuitionFee() {
         return Boolean.TRUE.equals(getReservationTax().getDiscountInTuitionFee());
     }
-    
+
     public boolean isEventDiscountInTuitionFeeWithTreasuryExemption() {
         return getReservationTax().getTreasuryExemptionType() != null;
     }
-    
+
     public IAcademicTreasuryEvent getReservationTaxAcademicTreasuryEvent() {
         var api = TreasuryBridgeAPIFactory.implementation();
 

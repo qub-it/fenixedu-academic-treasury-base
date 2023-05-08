@@ -37,8 +37,14 @@ public class ReservationTaxTariff extends ReservationTaxTariff_Base {
         super.setFixedDueDate(fixedDueDate);
 
         super.setApplyInterests(applyInterests);
-        super.setInterestRateType(interestRateType);
-        super.setInterestFixedAmount(interestFixedAmount);
+        
+        if(applyInterests) {
+            super.setInterestRateType(interestRateType);
+            super.setInterestFixedAmount(interestFixedAmount);
+        } else {
+            super.setInterestRateType(null);
+            super.setInterestFixedAmount(null);
+        }
 
         checkRules();
     }
@@ -57,9 +63,15 @@ public class ReservationTaxTariff extends ReservationTaxTariff_Base {
         super.setFixedDueDate(fixedDueDate);
 
         super.setApplyInterests(applyInterests);
-        super.setInterestRateType(interestRateType);
-        super.setInterestFixedAmount(interestFixedAmount);
 
+        if(applyInterests) {
+            super.setInterestRateType(interestRateType);
+            super.setInterestFixedAmount(interestFixedAmount);
+        } else {
+            super.setInterestRateType(null);
+            super.setInterestFixedAmount(null);
+        }
+        
         checkRules();
     }
 
