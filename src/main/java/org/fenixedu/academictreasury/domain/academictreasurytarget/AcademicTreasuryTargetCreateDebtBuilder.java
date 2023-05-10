@@ -57,7 +57,8 @@ import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.domain.paymentcodes.integration.ISibsPaymentCodePoolService;
-import org.fenixedu.treasury.domain.tariff.InterestType;
+import org.fenixedu.treasury.domain.tariff.InterestRate;
+import org.fenixedu.treasury.domain.tariff.InterestRateType;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -76,7 +77,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
         private BigDecimal amount;
         private LocalDate dueDate;
 
-        private InterestType interestType;
+        private InterestRateType interestRateType;
         private BigDecimal interestFixedAmount;
 
         public DebtBuilderWithAmountAndDueDate setAmount(BigDecimal amount) {
@@ -119,8 +120,8 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             return this;
         }
 
-        public DebtBuilderWithAmountAndDueDate setInterestType(InterestType interestType) {
-            this.interestType = interestType;
+        public DebtBuilderWithAmountAndDueDate setInterestRateType(InterestRateType interestRateType) {
+            this.interestRateType = interestRateType;
             return this;
         }
 
@@ -161,6 +162,10 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
                     target.getAcademicTreasuryTargetPropertiesMap(), product,
                     target.getAcademicTreasuryTargetDescription().getContent(TreasuryConstants.DEFAULT_LANGUAGE), BigDecimal.ONE,
                     null, when.toDateTimeAtStartOfDay());
+
+            if (this.interestRateType != null) {
+                InterestRate.createForDebitEntry(debitEntry, this.interestRateType, 1, false, 0, this.interestFixedAmount, null);
+            }
 
             if (createPaymentCode) {
                 createPaymentReferenceCode(debitEntry, dueDate);

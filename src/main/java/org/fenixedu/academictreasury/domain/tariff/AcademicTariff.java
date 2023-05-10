@@ -72,10 +72,9 @@ import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.DebitNote;
 import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
-import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
 import org.fenixedu.treasury.domain.tariff.InterestRate;
-import org.fenixedu.treasury.domain.tariff.InterestType;
+import org.fenixedu.treasury.domain.tariff.InterestRateType;
 import org.fenixedu.treasury.domain.tariff.Tariff;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
@@ -98,20 +97,20 @@ public class AcademicTariff extends AcademicTariff_Base {
     }
 
     @Override
-    protected void init(final FinantialEntity finantialEntity, final Product product, final DateTime beginDate,
-            final DateTime endDate, final DueDateCalculationType dueDateCalculationType, final LocalDate fixedDueDate,
-            final int numberOfDaysAfterCreationForDueDate, final boolean applyInterests, final InterestType interestType,
-            final int numberOfDaysAfterDueDate, final boolean applyInFirstWorkday, final int maximumDaysToApplyPenalty,
-            final BigDecimal interestFixedAmount, final BigDecimal rate) {
+    protected void init(FinantialEntity finantialEntity, Product product, DateTime beginDate,
+            DateTime endDate, DueDateCalculationType dueDateCalculationType, LocalDate fixedDueDate,
+            int numberOfDaysAfterCreationForDueDate, boolean applyInterests, InterestRateType interestRateType,
+            int numberOfDaysAfterDueDate, boolean applyInFirstWorkday, int maximumDaysToApplyPenalty,
+            BigDecimal interestFixedAmount, BigDecimal rate) {
         throw new RuntimeException("wrong call");
     }
 
-    protected void init(final FinantialEntity finantialEntity, final Product product, final AcademicTariffBean bean) {
+    protected void init(FinantialEntity finantialEntity, Product product, AcademicTariffBean bean) {
 
         super.init(finantialEntity, product, bean.getBeginDate().toDateTimeAtStartOfDay(),
                 bean.getEndDate() != null ? bean.getEndDate().toDateTimeAtStartOfDay().plusDays(1).minusSeconds(1) : null,
                 bean.getDueDateCalculationType(), bean.getFixedDueDate() != null ? bean.getFixedDueDate() : null,
-                bean.getNumberOfDaysAfterCreationForDueDate(), bean.isApplyInterests(), bean.getInterestType(),
+                bean.getNumberOfDaysAfterCreationForDueDate(), bean.isApplyInterests(), bean.getInterestRateType(),
                 bean.getNumberOfDaysAfterDueDate(), bean.isApplyInFirstWorkday(), bean.getMaximumDaysToApplyPenalty(),
                 bean.getInterestFixedAmount(), bean.getRate());
 
@@ -264,16 +263,20 @@ public class AcademicTariff extends AcademicTariff_Base {
                 bean.getEndDate().toDateTimeAtStartOfDay().plusDays(1).minusSeconds(1));
 
         if (bean.isApplyInterests() && getInterestRate() == null) {
-            InterestRate.createForTariff(this, bean.getInterestType(), bean.getNumberOfDaysAfterDueDate(),
+            InterestRate.createForTariff(this, bean.getInterestRateType(), bean.getNumberOfDaysAfterDueDate(),
                     bean.isApplyInFirstWorkday(), bean.getMaximumDaysToApplyPenalty(), bean.getInterestFixedAmount(),
                     bean.getRate());
         } else if (bean.isApplyInterests()) {
-            getInterestRate().edit(bean.getInterestType(), bean.getNumberOfDaysAfterDueDate(), bean.isApplyInFirstWorkday(),
+            getInterestRate().edit(bean.getInterestRateType(), bean.getNumberOfDaysAfterDueDate(), bean.isApplyInFirstWorkday(),
                     bean.getMaximumDaysToApplyPenalty(), bean.getInterestFixedAmount(), bean.getRate());
         }
 
         super.setApplyInterests(bean.isApplyInterests());
 
+        if(!getApplyInterests() && getInterestRate() != null) {
+            getInterestRate().delete();
+        }
+        
         checkRules();
     }
 

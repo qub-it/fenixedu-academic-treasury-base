@@ -82,8 +82,9 @@ import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
+import org.fenixedu.treasury.domain.settings.TreasurySettings;
 import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
-import org.fenixedu.treasury.domain.tariff.InterestType;
+import org.fenixedu.treasury.domain.tariff.InterestRateType;
 import org.fenixedu.treasury.dto.ITreasuryBean;
 import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
@@ -110,7 +111,6 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     private boolean customized;
     private DebtAccount payorDebtAccount;
 
-    
     Set<TuitionConditionRule> conditionRules;
 
     // TODO: Anil Use LocalizedString when web component is compatible with AngularJS
@@ -151,7 +151,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
     /* InterestRate */
     private boolean applyInterests;
-    private InterestType interestType;
+    private InterestRateType interestRateType;
     private int numberOfDaysAfterDueDate;
     private boolean applyInFirstWorkday;
     private int maximumDaysToApplyPenalty;
@@ -216,7 +216,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this.customized = tuitionPaymentPlan.isCustomized();
         this.defaultPaymentPlan = tuitionPaymentPlan.isDefaultPaymentPlan();
 
-        if(tuitionPaymentPlan.getCustomizedName() != null) {
+        if (tuitionPaymentPlan.getCustomizedName() != null) {
             this.name = tuitionPaymentPlan.getCustomizedName().getContent();
         }
 
@@ -227,7 +227,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
     private void fillWithInstallments(final TuitionPaymentPlan tuitionPaymentPlan) {
         DebtAccount tuitionPaymentPlanDebtAccount = this.payorDebtAccount;
-        
+
         for (final TuitionInstallmentTariff tuitionInstallmentTariff : tuitionPaymentPlan.getOrderedTuitionInstallmentTariffs()) {
 
             this.tuitionInstallmentProduct = tuitionInstallmentTariff.getProduct();
@@ -238,7 +238,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
             this.applyInterests = tuitionInstallmentTariff.getApplyInterests();
             if (this.applyInterests) {
-                this.interestType = tuitionInstallmentTariff.getInterestRate().getInterestType();
+                this.interestRateType = tuitionInstallmentTariff.getInterestRate().getInterestRateType();
                 this.numberOfDaysAfterDueDate = tuitionInstallmentTariff.getNumberOfDaysAfterCreationForDueDate();
                 this.applyInFirstWorkday = tuitionInstallmentTariff.getInterestRate().isApplyInFirstWorkday();
                 this.maximumDaysToApplyPenalty = tuitionInstallmentTariff.getInterestRate().getMaximumDaysToApplyPenalty();
@@ -260,7 +260,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
             this.payorDebtAccount = tuitionInstallmentTariff.getPayorDebtAccount();
             addInstallment();
         }
-        
+
         this.payorDebtAccount = tuitionPaymentPlanDebtAccount;
     }
 
@@ -372,11 +372,11 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
             errorMessages.add("error.TuitionPaymentPlan.fixedDueDate.required");
         }
 
-        if (this.applyInterests && this.interestType == null) {
+        if (this.applyInterests && this.interestRateType == null) {
             errorMessages.add("error.TuitionPaymentPlan.interestType.required");
         }
 
-        if (this.applyInterests && this.interestType != null && this.interestType.isFixedAmount()
+        if (this.applyInterests && this.interestRateType != null && this.interestRateType.isInterestFixedAmountRequired()
                 && this.interestFixedAmount == null) {
             errorMessages.add("error.TuitionPaymentPlan.interestFixedAmount.required");
         }
@@ -410,7 +410,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         installmentBean.setNumberOfDaysAfterCreationForDueDate(this.numberOfDaysAfterCreationForDueDate);
 
         installmentBean.setApplyInterests(this.applyInterests);
-        installmentBean.setInterestType(this.interestType);
+        installmentBean.setInterestRateType(this.interestRateType);
         installmentBean.setNumberOfDaysAfterDueDate(this.numberOfDaysAfterDueDate);
         installmentBean.setApplyInFirstWorkday(this.applyInFirstWorkday);
         installmentBean.setMaximumDaysToApplyPenalty(this.maximumDaysToApplyPenalty);
@@ -477,7 +477,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this.numberOfDaysAfterCreationForDueDate = 0;
 
         this.applyInterests = true;
-        this.interestType = InterestType.GLOBAL_RATE;
+        this.interestRateType = InterestRateType.getDefaultInterestRateType();
         this.numberOfDaysAfterDueDate = 1;
         this.applyInFirstWorkday = false;
         this.maximumDaysToApplyPenalty = 0;
@@ -565,28 +565,29 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     public void addOrReplaceConditionRules(TuitionConditionRule tuitionConditionRule) {
-        TuitionConditionRule rule = conditionRules.stream().filter(c -> c.getClass().isAssignableFrom(tuitionConditionRule.getClass()))
-                .findFirst().orElse(null);
+        TuitionConditionRule rule = conditionRules.stream()
+                .filter(c -> c.getClass().isAssignableFrom(tuitionConditionRule.getClass())).findFirst().orElse(null);
         if (rule != null) {
             conditionRules.remove(rule);
         }
-        
+
         conditionRules.add(tuitionConditionRule);
     }
 
     public void addConditionRules(TuitionConditionRule tuitionConditionRule) {
-        TuitionConditionRule rule = conditionRules.stream().filter(c -> c.getClass().isAssignableFrom(tuitionConditionRule.getClass()))
-                .findFirst().orElse(null);
+        TuitionConditionRule rule = conditionRules.stream()
+                .filter(c -> c.getClass().isAssignableFrom(tuitionConditionRule.getClass())).findFirst().orElse(null);
         if (rule != null) {
             throw new DomainException(TreasuryPlataformDependentServicesFactory.implementation()
                     .bundle(AcademicTreasuryConstants.BUNDLE, "error.TuitionPaymentPlan.conditionRule.duplicated"));
         }
-        
+
         conditionRules.add(tuitionConditionRule);
     }
 
     public void removeConditionRule(Class<? extends TuitionConditionRule> clazz) {
-        TuitionConditionRule rule = conditionRules.stream().filter(c -> clazz.isAssignableFrom(c.getClass())).findFirst().orElse(null);
+        TuitionConditionRule rule =
+                conditionRules.stream().filter(c -> clazz.isAssignableFrom(c.getClass())).findFirst().orElse(null);
         if (rule != null) {
             conditionRules.remove(rule);
         }
@@ -779,12 +780,12 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
     /* InterestRate */
 
-    public InterestType getInterestType() {
-        return interestType;
+    public InterestRateType getInterestRateType() {
+        return interestRateType;
     }
 
-    public void setInterestType(InterestType interestType) {
-        this.interestType = interestType;
+    public void setInterestRateType(InterestRateType interestRateType) {
+        this.interestRateType = interestRateType;
     }
 
     public int getNumberOfDaysAfterDueDate() {
@@ -1059,8 +1060,8 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     public static List<TreasuryTupleDataSourceBean> interestTypeDataSource() {
-        List<TreasuryTupleDataSourceBean> result = InterestType.findAll().stream()
-                .map((it) -> new TreasuryTupleDataSourceBean(it.name(), it.getDescriptionI18N().getContent()))
+        List<TreasuryTupleDataSourceBean> result = InterestRateType.getAvailableInterestRateTypesSortedByName().stream() //
+                .map(it -> new TreasuryTupleDataSourceBean(it.getExternalId(), it.getDescription().getContent())) //
                 .collect(Collectors.toList());
 
         result.add(AcademicTreasuryConstants.SELECT_OPTION);
@@ -1152,7 +1153,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
     public List<String> validateStudentConditions() {
         List<String> result = Lists.newArrayList();
-        if (getTuitionPaymentPlanGroup().isForRegistration() &&  !hasAtLeastOneConditionSpecified()) {
+        if (getTuitionPaymentPlanGroup().isForRegistration() && !hasAtLeastOneConditionSpecified()) {
             result.add("error.TuitionPaymentPlan.specify.at.least.one.condition");
         }
 
