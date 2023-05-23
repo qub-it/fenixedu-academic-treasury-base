@@ -1,3 +1,5 @@
+- Improvement: Present document certification number and date in debt and payments reports
+
 8.7.2 (17-04-2023)
 - Bug Fix: Add temporary trigger to fix labels of due date calculation type #UL-REIT-3144
 
