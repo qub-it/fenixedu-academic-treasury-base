@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
+import org.fenixedu.treasury.domain.tariff.InterestRateType;
 import org.fenixedu.treasury.domain.tariff.InterestType;
 import org.fenixedu.treasury.domain.tariff.Tariff;
 import org.joda.time.LocalDate;
@@ -24,7 +25,7 @@ public class ReservationTaxTariff extends ReservationTaxTariff_Base {
     
     protected ReservationTaxTariff(ReservationTax reservationTax, ExecutionInterval executionInterval, BigDecimal baseAmount,
             DueDateCalculationType dueDateCalculationType, int numberOfDaysAfterCreationForDueDate, LocalDate fixedDueDate,
-            boolean applyInterests, InterestType interestType, BigDecimal interestFixedAmount) {
+            boolean applyInterests, InterestRateType interestRateType, BigDecimal interestFixedAmount) {
 
         this();
 
@@ -37,8 +38,14 @@ public class ReservationTaxTariff extends ReservationTaxTariff_Base {
         super.setFixedDueDate(fixedDueDate);
 
         super.setApplyInterests(applyInterests);
-        super.setInterestType(interestType);
-        super.setInterestFixedAmount(interestFixedAmount);
+        
+        if(applyInterests) {
+            super.setInterestRateType(interestRateType);
+            super.setInterestFixedAmount(interestFixedAmount);
+        } else {
+            super.setInterestRateType(null);
+            super.setInterestFixedAmount(null);
+        }
 
         checkRules();
     }
@@ -48,7 +55,7 @@ public class ReservationTaxTariff extends ReservationTaxTariff_Base {
     }
 
     public void edit(BigDecimal baseAmount, DueDateCalculationType dueDateCalculationType,
-            int numberOfDaysAfterCreationForDueDate, LocalDate fixedDueDate, boolean applyInterests, InterestType interestType,
+            int numberOfDaysAfterCreationForDueDate, LocalDate fixedDueDate, boolean applyInterests, InterestRateType interestRateType,
             BigDecimal interestFixedAmount) {
 
         super.setBaseAmount(baseAmount);
@@ -57,9 +64,15 @@ public class ReservationTaxTariff extends ReservationTaxTariff_Base {
         super.setFixedDueDate(fixedDueDate);
 
         super.setApplyInterests(applyInterests);
-        super.setInterestType(interestType);
-        super.setInterestFixedAmount(interestFixedAmount);
 
+        if(applyInterests) {
+            super.setInterestRateType(interestRateType);
+            super.setInterestFixedAmount(interestFixedAmount);
+        } else {
+            super.setInterestRateType(null);
+            super.setInterestFixedAmount(null);
+        }
+        
         checkRules();
     }
 
@@ -75,6 +88,7 @@ public class ReservationTaxTariff extends ReservationTaxTariff_Base {
         super.setDomainRoot(null);
         super.setReservationTax(null);
         super.setExecutionInterval(null);
+        super.setInterestRateType(null);
 
         getDegreesSet().clear();
 
@@ -84,6 +98,18 @@ public class ReservationTaxTariff extends ReservationTaxTariff_Base {
     public LocalDate calculateDueDate(final LocalDate requestDate) {
         return Tariff.calculateDueDate(requestDate, getDueDateCalculationType(), getNumberOfDaysAfterCreationForDueDate(),
                 getFixedDueDate());
+    }
+    
+    @Override
+    @Deprecated
+    public InterestType getInterestType() {
+        return super.getInterestType();
+    }
+    
+    @Override
+    @Deprecated
+    public void setInterestType(InterestType interestType) {
+        super.setInterestType(interestType);
     }
 
     // @formatter:off
@@ -97,10 +123,10 @@ public class ReservationTaxTariff extends ReservationTaxTariff_Base {
             ReservationTax reservationTax, ExecutionInterval executionInterval, 
             BigDecimal baseAmount, DueDateCalculationType dueDateCalculationType, int numberOfDaysAfterCreationForDueDate,
             LocalDate fixedDueDate,
-            boolean applyInterests, InterestType interestType, BigDecimal interestFixedAmount) {
+            boolean applyInterests, InterestRateType interestRateType, BigDecimal interestFixedAmount) {
 
         return new ReservationTaxTariff(reservationTax, executionInterval, baseAmount, dueDateCalculationType,
-                numberOfDaysAfterCreationForDueDate, fixedDueDate, applyInterests, interestType, interestFixedAmount);
+                numberOfDaysAfterCreationForDueDate, fixedDueDate, applyInterests, interestRateType, interestFixedAmount);
     }
 
     public static Stream<ReservationTaxTariff> findAll() {

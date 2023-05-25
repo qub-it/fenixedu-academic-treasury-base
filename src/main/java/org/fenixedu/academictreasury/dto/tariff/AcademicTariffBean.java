@@ -52,8 +52,9 @@ import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
+import org.fenixedu.treasury.domain.settings.TreasurySettings;
 import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
-import org.fenixedu.treasury.domain.tariff.InterestType;
+import org.fenixedu.treasury.domain.tariff.InterestRateType;
 import org.fenixedu.treasury.dto.ITreasuryBean;
 import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
 import org.joda.time.LocalDate;
@@ -71,7 +72,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
     /* InterestRate */
     private boolean applyInterests;
-    private InterestType interestType;
+    private InterestRateType interestRateType;
     private int numberOfDaysAfterDueDate;
     private boolean applyInFirstWorkday;
     private int maximumDaysToApplyPenalty;
@@ -127,7 +128,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
     /* Payor debt account */
     private DebtAccount payorDebtAccount;
-    
+
     public AcademicTariffBean() {
         setBeginDate(new LocalDate());
         setEndDate(new LocalDate().plusYears(1));
@@ -137,7 +138,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         setNumberOfDaysAfterCreationForDueDate(0);
         setApplyInterests(false);
 
-        setInterestType(InterestType.GLOBAL_RATE);
+        setInterestRateType(InterestRateType.getDefaultInterestRateType());
         setNumberOfDaysAfterDueDate(0);
         setApplyInFirstWorkday(false);
         setMaximumDaysToApplyPenalty(0);
@@ -175,7 +176,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         setNumberOfDaysAfterCreationForDueDate(academicTariff.getNumberOfDaysAfterCreationForDueDate());
         setApplyInterests(academicTariff.getApplyInterests());
 
-        setInterestType(academicTariff.isApplyInterests() ? academicTariff.getInterestRate().getInterestType() : null);
+        setInterestRateType(academicTariff.isApplyInterests() ? academicTariff.getInterestRate().getInterestRateType() : null);
         setNumberOfDaysAfterDueDate(
                 academicTariff.isApplyInterests() ? academicTariff.getInterestRate().getNumberOfDaysAfterDueDate() : 1);
         setApplyInFirstWorkday(
@@ -215,8 +216,8 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
         /* InterestRate */
         this.setApplyInterests(tuitionInstallmentTariff.getApplyInterests());
-        this.setInterestType(tuitionInstallmentTariff.isApplyInterests() ? tuitionInstallmentTariff.getInterestRate()
-                .getInterestType() : null);
+        this.setInterestRateType(tuitionInstallmentTariff.isApplyInterests() ? tuitionInstallmentTariff.getInterestRate()
+                .getInterestRateType() : null);
         this.setNumberOfDaysAfterDueDate(tuitionInstallmentTariff.isApplyInterests() ? tuitionInstallmentTariff.getInterestRate()
                 .getNumberOfDaysAfterDueDate() : 1);
         this.setApplyInFirstWorkday(tuitionInstallmentTariff.isApplyInterests() ? tuitionInstallmentTariff.getInterestRate()
@@ -247,8 +248,8 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         this.tuitionInstallmentProductDataSource = TuitionPaymentPlanBean.tuitionInstallmentProductDataSource(
                 tuitionInstallmentTariff.getTuitionPaymentPlan().getTuitionPaymentPlanGroup(),
                 tuitionInstallmentTariff.getProduct().getTuitionInstallmentOrder());
-        
-       this.setPayorDebtAccount(tuitionInstallmentTariff.getPayorDebtAccount()); 
+
+        this.setPayorDebtAccount(tuitionInstallmentTariff.getPayorDebtAccount());
     }
 
     public void resetFields() {
@@ -261,7 +262,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
             setFixedDueDate(null);
         }
 
-        if (getInterestType() == null) {
+        if (getInterestRateType() == null) {
             setNumberOfDaysAfterCreationForDueDate(0);
             setApplyInFirstWorkday(false);
             setRate(BigDecimal.ZERO);
@@ -269,7 +270,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
         setMaximumDaysToApplyPenalty(0);
 
-        if (getInterestType() == null || !getInterestType().isFixedAmount()) {
+        if (getInterestRateType() == null || !getInterestRateType().isInterestFixedAmountRequired()) {
             setInterestFixedAmount(BigDecimal.ZERO);
         }
 
@@ -497,12 +498,12 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
     /* InterestRate */
 
-    public InterestType getInterestType() {
-        return interestType;
+    public InterestRateType getInterestRateType() {
+        return interestRateType;
     }
 
-    public void setInterestType(InterestType interestType) {
-        this.interestType = interestType;
+    public void setInterestRateType(InterestRateType interestRateType) {
+        this.interestRateType = interestRateType;
     }
 
     public int getNumberOfDaysAfterDueDate() {
@@ -666,7 +667,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
     public DebtAccount getPayorDebtAccount() {
         return payorDebtAccount;
     }
-    
+
     public void setPayorDebtAccount(DebtAccount payorDebtAccount) {
         this.payorDebtAccount = payorDebtAccount;
     }
