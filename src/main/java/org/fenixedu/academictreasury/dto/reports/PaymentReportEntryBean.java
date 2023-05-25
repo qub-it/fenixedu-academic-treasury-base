@@ -172,6 +172,8 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
     }
     
     private void fillERPInformation(final SettlementNote settlementNote) {
+        ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
+        
         this.closeDate = settlementNote != null ? settlementNote.getCloseDate() : null;
         this.exportedInLegacyERP =
                 settlementNote != null ? settlementNote.isExportedInLegacyERP() : false;
@@ -190,6 +192,11 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
             if(settlementEntry.getInvoiceEntry().getFinantialDocument() != null && ((Invoice) settlementEntry.getInvoiceEntry().getFinantialDocument()).getPayorDebtAccount() != null) {
                 this.erpPayorCustomerId = ((Invoice) settlementEntry.getInvoiceEntry().getFinantialDocument()).getPayorDebtAccount().getCustomer().getErpCustomerId();
             }
+        }
+        
+        if(treasuryServices.hasCertifiedDocument(settlementNote)) {
+            this.erpCertificationDate = treasuryServices.getCertifiedDocumentDate(settlementNote);
+            this.erpCertificateDocumentReference = treasuryServices.getCertifiedDocumentNumber(settlementNote);
         }
     }
     

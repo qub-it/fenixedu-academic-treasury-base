@@ -327,6 +327,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     }
 
     private void fillERPInformation(final InvoiceEntry entry) {
+        ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
+        
         final Currency currency = entry.getDebtAccount().getFinantialInstitution().getCurrency();
 
         this.closeDate = entry.getFinantialDocument() != null ? entry.getFinantialDocument().getCloseDate() : null;
@@ -357,6 +359,11 @@ public class DebtReportEntryBean implements SpreadsheetRow {
             this.originSettlementNoteForAdvancedCredit =
                     advancedCreditNote.getAdvancedPaymentSettlementNote() != null ? advancedCreditNote
                             .getAdvancedPaymentSettlementNote().getUiDocumentNumber() : "";
+        }
+        
+        if(entry.getFinantialDocument() != null && treasuryServices.hasCertifiedDocument(entry.getFinantialDocument())) {
+            this.erpCertificationDate = treasuryServices.getCertifiedDocumentDate(entry.getFinantialDocument());
+            this.erpCertificateDocumentReference = treasuryServices.getCertifiedDocumentNumber(entry.getFinantialDocument());
         }
     }
 
