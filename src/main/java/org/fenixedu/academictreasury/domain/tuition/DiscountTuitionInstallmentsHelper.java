@@ -154,11 +154,11 @@ public class DiscountTuitionInstallmentsHelper {
     public TuitionDebitEntryBean buildInstallmentDebitEntryBeanWithDiscount(TuitionInstallmentTariff tuitionInstallmentTariff) {
 
         final int installmentOrder = tuitionInstallmentTariff.getInstallmentOrder();
-        final LocalizedString installmentName = tuitionPaymentPlan.installmentName(registration, tuitionInstallmentTariff);
-        final LocalDate dueDate = tuitionInstallmentTariff.dueDate(debtDate);
-        final Vat vat = tuitionInstallmentTariff.vat(debtDate);
+        final LocalizedString installmentName = this.tuitionPaymentPlan.installmentName(this.registration, tuitionInstallmentTariff);
+        final LocalDate dueDate = tuitionInstallmentTariff.dueDate(this.debtDate);
+        final Vat vat = tuitionInstallmentTariff.vat(this.debtDate);
         BigDecimal tuitionInstallmentAmountToPay =
-                tuitionInstallmentTariff.amountToPay(registration, enrolledEctsUnits, enrolledCoursesCount, this.calculatorsMap);
+                tuitionInstallmentTariff.amountToPay(this.registration, this.enrolledEctsUnits, this.enrolledCoursesCount, this.calculatorsMap);
         final Currency currency = tuitionInstallmentTariff.getFinantialEntity().getFinantialInstitution().getCurrency();
 
         BigDecimal amountToSubtractFromAmountToPay = BigDecimal.ZERO;

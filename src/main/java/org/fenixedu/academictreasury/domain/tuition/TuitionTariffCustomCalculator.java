@@ -41,6 +41,7 @@ import java.math.BigDecimal;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.student.Registration;
 
+@Deprecated
 public interface TuitionTariffCustomCalculator {
     public BigDecimal getTotalAmount();
 
