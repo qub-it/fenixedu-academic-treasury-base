@@ -40,7 +40,7 @@ import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.acade
 import org.fenixedu.commons.i18n.LocalizedString;
 
 public enum TuitionTariffCalculatedAmountType {
-    CAPTIVE, REMAINING, PERCENTAGE;
+    CAPTIVE, REMAINING, PERCENTAGE, TOTAL_CALCULATED_AMOUNT;
 
     public boolean isCaptive() {
         return this == CAPTIVE;
@@ -52,6 +52,10 @@ public enum TuitionTariffCalculatedAmountType {
 
     public boolean isPercentage() {
         return this == PERCENTAGE;
+    }
+    
+    public boolean isTotalCalculatedAmount() {
+        return this == TOTAL_CALCULATED_AMOUNT;
     }
 
     public LocalizedString getDescriptionI18N() {

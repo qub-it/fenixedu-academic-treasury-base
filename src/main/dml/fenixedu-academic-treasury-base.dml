@@ -494,6 +494,19 @@ class tuition.calculators.TuitionPaymentPlanCalculator {
 		}
 	}
 	
+	class tuition.calculators.TuitionCalculatorAggregator extends tuition.calculators.TuitionPaymentPlanCalculator {
+	}
+	
+	relation TuitionCalculatorAggregatorTuitionPaymentPlanCalculator {
+		tuition.calculators.TuitionCalculatorAggregator playsRole tuitionCalculatorParentAggregator {
+			multiplicity 0..1;
+		}
+		
+		tuition.calculators.TuitionPaymentPlanCalculator playsRole tuitionPaymentPlanCalculatorChild {
+			multiplicity *;
+		}
+	}
+	
 	class tuition.calculators.TestTuitionPaymentPlanCalculator extends tuition.calculators.TuitionPaymentPlanCalculator {
 		BigDecimal amount;
 	}
@@ -557,6 +570,16 @@ class tuition.TuitionConditionRule {
 	
 	relation TuitionConditionRuleTuitionPaymentPlan {
 		tuition.TuitionPaymentPlan playsRole tuitionPaymentPlan {
+			multiplicity 0..1;
+		}
+		
+		tuition.TuitionConditionRule playsRole tuitionConditionRules {
+			multiplicity *;
+		}
+	}
+	
+	relation TuitionConditionRuleTuitionPaymentPlanCalculator {
+		tuition.calculators.TuitionPaymentPlanCalculator playsRole tuitionPaymentPlanCalculator {
 			multiplicity 0..1;
 		}
 		

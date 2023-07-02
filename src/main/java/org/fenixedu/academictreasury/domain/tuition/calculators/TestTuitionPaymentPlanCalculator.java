@@ -1,5 +1,6 @@
 package org.fenixedu.academictreasury.domain.tuition.calculators;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Locale;
 
@@ -13,6 +14,8 @@ import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.TreasuryConstants;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalculator_Base {
 
@@ -114,6 +117,29 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
         calculator.setTuitionPaymentPlan(tuitionPaymentPlanTarget);
 
         return calculator;
+    }
+    
+    @Override
+    public TuitionPaymentPlanCalculator copyTo(TuitionCalculatorAggregator tuitionCalculatorAggregatorTarget) {
+        TestTuitionPaymentPlanCalculator calculator = new TestTuitionPaymentPlanCalculator();
+
+        calculator.setAmount(getAmount());
+        calculator.setTuitionCalculatorParentAggregator(tuitionCalculatorAggregatorTarget);
+        
+        return calculator;
+    }
+
+    @Override
+    public void fillWithParametersFromImportation(String parameters) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        
+        try {
+            BigDecimal amount = objectMapper.readValue(parameters, BigDecimal.class);
+            
+            super.setAmount(amount);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void delete() {

@@ -112,6 +112,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
     private FinantialEntity finantialEntity;
     private Product emolumentProduct;
     private String sheetName;
+    private String tuitionPaymentPlanCalculatorKey;
 
     /* Used in tuition installment tariff edition */
     private List<TreasuryTupleDataSourceBean> tuitionCalculationTypeDataSource = null;
@@ -642,6 +643,14 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
     public void setSheetName(String sheetName) {
         this.sheetName = sheetName;
+    }
+    
+    public String getTuitionPaymentPlanCalculatorKey() {
+        return tuitionPaymentPlanCalculatorKey;
+    }
+    
+    public void setTuitionPaymentPlanCalculatorKey(String tuitionPaymentPlanCalculatorKey) {
+        this.tuitionPaymentPlanCalculatorKey = tuitionPaymentPlanCalculatorKey;
     }
 
     public boolean isBeanInfoFilled() {

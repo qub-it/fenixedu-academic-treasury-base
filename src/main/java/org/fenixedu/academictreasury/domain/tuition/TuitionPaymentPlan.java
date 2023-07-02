@@ -194,10 +194,16 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         if (getTuitionInstallmentTariffsSet().isEmpty()) {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.installments.must.not.be.empty");
         }
-        if (existsAtLeastOneTariffCalculatedAmountWithoutOnlyOneRemaining()) {
+        
+        if (existsAtLeastOneCalculatorWithMoreThanOneRemaining()) {
             throw new AcademicTreasuryDomainException(
                     "error.TuitionPaymentPlan.installments.customCalculators.must.have.remaining");
         }
+        
+//        if (existsAtLeastOneTariffCalculatedAmountWithoutOnlyOneRemaining()) {
+//            throw new AcademicTreasuryDomainException(
+//                    "error.TuitionPaymentPlan.installments.customCalculators.must.have.remaining");
+//        }
 
         if ((getTuitionPaymentPlanGroup().isForStandalone() || getTuitionPaymentPlanGroup().isForExtracurricular())
                 && getTuitionInstallmentTariffsSet().size() > 1) {
@@ -222,6 +228,11 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     }
 
+    // TODO
+    private boolean existsAtLeastOneCalculatorWithMoreThanOneRemaining() {
+        return false;
+    }
+    
     private boolean existsAtLeastOneTariffCalculatedAmountWithoutOnlyOneRemaining() {
         if (Boolean.TRUE.equals(getTuitionPaymentPlanGroup().getApplyDomainObjectCalculators())) {
             return !getTuitionInstallmentTariffsSet().stream()

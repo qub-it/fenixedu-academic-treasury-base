@@ -37,6 +37,7 @@ package org.fenixedu.academictreasury.domain.tuition;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -104,11 +105,10 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
     }
 
     @Override
-    protected void init(FinantialEntity finantialEntity, Product product, DateTime beginDate,
-            DateTime endDate, DueDateCalculationType dueDateCalculationType, LocalDate fixedDueDate,
-            int numberOfDaysAfterCreationForDueDate, boolean applyInterests, InterestRateType interestRateType,
-            int numberOfDaysAfterDueDate, boolean applyInFirstWorkday, int maximumDaysToApplyPenalty,
-            BigDecimal interestFixedAmount, BigDecimal rate) {
+    protected void init(FinantialEntity finantialEntity, Product product, DateTime beginDate, DateTime endDate,
+            DueDateCalculationType dueDateCalculationType, LocalDate fixedDueDate, int numberOfDaysAfterCreationForDueDate,
+            boolean applyInterests, InterestRateType interestRateType, int numberOfDaysAfterDueDate, boolean applyInFirstWorkday,
+            int maximumDaysToApplyPenalty, BigDecimal interestFixedAmount, BigDecimal rate) {
         throw new RuntimeException("wrong call");
     }
 
@@ -289,14 +289,13 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
             return false;
         }
 
-        if (getTuitionCalculationType().isCalculatedAmount() && getTuitionTariffCalculatedAmountType() != null) {
-            if (getTuitionTariffCalculatedAmountType().isPercentage()) {
-                return false;
-            }
-
-            if (getTuitionTariffCalculatedAmountType().isRemaining()) {
-                return false;
-            }
+        List<TuitionTariffCalculatedAmountType> doNotRequiredFixedAmountList =
+                List.of(TuitionTariffCalculatedAmountType.PERCENTAGE, TuitionTariffCalculatedAmountType.REMAINING,
+                        TuitionTariffCalculatedAmountType.TOTAL_CALCULATED_AMOUNT);
+        
+        if (getTuitionCalculationType().isCalculatedAmount()
+                && doNotRequiredFixedAmountList.contains(getTuitionTariffCalculatedAmountType())) {
+            return false;
         }
 
         return true;
@@ -427,30 +426,29 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
             if (getTuitionTariffCalculatedAmountType().isCaptive()) {
                 amountToPay = getFixedAmount();
-            }
-            if (getTuitionTariffCalculatedAmountType().isPercentage()) {
+            } else if (getTuitionTariffCalculatedAmountType().isPercentage()) {
                 amountToPay = Currency.getValueWithScale(getFactor().multiply(customAmountWithoutCaptive));
-            }
-            if (getTuitionTariffCalculatedAmountType().isRemaining()) {
-                BigDecimal totalPercentageAmount = getTuitionPaymentPlan().getOrderedTuitionInstallmentTariffs().stream()
-                        .filter(tariff -> {
+            } else if (getTuitionTariffCalculatedAmountType().isRemaining()) {
+                BigDecimal totalPercentageAmount =
+                        getTuitionPaymentPlan().getOrderedTuitionInstallmentTariffs().stream().filter(tariff -> {
                             boolean isSameCalculator = false;
-                            if (Boolean.TRUE
-                                    .equals(getTuitionPaymentPlan().getTuitionPaymentPlanGroup().getApplyDomainObjectCalculators())) {
+                            if (Boolean.TRUE.equals(
+                                    getTuitionPaymentPlan().getTuitionPaymentPlanGroup().getApplyDomainObjectCalculators())) {
                                 isSameCalculator = tariff.getTuitionPaymentPlanCalculator() == getTuitionPaymentPlanCalculator();
                             } else {
-                                isSameCalculator = tariff.getTuitionTariffCustomCalculator().equals(getTuitionTariffCustomCalculator());
+                                isSameCalculator =
+                                        tariff.getTuitionTariffCustomCalculator().equals(getTuitionTariffCustomCalculator());
                             }
-                            
+
                             return tariff.getTuitionCalculationType().isCalculatedAmount()
-                                    && tariff.getTuitionTariffCalculatedAmountType().isPercentage()
-                                    && isSameCalculator;
-                        })
-                        .map(tariff -> Currency.getValueWithScale(tariff.getFactor().multiply(customAmountWithoutCaptive)))
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                                    && tariff.getTuitionTariffCalculatedAmountType().isPercentage() && isSameCalculator;
+                        }).map(tariff -> Currency.getValueWithScale(tariff.getFactor().multiply(customAmountWithoutCaptive)))
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                 BigDecimal totalTariffAmount = totalCaptiveAmount.add(totalPercentageAmount);
                 amountToPay = customAmount.subtract(totalTariffAmount);
+            } else if (getTuitionTariffCalculatedAmountType().isTotalCalculatedAmount()) {
+                amountToPay = customAmount;
             }
         }
 
@@ -491,28 +489,28 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
                     .multiply(getAmountPerEctsOrUnitUsingFunctionCostIndexed(enrolment));
         } else if (getTuitionCalculationType().isCalculatedAmount()) {
             BigDecimal customAmount = null;
-            
+
             if (Boolean.TRUE.equals(getTuitionPaymentPlan().getTuitionPaymentPlanGroup().getApplyDomainObjectCalculators())) {
                 customAmount = getTuitionPaymentPlanCalculator().getTotalAmount(enrolment);
             } else {
                 customAmount = calculatorsMap.get(getTuitionTariffCustomCalculator()).getTotalAmount();
             }
 
-            BigDecimal totalCaptiveAmount = getTuitionPaymentPlan().getOrderedTuitionInstallmentTariffs().stream()
-                    .filter(tariff -> {
+            BigDecimal totalCaptiveAmount =
+                    getTuitionPaymentPlan().getOrderedTuitionInstallmentTariffs().stream().filter(tariff -> {
                         boolean isSameCalculator = false;
 
-                        if (Boolean.TRUE.equals(getTuitionPaymentPlan().getTuitionPaymentPlanGroup().getApplyDomainObjectCalculators())) {
+                        if (Boolean.TRUE
+                                .equals(getTuitionPaymentPlan().getTuitionPaymentPlanGroup().getApplyDomainObjectCalculators())) {
                             isSameCalculator = tariff.getTuitionPaymentPlanCalculator() == getTuitionPaymentPlanCalculator();
                         } else {
-                            isSameCalculator = tariff.getTuitionTariffCustomCalculator().equals(getTuitionTariffCustomCalculator());
+                            isSameCalculator =
+                                    tariff.getTuitionTariffCustomCalculator().equals(getTuitionTariffCustomCalculator());
                         }
-                        
+
                         return tariff.getTuitionCalculationType().isCalculatedAmount()
-                                && tariff.getTuitionTariffCalculatedAmountType().isCaptive()
-                                && isSameCalculator;
-                    })
-                    .map(tariff -> tariff.getFixedAmount()).reduce(BigDecimal.ZERO, BigDecimal::add);
+                                && tariff.getTuitionTariffCalculatedAmountType().isCaptive() && isSameCalculator;
+                    }).map(tariff -> tariff.getFixedAmount()).reduce(BigDecimal.ZERO, BigDecimal::add);
             BigDecimal customAmountWithoutCaptive = customAmount.subtract(totalCaptiveAmount);
 
             if (getTuitionTariffCalculatedAmountType().isCaptive()) {
@@ -522,22 +520,22 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
                 amountToPay = Currency.getValueWithScale(getFactor().multiply(customAmountWithoutCaptive));
             }
             if (getTuitionTariffCalculatedAmountType().isRemaining()) {
-                BigDecimal totalPercentageAmount = getTuitionPaymentPlan().getOrderedTuitionInstallmentTariffs().stream()
-                        .filter(tariff -> {
+                BigDecimal totalPercentageAmount =
+                        getTuitionPaymentPlan().getOrderedTuitionInstallmentTariffs().stream().filter(tariff -> {
                             boolean isSameCalculator = false;
-                            
-                            if (Boolean.TRUE.equals(getTuitionPaymentPlan().getTuitionPaymentPlanGroup().getApplyDomainObjectCalculators())) {
+
+                            if (Boolean.TRUE.equals(
+                                    getTuitionPaymentPlan().getTuitionPaymentPlanGroup().getApplyDomainObjectCalculators())) {
                                 isSameCalculator = tariff.getTuitionPaymentPlanCalculator() == getTuitionPaymentPlanCalculator();
                             } else {
-                                isSameCalculator = tariff.getTuitionTariffCustomCalculator().equals(getTuitionTariffCustomCalculator());
+                                isSameCalculator =
+                                        tariff.getTuitionTariffCustomCalculator().equals(getTuitionTariffCustomCalculator());
                             }
-                            
+
                             return tariff.getTuitionCalculationType().isCalculatedAmount()
-                                    && tariff.getTuitionTariffCalculatedAmountType().isPercentage()
-                                    && isSameCalculator;
-                        })
-                        .map(tariff -> Currency.getValueWithScale(tariff.getFactor().multiply(customAmountWithoutCaptive)))
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                                    && tariff.getTuitionTariffCalculatedAmountType().isPercentage() && isSameCalculator;
+                        }).map(tariff -> Currency.getValueWithScale(tariff.getFactor().multiply(customAmountWithoutCaptive)))
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
                 BigDecimal totalTariffAmount = totalCaptiveAmount.add(totalPercentageAmount);
                 amountToPay = customAmount.subtract(totalTariffAmount);
@@ -556,7 +554,7 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
     }
 
     public DebitEntry createDebitEntryForRegistration(final DebtAccount debtAccount,
-            final AcademicTreasuryEvent academicTreasuryEvent, final LocalDate when, 
+            final AcademicTreasuryEvent academicTreasuryEvent, final LocalDate when,
             Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap,
             BigDecimal amountToDiscount) {
 
@@ -582,7 +580,8 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
         updatePriceValuesInEvent(academicTreasuryEvent);
 
-        final Map<String, String> fillPriceProperties = fillPricePropertiesForRegistration(academicTreasuryEvent, dueDate, when, calculatorsMap);
+        final Map<String, String> fillPriceProperties =
+                fillPricePropertiesForRegistration(academicTreasuryEvent, dueDate, when, calculatorsMap);
 
         final DebitEntry debitEntry = DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent,
                 vat(when), amount, dueDate, fillPriceProperties, getProduct(),
@@ -619,8 +618,8 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
         updatePriceValuesInEvent(academicTreasuryEvent);
 
-        final Map<String, String> fillPriceProperties =
-                fillPricePropertiesForStandaloneOrExtracurricular(academicTreasuryEvent, standaloneEnrolment, dueDate, calculatorsMap);
+        final Map<String, String> fillPriceProperties = fillPricePropertiesForStandaloneOrExtracurricular(academicTreasuryEvent,
+                standaloneEnrolment, dueDate, calculatorsMap);
 
         final DebitEntry debitEntry = DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent,
                 vat(when), amount, dueDate, fillPriceProperties, getProduct(),
@@ -649,8 +648,8 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
         updatePriceValuesInEvent(academicTreasuryEvent);
 
-        final Map<String, String> fillPriceProperties =
-                fillPricePropertiesForStandaloneOrExtracurricular(academicTreasuryEvent, extracurricularEnrolment, dueDate, calculatorsMap);
+        final Map<String, String> fillPriceProperties = fillPricePropertiesForStandaloneOrExtracurricular(academicTreasuryEvent,
+                extracurricularEnrolment, dueDate, calculatorsMap);
 
         final DebitEntry debitEntry = DebitEntry.create(Optional.empty(), debtAccount, academicTreasuryEvent, vat(when), amount,
                 dueDate, fillPriceProperties, getProduct(),
@@ -806,27 +805,38 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
                     AcademicTreasuryEvent.AcademicTreasuryEventKeys.COURSE_FUNCTION_COST.getDescriptionI18N().getContent(),
                     cost.getFunctionCost().toPlainString());
         } else if (getTuitionCalculationType().isCalculatedAmount()) {
-            if(getTuitionPaymentPlanCalculator() != null) {
-                propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.CUSTOM_CALCULATOR.getDescriptionI18N().getContent(),
+            if (getTuitionPaymentPlanCalculator() != null) {
+                propertiesMap.put(
+                        AcademicTreasuryEvent.AcademicTreasuryEventKeys.CUSTOM_CALCULATOR.getDescriptionI18N().getContent(),
                         getTuitionPaymentPlanCalculator().getClass().getSimpleName());
-            } else if(getTuitionTariffCustomCalculator() != null) {
-                propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.CUSTOM_CALCULATOR.getDescriptionI18N().getContent(),
-                        getTuitionTariffCustomCalculator().getSimpleName());                
+            } else if (getTuitionTariffCustomCalculator() != null) {
+                propertiesMap.put(
+                        AcademicTreasuryEvent.AcademicTreasuryEventKeys.CUSTOM_CALCULATOR.getDescriptionI18N().getContent(),
+                        getTuitionTariffCustomCalculator().getSimpleName());
             }
-            
+
             propertiesMap.put(
                     AcademicTreasuryEvent.AcademicTreasuryEventKeys.CALCULATED_AMOUNT_TYPE.getDescriptionI18N().getContent(),
                     getTuitionTariffCalculatedAmountType().getDescriptionI18N().getContent());
+
             if (getTuitionTariffCalculatedAmountType().isCaptive()) {
                 propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.FINAL_AMOUNT.getDescriptionI18N().getContent(),
                         getFinantialEntity().getFinantialInstitution().getCurrency()
                                 .getValueFor(amountToPay(academicTreasuryEvent, enrolment, calculatorsMap)));
             }
+
             if (getTuitionTariffCalculatedAmountType().isPercentage()) {
                 propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.FACTOR.getDescriptionI18N().getContent(),
                         getFactor().toPlainString());
             }
+
             if (getTuitionTariffCalculatedAmountType().isRemaining()) {
+                propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.FINAL_AMOUNT.getDescriptionI18N().getContent(),
+                        getFinantialEntity().getFinantialInstitution().getCurrency()
+                                .getValueFor(amountToPay(academicTreasuryEvent, enrolment, calculatorsMap)));
+            }
+
+            if (getTuitionTariffCalculatedAmountType().isTotalCalculatedAmount()) {
                 propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.FINAL_AMOUNT.getDescriptionI18N().getContent(),
                         getFinantialEntity().getFinantialInstitution().getCurrency()
                                 .getValueFor(amountToPay(academicTreasuryEvent, enrolment, calculatorsMap)));
@@ -901,20 +911,23 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
             propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.FINAL_AMOUNT.getDescriptionI18N().getContent(),
                     getFinantialEntity().getFinantialInstitution().getCurrency().getValueFor(amountToPay(event, calculatorsMap)));
         } else if (getTuitionCalculationType().isCalculatedAmount()) {
-            if(getTuitionPaymentPlanCalculator() != null) {
-                propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.CUSTOM_CALCULATOR.getDescriptionI18N().getContent(),
+            if (getTuitionPaymentPlanCalculator() != null) {
+                propertiesMap.put(
+                        AcademicTreasuryEvent.AcademicTreasuryEventKeys.CUSTOM_CALCULATOR.getDescriptionI18N().getContent(),
                         getTuitionPaymentPlanCalculator().getClass().getSimpleName());
-            } else if(getTuitionTariffCustomCalculator() != null) {
-                propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.CUSTOM_CALCULATOR.getDescriptionI18N().getContent(),
+            } else if (getTuitionTariffCustomCalculator() != null) {
+                propertiesMap.put(
+                        AcademicTreasuryEvent.AcademicTreasuryEventKeys.CUSTOM_CALCULATOR.getDescriptionI18N().getContent(),
                         getTuitionTariffCustomCalculator().getSimpleName());
             }
-            
+
             propertiesMap.put(
                     AcademicTreasuryEvent.AcademicTreasuryEventKeys.CALCULATED_AMOUNT_TYPE.getDescriptionI18N().getContent(),
                     getTuitionTariffCalculatedAmountType().getDescriptionI18N().getContent());
             if (getTuitionTariffCalculatedAmountType().isCaptive()) {
                 propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.FINAL_AMOUNT.getDescriptionI18N().getContent(),
-                        getFinantialEntity().getFinantialInstitution().getCurrency().getValueFor(amountToPay(event, calculatorsMap)));
+                        getFinantialEntity().getFinantialInstitution().getCurrency()
+                                .getValueFor(amountToPay(event, calculatorsMap)));
             }
             if (getTuitionTariffCalculatedAmountType().isPercentage()) {
                 propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.FACTOR.getDescriptionI18N().getContent(),
@@ -922,7 +935,8 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
             }
             if (getTuitionTariffCalculatedAmountType().isRemaining()) {
                 propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.FINAL_AMOUNT.getDescriptionI18N().getContent(),
-                        getFinantialEntity().getFinantialInstitution().getCurrency().getValueFor(amountToPay(event, calculatorsMap)));
+                        getFinantialEntity().getFinantialInstitution().getCurrency()
+                                .getValueFor(amountToPay(event, calculatorsMap)));
             }
         }
 
@@ -976,7 +990,7 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
         super.setTuitionTariffCustomCalculatorClassName(
                 bean.getTuitionTariffCustomCalculator() != null ? bean.getTuitionTariffCustomCalculator().getName() : null);
-        
+
         super.setTuitionPaymentPlanCalculator(bean.getTuitionPaymentPlanCalculator());
 
         this.setDueDateCalculationType(bean.getDueDateCalculationType());
@@ -1068,7 +1082,7 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
     public void setTuitionTariffCustomCalculator(Class<? extends TuitionTariffCustomCalculator> clazz) {
         setTuitionTariffCustomCalculatorClassName(clazz != null ? clazz.getName() : "");
     }
-    
+
     @Override
     public void setFixedDueDate(LocalDate fixedDueDate) {
         if (getDueDateCalculationType().isBestOfFixedDateAndDaysAfterCreation()) {
