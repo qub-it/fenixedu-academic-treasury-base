@@ -66,7 +66,6 @@ import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEventPayment;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
 import org.fenixedu.academic.domain.treasury.IImprovementTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.IPaymentReferenceCode;
-import org.fenixedu.academic.domain.treasury.ITuitionTreasuryEvent;
 import org.fenixedu.academictreasury.domain.emoluments.AcademicTax;
 import org.fenixedu.academictreasury.domain.emoluments.ServiceRequestMapEntry;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
@@ -103,7 +102,7 @@ import com.google.common.collect.Sets;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.core.AbstractDomainObject;
 
-public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements IAcademicTreasuryEvent, ITuitionTreasuryEvent,
+public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements IAcademicTreasuryEvent,
         IImprovementTreasuryEvent, IAcademicServiceRequestAndAcademicTaxTreasuryEvent {
 
     private static Logger logger = LoggerFactory.getLogger(AcademicTreasuryEvent.class);
@@ -1488,108 +1487,6 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
         return super.getAmountForUrgencyRate();
     }
 
-    /* -------------------
-     * TUITION INFORMATION
-     * -------------------
-     */
-
-    @Override
-    public int getTuitionInstallmentSize() {
-        if (!isForRegistrationTuition()) {
-            throw new AcademicTreasuryDomainException("error.AcademicTreasuryEvent.only.tuition.for.registration.supported");
-        }
-
-        return orderedTuitionDebitEntriesList().size();
-    }
-
-    @Override
-    public BigDecimal getTuitionInstallmentAmountToPay(final int installmentOrder) {
-        if (!isForRegistrationTuition()) {
-            throw new AcademicTreasuryDomainException("error.AcademicTreasuryEvent.only.tuition.for.registration.supported");
-        }
-
-        return orderedTuitionDebitEntriesList().get(installmentOrder).getOpenAmount();
-    }
-
-    @Override
-    public BigDecimal getTuitionInstallmentRemainingAmountToPay(final int installmentOrder) {
-        if (!isForRegistrationTuition()) {
-            throw new AcademicTreasuryDomainException("error.AcademicTreasuryEvent.only.tuition.for.registration.supported");
-        }
-
-        return orderedTuitionDebitEntriesList().get(installmentOrder).getOpenAmount();
-    }
-
-    @Override
-    public BigDecimal getTuitionInstallmentExemptedAmount(final int installmentOrder) {
-        if (!isForRegistrationTuition()) {
-            throw new AcademicTreasuryDomainException("error.AcademicTreasuryEvent.only.tuition.for.registration.supported");
-        }
-
-        final DebitEntry debitEntry = orderedTuitionDebitEntriesList().get(installmentOrder);
-
-        BigDecimal result = debitEntry.getNetExemptedAmount();
-        result = result.add(debitEntry.getCreditEntriesSet().stream().filter(l -> l.isFromExemption()).map(l -> l.getNetAmount())
-                .reduce((a, b) -> a.add(b)).orElse(BigDecimal.ZERO));
-
-        return result;
-    }
-
-    @Override
-    public LocalDate getTuitionInstallmentDueDate(final int installmentOrder) {
-        if (!isForRegistrationTuition()) {
-            throw new AcademicTreasuryDomainException("error.AcademicTreasuryEvent.only.tuition.for.registration.supported");
-        }
-
-        final DebitEntry debitEntry = orderedTuitionDebitEntriesList().get(installmentOrder);
-        return debitEntry.getDueDate();
-    }
-
-    @Override
-    public String getTuitionInstallmentDescription(final int installmentOrder) {
-        if (!isForRegistrationTuition()) {
-            throw new AcademicTreasuryDomainException("error.AcademicTreasuryEvent.only.tuition.for.registration.supported");
-        }
-
-        final DebitEntry debitEntry = orderedTuitionDebitEntriesList().get(installmentOrder);
-        return debitEntry.getDescription();
-    }
-
-    @Override
-    public boolean isTuitionInstallmentExempted(final int installmentOrder) {
-        if (!isForRegistrationTuition()) {
-            throw new AcademicTreasuryDomainException("error.AcademicTreasuryEvent.only.tuition.for.registration.supported");
-        }
-
-        final DebitEntry debitEntry = orderedTuitionDebitEntriesList().get(installmentOrder);
-        return TreasuryExemption.findUnique(this, debitEntry.getProduct()).isPresent();
-    }
-
-    @Override
-    public String getTuitionInstallmentExemptionReason(final int installmentOrder) {
-        if (!isForRegistrationTuition()) {
-            throw new AcademicTreasuryDomainException("error.AcademicTreasuryEvent.only.tuition.for.registration.supported");
-        }
-
-        final DebitEntry debitEntry = orderedTuitionDebitEntriesList().get(installmentOrder);
-        if (!TreasuryExemption.findUnique(this, debitEntry.getProduct()).isPresent()) {
-            return null;
-        }
-
-        return TreasuryExemption.findUnique(this, debitEntry.getProduct()).get().getReason();
-    }
-
-    @Override
-    public List<IAcademicTreasuryEventPayment> getTuitionInstallmentPaymentsList(final int installmentOrder) {
-        if (!isForRegistrationTuition()) {
-            throw new AcademicTreasuryDomainException("error.AcademicTreasuryEvent.only.tuition.for.registration.supported");
-        }
-
-        final DebitEntry debitEntry = orderedTuitionDebitEntriesList().get(installmentOrder);
-
-        return debitEntry.getSettlementEntriesSet().stream().map(l -> new AcademicTreasuryEventPayment(l))
-                .collect(Collectors.toList());
-    }
 
     /*
      * -----------
@@ -1634,7 +1531,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     @Override
-    public BigDecimal getAmountToPay(final EnrolmentEvaluation enrolmentEvaluation) {
+    public BigDecimal getAmountWithVatToPay(final EnrolmentEvaluation enrolmentEvaluation) {
         if (!findActiveEnrolmentEvaluationDebitEntry(enrolmentEvaluation).isPresent()) {
             return BigDecimal.ZERO;
         }
@@ -1654,7 +1551,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     }
 
     @Override
-    public BigDecimal getExemptedAmount(final EnrolmentEvaluation enrolmentEvaluation) {
+    public BigDecimal getNetExemptedAmount(final EnrolmentEvaluation enrolmentEvaluation) {
         if (!isExempted(enrolmentEvaluation)) {
             return BigDecimal.ZERO;
         }

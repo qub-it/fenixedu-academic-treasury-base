@@ -38,6 +38,7 @@ package org.fenixedu.academictreasury.services;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -97,6 +98,10 @@ public class TuitionServices {
 
     public static synchronized void registerTuitionServiceExtension(final ITuitionServiceExtension extension) {
         TUITION_SERVICE_EXTENSIONS.add(extension);
+    }
+    
+    public static List<ITuitionServiceExtension> TUITION_SERVICE_EXTENSIONS() {
+        return Collections.unmodifiableList(TUITION_SERVICE_EXTENSIONS);
     }
 
     public static boolean isToPayRegistrationTuition(final Registration registration, final ExecutionYear executionYear) {
@@ -533,7 +538,7 @@ public class TuitionServices {
             final Currency currency = tuitionInstallmentTariff.getFinantialEntity().getFinantialInstitution().getCurrency();
 
             entries.add(
-                    new TuitionDebitEntryBean(installmentOrder, installmentName, dueDate, vat.getTaxRate(), amount, currency));
+                    new TuitionDebitEntryBean(installmentOrder, tuitionInstallmentTariff, installmentName, dueDate, vat.getTaxRate(), amount, currency));
         }
 
         return entries.stream().sorted((o1, o2) -> o1.getInstallmentOrder() - o2.getInstallmentOrder())
@@ -808,7 +813,7 @@ public class TuitionServices {
             final Currency currency = tuitionInstallmentTariff.getFinantialEntity().getFinantialInstitution().getCurrency();
 
             entries.add(
-                    new TuitionDebitEntryBean(installmentOrder, installmentName, dueDate, vat.getTaxRate(), amount, currency));
+                    new TuitionDebitEntryBean(installmentOrder, tuitionInstallmentTariff, installmentName, dueDate, vat.getTaxRate(), amount, currency));
         }
 
         return entries.stream().sorted((o1, o2) -> o1.getInstallmentOrder() - o2.getInstallmentOrder())

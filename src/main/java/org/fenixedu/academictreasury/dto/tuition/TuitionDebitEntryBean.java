@@ -37,6 +37,7 @@ package org.fenixedu.academictreasury.dto.tuition;
 
 import java.math.BigDecimal;
 
+import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Currency;
 import org.joda.time.LocalDate;
@@ -44,6 +45,7 @@ import org.joda.time.LocalDate;
 public class TuitionDebitEntryBean {
 
     private int installmentOrder;
+    private TuitionInstallmentTariff tuitionInstallmentTariff;
     private LocalizedString description;
     private LocalDate dueDate;
     private BigDecimal vatRate;
@@ -51,10 +53,11 @@ public class TuitionDebitEntryBean {
     private BigDecimal exemptedAmount;
     private Currency currency;
 
-    public TuitionDebitEntryBean(final int installmentOrder, final LocalizedString description, final LocalDate dueDate,
-            final BigDecimal vatRate, final BigDecimal amount, final Currency currency) {
+    public TuitionDebitEntryBean(int installmentOrder, TuitionInstallmentTariff tuitionInstallmentTariff, LocalizedString description, LocalDate dueDate,
+            BigDecimal vatRate, BigDecimal amount, Currency currency) {
         super();
         this.installmentOrder = installmentOrder;
+        this.tuitionInstallmentTariff = tuitionInstallmentTariff;
         this.description = description;
         this.dueDate = dueDate;
         this.vatRate = vatRate;
@@ -62,9 +65,9 @@ public class TuitionDebitEntryBean {
         this.currency = currency;
     }
 
-    public TuitionDebitEntryBean(int installmentOrder, LocalizedString description, LocalDate dueDate,
+    public TuitionDebitEntryBean(int installmentOrder, TuitionInstallmentTariff tuitionInstallmentTariff, LocalizedString description, LocalDate dueDate,
             BigDecimal vatRate, BigDecimal amount, BigDecimal exemptedAmount, Currency currency) {
-        this(installmentOrder, description, dueDate, vatRate, amount, currency);
+        this(installmentOrder, tuitionInstallmentTariff, description, dueDate, vatRate, amount, currency);
         this.exemptedAmount = exemptedAmount;
     }
     
@@ -74,6 +77,14 @@ public class TuitionDebitEntryBean {
     
     public void setInstallmentOrder(int installmentOrder) {
         this.installmentOrder = installmentOrder;
+    }
+    
+    public TuitionInstallmentTariff getTuitionInstallmentTariff() {
+        return tuitionInstallmentTariff;
+    }
+    
+    public void setTuitionInstallmentTariff(TuitionInstallmentTariff tuitionInstallmentTariff) {
+        this.tuitionInstallmentTariff = tuitionInstallmentTariff;
     }
 
     public LocalizedString getDescription() {

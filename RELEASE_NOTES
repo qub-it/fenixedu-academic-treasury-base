@@ -1,3 +1,14 @@
+- Refactor: Remove ITuitionTreasuryEvent methods from AcademicTreasuryEvent
+- Refactor: Rename AcademicTreasuryEvent::getAmountToPay to AcademicTreasuryEvent::getAmountWithVatToPay
+- Refactor: Rename AcademicTreasuryEvent::getExemptedAmount to AcademicTreasuryEvent::getNetExemptedAmount
+- Refactor: Replace invocation of TreasuryEvent::getAmountWithVatToPay(customer, null) to TreasuryEvent::getAmountWithVatToPay(customer)
+- Refactor: Rename ReservationTaxEventTarget::getAmountToPay to ReservationTaxEventTarget::getAmountWithVatToPay
+- Refactor: Remove references of ITuitionTreasuryEvent in AcademicTreasuryBridgeImpl
+- Refactor: Add TuitionInstallmentTariff property in bean TuitionDebitEntryBean, to help in recalculation of tuition installments
+- Refactor: Add helper method TuitionInstallmentTariff::createRecalculationDebitEntryForRegistration, to create an additional recalculated installment debit entry
+- Refactor: Remove empty method TuitionInstallmentTariff::updatePriceValuesInEvent
+- Improvement: Add new service to create tuition payment plan debts, that support recalculation of installments and and easier fluid interface to pass the arguments to the service
+
 10.1.0 (10-07-2023)
 - New feature: Tuition payment plan aggregators
 

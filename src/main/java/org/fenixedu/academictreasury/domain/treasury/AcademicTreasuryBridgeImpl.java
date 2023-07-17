@@ -60,7 +60,6 @@ import org.fenixedu.academic.domain.treasury.ITreasuryCustomer;
 import org.fenixedu.academic.domain.treasury.ITreasuryDebtAccount;
 import org.fenixedu.academic.domain.treasury.ITreasuryEntity;
 import org.fenixedu.academic.domain.treasury.ITreasuryProduct;
-import org.fenixedu.academic.domain.treasury.ITuitionTreasuryEvent;
 import org.fenixedu.academictreasury.domain.academicalAct.AcademicActBlockingSuspension;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.debtGeneration.AcademicDebtGenerationRule;
@@ -325,25 +324,25 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
      */
 
     @Override
-    public ITuitionTreasuryEvent getTuitionForRegistrationTreasuryEvent(final Registration registration,
+    public IAcademicTreasuryEvent getTuitionForRegistrationTreasuryEvent(final Registration registration,
             final ExecutionYear executionYear) {
         return TuitionServices.findAcademicTreasuryEventTuitionForRegistration(registration, executionYear);
     }
 
     @Override
-    public ITuitionTreasuryEvent getTuitionForStandaloneTreasuryEvent(final Registration registration,
+    public IAcademicTreasuryEvent getTuitionForStandaloneTreasuryEvent(final Registration registration,
             final ExecutionYear executionYear) {
         return TuitionServices.findAcademicTreasuryEventTuitionForStandalone(registration, executionYear);
     }
 
     @Override
-    public ITuitionTreasuryEvent getTuitionForExtracurricularTreasuryEvent(final Registration registration,
+    public IAcademicTreasuryEvent getTuitionForExtracurricularTreasuryEvent(final Registration registration,
             final ExecutionYear executionYear) {
         return null;
     }
 
     @Override
-    public ITuitionTreasuryEvent getTuitionForImprovementTreasuryEvent(final Registration registration,
+    public IAcademicTreasuryEvent getTuitionForImprovementTreasuryEvent(final Registration registration,
             final ExecutionYear executionYear) {
         return AcademicTaxServices.findAcademicTreasuryEventForImprovementTax(registration, executionYear);
     }

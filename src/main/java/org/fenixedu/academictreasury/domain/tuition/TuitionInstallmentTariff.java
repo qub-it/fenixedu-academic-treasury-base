@@ -578,13 +578,47 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
         final LocalDate dueDate = dueDate(when != null ? when : new LocalDate());
 
-        updatePriceValuesInEvent(academicTreasuryEvent);
-
         final Map<String, String> fillPriceProperties =
                 fillPricePropertiesForRegistration(academicTreasuryEvent, dueDate, when, calculatorsMap);
 
         final DebitEntry debitEntry = DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent,
                 vat(when), amount, dueDate, fillPriceProperties, getProduct(),
+                installmentName(academicTreasuryEvent.getRegistration()).getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE),
+                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay());
+
+        if (isAcademicalActBlockingOff()) {
+            debitEntry.markAcademicalActBlockingSuspension();
+        }
+
+        if (isBlockAcademicActsOnDebt()) {
+            debitEntry.markBlockAcademicActsOnDebt();
+        }
+
+        debitEntry.setPayorDebtAccount(getPayorDebtAccount());
+
+        return debitEntry;
+    }
+
+    public DebitEntry createRecalculationDebitEntryForRegistration(DebtAccount debtAccount,
+            AcademicTreasuryEvent academicTreasuryEvent, LocalDate when,
+            Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap,
+            BigDecimal recalculatedAmount, LocalDate recalculationDueDate) {
+
+        if (!getTuitionPaymentPlan().getTuitionPaymentPlanGroup().isForRegistration()) {
+            throw new RuntimeException("wrong call");
+        }
+
+        if (TreasuryConstants.isNegative(recalculatedAmount)) {
+            throw new RuntimeException("invalid tuition installment amount");
+        }
+
+        Map<String, String> fillPriceProperties =
+                fillPricePropertiesForRegistration(academicTreasuryEvent, recalculationDueDate, when, calculatorsMap);
+
+        fillPriceProperties.put("RECALCULATED_AMOUNT", recalculatedAmount.toString());
+        
+        DebitEntry debitEntry = DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent,
+                vat(when), recalculatedAmount, recalculationDueDate, fillPriceProperties, getProduct(),
                 installmentName(academicTreasuryEvent.getRegistration()).getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE),
                 AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay());
 
@@ -616,8 +650,6 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         final BigDecimal amount = amountToPay(academicTreasuryEvent, standaloneEnrolment, calculatorsMap);
         final LocalDate dueDate = dueDate(when != null ? when : new LocalDate());
 
-        updatePriceValuesInEvent(academicTreasuryEvent);
-
         final Map<String, String> fillPriceProperties = fillPricePropertiesForStandaloneOrExtracurricular(academicTreasuryEvent,
                 standaloneEnrolment, dueDate, calculatorsMap);
 
@@ -646,8 +678,6 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
         final LocalDate dueDate = dueDate(when != null ? when : new LocalDate());
 
-        updatePriceValuesInEvent(academicTreasuryEvent);
-
         final Map<String, String> fillPriceProperties = fillPricePropertiesForStandaloneOrExtracurricular(academicTreasuryEvent,
                 extracurricularEnrolment, dueDate, calculatorsMap);
 
@@ -659,10 +689,6 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         academicTreasuryEvent.associateEnrolment(debitEntry, extracurricularEnrolment);
 
         return debitEntry;
-    }
-
-    private void updatePriceValuesInEvent(final AcademicTreasuryEvent academicTreasuryEvent) {
-
     }
 
     public LocalizedString installmentName(Registration registration) {

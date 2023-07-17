@@ -539,7 +539,7 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
 
             for (final ERPTuitionInfoTypeAcademicEntry academicEntry : type.getErpTuitionInfoTypeAcademicEntriesSet()) {
                 if(academicEntry.isAppliedOnAcademicTreasuryEvent(event, executionYear)) {
-                    totalAmount = totalAmount.add(event.getAmountToPay(customer, null))
+                    totalAmount = totalAmount.add(event.getAmountWithVatToPay(customer))
                             .subtract(event.getInterestsAmountToPay(customer, null));
                     continue academicTreasuryEventLoop;
                 }

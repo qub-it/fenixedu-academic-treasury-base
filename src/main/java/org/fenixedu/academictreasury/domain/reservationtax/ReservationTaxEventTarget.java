@@ -234,11 +234,11 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
         return api.getAcademicTreasuryEventForTarget(this);
     }
 
-    public BigDecimal getAmountToPay() {
+    public BigDecimal getAmountWithVatToPay() {
         IAcademicTreasuryEvent academicTreasuryEvent = getReservationTaxAcademicTreasuryEvent();
 
         if (academicTreasuryEvent != null) {
-            return academicTreasuryEvent.getAmountToPay();
+            return academicTreasuryEvent.getAmountWithVatToPay();
         }
 
         return BigDecimal.ZERO;

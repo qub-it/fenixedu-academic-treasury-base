@@ -201,10 +201,10 @@ public class DiscountTuitionInstallmentsHelper {
         finalAmountToPay = finalAmountToPay.subtract(totalAmountToExempt);
 
         if (TreasuryConstants.isPositive(totalAmountToExempt)) {
-            return new TuitionDebitEntryBean(installmentOrder, installmentName, dueDate, vat.getTaxRate(), finalAmountToPay,
+            return new TuitionDebitEntryBean(installmentOrder, tuitionInstallmentTariff, installmentName, dueDate, vat.getTaxRate(), finalAmountToPay,
                     totalAmountToExempt, currency);
         } else {
-            return new TuitionDebitEntryBean(installmentOrder, installmentName, dueDate, vat.getTaxRate(), finalAmountToPay,
+            return new TuitionDebitEntryBean(installmentOrder, tuitionInstallmentTariff, installmentName, dueDate, vat.getTaxRate(), finalAmountToPay,
                     currency);
         }
     }
@@ -226,7 +226,7 @@ public class DiscountTuitionInstallmentsHelper {
 
         TreeMap<TreasuryEvent, BigDecimal> result = new TreeMap<>(TREASURY_EVENT_COMPARATOR);
         getOtherEventsToDiscountInTuitionFee(this.person, this.executionYear, degreeCurricularPlan)
-                .forEach(ev -> result.put(ev, ev.getAmountToPay()));
+                .forEach(ev -> result.put(ev, ev.getAmountWithVatToPay()));
 
         return result;
     }
