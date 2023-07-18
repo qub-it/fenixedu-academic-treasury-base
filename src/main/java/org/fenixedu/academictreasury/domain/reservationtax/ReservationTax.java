@@ -80,6 +80,10 @@ public class ReservationTax extends ReservationTax_Base {
         if (getTaxReservationDescription() == null) {
             throw new AcademicTreasuryDomainException("error.ReservationTax.taxReservationDescription.required");
         }
+        
+        if(getTreasuryExemptionType() == null) {
+            throw new AcademicTreasuryDomainException("error.ReservationTax.treasuryExemptionType.required");
+        }
     }
 
     public void edit(String code, LocalizedString name, FinantialEntity finantialEntity, Product product, boolean discountInTuitionFee,

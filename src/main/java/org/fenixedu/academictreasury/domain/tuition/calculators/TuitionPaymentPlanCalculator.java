@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academictreasury.domain.tuition.ITuitionRegistrationServiceParameters;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.commons.i18n.LocalizedString;
 
@@ -28,8 +29,16 @@ abstract public class TuitionPaymentPlanCalculator extends TuitionPaymentPlanCal
     public abstract boolean isValid();
 
     public abstract BigDecimal getTotalAmount(Registration registration);
+    
+    public BigDecimal getTotalAmount(Registration registration, ITuitionRegistrationServiceParameters parameters) {
+        return getTotalAmount(registration);
+    }
 
     public abstract BigDecimal getTotalAmount(Enrolment enrolment);
+    
+    public BigDecimal getTotalAmount(Enrolment enrolment, ITuitionRegistrationServiceParameters parameters) {
+        return getTotalAmount(enrolment);
+    }
 
     public abstract String getCalculationDescription(Registration registration);
 

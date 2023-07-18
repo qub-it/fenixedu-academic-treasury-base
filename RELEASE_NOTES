@@ -8,6 +8,9 @@
 - Refactor: Add helper method TuitionInstallmentTariff::createRecalculationDebitEntryForRegistration, to create an additional recalculated installment debit entry
 - Refactor: Remove empty method TuitionInstallmentTariff::updatePriceValuesInEvent
 - Improvement: Add new service to create tuition payment plan debts, that support recalculation of installments and and easier fluid interface to pass the arguments to the service
+- Refactor: Reservation Tax now requires treasury exemption
+- Refactor: Overloaded methods for TuitionInstallmentTariff::amountToPay and TuitionInstallmentTariff::createDebitEntryForRegistration, to receive ITuitionRegistrationParameters, in order to be able to receive more parameters to control tuition calculation amounts
+- Refactor: Overload TuitionPaymentPlanCalculation::getTotal to receive ITuitionRegistrationParameters, to be more flexible in receiving parameters
 
 10.1.0 (10-07-2023)
 - New feature: Tuition payment plan aggregators

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Function;
@@ -25,6 +26,7 @@ import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
+import org.fenixedu.academictreasury.domain.tuition.ITuitionRegistrationServiceParameters;
 import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
@@ -54,7 +56,7 @@ import org.joda.time.LocalDate;
 
 import com.google.common.base.Strings;
 
-public class RegistrationTuitionService {
+public class RegistrationTuitionService implements ITuitionRegistrationServiceParameters {
 
     boolean isForCalculationsOfOriginalAmounts = false;
 
@@ -183,7 +185,7 @@ public class RegistrationTuitionService {
                     || this.installmentOptions.installments.contains(tariff.getProduct());
 
             if (allowToCreateTheInstallment && !academicTreasuryEvent.isChargedWithDebitEntry(tariff)) {
-                BigDecimal tuitionInstallmentAmountToPay = tariff.amountToPay(academicTreasuryEvent, this._calculatorsMap);
+                BigDecimal tuitionInstallmentAmountToPay = tariff.amountToPay(this);
 
                 Map<TreasuryExemptionType, BigDecimal> exemptionsToApplyMap = new HashMap<>();
                 getAndDecrementFromDiscountMap(tuitionInstallmentAmountToPay, exemptionsToApplyMap);
@@ -263,13 +265,14 @@ public class RegistrationTuitionService {
 
                         // Create a new debit entry
                         Map<TreasuryExemptionType, BigDecimal> exemptionsToApplyMap = new HashMap<>();
-                        getAndDecrementFromDiscountMap(originalBean.getAmount(), exemptionsToApplyMap);
+                        getAndDecrementFromDiscountMap(originalBean.getAmount().add(originalBean.getExemptedAmount()),
+                                exemptionsToApplyMap);
 
                         createDebitEntryForRegistrationAndExempt(debtDate, debtAccount, academicTreasuryEvent, tariff,
                                 exemptionsToApplyMap);
                     }
                 } else {
-                    BigDecimal tuitionInstallmentAmountToPay = tariff.amountToPay(academicTreasuryEvent, this._calculatorsMap);
+                    BigDecimal tuitionInstallmentAmountToPay = tariff.amountToPay(this);
 
                     Map<TreasuryExemptionType, BigDecimal> exemptionsToApplyMap = new HashMap<>();
                     getAndDecrementFromDiscountMap(tuitionInstallmentAmountToPay, exemptionsToApplyMap);
@@ -293,7 +296,7 @@ public class RegistrationTuitionService {
     private void closeDebitEntriesInDebitNote(AcademicTreasuryEvent academicTreasuryEvent, Product product) {
         Predicate<DebitEntry> isDebitEntryInPreparingDocument =
                 de -> de.getFinantialDocument() != null && de.getFinantialDocument().isPreparing();
-                
+
         Map<DebtAccount, DebitNote> preparingDebitNotesMapByDebtAccount = DebitEntry.findActive(academicTreasuryEvent, product)
                 .filter(isDebitEntryInPreparingDocument).map(DebitEntry::getDebitNote)
                 .collect(Collectors.toMap(
@@ -377,8 +380,7 @@ public class RegistrationTuitionService {
     private Boolean createDebitEntryForRegistrationAndExempt(LocalDate debtDate, DebtAccount debtAccount,
             AcademicTreasuryEvent academicTreasuryEvent, TuitionInstallmentTariff tariff,
             Map<TreasuryExemptionType, BigDecimal> exemptionsToApplyMap) {
-        DebitEntry installmentDebitEntry = tariff.createDebitEntryForRegistration(debtAccount, academicTreasuryEvent, debtDate,
-                this._calculatorsMap, BigDecimal.ZERO);
+        DebitEntry installmentDebitEntry = tariff.createDebitEntryForRegistration(this);
 
         for (Entry<TreasuryExemptionType, BigDecimal> entry : exemptionsToApplyMap.entrySet()) {
             TreasuryExemptionType treasuryExemptionType = entry.getKey();
@@ -440,14 +442,18 @@ public class RegistrationTuitionService {
 
         var serviceBuilder = startServiceInvocation(registration, executionYear, debtDate);
 
-        serviceBuilder.applyEnrolledEctsUnits(serviceBuilder.enrolledEctsUnits);
-        serviceBuilder.applyEnrolledCoursesCount(serviceBuilder.enrolledCoursesCount);
+        serviceBuilder.applyEnrolledEctsUnits(this.registrationOptions.enrolledEctsUnits);
+        serviceBuilder.applyEnrolledCoursesCount(this.registrationOptions.enrolledCoursesCount);
+        serviceBuilder.applyDefaultEnrolmentCredits(this.registrationOptions.applyDefaultEnrolmentCredits);
 
         var tuitionPaymentPlanBuilder = serviceBuilder.withTuitionPaymentPlan(tuitionPaymentPlan);
 
         if (this.installmentOptions.installments != null) {
             var products = new HashSet<>(this.installmentOptions.installments);
-            products.addAll(this.installmentOptions.installments);
+
+            if (this.installmentRecalculationOptions.recalculateInstallments != null) {
+                products.addAll(this.installmentRecalculationOptions.recalculateInstallments.keySet());
+            }
 
             this._originalAmountsCalculator =
                     tuitionPaymentPlanBuilder.forceCreationIfNotEnrolled(true).restrictForInstallmentProducts(products)
@@ -641,8 +647,7 @@ public class RegistrationTuitionService {
                 return List.of(annulmentBean, recalculationBean);
             }
         } else {
-            BigDecimal tuitionInstallmentAmountToPay = tuitionInstallmentTariff.amountToPay(registration, enrolledEctsUnits,
-                    enrolledCoursesCount, this._calculatorsMap);
+            BigDecimal tuitionInstallmentAmountToPay = tuitionInstallmentTariff.amountToPay(this);
 
             if (!TreasuryConstants.isPositive(tuitionInstallmentAmountToPay)) {
                 return null;
@@ -722,7 +727,7 @@ public class RegistrationTuitionService {
                     .map(tariff -> tariff.getTuitionPaymentPlanCalculator()) //
                     .collect(Collectors.toSet()).forEach(calculator -> {
                         strBuilder.append(calculator.getName().getContent(services.defaultLocale())).append(" (")
-                                .append(calculator.getTotalAmount(registration)).append("): \n");
+                                .append(calculator.getTotalAmount(registration, this)).append("): \n");
 
                         strBuilder.append(calculator.getCalculationDescription(registration)).append("\n");
                     });
@@ -777,6 +782,8 @@ public class RegistrationTuitionService {
         BigDecimal enrolledEctsUnits;
         BigDecimal enrolledCoursesCount;
 
+        boolean applyDefaultEnrolmentCredits = false;
+
         RegistrationOptions(Registration registration, ExecutionYear executionYear, LocalDate debtDate) {
             this.registration = registration;
             this.executionYear = executionYear;
@@ -800,15 +807,15 @@ public class RegistrationTuitionService {
             return this;
         }
 
+        public RegistrationOptions applyDefaultEnrolmentCredits(boolean value) {
+            this.applyDefaultEnrolmentCredits = value;
+            return this;
+        }
+
         public TuitionOptions withTuitionPaymentPlan(TuitionPaymentPlan tuitionPaymentPlan) {
             return new TuitionOptions(tuitionPaymentPlan);
         }
 
-        /**
-         * 
-         * @param forceCreationIfNotEnrolled -
-         * @return
-         */
         public TuitionOptions withInferedTuitionPaymentPlan() {
             return new TuitionOptions();
         }
@@ -890,6 +897,76 @@ public class RegistrationTuitionService {
         InstallmentRecalculationOptions(Map<Product, LocalDate> recalculateInstallments) {
             this.recalculateInstallments = recalculateInstallments;
         }
+    }
+
+    @Override
+    public Registration getRegistration() {
+        return this.registrationOptions.registration;
+    }
+
+    @Override
+    public ExecutionYear getExecutionYear() {
+        return this.registrationOptions.executionYear;
+    }
+
+    @Override
+    public Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> getCustomCalculatorsMap() {
+        return this._calculatorsMap;
+    }
+
+    @Override
+    public BigDecimal getEnrolledEctsUnits() {
+        return this.registrationOptions.enrolledEctsUnits;
+    }
+
+    @Override
+    public BigDecimal getEnrolledCoursesCount() {
+        return this.registrationOptions.enrolledCoursesCount;
+    }
+
+    @Override
+    public boolean isApplyDefaultEnrolmentCredits() {
+        return this.registrationOptions.applyDefaultEnrolmentCredits;
+    }
+
+    @Override
+    public Optional<DebtAccount> getDebtAccount() {
+        final Person person = getRegistration().getPerson();
+        final String addressFiscalCountryCode = PersonCustomer.addressCountryCode(person);
+        final String fiscalNumber = PersonCustomer.fiscalNumber(person);
+        if (Strings.isNullOrEmpty(addressFiscalCountryCode) || Strings.isNullOrEmpty(fiscalNumber)) {
+            return Optional.empty();
+        }
+
+        // Read person customer
+
+        if (!PersonCustomer.findUnique(person, addressFiscalCountryCode, fiscalNumber).isPresent()) {
+            return Optional.empty();
+        }
+
+        final PersonCustomer personCustomer = PersonCustomer.findUnique(person, addressFiscalCountryCode, fiscalNumber).get();
+        if (!personCustomer.isActive()) {
+            return Optional.empty();
+        }
+
+        if (this.tuitionOptions.tuitionPaymentPlan == null) {
+            return Optional.empty();
+        }
+
+        TuitionPaymentPlan tuitionPaymentPlan = this.tuitionOptions.tuitionPaymentPlan;
+
+        return DebtAccount.findUnique(tuitionPaymentPlan.getFinantialEntity().getFinantialInstitution(), personCustomer);
+    }
+
+    @Override
+    public Optional<AcademicTreasuryEvent> getAcademicTreasuryEvent() {
+        return AcademicTreasuryEvent.findUniqueForRegistrationTuition(getRegistration(), getExecutionYear())
+                .map(AcademicTreasuryEvent.class::cast);
+    }
+
+    @Override
+    public LocalDate getDebtDate() {
+        return this.registrationOptions.debtDate;
     }
 
 }

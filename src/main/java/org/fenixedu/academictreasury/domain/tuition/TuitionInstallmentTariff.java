@@ -292,7 +292,7 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         List<TuitionTariffCalculatedAmountType> doNotRequiredFixedAmountList =
                 List.of(TuitionTariffCalculatedAmountType.PERCENTAGE, TuitionTariffCalculatedAmountType.REMAINING,
                         TuitionTariffCalculatedAmountType.TOTAL_CALCULATED_AMOUNT);
-        
+
         if (getTuitionCalculationType().isCalculatedAmount()
                 && doNotRequiredFixedAmountList.contains(getTuitionTariffCalculatedAmountType())) {
             return false;
@@ -377,6 +377,7 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
                 .multiply(AcademicTreasuryConstants.divide(cost.getFunctionCost(), BigDecimal.TEN).add(BigDecimal.ONE));
     }
 
+    // Mark as deprecated
     public BigDecimal amountToPay(final AcademicTreasuryEvent academicTreasuryEvent,
             Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap) {
         final BigDecimal enrolledEctsUnits = academicTreasuryEvent.getEnrolledEctsUnits();
@@ -385,6 +386,7 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
     }
 
+    // Mark as deprecated
     public BigDecimal amountToPay(Registration registration, final BigDecimal enrolledEctsUnits,
             final BigDecimal enrolledCoursesCount,
             Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap) {
@@ -403,6 +405,88 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
             BigDecimal customAmount = null;
             if (Boolean.TRUE.equals(getTuitionPaymentPlan().getTuitionPaymentPlanGroup().getApplyDomainObjectCalculators())) {
                 customAmount = getTuitionPaymentPlanCalculator().getTotalAmount(registration);
+            } else {
+                customAmount = calculatorsMap.get(getTuitionTariffCustomCalculator()).getTotalAmount();
+            }
+
+            BigDecimal totalCaptiveAmount =
+                    getTuitionPaymentPlan().getOrderedTuitionInstallmentTariffs().stream().filter(tariff -> {
+                        boolean isSameCalculator = false;
+
+                        if (Boolean.TRUE
+                                .equals(getTuitionPaymentPlan().getTuitionPaymentPlanGroup().getApplyDomainObjectCalculators())) {
+                            isSameCalculator = tariff.getTuitionPaymentPlanCalculator() == getTuitionPaymentPlanCalculator();
+                        } else {
+                            isSameCalculator =
+                                    tariff.getTuitionTariffCustomCalculator().equals(getTuitionTariffCustomCalculator());
+                        }
+
+                        return tariff.getTuitionCalculationType().isCalculatedAmount()
+                                && tariff.getTuitionTariffCalculatedAmountType().isCaptive() && isSameCalculator;
+                    }).map(tariff -> tariff.getFixedAmount()).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal customAmountWithoutCaptive = customAmount.subtract(totalCaptiveAmount);
+
+            if (getTuitionTariffCalculatedAmountType().isCaptive()) {
+                amountToPay = getFixedAmount();
+            } else if (getTuitionTariffCalculatedAmountType().isPercentage()) {
+                amountToPay = Currency.getValueWithScale(getFactor().multiply(customAmountWithoutCaptive));
+            } else if (getTuitionTariffCalculatedAmountType().isRemaining()) {
+                BigDecimal totalPercentageAmount =
+                        getTuitionPaymentPlan().getOrderedTuitionInstallmentTariffs().stream().filter(tariff -> {
+                            boolean isSameCalculator = false;
+                            if (Boolean.TRUE.equals(
+                                    getTuitionPaymentPlan().getTuitionPaymentPlanGroup().getApplyDomainObjectCalculators())) {
+                                isSameCalculator = tariff.getTuitionPaymentPlanCalculator() == getTuitionPaymentPlanCalculator();
+                            } else {
+                                isSameCalculator =
+                                        tariff.getTuitionTariffCustomCalculator().equals(getTuitionTariffCustomCalculator());
+                            }
+
+                            return tariff.getTuitionCalculationType().isCalculatedAmount()
+                                    && tariff.getTuitionTariffCalculatedAmountType().isPercentage() && isSameCalculator;
+                        }).map(tariff -> Currency.getValueWithScale(tariff.getFactor().multiply(customAmountWithoutCaptive)))
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                BigDecimal totalTariffAmount = totalCaptiveAmount.add(totalPercentageAmount);
+                amountToPay = customAmount.subtract(totalTariffAmount);
+            } else if (getTuitionTariffCalculatedAmountType().isTotalCalculatedAmount()) {
+                amountToPay = customAmount;
+            }
+        }
+
+        if (amountToPay == null) {
+            throw new AcademicTreasuryDomainException("error.TuitionInstallmentTariff.unknown.amountToPay");
+        }
+
+        if (isApplyMaximumAmount() && AcademicTreasuryConstants.isGreaterThan(amountToPay, getMaximumAmount())) {
+            return getMaximumAmount();
+        }
+
+        return amountToPay;
+    }
+
+    public BigDecimal amountToPay(ITuitionRegistrationServiceParameters parameters) {
+        Registration registration = parameters.getRegistration();
+        BigDecimal enrolledEctsUnits = parameters.getEnrolledEctsUnits();
+        BigDecimal enrolledCoursesCount = parameters.getEnrolledCoursesCount();
+        Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap =
+                parameters.getCustomCalculatorsMap();
+
+        if (!getTuitionPaymentPlan().getTuitionPaymentPlanGroup().isForRegistration()) {
+            throw new RuntimeException("wrong call");
+        }
+
+        BigDecimal amountToPay = null;
+        if (getTuitionCalculationType().isFixedAmount()) {
+            amountToPay = getFixedAmount();
+        } else if (getTuitionCalculationType().isEcts()) {
+            amountToPay = enrolledEctsUnits.multiply(getAmountPerEctsOrUnit(registration.getActiveDegreeCurricularPlan()));
+        } else if (getTuitionCalculationType().isUnits()) {
+            amountToPay = enrolledCoursesCount.multiply(getAmountPerEctsOrUnit(registration.getActiveDegreeCurricularPlan()));
+        } else if (getTuitionCalculationType().isCalculatedAmount()) {
+            BigDecimal customAmount = null;
+            if (Boolean.TRUE.equals(getTuitionPaymentPlan().getTuitionPaymentPlanGroup().getApplyDomainObjectCalculators())) {
+                customAmount = getTuitionPaymentPlanCalculator().getTotalAmount(registration, parameters);
             } else {
                 customAmount = calculatorsMap.get(getTuitionTariffCustomCalculator()).getTotalAmount();
             }
@@ -599,6 +683,50 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         return debitEntry;
     }
 
+    public DebitEntry createDebitEntryForRegistration(ITuitionRegistrationServiceParameters parameters) {
+        final DebtAccount debtAccount =
+                parameters.getDebtAccount().orElseThrow(() -> new IllegalStateException("debt account not created"));
+        final AcademicTreasuryEvent academicTreasuryEvent = parameters.getAcademicTreasuryEvent()
+                .orElseThrow(() -> new IllegalStateException("academic treasury event not created"));
+        
+        final LocalDate when = parameters.getDebtDate();
+
+        Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap =
+                parameters.getCustomCalculatorsMap();
+
+        if (!getTuitionPaymentPlan().getTuitionPaymentPlanGroup().isForRegistration()) {
+            throw new RuntimeException("wrong call");
+        }
+
+        final BigDecimal amount = amountToPay(parameters);
+
+        if (TreasuryConstants.isNegative(amount)) {
+            throw new RuntimeException("invalid tuition installment amount");
+        }
+
+        final LocalDate dueDate = dueDate(when != null ? when : new LocalDate());
+
+        final Map<String, String> fillPriceProperties =
+                fillPricePropertiesForRegistration(academicTreasuryEvent, dueDate, when, calculatorsMap);
+
+        final DebitEntry debitEntry = DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent,
+                vat(when), amount, dueDate, fillPriceProperties, getProduct(),
+                installmentName(academicTreasuryEvent.getRegistration()).getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE),
+                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay());
+
+        if (isAcademicalActBlockingOff()) {
+            debitEntry.markAcademicalActBlockingSuspension();
+        }
+
+        if (isBlockAcademicActsOnDebt()) {
+            debitEntry.markBlockAcademicActsOnDebt();
+        }
+
+        debitEntry.setPayorDebtAccount(getPayorDebtAccount());
+
+        return debitEntry;
+    }
+
     public DebitEntry createRecalculationDebitEntryForRegistration(DebtAccount debtAccount,
             AcademicTreasuryEvent academicTreasuryEvent, LocalDate when,
             Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap,
@@ -616,9 +744,9 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
                 fillPricePropertiesForRegistration(academicTreasuryEvent, recalculationDueDate, when, calculatorsMap);
 
         fillPriceProperties.put("RECALCULATED_AMOUNT", recalculatedAmount.toString());
-        
-        DebitEntry debitEntry = DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent,
-                vat(when), recalculatedAmount, recalculationDueDate, fillPriceProperties, getProduct(),
+
+        DebitEntry debitEntry = DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent, vat(when),
+                recalculatedAmount, recalculationDueDate, fillPriceProperties, getProduct(),
                 installmentName(academicTreasuryEvent.getRegistration()).getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE),
                 AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay());
 
