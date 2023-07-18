@@ -1,3 +1,4 @@
+10.2.0 (18-07-2023)
 - Refactor: Remove ITuitionTreasuryEvent methods from AcademicTreasuryEvent
 - Refactor: Rename AcademicTreasuryEvent::getAmountToPay to AcademicTreasuryEvent::getAmountWithVatToPay
 - Refactor: Rename AcademicTreasuryEvent::getExemptedAmount to AcademicTreasuryEvent::getNetExemptedAmount
