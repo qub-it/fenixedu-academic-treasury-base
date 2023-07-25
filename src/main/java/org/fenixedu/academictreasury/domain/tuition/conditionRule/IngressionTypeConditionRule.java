@@ -117,7 +117,7 @@ public class IngressionTypeConditionRule extends IngressionTypeConditionRule_Bas
         String[] split = string.split("\\|");
         for (String s : split) {
             IngressionType value =
-                    IngressionType.findAllByPredicate(i -> i.getLocalizedName().equals(s)).findFirst().orElse(null);
+                    IngressionType.findAllByPredicate(i -> i.getDescription().getContent().equals(s)).findFirst().orElse(null);
 
             if (value == null) {
                 throw new AcademicTreasuryDomainException("error.IngressionTypeConditionRule.ingressionType.invalid", s);

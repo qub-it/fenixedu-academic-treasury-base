@@ -340,7 +340,7 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                 if (!entry.isCreateDebt()) {
                     return null;
                 }
-
+                
                 boolean forceCreation = entry.isCreateDebt() && entry.isForceCreation()
                         && registration.getLastRegistrationState(executionYear) != null
                         && registration.getLastRegistrationState(executionYear).isActive()
@@ -383,7 +383,10 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                     return null;
                 }
 
+                boolean isRegistrationToPayGratuities = TuitionServices.isToPayRegistrationTuition(registration, rule.getExecutionYear());
+                
                 boolean forceCreation = entry.isCreateDebt() && entry.isForceCreation()
+                        && isRegistrationToPayGratuities
                         && registration.getLastRegistrationState(executionYear) != null
                         && registration.getLastRegistrationState(executionYear).isActive()
                         && (!entry.isLimitToRegisteredOnExecutionYear() || registration.isFirstTime(rule.getExecutionYear()));

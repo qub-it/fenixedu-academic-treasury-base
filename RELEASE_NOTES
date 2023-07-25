@@ -1,3 +1,10 @@
+- New Feature: New tuition condition rule, to check the registration ingression year (or start execution year)
+- Bug Fix: Only create tuition by force, in create academic debts strategy executed by academic debt generation rules, if the registration is to pay gratuities
+- Bug Fix: In tuition importation, fix the ingression type condition rule importation
+- Improvement: Allow default tuition payment plan configured with other installment calculation amounts than fixed amount type. Only check if the default tuition payment plan is fixed amount when used as indexed for ECTS calculation amount
+- Refactor: Remove the check that all tuition payment plans are for only one finantial entity.
+- Bug Fix: Fix installment name buider, when using the degree code
+
 10.2.0 (18-07-2023)
 - Refactor: Remove ITuitionTreasuryEvent methods from AcademicTreasuryEvent
 - Refactor: Rename AcademicTreasuryEvent::getAmountToPay to AcademicTreasuryEvent::getAmountWithVatToPay

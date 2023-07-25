@@ -344,8 +344,15 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
             throw new AcademicTreasuryDomainException("error.TuitionInstallmentTariff.default.payment.plan.not.defined");
         }
 
-        final TuitionPaymentPlan defaultPaymentPlan =
+        TuitionPaymentPlan defaultPaymentPlan =
                 TuitionPaymentPlan.findUniqueDefaultPaymentPlan(dcp, getTuitionPaymentPlan().getExecutionYear()).get();
+
+        for (final TuitionInstallmentTariff tuitionInstallmentTariff : defaultPaymentPlan.getTuitionInstallmentTariffsSet()) {
+            if (!tuitionInstallmentTariff.getTuitionCalculationType().isFixedAmount()) {
+                throw new AcademicTreasuryDomainException(
+                        "error.TuitionPaymentPlan.default.payment.plan.tariffs.calculation.type.not.fixed.amount");
+            }
+        }
 
         return AcademicTreasuryConstants.divide(
                 AcademicTreasuryConstants.defaultScale(defaultPaymentPlan.tuitionTotalAmount()).multiply(getFactor()),
@@ -688,7 +695,7 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
                 parameters.getDebtAccount().orElseThrow(() -> new IllegalStateException("debt account not created"));
         final AcademicTreasuryEvent academicTreasuryEvent = parameters.getAcademicTreasuryEvent()
                 .orElseThrow(() -> new IllegalStateException("academic treasury event not created"));
-        
+
         final LocalDate when = parameters.getDebtDate();
 
         Map<Class<? extends TuitionTariffCustomCalculator>, TuitionTariffCustomCalculator> calculatorsMap =

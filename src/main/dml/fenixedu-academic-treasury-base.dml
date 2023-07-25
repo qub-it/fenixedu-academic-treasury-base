@@ -627,6 +627,7 @@ class tuition.TuitionConditionRule {
 				multiplicity *;
 			}
 		}
+		
 	class tuition.conditionRule.ExecutionIntervalConditionRule extends tuition.TuitionConditionRule {
 	}
 		relation TuitionConditionRuleExecutionInterval {
@@ -641,6 +642,7 @@ class tuition.TuitionConditionRule {
 	
 	class tuition.conditionRule.StatuteTypeConditionRule extends tuition.TuitionConditionRule {
 	}
+	
 		relation TuitionConditionRuleStatuteType {
 			.org.fenixedu.academic.domain.student.StatuteType playsRole statuteType {
 				multiplicity *;
@@ -658,6 +660,19 @@ class tuition.TuitionConditionRule {
 	class tuition.conditionRule.WithLaboratorialClassesConditionRule extends tuition.TuitionConditionRule {
 		Boolean withLaboratorialClasses;
 	}
+	
+	class tuition.conditionRule.RegistrationYearConditionRule extends tuition.TuitionConditionRule {
+	}
+		
+		relation RegistrationYearConditionRuleExecutionInterval {
+			.org.fenixedu.academic.domain.ExecutionInterval playsRole executionIntervals {
+				multiplicity *;
+			}
+		
+			tuition.conditionRule.RegistrationYearConditionRule playsRole registrationYearConditionRules {
+				multiplicity *;
+			}
+		}
 
 /*----------------------
  * AcademicTreasuryEvent

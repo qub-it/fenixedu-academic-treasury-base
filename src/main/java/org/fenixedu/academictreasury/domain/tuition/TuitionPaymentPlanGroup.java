@@ -348,7 +348,7 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
 
             valueMap.put("productName", StringUtils.isNotEmpty(productName.getContent(locale)) ? productName
                     .getContent(locale) : productName.getContent());
-            valueMap.put("degreCode", degreeCode);
+            valueMap.put("degreeCode", degreeCode);
             valueMap.put("degreeName", degreeName);
             valueMap.put("executionYearName", executionYearQualifiedName);
 

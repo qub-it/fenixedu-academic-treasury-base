@@ -182,15 +182,6 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.default.payment.plan.must.be.for.registration");
         }
 
-        if (isDefaultPaymentPlan()) {
-            for (final TuitionInstallmentTariff tuitionInstallmentTariff : getTuitionInstallmentTariffsSet()) {
-                if (!tuitionInstallmentTariff.getTuitionCalculationType().isFixedAmount()) {
-                    throw new AcademicTreasuryDomainException(
-                            "error.TuitionPaymentPlan.default.payment.plan.tariffs.calculation.type.not.fixed.amount");
-                }
-            }
-        }
-
         if (getTuitionInstallmentTariffsSet().isEmpty()) {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.installments.must.not.be.empty");
         }
@@ -214,18 +205,6 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         if (getTuitionPaymentPlanGroup().isForRegistration() && !hasAtLeastOneConditionSpecified()) {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.specify.at.least.one.condition");
         }
-
-        // Ensure that all tuition payment plans are from the same finantial entity.
-        // For now tuition payment plans in different finantial entities are not 
-        // supported
-
-        Set<FinantialEntity> finantialEntities = find(getTuitionPaymentPlanGroup(), getExecutionYear())
-                .map(TuitionPaymentPlan::getFinantialEntity).collect(Collectors.toSet());
-
-        if (finantialEntities.size() > 1) {
-            throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.different.finantial.entities.not.supported");
-        }
-
     }
 
     // TODO
