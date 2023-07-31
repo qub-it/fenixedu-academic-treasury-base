@@ -1,3 +1,5 @@
+- Refactor: Pass in the constructor, the description of legacy academic treasury event
+
 10.3.0 (25-07-2023)
 - New Feature: New tuition condition rule, to check the registration ingression year (or start execution year)
 - Bug Fix: Only create tuition by force, in create academic debts strategy executed by academic debt generation rules, if the registration is to pay gratuities

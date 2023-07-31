@@ -39,37 +39,40 @@ import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Product;
 import org.joda.time.LocalDate;
 
 public class LegacyAcademicTreasuryEvent extends LegacyAcademicTreasuryEvent_Base {
 
-    protected LegacyAcademicTreasuryEvent(final Person person, Product product, Degree degree, ExecutionYear executionYear) {
+    protected LegacyAcademicTreasuryEvent(final Person person, Product product, Degree degree, ExecutionYear executionYear,
+            LocalizedString description) {
         super();
         this.setPerson(person);
         this.setProduct(product);
         this.setExecutionYear(executionYear);
         this.setDegree(degree);
-        
+        super.setDescription(description);
+
         checkRules();
     }
 
     public static LegacyAcademicTreasuryEvent create(final Person person, final Product product, final Degree degree,
-            final ExecutionYear executionYear) {
-        return new LegacyAcademicTreasuryEvent(person, product, degree, executionYear);
+            final ExecutionYear executionYear, LocalizedString description) {
+        return new LegacyAcademicTreasuryEvent(person, product, degree, executionYear, description);
     }
-    
+
     @Override
     protected void checkRules() {
-        if(getPerson() == null) {
+        if (getPerson() == null) {
             throw new AcademicTreasuryDomainException("error.LegacyAcademicTreasuryEvent.person.required");
         }
-        
-        if(getProduct() == null) {
+
+        if (getProduct() == null) {
             throw new AcademicTreasuryDomainException("error.LegacyAcademicTreasuryEvent.product.required");
         }
     }
-    
+
     @Override
     public boolean isAcademicServiceRequestEvent() {
         return false;
