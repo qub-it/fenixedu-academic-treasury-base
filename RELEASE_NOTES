@@ -1,4 +1,6 @@
 - Improvement: Print in debt account report, the customer code and customer active
+- Improvement: Export invoice entry code in debt report
+- Bug fix: In academic treasury event, return the degree code associated with treasury event target
 
 8.2.8 (05-07-2022)
 - Refactor: Implement import and export operations for AcademicDebtGenerationRuleRestriction class and subclasses, in order to be able to migrate from other systems

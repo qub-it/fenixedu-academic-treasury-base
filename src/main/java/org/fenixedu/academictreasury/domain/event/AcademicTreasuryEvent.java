@@ -720,6 +720,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
             degree = getRegistration().getDegree();
         } else if(isForCustomAcademicDebt() && getRegistration() != null) {
             degree = getRegistration().getDegree();
+        } else if(isForTreasuryEventTarget() && ((IAcademicTreasuryTarget) getTreasuryEventTarget()).getAcademicTreasuryTargetDegree() != null ) {
+            return ((IAcademicTreasuryTarget) getTreasuryEventTarget()).getAcademicTreasuryTargetDegree();
         }
 
         return degree;

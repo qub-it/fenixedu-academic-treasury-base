@@ -157,14 +157,12 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             this.vatNumberValid = FiscalCodeValidation.isValidFiscalNumber(debtAccount.getCustomer().getFiscalCountry(),
                     debtAccount.getCustomer().getFiscalNumber());
 
-            this.totalInDebt = BigDecimal.ZERO.toString();
-//            this.totalInDebt = debtAccount.getFinantialInstitution().getCurrency().getValueWithScale(debtAccount.getTotalInDebt())
-//                    .toString();
-//
-//            if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
-//                this.totalInDebt = this.totalInDebt.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
-//            }
-            
+            this.totalInDebt = debtAccount.getFinantialInstitution().getCurrency().getValueWithScale(debtAccount.getTotalInDebt())
+                    .toString();
+
+            if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
+                this.totalInDebt = this.totalInDebt.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
+            }
 
             this.completed = true;
         } catch (final Exception e) {

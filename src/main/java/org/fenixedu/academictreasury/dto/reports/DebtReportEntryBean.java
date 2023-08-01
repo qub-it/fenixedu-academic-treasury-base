@@ -83,7 +83,9 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
     // @formatter:off
     public static String[] SPREADSHEET_DEBIT_HEADERS =
-            { academicTreasuryBundle("label.DebtReportEntryBean.header.identification"),
+            { 
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.identification"),
+                    "Code",
                     academicTreasuryBundle("label.DebtReportEntryBean.header.entryType"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.versioningCreator"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.creationDate"),
@@ -138,7 +140,9 @@ public class DebtReportEntryBean implements SpreadsheetRow {
             };
 
     public static String[] SPREADSHEET_CREDIT_HEADERS =
-            { academicTreasuryBundle("label.DebtReportEntryBean.header.identification"),
+            { 
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.identification"),
+                    "Code",
                     academicTreasuryBundle("label.DebtReportEntryBean.header.entryType"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.versioningCreator"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.creationDate"),
@@ -195,6 +199,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     private boolean completed = false;
 
     private String identification;
+    private String invoiceEntryCode;
     private String entryType;
     private String versioningCreator;
     private DateTime creationDate;
@@ -269,6 +274,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
         try {
             this.identification = entry.getExternalId();
+            this.invoiceEntryCode = entry.getCode();
             this.entryType = entryType(entry);
             this.creationDate = treasuryServices.versioningCreationDate(entry);
             this.versioningCreator = treasuryServices.versioningCreatorUsername(entry);
@@ -605,6 +611,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
             if (invoiceEntry.isDebitNoteEntry()) {
                 int i = 1;
 
+                row.createCell(i++).setCellValue(valueOrEmpty(this.invoiceEntryCode));
                 row.createCell(i++).setCellValue(valueOrEmpty(entryType));
                 row.createCell(i++).setCellValue(valueOrEmpty(versioningCreator));
                 row.createCell(i++).setCellValue(valueOrEmpty(creationDate));
@@ -695,6 +702,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
             } else if (invoiceEntry.isCreditNoteEntry()) {
                 int i = 1;
+                
+                row.createCell(i++).setCellValue(valueOrEmpty(this.invoiceEntryCode));
                 row.createCell(i++).setCellValue(valueOrEmpty(entryType));
                 row.createCell(i++).setCellValue(valueOrEmpty(versioningCreator));
                 row.createCell(i++).setCellValue(valueOrEmpty(creationDate));
