@@ -1,3 +1,6 @@
+- Improvement: Support in legacy treasury event, the account as tuition and discount tuition amount
+- Improvement: Add minimum and maximum amount in tuition calculator aggregator
+
 10.3.1 (31-07-2023)
 - Refactor: Pass in the constructor, the description of legacy academic treasury event
 

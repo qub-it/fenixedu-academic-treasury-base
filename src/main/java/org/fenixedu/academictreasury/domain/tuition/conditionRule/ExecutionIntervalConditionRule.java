@@ -108,6 +108,7 @@ public class ExecutionIntervalConditionRule extends ExecutionIntervalConditionRu
     public void delete() {
         getExecutionIntervalSet().clear();
         setTuitionPaymentPlan(null);
+        setTuitionPaymentPlanCalculator(null);
         setDomainRoot(null);
         deleteDomainObject();
     }

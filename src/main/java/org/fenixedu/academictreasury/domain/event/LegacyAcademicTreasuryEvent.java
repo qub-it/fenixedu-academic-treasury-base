@@ -137,4 +137,15 @@ public class LegacyAcademicTreasuryEvent extends LegacyAcademicTreasuryEvent_Bas
     public LocalDate getTreasuryEventDate() {
         return this.getDueDate();
     }
+    
+    @Override
+    public boolean isEventAccountedAsTuition() {
+        return Boolean.TRUE.equals(getLegacyEventAccountedAsTuition());
+    }
+    
+    @Override
+    public boolean isEventDiscountInTuitionFee() {
+        return Boolean.TRUE.equals(getLegacyEventDiscountInTuitionFee());
+    }
+    
 }

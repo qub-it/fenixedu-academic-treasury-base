@@ -107,6 +107,7 @@ public class RegistrationProtocolConditionRule extends RegistrationProtocolCondi
     public void delete() {
         getRegistrationProtocolSet().clear();
         setTuitionPaymentPlan(null);
+        setTuitionPaymentPlanCalculator(null);
         setDomainRoot(null);
         deleteDomainObject();
     }

@@ -100,6 +100,7 @@ public class IngressionTypeConditionRule extends IngressionTypeConditionRule_Bas
     public void delete() {
         getIngressionSet().clear();
         setTuitionPaymentPlan(null);
+        setTuitionPaymentPlanCalculator(null);
         setDomainRoot(null);
         deleteDomainObject();
     }

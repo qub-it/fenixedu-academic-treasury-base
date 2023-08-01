@@ -107,6 +107,7 @@ public class WithLaboratorialClassesConditionRule extends WithLaboratorialClasse
     @Override
     public void delete() {
         setTuitionPaymentPlan(null);
+        setTuitionPaymentPlanCalculator(null);
         setDomainRoot(null);
         deleteDomainObject();
     }

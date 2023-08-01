@@ -97,6 +97,7 @@ public class CurricularYearConditionRule extends CurricularYearConditionRule_Bas
     public void delete() {
         getCurricularYearSet().clear();
         setTuitionPaymentPlan(null);
+        setTuitionPaymentPlanCalculator(null);
         setDomainRoot(null);
         deleteDomainObject();
     }

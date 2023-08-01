@@ -139,6 +139,7 @@ public class RegistrationRegimeTypeConditionRule extends RegistrationRegimeTypeC
     @Override
     public void delete() {
         setTuitionPaymentPlan(null);
+        setTuitionPaymentPlanCalculator(null);
         setDomainRoot(null);
         deleteDomainObject();
     }

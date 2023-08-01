@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
 
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academictreasury.domain.tuition.ITuitionRegistrationServiceParameters;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
@@ -41,27 +43,58 @@ public class TuitionCalculatorAggregator extends TuitionCalculatorAggregator_Bas
 
     @Override
     public BigDecimal getTotalAmount(Registration registration) {
+        return getTotalAmount(registration, (ITuitionRegistrationServiceParameters) null);
+    }
+
+    public BigDecimal getTotalAmount(Registration registration, ITuitionRegistrationServiceParameters parameters) {
         Predicate<TuitionPaymentPlanCalculator> conditionValidTo = (tuitionPaymentPlanCalculator) -> tuitionPaymentPlanCalculator
                 .getTuitionConditionRulesSet().stream().allMatch(c -> c.isValidTo(registration, getExecutionYear(), null));
 
-        return getTuitionPaymentPlanCalculatorChildSet().stream().filter(conditionValidTo)
-                .map(c -> c.getTotalAmount(registration)).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalAmount = getTuitionPaymentPlanCalculatorChildSet().stream().filter(conditionValidTo)
+                .map(c -> c.getTotalAmount(registration, parameters)).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (getMinimumAmount() != null) {
+            totalAmount = totalAmount.max(getMinimumAmount());
+        }
+
+        if (getMaximumAmount() != null) {
+            totalAmount = totalAmount.min(getMaximumAmount());
+        }
+
+        return totalAmount;
     }
 
     @Override
     public BigDecimal getTotalAmount(Enrolment enrolment) {
-        Predicate<TuitionPaymentPlanCalculator> conditionValidTo =
-                (tuitionPaymentPlanCalculator) -> tuitionPaymentPlanCalculator.getTuitionConditionRulesSet().stream()
-                        .allMatch(c -> c.isValidTo(enrolment.getRegistration(), getExecutionYear(), enrolment));
+        return getTotalAmount(enrolment, (ITuitionRegistrationServiceParameters) null);
+    }
 
-        return getTuitionPaymentPlanCalculatorChildSet().stream().filter(conditionValidTo).map(c -> c.getTotalAmount(enrolment))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    public BigDecimal getTotalAmount(Enrolment enrolment, ITuitionRegistrationServiceParameters parameters) {
+        Predicate<TuitionPaymentPlanCalculator> conditionValidTo =
+                (tuitionPaymentPlanCalculator) -> tuitionPaymentPlanCalculator.getTuitionConditionRulesSet().isEmpty()
+                        || tuitionPaymentPlanCalculator.getTuitionConditionRulesSet().stream()
+                                .allMatch(c -> c.isValidTo(enrolment.getRegistration(), getExecutionYear(), enrolment));
+
+        BigDecimal totalAmount = getTuitionPaymentPlanCalculatorChildSet().stream().filter(conditionValidTo)
+                .map(c -> c.getTotalAmount(enrolment, parameters)).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (getMinimumAmount() != null) {
+            totalAmount = totalAmount.max(getMinimumAmount());
+        }
+
+        if (getMaximumAmount() != null) {
+            totalAmount = totalAmount.min(getMaximumAmount());
+        }
+
+        return totalAmount;
     }
 
     @Override
     public String getCalculationDescription(Registration registration) {
-        Predicate<TuitionPaymentPlanCalculator> conditionValidTo = (tuitionPaymentPlanCalculator) -> tuitionPaymentPlanCalculator
-                .getTuitionConditionRulesSet().stream().allMatch(c -> c.isValidTo(registration, getExecutionYear(), null));
+        Predicate<TuitionPaymentPlanCalculator> conditionValidTo =
+                (tuitionPaymentPlanCalculator) -> tuitionPaymentPlanCalculator.getTuitionConditionRulesSet().isEmpty()
+                        || tuitionPaymentPlanCalculator.getTuitionConditionRulesSet().stream()
+                                .allMatch(c -> c.isValidTo(registration, getExecutionYear(), null));
 
         return getTuitionPaymentPlanCalculatorChildSet().stream().filter(conditionValidTo)
                 .map(c -> c.getCalculationDescription(registration)).reduce((a, c) -> a + c).get();
@@ -70,8 +103,9 @@ public class TuitionCalculatorAggregator extends TuitionCalculatorAggregator_Bas
     @Override
     public String getCalculationDescription(Enrolment enrolment) {
         Predicate<TuitionPaymentPlanCalculator> conditionValidTo =
-                (tuitionPaymentPlanCalculator) -> tuitionPaymentPlanCalculator.getTuitionConditionRulesSet().stream()
-                        .allMatch(c -> c.isValidTo(enrolment.getRegistration(), getExecutionYear(), enrolment));
+                (tuitionPaymentPlanCalculator) -> tuitionPaymentPlanCalculator.getTuitionConditionRulesSet().isEmpty()
+                        || tuitionPaymentPlanCalculator.getTuitionConditionRulesSet().stream()
+                                .allMatch(c -> c.isValidTo(enrolment.getRegistration(), getExecutionYear(), enrolment));
 
         return getTuitionPaymentPlanCalculatorChildSet().stream().filter(conditionValidTo)
                 .map(c -> c.getCalculationDescription(enrolment)).reduce((a, c) -> a + c).get();

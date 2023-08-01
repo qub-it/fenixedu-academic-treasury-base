@@ -61,6 +61,10 @@ public abstract class TuitionConditionRule extends TuitionConditionRule_Base {
     public boolean isValidTo(final Registration registration, final ExecutionYear executionYear) {
         return isValidTo(registration, executionYear, null);
     }
+    
+    public String getPresentationName() {
+        return getPresentationName(this.getClass());
+    }
 
     public abstract boolean checkRules();
 

@@ -114,6 +114,7 @@ public class StatuteTypeConditionRule extends StatuteTypeConditionRule_Base {
     public void delete() {
         getStatuteTypeSet().clear();
         setTuitionPaymentPlan(null);
+        setTuitionPaymentPlanCalculator(null);
         setDomainRoot(null);
         deleteDomainObject();
     }
