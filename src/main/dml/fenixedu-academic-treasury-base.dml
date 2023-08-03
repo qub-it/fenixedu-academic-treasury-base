@@ -711,6 +711,16 @@ class event.LegacyAcademicTreasuryEvent extends event.AcademicTreasuryEvent {
     Boolean legacyEventDiscountInTuitionFee;
 }
 
+	relation LegacyAcademicTreasuryEventTreasuryExemptionType {
+		event.LegacyAcademicTreasuryEvent playsRole legacyAcademicTreasuryEvent {
+			multiplicity *;
+		}
+		
+		.org.fenixedu.treasury.domain.exemption.TreasuryExemptionType playsRole exemptionToApplyInEventDiscountInTuitionFee {
+			multiplicity 0..1;
+		}
+	}
+
 	relation AcademicTreasuryEventAcademicServiceRequest {
 		.org.fenixedu.academic.domain.serviceRequests.AcademicServiceRequest playsRole academicServiceRequest {
 			multiplicity 0..1;
@@ -1914,6 +1924,59 @@ class reservationtax.ReservationTaxEventTarget {
 		}
 	
 		reservationtax.ReservationTaxEventTarget playsRole reservationTaxEventTargets {
+			multiplicity *;
+		}
+	}
+	
+class tuition.exemptions.StatuteExemptionByIntervalMapEntry {
+}
+
+	relation StatuteExemptionByIntervalMapEntryDomainRoot {
+		.pt.ist.fenixframework.DomainRoot playsRole domainRoot {
+			multiplicity 1..1;
+		}
+		
+		tuition.exemptions.StatuteExemptionByIntervalMapEntry playsRole statuteExemptionByIntervalMapEntry {
+			multiplicity *;
+		}
+	}
+	
+	relation StatuteExemptionByIntervalMapEntryStatuteType {
+		.org.fenixedu.academic.domain.student.StatuteType playsRole statuteType {
+			multiplicity 1..1;
+		}
+		
+		tuition.exemptions.StatuteExemptionByIntervalMapEntry playsRole statuteExemptionByIntervalMapEntry {
+			multiplicity *;
+		}
+	}
+	
+	relation StatuteExemptionByIntervalMapEntryFinantialEntity {
+		.org.fenixedu.treasury.domain.FinantialEntity playsRole finantialEntity {
+			multiplicity 1..1;
+		}
+			
+		tuition.exemptions.StatuteExemptionByIntervalMapEntry playsRole statuteExemptionByIntervalMapEntry {
+			multiplicity *;
+		}
+	}
+	
+	relation StatuteExemptionByIntervalMapEntryExecutionInterval {
+		.org.fenixedu.academic.domain.ExecutionInterval playsRole executionInterval {
+			multiplicity 1..1;
+		}
+			
+		tuition.exemptions.StatuteExemptionByIntervalMapEntry playsRole statuteExemptionByIntervalMapEntry {
+			multiplicity *;
+		}
+	}
+	
+	relation StatuteExemptionByIntervalMapEntryTreasuryExemptionType {
+		.org.fenixedu.treasury.domain.exemption.TreasuryExemptionType playsRole treasuryExemptionType {
+			multiplicity 1..1;
+		}
+			
+		tuition.exemptions.StatuteExemptionByIntervalMapEntry playsRole statuteExemptionByIntervalMapEntry {
 			multiplicity *;
 		}
 	}

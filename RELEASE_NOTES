@@ -1,5 +1,9 @@
 - Improvement: Support in legacy treasury event, the account as tuition and discount tuition amount
 - Improvement: Add minimum and maximum amount in tuition calculator aggregator
+- Improvement: Support in the legacy treasury event, the exemption type to discount tuition amount
+- Improvement: Add in the debt report invoice entries, the invoice entry code in the end
+- Improvement: The academic event discount in tuition fee with treasury exemption is true by default
+- New feature: Domain model for exemption by statutes
 
 10.3.1 (31-07-2023)
 - Refactor: Pass in the constructor, the description of legacy academic treasury event

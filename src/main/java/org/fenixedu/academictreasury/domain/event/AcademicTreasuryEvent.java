@@ -882,11 +882,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
     @Override
     public boolean isEventDiscountInTuitionFeeWithTreasuryExemption() {
-        if (isForTreasuryEventTarget() && (getTreasuryEventTarget() instanceof ReservationTaxEventTarget)) {
-            return ((ReservationTaxEventTarget) getTreasuryEventTarget()).isEventDiscountInTuitionFeeWithTreasuryExemption();
-        }
-
-        return false;
+        return true;
     }
 
     @Override

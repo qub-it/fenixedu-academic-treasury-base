@@ -83,7 +83,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
     // @formatter:off
     public static String[] SPREADSHEET_DEBIT_HEADERS =
-            { academicTreasuryBundle("label.DebtReportEntryBean.header.identification"),
+            { 
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.identification"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.entryType"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.versioningCreator"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.creationDate"),
@@ -134,12 +135,13 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     academicTreasuryBundle("label.DebtReportEntryBean.header.legacyERPCertificateDocumentReference"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificationDate"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificateDocumentReference"),
-                    academicTreasuryBundle("label.DebtReportEntryBean.header.originSettlementNoteForAdvancedCredit")
-
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.originSettlementNoteForAdvancedCredit"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.code")
             };
 
     public static String[] SPREADSHEET_CREDIT_HEADERS =
-            { academicTreasuryBundle("label.DebtReportEntryBean.header.identification"),
+            { 
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.identification"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.entryType"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.versioningCreator"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.creationDate"),
@@ -190,13 +192,16 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     academicTreasuryBundle("label.DebtReportEntryBean.header.legacyERPCertificateDocumentReference"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificationDate"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificateDocumentReference"),
-                    academicTreasuryBundle("label.DebtReportEntryBean.header.originSettlementNoteForAdvancedCredit") };
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.originSettlementNoteForAdvancedCredit"),
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.code")
+                    };
     // @formatter:on
 
     private InvoiceEntry invoiceEntry;
     private boolean completed = false;
 
     private String identification;
+    private String code;
     private String entryType;
     private String versioningCreator;
     private DateTime creationDate;
@@ -260,6 +265,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     
     private String documentObservations;
     private String documentTermsAndConditions;
+    
 
     public DebtReportEntryBean(final InvoiceEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
@@ -271,6 +277,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
         try {
             this.identification = entry.getExternalId();
+            this.code = entry.getCode();
             this.entryType = entryType(entry);
             this.creationDate = treasuryServices.versioningCreationDate(entry);
             this.versioningCreator = treasuryServices.versioningCreatorUsername(entry);
@@ -706,6 +713,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 row.createCell(i++).setCellValue(valueOrEmpty(erpCertificationDate));
                 row.createCell(i++).setCellValue(valueOrEmpty(erpCertificateDocumentReference));
                 row.createCell(i++).setCellValue(valueOrEmpty(originSettlementNoteForAdvancedCredit));
+                row.createCell(i++).setCellValue(valueOrEmpty(this.code));
 
             } else if (invoiceEntry.isCreditNoteEntry()) {
                 int i = 1;
@@ -784,6 +792,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 row.createCell(i++).setCellValue(valueOrEmpty(erpCertificationDate));
                 row.createCell(i++).setCellValue(valueOrEmpty(erpCertificateDocumentReference));
                 row.createCell(i++).setCellValue(valueOrEmpty(originSettlementNoteForAdvancedCredit));
+                row.createCell(i++).setCellValue(valueOrEmpty(this.code));
 
             }
 

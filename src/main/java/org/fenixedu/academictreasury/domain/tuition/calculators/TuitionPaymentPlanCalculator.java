@@ -59,6 +59,7 @@ abstract public class TuitionPaymentPlanCalculator extends TuitionPaymentPlanCal
     public void delete() {
         super.setDomainRoot(null);
         super.setTuitionPaymentPlan(null);
+        super.setTuitionCalculatorParentAggregator(null);
         
         getTuitionConditionRulesSet().forEach(r -> r.delete());
         
