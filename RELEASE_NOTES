@@ -4,6 +4,7 @@
 - Improvement: Add in the debt report invoice entries, the invoice entry code in the end
 - Improvement: The academic event discount in tuition fee with treasury exemption is true by default
 - New feature: Domain model for exemption by statutes
+- Improvement: Unit tests for tuition payment plans calculations
 
 10.3.1 (31-07-2023)
 - Refactor: Pass in the constructor, the description of legacy academic treasury event

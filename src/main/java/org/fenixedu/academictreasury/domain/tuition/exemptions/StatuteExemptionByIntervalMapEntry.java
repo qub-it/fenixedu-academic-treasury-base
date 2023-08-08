@@ -69,4 +69,9 @@ public class StatuteExemptionByIntervalMapEntry extends StatuteExemptionByInterv
                 .filter(s -> s.getTreasuryExemptionType() == treasuryExemptionType);
     }
 
+    public static StatuteExemptionByIntervalMapEntry create(FinantialEntity finantialEntity, ExecutionInterval executionInterval,
+            StatuteType statuteType, TreasuryExemptionType treasuryExemptionType) {
+        return new StatuteExemptionByIntervalMapEntry(finantialEntity, executionInterval, statuteType, treasuryExemptionType);
+    }
+
 }
