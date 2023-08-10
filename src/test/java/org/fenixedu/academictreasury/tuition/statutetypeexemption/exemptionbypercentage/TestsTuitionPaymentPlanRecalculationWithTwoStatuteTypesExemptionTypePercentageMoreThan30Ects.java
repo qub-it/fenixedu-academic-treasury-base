@@ -68,6 +68,7 @@ public class TestsTuitionPaymentPlanRecalculationWithTwoStatuteTypesExemptionTyp
 
                 TuitionPaymentPlanTestsUtilities.startUp();
                 AcademicTreasuryBootstrapper.bootstrap();
+                BasicAcademicTreasuryUtils.createReservationTaxes();
                 BasicAcademicTreasuryUtils.createStatuteTypeExemptionsMap();
                 createTuitionPaymentPlanWithAmountByEcts();
 

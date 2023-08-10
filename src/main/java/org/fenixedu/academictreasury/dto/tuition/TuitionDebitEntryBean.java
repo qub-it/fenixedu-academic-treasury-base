@@ -36,10 +36,12 @@
 package org.fenixedu.academictreasury.dto.tuition;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Currency;
+import org.fenixedu.treasury.domain.exemption.TreasuryExemptionType;
 import org.joda.time.LocalDate;
 
 public class TuitionDebitEntryBean {
@@ -53,6 +55,8 @@ public class TuitionDebitEntryBean {
     private BigDecimal exemptedAmount;
     private Currency currency;
 
+    private Map<TreasuryExemptionType, BigDecimal> exemptionsMap;
+    
     public TuitionDebitEntryBean(int installmentOrder, TuitionInstallmentTariff tuitionInstallmentTariff, LocalizedString description, LocalDate dueDate,
             BigDecimal vatRate, BigDecimal amount, Currency currency) {
         super();
@@ -66,9 +70,10 @@ public class TuitionDebitEntryBean {
     }
 
     public TuitionDebitEntryBean(int installmentOrder, TuitionInstallmentTariff tuitionInstallmentTariff, LocalizedString description, LocalDate dueDate,
-            BigDecimal vatRate, BigDecimal amount, BigDecimal exemptedAmount, Currency currency) {
+            BigDecimal vatRate, BigDecimal amount, BigDecimal exemptedAmount, Map<TreasuryExemptionType, BigDecimal> exemptionsMap, Currency currency) {
         this(installmentOrder, tuitionInstallmentTariff, description, dueDate, vatRate, amount, currency);
         this.exemptedAmount = exemptedAmount;
+        this.exemptionsMap = exemptionsMap;
     }
     
     public int getInstallmentOrder() {
@@ -133,6 +138,14 @@ public class TuitionDebitEntryBean {
     
     public void setCurrency(Currency currency) {
         this.currency = currency;
+    }
+    
+    public Map<TreasuryExemptionType, BigDecimal> getExemptionsMap() {
+        return exemptionsMap;
+    }
+    
+    public void setExemptionsMap(Map<TreasuryExemptionType, BigDecimal> exemptionsMap) {
+        this.exemptionsMap = exemptionsMap;
     }
 
 }

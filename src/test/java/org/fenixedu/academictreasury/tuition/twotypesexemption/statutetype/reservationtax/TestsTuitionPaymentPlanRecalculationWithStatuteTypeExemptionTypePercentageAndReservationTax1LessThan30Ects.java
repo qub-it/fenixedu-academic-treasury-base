@@ -1,4 +1,4 @@
-package org.fenixedu.academictreasury.tuition.statutetypeexemption.exemptionbypercentage;
+package org.fenixedu.academictreasury.tuition.twotypesexemption.statutetype.reservationtax;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -54,7 +54,7 @@ import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
 
 @RunWith(FenixFrameworkRunner.class)
-public class TestsTuitionPaymentPlanRecalculationWithTwoStatuteTypesExemptionTypePercentageLessThan30Ects {
+public class TestsTuitionPaymentPlanRecalculationWithStatuteTypeExemptionTypePercentageAndReservationTax1LessThan30Ects {
 
     private static Registration registration;
     private static ExecutionInterval executionInterval;
@@ -174,11 +174,14 @@ public class TestsTuitionPaymentPlanRecalculationWithTwoStatuteTypesExemptionTyp
         new StudentStatute(registration.getStudent(), StatuteType.findByCode("ST3").get(), executionInterval,
                 executionInterval.getNext(), null, null, null, registration);
 
-        new StudentStatute(registration.getStudent(), StatuteType.findByCode("ST4").get(), executionInterval,
-                executionInterval.getNext(), null, null, null, registration);
+        ReservationTaxEventTarget.createReservationTaxDebt(
+                ReservationTax.findUniqueActiveByProduct(Product.findUniqueByCode("RT1").get()).get(), registration.getPerson(),
+                registration.getLastStudentCurricularPlan().getDegreeCurricularPlan(), executionYear, new LocalDate());
 
         Product firstInstallmentProduct = Product.findUniqueByCode("PROP_1_PREST_1_CIC").get();
         Product secondInstallmentProduct = Product.findUniqueByCode("PROP_2_PREST_1_CIC").get();
+        Product thirdInstallmentProduct = Product.findUniqueByCode("PROP_3_PREST_1_CIC").get();
+        Product fourthInstallmentProduct = Product.findUniqueByCode("PROP_4_PREST_1_CIC").get();
 
         RegistrationTuitionService.startServiceInvocation(registration, executionYear, new LocalDate()) //
                 .applyEnrolledEctsUnits(new BigDecimal("30")) //
@@ -191,11 +194,11 @@ public class TestsTuitionPaymentPlanRecalculationWithTwoStatuteTypesExemptionTyp
         AcademicTreasuryEvent academicTreasuryEvent =
                 AcademicTreasuryEvent.findUniqueForRegistrationTuition(registration, executionYear).get();
 
-        assertEquals(new BigDecimal("168.00"), academicTreasuryEvent.getAmountWithVatToPay());
-        assertEquals(new BigDecimal("132.00"), academicTreasuryEvent.getNetExemptedAmount(firstInstallmentProduct).setScale(2));
+        assertEquals(new BigDecimal("0.00"), academicTreasuryEvent.getAmountWithVatToPay());
+        assertEquals(new BigDecimal("300.00"), academicTreasuryEvent.getNetExemptedAmount(firstInstallmentProduct).setScale(2));
 
         RegistrationTuitionService.startServiceInvocation(registration, executionYear, new LocalDate())
-                .applyEnrolledEctsUnits(new BigDecimal("17.33")) //
+                .applyEnrolledEctsUnits(new BigDecimal("20")) //
                 .applyEnrolledCoursesCount(new BigDecimal("5")) //
                 .withInferedTuitionPaymentPlan() //
                 .withAllInstallments() //
@@ -203,20 +206,47 @@ public class TestsTuitionPaymentPlanRecalculationWithTwoStatuteTypesExemptionTyp
                 .recalculateInstallments(Map.of(firstInstallmentProduct, new LocalDate())) //
                 .executeTuitionPaymentPlanCreation();
 
-        assertEquals(new BigDecimal("388.20"), academicTreasuryEvent.getAmountWithVatToPay());
-        assertEquals(new BigDecimal("305.00"), academicTreasuryEvent.getNetExemptedAmount());
-        
-        assertEquals(new BigDecimal("76.25"), academicTreasuryEvent.getNetExemptedAmount(secondInstallmentProduct));
-        assertEquals(new BigDecimal("97.05"), academicTreasuryEvent.getAmountWithVatToPay(secondInstallmentProduct));
+        assertEquals(new BigDecimal("186.00"), academicTreasuryEvent.getAmountWithVatToPay());
+        assertEquals(new BigDecimal("614.00"), academicTreasuryEvent.getNetExemptedAmount());
 
-        assertEquals(new BigDecimal("76.25"), academicTreasuryEvent.getNetExemptedAmount(firstInstallmentProduct));
-        assertEquals(new BigDecimal("97.05"), academicTreasuryEvent.getAmountWithVatToPay(firstInstallmentProduct));
+        assertEquals(new BigDecimal("0.00"), academicTreasuryEvent.getAmountWithVatToPay(firstInstallmentProduct));
+        assertEquals(new BigDecimal("200.00"), academicTreasuryEvent.getNetExemptedAmount(firstInstallmentProduct).setScale(2));
 
-        TreasuryExemptionType usedTreasuryExemptionType3 = TreasuryExemptionType.findByCode("TET3").findFirst().get();
-        TreasuryExemptionType usedTreasuryExemptionType4 = TreasuryExemptionType.findByCode("TET4").findFirst().get();
+        assertEquals(new BigDecimal("0.00"), academicTreasuryEvent.getAmountWithVatToPay(secondInstallmentProduct));
+        assertEquals(new BigDecimal("200.00"), academicTreasuryEvent.getNetExemptedAmount(secondInstallmentProduct));
+
+        assertEquals(new BigDecimal("52.00"), academicTreasuryEvent.getAmountWithVatToPay(thirdInstallmentProduct));
+        assertEquals(new BigDecimal("148.00"), academicTreasuryEvent.getNetExemptedAmount(thirdInstallmentProduct));
+
+        assertEquals(new BigDecimal("134.00"), academicTreasuryEvent.getAmountWithVatToPay(fourthInstallmentProduct));
+        assertEquals(new BigDecimal("66.00"), academicTreasuryEvent.getNetExemptedAmount(fourthInstallmentProduct));
+
+        TreasuryExemptionType usedTreasuryExemptionType1 = TreasuryExemptionType.findByCode("TET1").findFirst().get();
+        TreasuryExemptionType usedTreasuryExemptionType2 = TreasuryExemptionType.findByCode("TET3").findFirst().get();
+
+        assertTrue("Treasury exemption type used", academicTreasuryEvent.getTreasuryExemptionsSet().stream().allMatch(
+                e -> List.of(usedTreasuryExemptionType1, usedTreasuryExemptionType2).contains(e.getTreasuryExemptionType())));
+
+        assertTrue("Treasury exemption type used installment one",
+                DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct)
+                        .flatMap(d -> d.getTreasuryExemptionsSet().stream()).map(te -> te.getTreasuryExemptionType())
+                        .allMatch(tet -> List.of(usedTreasuryExemptionType1, usedTreasuryExemptionType2).contains(tet)));
         
-        assertTrue("Treasury exemption type used", academicTreasuryEvent.getTreasuryExemptionsSet().stream()
-                .allMatch(e -> List.of(usedTreasuryExemptionType3, usedTreasuryExemptionType4).contains(e.getTreasuryExemptionType())));
+        assertTrue("Treasury exemption type used installment two",
+                DebitEntry.findActive(academicTreasuryEvent, secondInstallmentProduct)
+                        .flatMap(d -> d.getTreasuryExemptionsSet().stream()).map(te -> te.getTreasuryExemptionType())
+                        .allMatch(tet -> List.of(usedTreasuryExemptionType1, usedTreasuryExemptionType2).contains(tet)));
+
+        assertTrue("Treasury exemption type used installment three",
+                DebitEntry.findActive(academicTreasuryEvent, thirdInstallmentProduct)
+                        .flatMap(d -> d.getTreasuryExemptionsSet().stream()).map(te -> te.getTreasuryExemptionType())
+                        .allMatch(tet -> List.of(usedTreasuryExemptionType1, usedTreasuryExemptionType2).contains(tet)));
+        
+        assertTrue("Treasury exemption type used installment four",
+                DebitEntry.findActive(academicTreasuryEvent, fourthInstallmentProduct)
+                        .flatMap(d -> d.getTreasuryExemptionsSet().stream()).map(te -> te.getTreasuryExemptionType())
+                        .allMatch(tet -> List.of(usedTreasuryExemptionType2).contains(tet)));
+        
     }
 
     private static FinantialEntity readFinantialEntity() {

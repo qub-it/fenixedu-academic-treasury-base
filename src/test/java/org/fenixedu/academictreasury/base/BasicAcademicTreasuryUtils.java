@@ -230,7 +230,7 @@ public class BasicAcademicTreasuryUtils {
 
     public static void createReservationTaxes() {
         TreasuryExemptionType tet1 =
-                TreasuryExemptionType.create("TET1", ls("Treasury Exemption 1"), new BigDecimal("100.00"), true);
+                TreasuryExemptionType.create("TET1", ls("Treasury Exemption 1"), new BigDecimal("12.21"), true);
 
         TreasuryExemptionType tet2 =
                 TreasuryExemptionType.create("TET2", ls("Treasury Exemption 2"), new BigDecimal("100.00"), true);
@@ -260,6 +260,8 @@ public class BasicAcademicTreasuryUtils {
     }
 
     public static void createStatuteTypeExemptionsMap() {
+        TreasuryExemptionType tet1 = TreasuryExemptionType.findByCode("TET1").iterator().next();
+        
         TreasuryExemptionType tet3 =
                 TreasuryExemptionType.create("TET3", ls("Treasury Exemption 3"), new BigDecimal("33.00"), true);
 
@@ -268,10 +270,12 @@ public class BasicAcademicTreasuryUtils {
 
         StatuteType st3 = StatuteType.create("ST3", ls("Statute Type 3"));
         StatuteType st4 = StatuteType.create("ST4", ls("Statute Type 4"));
+        StatuteType st5 = StatuteType.create("ST_SHARED", ls("Statute Type Shared"));
 
         ExecutionYear.readNotClosedExecutionYears().forEach(ey -> {
             StatuteExemptionByIntervalMapEntry.create(FinantialEntity.findAll().iterator().next(), ey, st3, tet3);
             StatuteExemptionByIntervalMapEntry.create(FinantialEntity.findAll().iterator().next(), ey, st4, tet4);
+            StatuteExemptionByIntervalMapEntry.create(FinantialEntity.findAll().iterator().next(), ey, st5, tet1);
         });
 
     }

@@ -202,7 +202,7 @@ public class DiscountTuitionInstallmentsHelper {
 
         if (TreasuryConstants.isPositive(totalAmountToExempt)) {
             return new TuitionDebitEntryBean(installmentOrder, tuitionInstallmentTariff, installmentName, dueDate, vat.getTaxRate(), finalAmountToPay,
-                    totalAmountToExempt, currency);
+                    totalAmountToExempt, null, currency);
         } else {
             return new TuitionDebitEntryBean(installmentOrder, tuitionInstallmentTariff, installmentName, dueDate, vat.getTaxRate(), finalAmountToPay,
                     currency);
