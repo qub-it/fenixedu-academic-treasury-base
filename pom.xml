@@ -34,7 +34,7 @@
 			<artifactId>fenixedu-academic-core</artifactId>
 			<type>test-jar</type>
 			<scope>test</scope>
-			<version>41.4.1</version>
+			<version>41.4.4</version>
 		</dependency>
 
 		<dependency>
