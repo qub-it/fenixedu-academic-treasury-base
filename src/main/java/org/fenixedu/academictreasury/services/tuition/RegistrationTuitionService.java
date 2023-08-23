@@ -770,7 +770,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
                 LocalizedString recalculationInstallmentName = AcademicTreasuryConstants
                         .academicTreasuryBundleI18N("label.RegistrationTuitionService.recalculation.installmentName.prefix")
-                        .append(installmentName);
+                        .append(" ").append(installmentName);
 
                 return Collections.singletonList(
                         new TuitionDebitEntryBean(installmentOrder, tariff, recalculationInstallmentName, recalculationDueDate,
@@ -784,7 +784,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                 LocalDate recalculationDueDate = this.installmentRecalculationOptions.recalculateInstallments.get(product);
                 LocalizedString recalculationInstallmentName = AcademicTreasuryConstants
                         .academicTreasuryBundleI18N("label.RegistrationTuitionService.recalculation.installmentName.prefix")
-                        .append(installmentName);
+                        .append(" ").append(installmentName);
 
                 // We need how to take the difference exemption. We take from the
                 // mapForOnlyThisInstallment or the mapForAllInstallments exemption map? And how much to take
@@ -842,12 +842,8 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                                 vat.getTaxRate(), getNetAmountAlreadyDebited(product).negate(),
                                 getNetAmountAlreadyExempted(product).negate(), new HashMap<>(), currency);
 
-                LocalizedString recalculationInstallmentName = AcademicTreasuryConstants
-                        .academicTreasuryBundleI18N("label.RegistrationTuitionService.recalculation.installmentName.prefix")
-                        .append(installmentName);
-
                 TuitionDebitEntryBean recalculationBean = new TuitionDebitEntryBean(installmentOrder, tariff,
-                        recalculationInstallmentName, recalculationDueDate, vat.getTaxRate(), originalBean.getAmount(),
+                        installmentName, recalculationDueDate, vat.getTaxRate(), originalBean.getAmount(),
                         originalBean.getExemptedAmount(), new HashMap<>(), currency);
 
                 BigDecimal recurringAmountToExempt = getAndDecrementFromDiscountMap(_discountExemptionsMapForOnlyThisInstallment,
@@ -861,7 +857,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
             }
 
             throw new IllegalStateException("reculation: do not know how to handle this case???");
-        } else {
+        } else if(!isTuitionInstallmentCharged(product) || this.isForCalculationsOfOriginalAmounts) {
             BigDecimal tuitionInstallmentAmountToPay = tariff.amountToPay(this);
 
             if (!TreasuryConstants.isPositive(tuitionInstallmentAmountToPay)) {
@@ -882,6 +878,8 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
             return Collections.singletonList(new TuitionDebitEntryBean(installmentOrder, tariff, installmentName, dueDate,
                     vat.getTaxRate(), finalAmountToPay, totalAmountToExempt, exemptionsMapToApply, currency));
+        } else {
+            return Collections.emptyList();
         }
     }
 

@@ -38,7 +38,9 @@ package org.fenixedu.academictreasury.dto.tuition;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -54,6 +56,7 @@ import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
+import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.dto.ITreasuryBean;
 import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
@@ -88,6 +91,14 @@ public class TuitionDebtCreationBean implements Serializable, ITreasuryBean {
     private TuitionPaymentPlanGroup tuitionPaymentPlanGroup;
     private AcademicTax academicTax;
 
+    private Boolean allInstallmentProducts;
+
+    private List<Product> installmentProductsList;
+    
+    private Map<Product, LocalDate> recalculationInstallmentProductsMap = new HashMap<>();
+    
+    private Boolean applyDefaultEnrolmentCredits;
+    
     public TuitionDebtCreationBean(final DebtAccount debtAccount, final TuitionPaymentPlanGroup tuitionPaymentPlanGroup) {
         this.debtAccount = debtAccount;
         this.tuitionPaymentPlanGroup = tuitionPaymentPlanGroup;
@@ -372,6 +383,14 @@ public class TuitionDebtCreationBean implements Serializable, ITreasuryBean {
         return this.tuitionPaymentPlanGroup != null && this.tuitionPaymentPlanGroup.isForRegistration();
     }
 
+    public void addRecalculationInstallmentProduct(Product product, LocalDate dueDate) {
+        this.recalculationInstallmentProductsMap.put(product, dueDate);
+    }
+
+    public void removeRecalculationInstallmentProduct(Product product) {
+        this.recalculationInstallmentProductsMap.remove(product);
+    }
+
     /* -----------------
      * GETTERS & SETTERS
      * -----------------
@@ -421,5 +440,36 @@ public class TuitionDebtCreationBean implements Serializable, ITreasuryBean {
     public void setEnrolment(Enrolment enrolment) {
         this.enrolment = enrolment;
     }
+    
+    public Boolean getAllInstallmentProducts() {
+        return allInstallmentProducts;
+    }
+    
+    public void setAllInstallmentProducts(Boolean allInstallmentProducts) {
+        this.allInstallmentProducts = allInstallmentProducts;
+    }
+    
+    public List<Product> getInstallmentProductsList() {
+        return installmentProductsList;
+    }
+    
+    public void setInstallmentProductsList(List<Product> installmentProductsList) {
+        this.installmentProductsList = installmentProductsList;
+    }
 
+    public Map<Product, LocalDate> getRecalculationInstallmentProductsMap() {
+        return recalculationInstallmentProductsMap;
+    }
+    
+    public void setRecalculationInstallmentProductsMap(Map<Product, LocalDate> recalculationInstallmentProductsMap) {
+        this.recalculationInstallmentProductsMap = recalculationInstallmentProductsMap;
+    }
+    
+    public Boolean getApplyDefaultEnrolmentCredits() {
+        return applyDefaultEnrolmentCredits;
+    }
+    
+    public void setApplyDefaultEnrolmentCredits(Boolean applyDefaultEnrolmentCredits) {
+        this.applyDefaultEnrolmentCredits = applyDefaultEnrolmentCredits;
+    }
 }

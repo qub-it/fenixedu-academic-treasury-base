@@ -56,9 +56,11 @@ public class TuitionDebitEntryBean {
     private Currency currency;
 
     private Map<TreasuryExemptionType, BigDecimal> exemptionsMap;
-    
-    public TuitionDebitEntryBean(int installmentOrder, TuitionInstallmentTariff tuitionInstallmentTariff, LocalizedString description, LocalDate dueDate,
-            BigDecimal vatRate, BigDecimal amount, Currency currency) {
+
+    private BigDecimal netAmountAlreadyCreated;
+
+    public TuitionDebitEntryBean(int installmentOrder, TuitionInstallmentTariff tuitionInstallmentTariff,
+            LocalizedString description, LocalDate dueDate, BigDecimal vatRate, BigDecimal amount, Currency currency) {
         super();
         this.installmentOrder = installmentOrder;
         this.tuitionInstallmentTariff = tuitionInstallmentTariff;
@@ -69,8 +71,9 @@ public class TuitionDebitEntryBean {
         this.currency = currency;
     }
 
-    public TuitionDebitEntryBean(int installmentOrder, TuitionInstallmentTariff tuitionInstallmentTariff, LocalizedString description, LocalDate dueDate,
-            BigDecimal vatRate, BigDecimal amount, BigDecimal exemptedAmount, Map<TreasuryExemptionType, BigDecimal> exemptionsMap, Currency currency) {
+    public TuitionDebitEntryBean(int installmentOrder, TuitionInstallmentTariff tuitionInstallmentTariff,
+            LocalizedString description, LocalDate dueDate, BigDecimal vatRate, BigDecimal amount, BigDecimal exemptedAmount,
+            Map<TreasuryExemptionType, BigDecimal> exemptionsMap, Currency currency) {
         this(installmentOrder, tuitionInstallmentTariff, description, dueDate, vatRate, amount, currency);
         this.exemptedAmount = exemptedAmount;
         this.exemptionsMap = exemptionsMap;
@@ -79,15 +82,15 @@ public class TuitionDebitEntryBean {
     public int getInstallmentOrder() {
         return installmentOrder;
     }
-    
+
     public void setInstallmentOrder(int installmentOrder) {
         this.installmentOrder = installmentOrder;
     }
-    
+
     public TuitionInstallmentTariff getTuitionInstallmentTariff() {
         return tuitionInstallmentTariff;
     }
-    
+
     public void setTuitionInstallmentTariff(TuitionInstallmentTariff tuitionInstallmentTariff) {
         this.tuitionInstallmentTariff = tuitionInstallmentTariff;
     }
@@ -95,7 +98,7 @@ public class TuitionDebitEntryBean {
     public LocalizedString getDescription() {
         return description;
     }
-    
+
     public void setDescription(LocalizedString description) {
         this.description = description;
     }
@@ -103,7 +106,7 @@ public class TuitionDebitEntryBean {
     public LocalDate getDueDate() {
         return dueDate;
     }
-    
+
     public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
@@ -111,7 +114,7 @@ public class TuitionDebitEntryBean {
     public BigDecimal getVatRate() {
         return vatRate;
     }
-    
+
     public void setVatRate(BigDecimal vatRate) {
         this.vatRate = vatRate;
     }
@@ -119,33 +122,41 @@ public class TuitionDebitEntryBean {
     public BigDecimal getAmount() {
         return amount;
     }
-    
+
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
-    
+
     public BigDecimal getExemptedAmount() {
         return exemptedAmount;
     }
-    
+
     public void setExemptedAmount(BigDecimal exemptedAmount) {
         this.exemptedAmount = exemptedAmount;
     }
-    
+
     public Currency getCurrency() {
         return currency;
     }
-    
+
     public void setCurrency(Currency currency) {
         this.currency = currency;
     }
-    
+
     public Map<TreasuryExemptionType, BigDecimal> getExemptionsMap() {
         return exemptionsMap;
     }
-    
+
     public void setExemptionsMap(Map<TreasuryExemptionType, BigDecimal> exemptionsMap) {
         this.exemptionsMap = exemptionsMap;
+    }
+
+    public BigDecimal getNetAmountAlreadyCreated() {
+        return netAmountAlreadyCreated;
+    }
+
+    public void setNetAmountAlreadyCreated(BigDecimal netAmountAlreadyCreated) {
+        this.netAmountAlreadyCreated = netAmountAlreadyCreated;
     }
 
 }

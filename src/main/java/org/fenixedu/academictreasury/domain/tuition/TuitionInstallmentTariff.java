@@ -752,10 +752,15 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
         fillPriceProperties.put("RECALCULATED_AMOUNT", recalculatedAmount.toString());
 
-        DebitEntry debitEntry = DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent, vat(when),
-                recalculatedAmount, recalculationDueDate, fillPriceProperties, getProduct(),
-                installmentName(academicTreasuryEvent.getRegistration()).getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE),
-                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay());
+        String recalculationLabel = AcademicTreasuryConstants.academicTreasuryBundle(AcademicTreasuryConstants.DEFAULT_LANGUAGE,
+                "label.RegistrationTuitionService.recalculation.installmentName.prefix");
+        String installmentName =
+                installmentName(academicTreasuryEvent.getRegistration()).getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE);
+        
+        DebitEntry debitEntry =
+                DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent, vat(when), recalculatedAmount,
+                        recalculationDueDate, fillPriceProperties, getProduct(), recalculationLabel + " " + installmentName,
+                        AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay());
 
         if (isAcademicalActBlockingOff()) {
             debitEntry.markAcademicalActBlockingSuspension();

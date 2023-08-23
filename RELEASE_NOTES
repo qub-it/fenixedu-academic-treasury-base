@@ -1,3 +1,5 @@
+- Bug Fix: Fixes and improvements in registration tuition service
+
 11.0.0 (14-08-2023)
 - Improvement: Support in legacy treasury event, the account as tuition and discount tuition amount
 - Improvement: Add minimum and maximum amount in tuition calculator aggregator
