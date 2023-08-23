@@ -38,6 +38,7 @@ package org.fenixedu.academictreasury.dto.tuition;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +94,7 @@ public class TuitionDebtCreationBean implements Serializable, ITreasuryBean {
 
     private Boolean allInstallmentProducts;
 
-    private List<Product> installmentProductsList;
+    private List<Product> installmentProductsList = new ArrayList<>();
     
     private Map<Product, LocalDate> recalculationInstallmentProductsMap = new HashMap<>();
     
