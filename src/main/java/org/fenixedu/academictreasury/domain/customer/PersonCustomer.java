@@ -955,12 +955,6 @@ public class PersonCustomer extends PersonCustomer_Base {
             newCustomer.get().activateCustomer();
         }
 
-        if (personCustomer != null) {
-            personCustomer.checkRules();
-        }
-
-        newCustomer.get().checkRules();
-
         return true;
     }
 
