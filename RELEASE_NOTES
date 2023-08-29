@@ -1,3 +1,6 @@
+- Bug Fix: Fix NPE in create payment references strategy for academic debt generation rule
+- Improvement: Associate academic debt generation rules by finantial entity
+
 11.0.1 (28-08-2023)
 - Bug Fix: Fixes and improvements in registration tuition service
 - Improvement: Remove superfluous check rules in PersonCustomer::switchCustomer
