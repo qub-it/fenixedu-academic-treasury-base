@@ -435,8 +435,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
             getTuitionInstallmentTariffsSet().stream().filter(tariff -> tariff.getTuitionPaymentPlanCalculator() != null)
             .map(tariff -> tariff.getTuitionPaymentPlanCalculator()).collect(Collectors.toSet()).forEach(calculator -> {
                 strBuilder.append(calculator.getName().getContent(services.defaultLocale())).append(" (")
-                        .append(academicTreasuryEvent.formatMoney(calculator.getTotalAmount(registration))).append("): \n");
-                String description = calculator.getCalculationDescription(registration);
+                        .append(academicTreasuryEvent.formatMoney(calculator.getTotalAmount(standaloneEnrolment))).append("): \n");
+                String description = calculator.getCalculationDescription(standaloneEnrolment);
                 strBuilder.append(description).append("\n");
             });
 
@@ -514,8 +514,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
             .filter(tariff -> tariff.getTuitionPaymentPlanCalculator() != null)
             .map(tariff -> tariff.getTuitionPaymentPlanCalculator()).collect(Collectors.toSet()).forEach(calculator -> {
                 strBuilder.append(calculator.getName()).append(" (")
-                        .append(academicTreasuryEvent.formatMoney(calculator.getTotalAmount(registration))).append("): \n");
-                String description = calculator.getCalculationDescription(registration);
+                        .append(academicTreasuryEvent.formatMoney(calculator.getTotalAmount(extracurricularEnrolment))).append("): \n");
+                String description = calculator.getCalculationDescription(extracurricularEnrolment);
                 strBuilder.append(description).append("\n");
             });
 
