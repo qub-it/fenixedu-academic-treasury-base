@@ -910,16 +910,6 @@ class debtGeneration.AcademicDebtGenerationRule {
 		}
 	}
 	
-	relation AcademicDebtGenerationRuleFinantialEntity {
-		.org.fenixedu.treasury.domain.FinantialEntity playsRole finantialEntity {
-			multiplicity 1..1;
-		}
-		
-		debtGeneration.AcademicDebtGenerationRule playsRole academicDebtGenerationRules {
-			multiplicity *;
-		}
-	}
-	
 class debtGeneration.AcademicDebtGenerationRuleEntry {
 	boolean createDebt;
 	boolean toCreateAfterLastRegistrationStateDate;

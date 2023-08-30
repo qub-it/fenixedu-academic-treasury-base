@@ -57,7 +57,6 @@ import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainExc
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.dto.debtGeneration.AcademicDebtGenerationRuleBean;
 import org.fenixedu.academictreasury.dto.debtGeneration.AcademicDebtGenerationRuleBean.ProductEntry;
-import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.slf4j.Logger;
@@ -102,7 +101,6 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         setBackgroundExecution(true);
 
         setAcademicDebtGenerationRuleType(bean.getType());
-        setFinantialEntity(bean.getFinantialEntity());
         setExecutionYear(bean.getExecutionYear());
         setAggregateOnDebitNote(bean.isAggregateOnDebitNote());
         setEntriesAggregationInDebitNoteType(bean.getEntriesAggregationInDebitNoteType());
@@ -148,7 +146,6 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         setBackgroundExecution(ruleToCopy.isBackgroundExecution());
 
         setAcademicDebtGenerationRuleType(ruleToCopy.getAcademicDebtGenerationRuleType());
-        setFinantialEntity(ruleToCopy.getFinantialEntity());
         setExecutionYear(executionYear);
         setAggregateOnDebitNote(ruleToCopy.isAggregateOnDebitNote());
         setEntriesAggregationInDebitNoteType(ruleToCopy.getEntriesAggregationInDebitNoteType());
@@ -194,10 +191,6 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     public void checkRules() {
         if (getDomainRoot() == null) {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.bennu.required");
-        }
-        
-        if(getFinantialEntity() == null) {
-            throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.finantialEntity.required");
         }
 
         if (getExecutionYear() == null) {
@@ -319,9 +312,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         setDomainRoot(null);
         setAcademicDebtGenerationRuleType(null);
         getDegreeCurricularPlansSet().clear();
-        setFinantialEntity(null);
         setExecutionYear(null);
-        
         while (getAcademicDebtGenerationRuleEntriesSet().size() > 0) {
             getAcademicDebtGenerationRuleEntriesSet().iterator().next().delete();
         }
@@ -554,13 +545,12 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     }
 
     public static List<AcademicDebtGenerationProcessingResult> runAllActive(final boolean runOnlyWithBackgroundExecution) {
-        return runAllActive(runOnlyWithBackgroundExecution, null, null, null, null);
+        return runAllActive(runOnlyWithBackgroundExecution, null, null, null);
     }
 
     public static List<AcademicDebtGenerationProcessingResult> runAllActive(final boolean runOnlyWithBackgroundExecution,
             Consumer<List<AcademicDebtGenerationProcessingResult>> ruleExecutionCallback,
             AcademicDebtGenerationRuleType typeArg,
-            FinantialEntity finantialEntityArg,
             ExecutionYear executionYearArg) {
         final List<Future<List<AcademicDebtGenerationProcessingResult>>> futureList = Lists.newArrayList();
 
@@ -575,10 +565,6 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
             for (final AcademicDebtGenerationRule academicDebtGenerationRule : AcademicDebtGenerationRule.findActiveByType(type)
                     .sorted(COMPARE_BY_ORDER_NUMBER).collect(Collectors.toList())) {
 
-                if(finantialEntityArg != null && academicDebtGenerationRule.getFinantialEntity() != finantialEntityArg) {
-                    continue;
-                }
-                
                 if (executionYearArg != null && academicDebtGenerationRule.getExecutionYear() != executionYearArg) {
                     continue;
                 }

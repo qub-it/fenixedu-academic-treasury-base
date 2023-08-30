@@ -54,10 +54,10 @@ import org.fenixedu.academictreasury.domain.debtGeneration.DebtGenerationRuleRes
 import org.fenixedu.academictreasury.domain.debtGeneration.IAcademicDebtGenerationRuleStrategy;
 import org.fenixedu.academictreasury.domain.emoluments.AcademicTax;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
+import org.fenixedu.academictreasury.dto.debtGeneration.AcademicDebtGenerationRuleBean.ProductEntry;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
-import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.settings.TreasurySettings;
 import org.fenixedu.treasury.dto.ITreasuryBean;
@@ -112,7 +112,6 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
 
     private AcademicDebtGenerationRuleType type;
 
-    private FinantialEntity finantialEntity;
     private ExecutionYear executionYear;
     private boolean aggregateOnDebitNote;
     private AcademicDebtEntriesAggregationInDebitNoteType entriesAggregationInDebitNoteType;
@@ -152,10 +151,8 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
     private boolean appliedMinimumAmountForPaymentCode;
     private BigDecimal minimumAmountForPaymentCode;
 
-    public AcademicDebtGenerationRuleBean(AcademicDebtGenerationRuleType type, FinantialEntity finantialEntity,
-            ExecutionYear executionYear) {
+    public AcademicDebtGenerationRuleBean(final AcademicDebtGenerationRuleType type, final ExecutionYear executionYear) {
         this.type = type;
-        this.finantialEntity = finantialEntity;
         this.executionYear = executionYear;
 
         this.executionYearDataSource = ExecutionYear.readNotClosedExecutionYears().stream()
@@ -222,7 +219,6 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
 
     public AcademicDebtGenerationRuleBean(final AcademicDebtGenerationRule rule) {
         this.type = rule.getAcademicDebtGenerationRuleType();
-        this.finantialEntity = rule.getFinantialEntity();
         this.executionYear = rule.getExecutionYear();
 
         this.executionYearDataSource = ExecutionYear.readNotClosedExecutionYears().stream()
@@ -249,25 +245,23 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
 
     public void chooseDegreeType() {
         if (getExecutionYear() == null) {
-            this.degreeCurricularPlanDataSource = Collections.<TreasuryTupleDataSourceBean> emptyList();
+            degreeCurricularPlanDataSource = Collections.<TreasuryTupleDataSourceBean> emptyList();
             return;
         }
 
         if (getDegreeType() == null) {
-            this.degreeCurricularPlanDataSource = Collections.<TreasuryTupleDataSourceBean> emptyList();
+            degreeCurricularPlanDataSource = Collections.<TreasuryTupleDataSourceBean> emptyList();
             return;
         }
 
         final List<TreasuryTupleDataSourceBean> result =
                 ExecutionDegree.getAllByExecutionYearAndDegreeType(getExecutionYear(), getDegreeType()).stream()
-                        .filter(e -> AcademicTreasuryPlataformDependentServicesFactory.implementation()
-                                .readDegrees(this.finantialEntity).contains(e.getDegree())) //
-                        .map(e -> e.getDegreeCurricularPlan()) //
+                        .map(e -> e.getDegreeCurricularPlan())
                         .map((dcp) -> new TreasuryTupleDataSourceBean(dcp.getExternalId(),
-                                "[" + dcp.getDegree().getCode() + "] " + dcp.getPresentationName(getExecutionYear()))) //
+                                "[" + dcp.getDegree().getCode() + "] " + dcp.getPresentationName(getExecutionYear())))
                         .collect(Collectors.toList());
 
-        this.degreeCurricularPlanDataSource =
+        degreeCurricularPlanDataSource =
                 result.stream().sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT).collect(Collectors.toList());
     }
 
@@ -340,11 +334,11 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
     public void setAggregateOnDebitNote(boolean aggregateOnDebitNote) {
         this.aggregateOnDebitNote = aggregateOnDebitNote;
     }
-
+    
     public AcademicDebtEntriesAggregationInDebitNoteType getEntriesAggregationInDebitNoteType() {
         return entriesAggregationInDebitNoteType;
     }
-
+    
     public void setEntriesAggregationInDebitNoteType(
             AcademicDebtEntriesAggregationInDebitNoteType entriesAggregationInDebitNoteType) {
         this.entriesAggregationInDebitNoteType = entriesAggregationInDebitNoteType;
@@ -384,14 +378,6 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
 
     public void setToCreateAfterLastRegistrationStateDate(boolean toCreateAfterLastRegistrationStateDate) {
         this.toCreateAfterLastRegistrationStateDate = toCreateAfterLastRegistrationStateDate;
-    }
-
-    public FinantialEntity getFinantialEntity() {
-        return finantialEntity;
-    }
-
-    public void setFinantialEntity(FinantialEntity finantialEntity) {
-        this.finantialEntity = finantialEntity;
     }
 
     public ExecutionYear getExecutionYear() {
