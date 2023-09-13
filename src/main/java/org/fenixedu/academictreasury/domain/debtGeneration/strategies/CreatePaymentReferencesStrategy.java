@@ -360,6 +360,10 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
         } else if (tuitionPaymentPlanGroup.isForStandalone()) {
             t = TuitionServices.findAcademicTreasuryEventTuitionForStandalone(registration, executionYear);
         }
+        
+        if(t == null) {
+            return Collections.emptySet();
+        }
 
         return findActiveDebitEntries(customer, t, product).filter(d -> d.isInDebt())
                 .filter(d -> SibsPaymentRequest.findCreatedByDebitEntry(d).count() == 0
