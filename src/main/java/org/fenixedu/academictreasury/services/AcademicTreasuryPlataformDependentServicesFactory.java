@@ -43,7 +43,7 @@ public class AcademicTreasuryPlataformDependentServicesFactory {
         return _impl;
     }
     
-    public static synchronized void registerImplementation(IAcademicTreasuryPlatformDependentServices impl) {
+    public static void registerImplementation(IAcademicTreasuryPlatformDependentServices impl) {
         _impl = impl;
     }
 	

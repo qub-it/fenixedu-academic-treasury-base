@@ -1,3 +1,5 @@
+- Improvement: Remove synchronized keywords to avoid contention. Replace StringBuilder with StringBuffer to avoid synchronized facility
+
 11.0.2 (30-08-2023)
 - Bug Fix: Fix bug in standalone and extracurricular tuitions, using the new model of calculators
 

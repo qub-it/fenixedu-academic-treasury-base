@@ -50,18 +50,15 @@ import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
 
 public class ErrorsLog implements IErrorsLog {
-    final StringBuilder sb = new StringBuilder();
+    final StringBuffer sb = new StringBuffer();
 
     public void addError(final InvoiceEntry entry, final Exception e) {
-        synchronized (this) {
-            final String oid = entry.getExternalId();
-            final String documentNumber =
-                    entry.getFinantialDocument() != null ? entry.getFinantialDocument().getUiDocumentNumber() : "";
-            final String description = entry.getDescription();
+        final String oid = entry.getExternalId();
+        final String documentNumber =
+                entry.getFinantialDocument() != null ? entry.getFinantialDocument().getUiDocumentNumber() : "";
+        final String description = entry.getDescription();
 
-            sb.append(String.format("[%s/%s] - '%s'\n", oid, documentNumber, description));
-            sb.append(ExceptionUtils.getFullStackTrace(e)).append("\n\n");
-        }
+        sb.append(String.format("[%s/%s] - '%s'\n%s\n\n", oid, documentNumber, description, ExceptionUtils.getFullStackTrace(e)));
     }
 
     public void addError(final SettlementEntry entry, final Exception e) {
@@ -71,8 +68,7 @@ public class ErrorsLog implements IErrorsLog {
                     entry.getFinantialDocument() != null ? entry.getFinantialDocument().getUiDocumentNumber() : "";
             final String description = entry.getDescription() != null ? entry.getDescription() : "";
 
-            sb.append(String.format("[%s/%s] - '%s'\n", oid, documentNumber, description));
-            sb.append(ExceptionUtils.getFullStackTrace(e)).append("\n\n");
+            sb.append(String.format("[%s/%s] - '%s'\n%s\n\n", oid, documentNumber, description, ExceptionUtils.getFullStackTrace(e)));
         }
     }
 
@@ -82,8 +78,7 @@ public class ErrorsLog implements IErrorsLog {
             final String documentNumber =
                     entry.getSettlementNote() != null ? entry.getSettlementNote().getUiDocumentNumber() : "";
 
-            sb.append(String.format("[%s/%s]\n", oid, documentNumber));
-            sb.append(ExceptionUtils.getFullStackTrace(e)).append("\n\n");
+            sb.append(String.format("[%s/%s]\n%s\n\n", oid, documentNumber, ExceptionUtils.getFullStackTrace(e)));
 
         }
     }
@@ -94,8 +89,7 @@ public class ErrorsLog implements IErrorsLog {
             final String documentNumber =
                     entry.getSettlementNote() != null ? entry.getSettlementNote().getUiDocumentNumber() : "";
 
-            sb.append(String.format("[%s/%s]\n", oid, documentNumber));
-            sb.append(ExceptionUtils.getFullStackTrace(e)).append("\n\n");
+            sb.append(String.format("[%s/%s]\n%s\n\n", oid, documentNumber, ExceptionUtils.getFullStackTrace(e)));
         }
     }
 
@@ -110,8 +104,7 @@ public class ErrorsLog implements IErrorsLog {
             } catch(Exception e2) {
             }
 
-            sb.append(String.format("[%s/%s] - %s\n", oid, identification, name));
-            sb.append(ExceptionUtils.getFullStackTrace(e)).append("\n\n");
+            sb.append(String.format("[%s/%s] - %s\n%s\n\n", oid, identification, name, ExceptionUtils.getFullStackTrace(e)));
         }
     }
     
@@ -120,8 +113,7 @@ public class ErrorsLog implements IErrorsLog {
             final String oid = academicActBlockingSuspension.getExternalId();
             final String name = academicActBlockingSuspension.getPerson().getName();
 
-            sb.append(String.format("[%s] - %s\n", oid, name));
-            sb.append(ExceptionUtils.getFullStackTrace(e)).append("\n\n");
+            sb.append(String.format("[%s] - %s\n%s\n\n", oid, name, ExceptionUtils.getFullStackTrace(e)));
         }        
     }
     
@@ -130,8 +122,7 @@ public class ErrorsLog implements IErrorsLog {
             final String oid = paymentRequest.getExternalId();
             final String referenceCode = paymentRequest.getReferenceCode();
 
-            sb.append(String.format("[%s] - %s\n", oid, referenceCode));
-            sb.append(ExceptionUtils.getFullStackTrace(e)).append("\n\n");
+            sb.append(String.format("[%s] - %s\n%s\n\n", oid, referenceCode, ExceptionUtils.getFullStackTrace(e)));
         }
     }
     
@@ -140,8 +131,7 @@ public class ErrorsLog implements IErrorsLog {
             final String oid = sibsTransactionDetail.getExternalId();
             final String referenceCode = sibsTransactionDetail.getSibsPaymentReferenceCode();
 
-            sb.append(String.format("[%s] - %s\n", oid, referenceCode));
-            sb.append(ExceptionUtils.getFullStackTrace(e)).append("\n\n");
+            sb.append(String.format("[%s] - %s\n%s\n\n", oid, referenceCode, ExceptionUtils.getFullStackTrace(e)));
         }        
     }
     
@@ -149,8 +139,7 @@ public class ErrorsLog implements IErrorsLog {
         synchronized(this) {
             final String oid = treasuryExemption.getExternalId();
             
-            sb.append(String.format("[%s]\n", oid));
-            sb.append(ExceptionUtils.getFullStackTrace(e)).append("\n\n");
+            sb.append(String.format("[%s]\n%s\n\n", oid, ExceptionUtils.getFullStackTrace(e)));
         }
     }
 
@@ -158,8 +147,7 @@ public class ErrorsLog implements IErrorsLog {
         synchronized(this) {
             final String oid = product.getExternalId();
 
-            sb.append(String.format("[%s]\n", oid));
-            sb.append(ExceptionUtils.getFullStackTrace(e)).append("\n\n");
+            sb.append(String.format("[%s]\n%s\n\n", oid, ExceptionUtils.getFullStackTrace(e)));
         }
     }
     

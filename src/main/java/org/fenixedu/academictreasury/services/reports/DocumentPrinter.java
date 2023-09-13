@@ -68,7 +68,7 @@ public class DocumentPrinter {
         registerService();
     }
 
-    public static synchronized void registerService() {
+    private static void registerService() {
         IDocumentTemplateService service = new DocumentPrinterConfiguration();
         DocumentTemplateEngine.registerServiceImplementations(service);
     }

@@ -96,7 +96,7 @@ public class TuitionServices {
 
     private static final List<ITuitionServiceExtension> TUITION_SERVICE_EXTENSIONS = Lists.newArrayList();
 
-    public static synchronized void registerTuitionServiceExtension(final ITuitionServiceExtension extension) {
+    public static void registerTuitionServiceExtension(final ITuitionServiceExtension extension) {
         TUITION_SERVICE_EXTENSIONS.add(extension);
     }
     
