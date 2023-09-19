@@ -41,6 +41,7 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Product;
+import org.fenixedu.treasury.domain.exemption.TreasuryExemptionType;
 import org.joda.time.LocalDate;
 
 public class LegacyAcademicTreasuryEvent extends LegacyAcademicTreasuryEvent_Base {
@@ -73,6 +74,20 @@ public class LegacyAcademicTreasuryEvent extends LegacyAcademicTreasuryEvent_Bas
         }
     }
 
+    @Override
+    public String getDegreeCode() {
+        if (getDegree() == null) {
+            return null;
+        }
+
+        return getDegree().getCode();
+    }
+    
+    @Override
+    public TreasuryExemptionType getTreasuryExemptionToApplyInEventDiscountInTuitionFee() {
+        return super.getExemptionToApplyInEventDiscountInTuitionFee();
+    }
+    
     @Override
     public boolean isAcademicServiceRequestEvent() {
         return false;
