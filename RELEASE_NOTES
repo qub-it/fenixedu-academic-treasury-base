@@ -1,3 +1,7 @@
+- Refactor: Remove relation between TreasuryEvent and TreasuryExemption. the treasuryEvent can be infered in treasuryExemption by accessing the associated debitEntry
+- Refactor: Added method to know what is the associated tuition payment plan of calculator, since it might be connected to a aggregator calculator
+- Bug Fix: Add missing error label
+
 11.1.0 (14-09-2023)
 - Improvement: Remove synchronized keywords to avoid contention. Replace StringBuilder with StringBuffer to avoid synchronized facility
 - Improvement: Associate academic debt generation rules by finantial entity

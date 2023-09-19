@@ -810,10 +810,6 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
             debitEntry.setTreasuryEvent(this);
         }
 
-        for (final TreasuryExemption exemption : Sets.newHashSet(event.getTreasuryExemptionsSet())) {
-            exemption.setTreasuryEvent(this);
-        }
-
     }
 
     @Override

@@ -80,7 +80,7 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
 
     public static final Comparator<ExemptionsGenerationRequestFile> COMPARE_BY_CREATION_DATE = (o1, o2) -> {
         int c = o1.getCreationDate().compareTo(o2.getCreationDate());
-        
+
         return c != 0 ? c : o1.getExternalId().compareTo(o2.getExternalId());
     };
 
@@ -109,11 +109,11 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
         setTreasuryExemptionType(treasuryExemptionType);
 
         ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
-        
+
         services.createFile(this, filename, CONTENT_TYPE, content);
 
         checkRules();
-        
+
     }
 
     private void checkRules() {
@@ -142,13 +142,13 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
                     for (int installmentOrder : row.getTuitionInstallmentsOrderSet()) {
                         DebitEntry tuitionDebitEntry = row.getTuitionDebitEntry(installmentOrder);
                         if (tuitionDebitEntry != null) {
-                            TreasuryExemption.create(getTreasuryExemptionType(), row.getTreasuryEvent(), row.getReason(),
+                            TreasuryExemption.create(getTreasuryExemptionType(), row.getReason(),
                                     row.getDiscountAmount(installmentOrder), tuitionDebitEntry);
                         }
                     }
                 } else {
-                    TreasuryExemption.create(getTreasuryExemptionType(), row.getTreasuryEvent(), row.getReason(),
-                            row.getDiscountAmount(), row.getDebitEntry());
+                    TreasuryExemption.create(getTreasuryExemptionType(), row.getReason(), row.getDiscountAmount(),
+                            row.getDebitEntry());
                 }
             } catch (Exception e) {
                 throw new AcademicTreasuryDomainException("error.ExemptionsGenerationRequestFile.unable.to.create.exemption",
@@ -158,19 +158,19 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
         }
 
         final DateTime now = new DateTime();
-        
+
         setWhenProcessed(now);
     }
-    
+
     @Override
     public void delete() {
         final ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
-        
+
         setDomainRoot(null);
         setTreasuryExemptionType(null);
-        
+
         services.deleteFile(this);
-        
+
         super.deleteDomainObject();
     }
 
@@ -184,13 +184,13 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
     public static Stream<ExemptionsGenerationRequestFile> findAll() {
         return FenixFramework.getDomainRoot().getExemptionsGenerationRequestFileSet().stream();
     }
-    
+
     @Atomic
     public static ExemptionsGenerationRequestFile create(final TreasuryExemptionType treasuryExemptionType, final String filename,
             final byte[] content) {
         return new ExemptionsGenerationRequestFile(treasuryExemptionType, filename, content);
     }
-    
+
     public static List<ExemptionsGenerationRowResult> readExcel(final TreasuryExemptionType treasuryExemptionType,
             byte[] content) {
         try {
@@ -279,8 +279,7 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
 
                 if (registration == null) {
                     throw new AcademicTreasuryDomainException("error.ExemptionsGenerationRequestFile.registration.not.found",
-                            String.valueOf(rowNum), studentNumberValue, degreeCodeValue,
-                            degree.getPresentationName());
+                            String.valueOf(rowNum), studentNumberValue, degreeCodeValue, degree.getPresentationName());
                 }
 
                 if (!registration.getStudent().getName().trim().equals(studentNameValue)) {
@@ -300,9 +299,11 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
                             String.valueOf(rowNum), studentNumberValue);
                 }
 
-                final PersonCustomer personCustomer = PersonCustomer.findUnique(person, addressFiscalCountryCode, fiscalNumber).get();
+                final PersonCustomer personCustomer =
+                        PersonCustomer.findUnique(person, addressFiscalCountryCode, fiscalNumber).get();
                 if (!personCustomer.isActive()) {
-                    throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active", addressFiscalCountryCode, fiscalNumber);
+                    throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active", addressFiscalCountryCode,
+                            fiscalNumber);
                 }
 
                 TreasuryEvent treasuryEvent = null;

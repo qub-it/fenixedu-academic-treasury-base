@@ -25,6 +25,11 @@ abstract public class TuitionPaymentPlanCalculator extends TuitionPaymentPlanCal
         return getTuitionCalculatorParentAggregator() != null ? getTuitionCalculatorParentAggregator()
                 .getExecutionYear() : getTuitionPaymentPlan().getExecutionYear();
     }
+    
+    public TuitionPaymentPlan getAssociatedTuitionPaymentPlan() {
+        return getTuitionCalculatorParentAggregator() != null ? getTuitionCalculatorParentAggregator()
+                .getAssociatedTuitionPaymentPlan() : getTuitionPaymentPlan();
+    }
 
     public abstract boolean isValid();
 

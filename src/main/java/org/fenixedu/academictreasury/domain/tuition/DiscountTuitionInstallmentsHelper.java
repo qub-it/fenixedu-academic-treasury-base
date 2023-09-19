@@ -141,7 +141,7 @@ public class DiscountTuitionInstallmentsHelper {
 
                 String reason = treasuryExemptionType.getName()
                         .getContent(TreasuryPlataformDependentServicesFactory.implementation().defaultLocale());
-                TreasuryExemption.create(treasuryExemptionType, this.tuitionAcademicTreasuryEvent, reason, amountToExempt,
+                TreasuryExemption.create(treasuryExemptionType, reason, amountToExempt,
                         installmentDebitEntry);
             }
 

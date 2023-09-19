@@ -523,7 +523,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
             String reason = treasuryExemptionType.getName()
                     .getContent(TreasuryPlataformDependentServicesFactory.implementation().defaultLocale());
-            TreasuryExemption.create(treasuryExemptionType, academicTreasuryEvent, reason, amountToExempt, installmentDebitEntry);
+            TreasuryExemption.create(treasuryExemptionType, reason, amountToExempt, installmentDebitEntry);
         }
 
         return true;
@@ -540,7 +540,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
             String reason = treasuryExemptionType.getName()
                     .getContent(TreasuryPlataformDependentServicesFactory.implementation().defaultLocale());
-            TreasuryExemption.create(treasuryExemptionType, academicTreasuryEvent, reason, amountToExempt, installmentDebitEntry);
+            TreasuryExemption.create(treasuryExemptionType, reason, amountToExempt, installmentDebitEntry);
         }
 
         return true;
