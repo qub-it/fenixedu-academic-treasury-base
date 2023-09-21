@@ -1,3 +1,4 @@
+11.1.2 (21-09-2023)
 - Improvement: In exemptions request by file, read the product of treasury event by code, besides reading by description (#UL-FC-4400)
 - Improvement: In exemptions request by file, if the debit entry name is not specified, consider only debit entries in treasury event which are not interests (#UL-FC-4400)
 
