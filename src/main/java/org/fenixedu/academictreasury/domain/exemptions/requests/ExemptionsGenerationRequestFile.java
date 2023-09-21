@@ -61,6 +61,7 @@ import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemptionType;
+import org.fenixedu.treasury.domain.settings.TreasurySettings;
 import org.fenixedu.treasury.services.accesscontrol.TreasuryAccessControlAPI;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
@@ -324,8 +325,13 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
 
                 if (treasuryEvent == null) {
                     // Find by description not found, find by tuition or academic tax
-                    final Product product = Product.findByName(treasuryEventValue).findFirst().orElse(null);
+                    Product product = Product.findByName(treasuryEventValue).findFirst().orElse(null);
 
+                    if(product == null) {
+                        // try and read by product code
+                        product = Product.findUniqueByCode(treasuryEventValue).orElse(null);
+                    }
+                    
                     if (product != null) {
                         if (product == TuitionPaymentPlanGroup.findUniqueDefaultGroupForRegistration().get()
                                 .getCurrentProduct()) {
@@ -434,7 +440,10 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
 
                 if (debitEntry == null && !isTreasuryEventForRegistrationTuition(treasuryEvent)) {
                     final Set<DebitEntry> debitEntries =
-                            DebitEntry.findActive(treasuryEvent).collect(Collectors.<DebitEntry> toSet());
+                            DebitEntry
+                                .findActive(treasuryEvent) //
+                                .filter(de -> de.getProduct() != TreasurySettings.getInstance().getInterestProduct()) //
+                                .collect(Collectors.<DebitEntry> toSet());
 
                     if (debitEntries.size() == 0) {
                         throw new AcademicTreasuryDomainException(

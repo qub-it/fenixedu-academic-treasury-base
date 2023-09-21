@@ -1,3 +1,6 @@
+- Improvement: In exemptions request by file, read the product of treasury event by code, besides reading by description (#UL-FC-4400)
+- Improvement: In exemptions request by file, if the debit entry name is not specified, consider only debit entries in treasury event which are not interests (#UL-FC-4400)
+
 11.1.1 (19-09-2023)
 - Refactor: Remove relation between TreasuryEvent and TreasuryExemption. the treasuryEvent can be infered in treasuryExemption by accessing the associated debitEntry
 - Refactor: Added method to know what is the associated tuition payment plan of calculator, since it might be connected to a aggregator calculator
