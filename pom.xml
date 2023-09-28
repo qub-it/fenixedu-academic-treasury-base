@@ -10,7 +10,7 @@
 
 	<groupId>org.fenixedu</groupId>
 	<artifactId>fenixedu-academic-treasury-base</artifactId>
-	<version>11.1.2</version>
+	<version>11.1.3</version>
 	<packaging>jar</packaging>
 
 	<name>Academic Treasury Base</name>
