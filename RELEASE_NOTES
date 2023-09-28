@@ -1,3 +1,8 @@
+- Refactor: Fix the academic treasury event degree association and use the DML AcademicTreasuryEvent and Degree relation (#qubIT-Fenix-4374)
+- Bug Fix: Fix tuition payment plan tuition deletion for many degree curricular plans. The reorder of tuition payment plan orders was fixed (#qubIT-Fenix-4401)
+- Bug Fix: Fix tuition payment plan creation, when the tuition payment plan orders are not strictly sequential (<previous order> + 1) (#qubIT-Fenix-4402)
+- Bug Fix: Add specific method factory to create TuitionPaymentPlanBean, when copying a tuition payment plan, to fix the copy of tuition calculators (#qubIT-Fenix-4403)
+
 11.1.2 (21-09-2023)
 - Improvement: In exemptions request by file, read the product of treasury event by code, besides reading by description (#UL-FC-4400)
 - Improvement: In exemptions request by file, if the debit entry name is not specified, consider only debit entries in treasury event which are not interests (#UL-FC-4400)

@@ -628,6 +628,11 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         getTuitionPaymentPlanCalculatorSet().forEach(c -> c.delete());
 
         super.getTuitionConditionRulesSet().forEach(rule -> rule.delete());
+
+        while (!getTuitionPaymentPlanOrdersSet().isEmpty()) {
+            getTuitionPaymentPlanOrdersSet().iterator().next().delete(false);
+        }
+        
         super.setTuitionPaymentPlanGroup(null);
         super.setExecutionYear(null);
         super.setProduct(null);
@@ -637,9 +642,6 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         setCopyFromTuitionPaymentPlan(null);
         while (!getTuitionPaymentPlanCopiesSet().isEmpty()) {
             getTuitionPaymentPlanCopiesSet().iterator().next().setCopyFromTuitionPaymentPlan(null);
-        }
-        while (!getTuitionPaymentPlanOrdersSet().isEmpty()) {
-            getTuitionPaymentPlanOrdersSet().iterator().next().delete(false);
         }
 
         // From old model but migrated tuition payment plans might have associated dcp or other conditions

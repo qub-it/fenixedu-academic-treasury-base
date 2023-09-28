@@ -678,24 +678,35 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
     @Override
     public String getDegreeCode() {
-        if (degree() == null) {
+        if (getDegree() == null) {
             return null;
         }
 
-        return degree().getCode();
+        return getDegree().getCode();
     }
 
     @Override
     public String getDegreeName() {
-        if (degree() == null) {
+        if (getDegree() == null) {
             return null;
         }
 
         if (getExecutionYear() != null) {
-            return degree().getPresentationName(getExecutionYear());
+            return getDegree().getPresentationName(getExecutionYear());
         }
 
-        return degree().getPresentationName();
+        return getDegree().getPresentationName();
+    }
+    
+    @Override
+    public Degree getDegree() {
+        Degree degree = degree();
+        
+        if(degree != null) {
+            return degree;
+        }
+        
+        return super.getDegree();
     }
 
     @Override
@@ -847,10 +858,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     @Override
     public Optional<Tariff> findMatchTariff(FinantialEntity finantialEntity, Product product, LocalDate when) {
 
-        if (degree() != null) {
-            return Optional
-                    .ofNullable(AcademicTariff.findMatch(finantialEntity, product, degree(), when.toDateTimeAtStartOfDay()));
-        } else if (getDegree() != null) {
+        if (getDegree() != null) {
             return Optional
                     .ofNullable(AcademicTariff.findMatch(finantialEntity, product, getDegree(), when.toDateTimeAtStartOfDay()));
         }

@@ -84,7 +84,6 @@ import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
-import org.fenixedu.treasury.domain.settings.TreasurySettings;
 import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
 import org.fenixedu.treasury.domain.tariff.InterestRateType;
 import org.fenixedu.treasury.dto.ITreasuryBean;
@@ -94,6 +93,8 @@ import org.joda.time.LocalDate;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
+import pt.ist.fenixframework.Atomic;
 
 public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
@@ -307,10 +308,10 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     public void updateDatesBasedOnSelectedExecutionYear() {
-        if(!isTuitionPaymentPlanCreationFromCopy()) {
+        if (!isTuitionPaymentPlanCreationFromCopy()) {
             return;
         }
-        
+
         int executionYearInterval = this.executionYear.getAcademicInterval().getStart().getYear()
                 - this.copiedExecutionYear.getAcademicInterval().getStart().getYear();
 
@@ -322,7 +323,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
             }
         }
     }
-    
+
     private boolean isTuitionPaymentPlanCreationFromCopy() {
         return this.copiedExecutionYear != null;
     }
@@ -1232,6 +1233,27 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
     public void setTuitionPaymentPlanCalculatorList(List<TuitionPaymentPlanCalculator> tuitionPaymentPlanCalculatorList) {
         this.tuitionPaymentPlanCalculatorList = tuitionPaymentPlanCalculatorList;
+    }
+
+    @Atomic
+    public static TuitionPaymentPlanBean createForCopy(TuitionPaymentPlan tuitionPaymentPlan) {
+        TuitionPaymentPlanBean result = new TuitionPaymentPlanBean(tuitionPaymentPlan);
+
+        final Map<TuitionPaymentPlanCalculator, TuitionPaymentPlanCalculator> map = new HashMap<>();
+        result.tuitionPaymentPlanCalculatorList.clear();
+        tuitionPaymentPlan.getTuitionPaymentPlanCalculatorSet().forEach(c -> {
+            TuitionPaymentPlanCalculator copyTo = c.copyTo((TuitionPaymentPlan) null);
+
+            result.tuitionPaymentPlanCalculatorList.add(copyTo);
+            map.put(c, copyTo);
+        });
+
+        // Reset the installments tuition calculators
+        result.tuitionInstallmentBeans.stream().filter(b -> b.getTuitionPaymentPlanCalculator() != null).forEach(b -> {
+            b.setTuitionPaymentPlanCalculator(map.get(b.getTuitionPaymentPlanCalculator()));
+        });
+
+        return result;
     }
 
 }

@@ -207,8 +207,9 @@ public class TuitionPaymentPlanOrder extends TuitionPaymentPlanOrder_Base {
             return null;
         }
 
-        return findSortedByPaymentPlanOrder(getTuitionPaymentPlanGroup(), getDegreeCurricularPlan(), getExecutionYear())
-                .collect(Collectors.toList()).get(getPaymentPlanOrder() - 2);
+        List<TuitionPaymentPlanOrder> list = findSortedByPaymentPlanOrder(getTuitionPaymentPlanGroup(), getDegreeCurricularPlan(), getExecutionYear())
+                .collect(Collectors.toList());
+        return list.get(list.indexOf(this) - 1);
     }
 
     private TuitionPaymentPlanOrder getNextTuitionPaymentPlan() {
@@ -216,8 +217,9 @@ public class TuitionPaymentPlanOrder extends TuitionPaymentPlanOrder_Base {
             return null;
         }
 
-        return findSortedByPaymentPlanOrder(getTuitionPaymentPlanGroup(), getDegreeCurricularPlan(), getExecutionYear())
-                .collect(Collectors.toList()).get(getPaymentPlanOrder());
+        List<TuitionPaymentPlanOrder> list = findSortedByPaymentPlanOrder(getTuitionPaymentPlanGroup(), getDegreeCurricularPlan(), getExecutionYear())
+                .collect(Collectors.toList());
+        return list.get(list.indexOf(this) + 1);
     }
 
     private ExecutionYear getExecutionYear() {

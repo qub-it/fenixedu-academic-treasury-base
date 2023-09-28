@@ -111,12 +111,12 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
 
     @Override
     public TuitionPaymentPlanCalculator copyTo(TuitionPaymentPlan tuitionPaymentPlanTarget) {
-        TestTuitionPaymentPlanCalculator calculator = new TestTuitionPaymentPlanCalculator();
+        TestTuitionPaymentPlanCalculator copy = new TestTuitionPaymentPlanCalculator();
 
-        calculator.setAmount(getAmount());
-        calculator.setTuitionPaymentPlan(tuitionPaymentPlanTarget);
+        copy.setAmount(getAmount());
+        copy.setTuitionPaymentPlan(tuitionPaymentPlanTarget);
 
-        return calculator;
+        return copy;
     }
     
     @Override
