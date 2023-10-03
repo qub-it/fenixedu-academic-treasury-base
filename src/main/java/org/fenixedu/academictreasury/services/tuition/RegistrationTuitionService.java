@@ -861,7 +861,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
             BigDecimal tuitionInstallmentAmountToPay = tariff.amountToPay(this);
 
             if (!TreasuryConstants.isPositive(tuitionInstallmentAmountToPay)) {
-                return null;
+                return Collections.emptyList();
             }
 
             Map<TreasuryExemptionType, BigDecimal> exemptionsMapToApply = new HashMap<>();

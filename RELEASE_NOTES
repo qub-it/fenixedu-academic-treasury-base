@@ -1,3 +1,5 @@
+- Bug Fix: NPE in creation registration tuition, in cases where the amount for a tuition installment is zero (#qubIT-Fenix-4417)
+
 11.1.3 (28-09-2023)
 - Refactor: Fix the academic treasury event degree association and use the DML AcademicTreasuryEvent and Degree relation (#qubIT-Fenix-4374)
 - Bug Fix: Fix tuition payment plan tuition deletion for many degree curricular plans. The reorder of tuition payment plan orders was fixed (#qubIT-Fenix-4401)
