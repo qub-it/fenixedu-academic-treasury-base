@@ -1,3 +1,4 @@
+11.1.4 (18-10-2023)
 - Refactor: Rename method parameter for better code readability [#qubIT-Fenix-4459]
 - Improvement: Add to AcademicTreasuryEvent a method to merge with a target person, which basically set the person and allow merge data of treasury event targets. For now support only for ReservationTaxEventTarget [#qubIT-Fenix-4459]
 
