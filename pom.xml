@@ -25,7 +25,7 @@
 		<dependency>
 			<groupId>com.qubit.solution.fenixedu</groupId>
 			<artifactId>fenixedu-academic-core</artifactId>
-			<version>41.4.4</version>
+			<version>43.0.3</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -34,7 +34,7 @@
 			<artifactId>fenixedu-academic-core</artifactId>
 			<type>test-jar</type>
 			<scope>test</scope>
-			<version>41.4.4</version>
+			<version>43.0.3</version>
 		</dependency>
 
 		<dependency>

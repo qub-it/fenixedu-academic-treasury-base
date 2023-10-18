@@ -603,19 +603,19 @@ public class PersonCustomer extends PersonCustomer_Base {
         return PersonCustomer.find(getAssociatedPerson()).collect(Collectors.<Customer> toSet());
     }
 
-    public void mergeWithPerson(final Person person) {
+    public void mergeWithPerson(final Person personToDelete) {
         IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
-        if (getPerson() == person) {
+        if (getPerson() == personToDelete) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.merging.not.happening");
         }
 
-        if (getPersonForInactivePersonCustomer() == person) {
+        if (getPersonForInactivePersonCustomer() == personToDelete) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.merged.already.with.person");
         }
 
-        if (services.personCustomer(person) != null) {
-            final PersonCustomer personCustomer = services.personCustomer(person);
+        if (services.personCustomer(personToDelete) != null) {
+            final PersonCustomer personCustomer = services.personCustomer(personToDelete);
             personCustomer.saveFiscalAddressFieldsFromPersonInCustomer();
             personCustomer.setPersonForInactivePersonCustomer(getPerson());
             personCustomer.setPerson(null);
@@ -623,15 +623,15 @@ public class PersonCustomer extends PersonCustomer_Base {
             personCustomer.checkRules();
         }
 
-        for (final PersonCustomer personCustomer : services.inactivePersonCustomers(person)) {
+        for (final PersonCustomer personCustomer : services.inactivePersonCustomers(personToDelete)) {
             personCustomer.setPersonForInactivePersonCustomer(getPerson());
             personCustomer.setFromPersonMerge(true);
             personCustomer.checkRules();
         }
 
         final Person thisPerson = getAssociatedPerson();
-        for (final AcademicTreasuryEvent e : Sets.newHashSet(services.academicTreasuryEventsSet(person))) {
-            e.setPerson(thisPerson);
+        for (final AcademicTreasuryEvent e : Sets.newHashSet(services.academicTreasuryEventsSet(personToDelete))) {
+            e.mergeToTargetPerson(thisPerson);
         }
 
         checkRules();

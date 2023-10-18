@@ -772,6 +772,14 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
         throw new AcademicTreasuryDomainException("error.AcademicTreasuryEvent.unkwnown.type");
     }
+    
+    public void mergeToTargetPerson(Person targetPerson) {
+        super.setPerson(targetPerson);
+        
+        if(isForTreasuryEventTarget() && getTreasuryEventTarget() != null && getTreasuryEventTarget() instanceof ReservationTaxEventTarget) {
+            ((ReservationTaxEventTarget) getTreasuryEventTarget()).mergeToTargetPerson(targetPerson);
+        }
+    }
 
     public void mergeDebitEntriesAndExemptions(final AcademicTreasuryEvent event) {
         if (this.getTreasuryEventTypeCode() != event.getTreasuryEventTypeCode()) {

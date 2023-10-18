@@ -244,6 +244,13 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
         return BigDecimal.ZERO;
     }
 
+    // TODO ANIL 2023-10-18: Put the override annotation when the
+    // fenixedu-academic is released
+    // @Override
+    public void mergeToTargetPerson(Person targetPerson) {
+        setPerson(targetPerson);
+    }
+    
     // @formatter:off
     /* ********
      * SERVICES

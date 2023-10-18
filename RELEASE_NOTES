@@ -1,3 +1,6 @@
+- Refactor: Rename method parameter for better code readability [#qubIT-Fenix-4459]
+- Improvement: Add to AcademicTreasuryEvent a method to merge with a target person, which basically set the person and allow merge data of treasury event targets. For now support only for ReservationTaxEventTarget [#qubIT-Fenix-4459]
+
 11.1.3 (28-09-2023)
 - Refactor: Fix the academic treasury event degree association and use the DML AcademicTreasuryEvent and Degree relation (#qubIT-Fenix-4374)
 - Bug Fix: Fix tuition payment plan tuition deletion for many degree curricular plans. The reorder of tuition payment plan orders was fixed (#qubIT-Fenix-4401)
