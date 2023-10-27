@@ -65,7 +65,6 @@ public class AcademicTreasurySettings extends AcademicTreasurySettings_Base {
         setImprovementAcademicTax(improvementAcademicTax);
         setCloseServiceRequestEmolumentsWithDebitNote(closeServiceRequestEmolumentsWithDebitNote);
         setRunAcademicDebtGenerationRuleOnNormalEnrolment(runAcademicDebtGenerationRuleOnNormalEnrolment);
-        setDebtGenerationRulesPeriodicExecutionActive(true);
     }
 
     @Atomic

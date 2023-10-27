@@ -1148,6 +1148,7 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
                     bean.getMaximumDaysToApplyPenalty(), bean.getInterestFixedAmount(), bean.getRate());
         }
 
+        super.setInstallmentOrder(bean.getInstallmentOrder());
         super.setBeginDate(bean.getBeginDate().toDateTimeAtStartOfDay());
         super.setEndDate(bean.getEndDate() != null ? bean.getEndDate().toDateTimeAtStartOfDay() : null);
 

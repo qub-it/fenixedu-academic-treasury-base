@@ -1,3 +1,7 @@
+- Bug Fix: NPE in creation registration tuition, in cases where the amount for a tuition installment is zero [#qubIT-Fenix-4417]
+- Bug Fix: When editing installment, save the installment order [#qubIT-Fenix-4401]
+- Refactor: Remove the temporary fix flag for the correct academic tax debit entry date [relates to fix applied in version 8.6.7 of 16-02-2023]
+
 11.1.4 (18-10-2023)
 - Refactor: Rename method parameter for better code readability [#qubIT-Fenix-4459]
 - Improvement: Add to AcademicTreasuryEvent a method to merge with a target person, which basically set the person and allow merge data of treasury event targets. For now support only for ReservationTaxEventTarget [#qubIT-Fenix-4459]
