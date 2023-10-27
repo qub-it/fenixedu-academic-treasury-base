@@ -1,3 +1,4 @@
+11.1.5 (27-10-2023)
 - Bug Fix: NPE in creation registration tuition, in cases where the amount for a tuition installment is zero [#qubIT-Fenix-4417]
 - Bug Fix: When editing installment, save the installment order [#qubIT-Fenix-4401]
 - Refactor: Remove the temporary fix flag for the correct academic tax debit entry date [relates to fix applied in version 8.6.7 of 16-02-2023]
