@@ -136,7 +136,7 @@ public class SibsOnlinePaymentsGatewayForwardImplementation implements IForwardP
             });
 
             FenixFramework.atomic(() -> {
-                if (!result.isInvocationSuccess() || (result.getStateType() == ForwardPaymentStateType.REJECTED)) {
+                if (!result.isOperationSuccess() || (result.getStateType() == ForwardPaymentStateType.REJECTED)) {
                     forwardPayment.reject(checkoutBean.getPaymentGatewayResultCode(),
                             checkoutBean.getPaymentGatewayResultDescription(), checkoutBean.getRequestLog(),
                             checkoutBean.getResponseLog());
@@ -326,7 +326,7 @@ public class SibsOnlinePaymentsGatewayForwardImplementation implements IForwardP
 
             final boolean success = paymentStatusBean.isInPayedState();
 
-            if (!paymentStatusBean.isInvocationSuccess()) {
+            if (!paymentStatusBean.isOperationSuccess()) {
                 throw new TreasuryDomainException("error.ManageForwardPayments.postProcessPayment.invocation.unsucessful",
                         String.valueOf(forwardPayment.getOrderNumber()));
             }

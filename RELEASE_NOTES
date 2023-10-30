@@ -1,3 +1,5 @@
+- Refactor: Rename method PaymentRequestLog#isInvocationSuccess to PaymentRequestLog#isOperationSuccess [#qubIT-Fenix-4327]
+
 11.1.5 (27-10-2023)
 - Bug Fix: NPE in creation registration tuition, in cases where the amount for a tuition installment is zero [#qubIT-Fenix-4417]
 - Bug Fix: When editing installment, save the installment order [#qubIT-Fenix-4401]
