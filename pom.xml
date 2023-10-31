@@ -40,7 +40,7 @@
 		<dependency>
 			<groupId>org.fenixedu</groupId>
 			<artifactId>fenixedu-treasury-base</artifactId>
-			<version>11.5.0</version>
+			<version>11.6.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.fenixedu</groupId>
