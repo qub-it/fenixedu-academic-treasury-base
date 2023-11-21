@@ -102,8 +102,8 @@ import com.google.common.collect.Sets;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.core.AbstractDomainObject;
 
-public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements IAcademicTreasuryEvent,
-        IImprovementTreasuryEvent, IAcademicServiceRequestAndAcademicTaxTreasuryEvent {
+public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
+        implements IAcademicTreasuryEvent, IImprovementTreasuryEvent, IAcademicServiceRequestAndAcademicTaxTreasuryEvent {
 
     private static Logger logger = LoggerFactory.getLogger(AcademicTreasuryEvent.class);
 
@@ -578,7 +578,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
             return getExecutionYear().getBeginLocalDate();
         } else if (isForTreasuryEventTarget()) {
             return ((IAcademicTreasuryTarget) getTreasuryEventTarget()).getAcademicTreasuryTargetEventDate();
-        } else if(isForCustomAcademicDebt()) {
+        } else if (isForCustomAcademicDebt()) {
             return getCustomAcademicDebtEventDate();
         }
 
@@ -697,15 +697,15 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
         return getDegree().getPresentationName();
     }
-    
+
     @Override
     public Degree getDegree() {
         Degree degree = degree();
-        
-        if(degree != null) {
+
+        if (degree != null) {
             return degree;
         }
-        
+
         return super.getDegree();
     }
 
@@ -741,7 +741,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
             degree = getRegistration().getDegree();
         } else if (isForCustomAcademicDebt() && getRegistration() != null) {
             degree = getRegistration().getDegree();
-        } else if(isForTreasuryEventTarget() && ((IAcademicTreasuryTarget) getTreasuryEventTarget()).getAcademicTreasuryTargetDegree() != null ) {
+        } else if (isForTreasuryEventTarget()
+                && ((IAcademicTreasuryTarget) getTreasuryEventTarget()).getAcademicTreasuryTargetDegree() != null) {
             return ((IAcademicTreasuryTarget) getTreasuryEventTarget()).getAcademicTreasuryTargetDegree();
         }
 
@@ -772,11 +773,12 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
         throw new AcademicTreasuryDomainException("error.AcademicTreasuryEvent.unkwnown.type");
     }
-    
+
     public void mergeToTargetPerson(Person targetPerson) {
         super.setPerson(targetPerson);
-        
-        if(isForTreasuryEventTarget() && getTreasuryEventTarget() != null && getTreasuryEventTarget() instanceof ReservationTaxEventTarget) {
+
+        if (isForTreasuryEventTarget() && getTreasuryEventTarget() != null
+                && getTreasuryEventTarget() instanceof ReservationTaxEventTarget) {
             ((ReservationTaxEventTarget) getTreasuryEventTarget()).mergeToTargetPerson(targetPerson);
         }
     }
@@ -1428,7 +1430,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
             ((IAcademicTreasuryTarget) getTreasuryEventTarget()).handleSettlement(this);
         }
     }
-    
+
     @Override
     public void invokeSettlementCallbacks(TreasuryExemption treasuryExemption) {
         if (isForTreasuryEventTarget()) {
@@ -1494,7 +1496,6 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
 
         return super.getAmountForUrgencyRate();
     }
-
 
     /*
      * -----------
@@ -1756,6 +1757,25 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base implements
     public String getPersonName() {
         if (getPerson() != null) {
             return getPerson().getName();
+        }
+
+        return null;
+    }
+
+    // @formatter: off
+    /* ******************************** *
+     * FINANTIAL ENTITY RELATED METHODS *
+     * ******************************** */
+    // @formatter: on
+
+    @Override
+    public FinantialEntity getAssociatedFinantialEntity() {
+        if (getDegree() != null) {
+            Degree degree = getDegree();
+            FinantialEntity finantialEntityOfDegree = AcademicTreasuryPlataformDependentServicesFactory.implementation()
+                    .finantialEntityOfDegree(degree, getTreasuryEventDate());
+
+            return finantialEntityOfDegree;
         }
 
         return null;

@@ -25,7 +25,7 @@
 		<dependency>
 			<groupId>com.qubit.solution.fenixedu</groupId>
 			<artifactId>fenixedu-academic-core</artifactId>
-			<version>43.0.3</version>
+			<version>44.2.0</version>
 			<scope>compile</scope>
 		</dependency>
 
@@ -34,13 +34,13 @@
 			<artifactId>fenixedu-academic-core</artifactId>
 			<type>test-jar</type>
 			<scope>test</scope>
-			<version>43.0.3</version>
+			<version>44.2.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.fenixedu</groupId>
 			<artifactId>fenixedu-treasury-base</artifactId>
-			<version>11.6.0</version>
+			<version>11.7.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.fenixedu</groupId>
