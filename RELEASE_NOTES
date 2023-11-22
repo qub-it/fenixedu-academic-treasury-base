@@ -1,3 +1,4 @@
+11.2.0 (22-11-2023)
 - New Feature: Creation of payment reference codes by finantial entity, in academic debt generation rule for payment codes strategy [#qubIT-Fenix-4600]
 - Improvement: Method to obtain the associated finantial entity by academic treasury event [#qubIT-Fenix-4598]
 
