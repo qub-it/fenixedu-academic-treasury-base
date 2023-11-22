@@ -65,12 +65,14 @@ import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependent
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.treasury.domain.Customer;
 import org.fenixedu.treasury.domain.FinantialEntity;
+import org.fenixedu.treasury.domain.FinantialInstitution;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.ProductGroup;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
+import org.fenixedu.treasury.domain.paymentcodes.integration.ISibsPaymentCodePoolService;
 import org.fenixedu.treasury.domain.settings.TreasurySettings;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.LocalDate;
@@ -270,12 +272,24 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
         }
 
         DebtAccount debtAccount = debitEntries.iterator().next().getDebtAccount();
-        debtAccount.getFinantialInstitution().getDefaultDigitalPaymentPlatform().castToSibsPaymentCodePoolService()
-                .createSibsPaymentRequest(debtAccount, debitEntries, Collections.emptySet());
+        getDefaultDigitalPaymentPlatform(debtAccount, rule.getFinantialEntity()).createSibsPaymentRequest(debtAccount,
+                debitEntries, Collections.emptySet());
 
         if (rule.getAcademicTaxDueDateAlignmentType() != null) {
             FenixFramework.atomic(() -> rule.getAcademicTaxDueDateAlignmentType().applyDueDate(rule, debitEntries));
         }
+    }
+
+    private ISibsPaymentCodePoolService getDefaultDigitalPaymentPlatform(DebtAccount debtAccount,
+            FinantialEntity finantialEntity) {
+        FinantialInstitution finantialInstitution = debtAccount.getFinantialInstitution();
+
+        if (Boolean.TRUE.equals(finantialInstitution.getLimitPaymentRequestsByFinantialEntity())) {
+            return finantialEntity.getDefaultDigitalPaymentPlatform().castToSibsPaymentCodePoolService();
+        }
+
+        return finantialInstitution.getDefaultDigitalPaymentPlatform().castToSibsPaymentCodePoolService();
+
     }
 
     private Set<Customer> referencedCustomers(Set<DebitEntry> debitEntries) {
@@ -360,8 +374,8 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
         } else if (tuitionPaymentPlanGroup.isForStandalone()) {
             t = TuitionServices.findAcademicTreasuryEventTuitionForStandalone(registration, executionYear);
         }
-        
-        if(t == null) {
+
+        if (t == null) {
             return Collections.emptySet();
         }
 
