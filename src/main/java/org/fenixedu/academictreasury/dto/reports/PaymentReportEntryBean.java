@@ -35,7 +35,6 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
-
 import static org.fenixedu.academictreasury.dto.reports.DebtReportEntryBean.personalEmail;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
@@ -64,36 +63,34 @@ import com.google.common.base.Strings;
 
 public class PaymentReportEntryBean implements SpreadsheetRow {
 
-    public static String[] SPREADSHEET_HEADERS = { 
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.identification"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.creationDate"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.responsible"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.settlementNoteNumber"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.settlementNoteDocumentDate"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.settlementOriginDocumentNumber"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.paymentDate"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.settlementNoteAnnuled"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.documentExportationPending"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.paymentMethod"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.amount"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.customerId"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.debtAccountId"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.name"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.identificationType"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.identificationNumber"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.vatNumber"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.email"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.address"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.studentNumber"),
-        academicTreasuryBundle("label.PaymentReportEntryBean.header.closeDate"),
-        academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificationDate"),
-        academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificateDocumentReference"),
+    public static String[] SPREADSHEET_HEADERS = { academicTreasuryBundle("label.PaymentReportEntryBean.header.identification"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.creationDate"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.responsible"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.settlementNoteNumber"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.settlementNoteDocumentDate"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.settlementOriginDocumentNumber"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.paymentDate"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.settlementNoteAnnuled"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.documentExportationPending"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.paymentMethod"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.amount"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.customerId"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.debtAccountId"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.name"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.identificationType"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.identificationNumber"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.vatNumber"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.email"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.address"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.studentNumber"),
+            academicTreasuryBundle("label.PaymentReportEntryBean.header.closeDate"),
+            academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificationDate"),
+            academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificateDocumentReference"),
             academicTreasuryBundle("label.PaymentReportEntryBean.header.documentObservations"),
             academicTreasuryBundle("label.PaymentReportEntryBean.header.documentTermsAndConditions"),
-        
+
     };
- 
-    
+
     private PaymentEntry paymentEntry;
     private boolean completed;
 
@@ -125,22 +122,22 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
 
     private LocalDate erpCertificationDate;
     private String erpCertificateDocumentReference;
-    
+
     private String erpCustomerId;
     private String erpPayorCustomerId;
-    
+
     private String decimalSeparator;
-    
+
     private String documentObservations;
     private String documentTermsAndConditions;
-    
+
     public PaymentReportEntryBean(final PaymentEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
 
         this.decimalSeparator = request != null ? request.getDecimalSeparator() : DebtReportRequest.COMMA;
-        
+
         paymentEntry = entry;
-        
+
         try {
             final SettlementNote settlementNote = entry.getSettlementNote();
 
@@ -154,61 +151,62 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
             this.settlementNoteAnnuled = settlementNote.isAnnulled();
             this.documentExportationPending = settlementNote.isDocumentToExport();
             this.paymentMethod = entry.getPaymentMethod().getName().getContent();
-            this.amount = settlementNote.getDebtAccount().getFinantialInstitution().getCurrency().getValueWithScale(entry.getPayedAmount());
-            
+            this.amount = settlementNote.getDebtAccount().getFinantialInstitution().getCurrency()
+                    .getValueWithScale(entry.getPayedAmount());
+
             fillStudentInformation(entry);
-            
+
             fillERPInformation(settlementNote);
-            
+
             this.documentObservations = entry.getSettlementNote().getDocumentObservations();
             this.documentTermsAndConditions = entry.getSettlementNote().getDocumentTermsAndConditions();
 
             this.completed = true;
-            
-        } catch(final Exception e) {
+
+        } catch (final Exception e) {
             e.printStackTrace();
             errorsLog.addError(entry, e);
         }
     }
-    
+
     private void fillERPInformation(final SettlementNote settlementNote) {
         ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-        
+
         this.closeDate = settlementNote != null ? settlementNote.getCloseDate() : null;
-        this.exportedInLegacyERP =
-                settlementNote != null ? settlementNote.isExportedInLegacyERP() : false;
+        this.exportedInLegacyERP = settlementNote != null ? settlementNote.isExportedInLegacyERP() : false;
 
-        this.erpCertificationDate =
-                settlementNote != null ? settlementNote.getErpCertificationDate() : null;
+        this.erpCertificationDate = settlementNote != null ? settlementNote.getErpCertificationDate() : null;
 
-        this.erpCertificateDocumentReference = settlementNote != null ? settlementNote
-                .getErpCertificateDocumentReference() : null;
+        this.erpCertificateDocumentReference =
+                settlementNote != null ? settlementNote.getErpCertificateDocumentReference() : null;
 
         this.erpCustomerId = settlementNote.getDebtAccount().getCustomer().getErpCustomerId();
 
-        
-        if(!settlementNote.getSettlemetEntriesSet().isEmpty()) {
+        if (!settlementNote.getSettlemetEntriesSet().isEmpty()) {
             final SettlementEntry settlementEntry = settlementNote.getSettlemetEntriesSet().iterator().next();
-            if(settlementEntry.getInvoiceEntry().getFinantialDocument() != null && ((Invoice) settlementEntry.getInvoiceEntry().getFinantialDocument()).getPayorDebtAccount() != null) {
-                this.erpPayorCustomerId = ((Invoice) settlementEntry.getInvoiceEntry().getFinantialDocument()).getPayorDebtAccount().getCustomer().getErpCustomerId();
+            if (settlementEntry.getInvoiceEntry().getFinantialDocument() != null
+                    && ((Invoice) settlementEntry.getInvoiceEntry().getFinantialDocument()).getPayorDebtAccount() != null) {
+                this.erpPayorCustomerId = ((Invoice) settlementEntry.getInvoiceEntry().getFinantialDocument())
+                        .getPayorDebtAccount().getCustomer().getErpCustomerId();
             }
         }
-        
-        if(treasuryServices.hasCertifiedDocument(settlementNote)) {
+
+        if (treasuryServices.hasCertifiedDocument(settlementNote)) {
             this.erpCertificationDate = treasuryServices.getCertifiedDocumentDate(settlementNote);
             this.erpCertificateDocumentReference = treasuryServices.getCertifiedDocumentNumber(settlementNote);
         }
     }
-    
+
     private void fillStudentInformation(final PaymentEntry entry) {
         final Customer customer = entry.getSettlementNote().getDebtAccount().getCustomer();
 
         this.customerId = customer.getExternalId();
         this.debtAccountId = entry.getSettlementNote().getDebtAccount().getExternalId();
-        
+
         this.name = customer.getName();
 
-        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null && ((PersonCustomer) customer).getAssociatedPerson().getIdDocumentType() != null) {
+        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null
+                && ((PersonCustomer) customer).getAssociatedPerson().getIdDocumentType() != null) {
             this.identificationType = ((PersonCustomer) customer).getAssociatedPerson().getIdDocumentType().getLocalizedName();
         }
 
@@ -224,7 +222,8 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
 
         this.address = customer.getAddress();
 
-        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null && ((PersonCustomer) customer).getAssociatedPerson().getStudent() != null) {
+        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null
+                && ((PersonCustomer) customer).getAssociatedPerson().getStudent() != null) {
             final Person person = ((PersonCustomer) customer).getAssociatedPerson();
             this.studentNumber = person.getStudent().getNumber();
         }
@@ -233,17 +232,18 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
     @Override
     public void writeCellValues(final Row row, final IErrorsLog ierrorsLog) {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
-        
+
         try {
             row.createCell(0).setCellValue(identification);
 
-            if(!completed) {
-                row.createCell(1).setCellValue(academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+            if (!completed) {
+                row.createCell(1)
+                        .setCellValue(academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
-            
+
             int i = 1;
-            
+
             row.createCell(i++).setCellValue(valueOrEmpty(this.creationDate));
             row.createCell(i++).setCellValue(valueOrEmpty(this.responsible));
             row.createCell(i++).setCellValue(valueOrEmpty(this.settlementNoteNumber));
@@ -256,14 +256,14 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
 
             {
                 String value = amount != null ? amount.toString() : "";
-                
-                if(DebtReportRequest.COMMA.equals(decimalSeparator)) {
+
+                if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
                     value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                 }
-                
+
                 row.createCell(i++).setCellValue(value);
             }
-            
+
             row.createCell(i++).setCellValue(customerId);
             row.createCell(i++).setCellValue(debtAccountId);
             row.createCell(i++).setCellValue(valueOrEmpty(name));
@@ -274,19 +274,19 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
             row.createCell(i++).setCellValue(valueOrEmpty(address));
             row.createCell(i++).setCellValue(valueOrEmpty(studentNumber));
             row.createCell(i++).setCellValue(valueOrEmpty(closeDate));
-   
+
             row.createCell(i++).setCellValue(valueOrEmpty(erpCertificationDate));
             row.createCell(i++).setCellValue(valueOrEmpty(erpCertificateDocumentReference));
-            
+
             row.createCell(i++).setCellValue(valueOrEmpty(this.documentObservations));
             row.createCell(i++).setCellValue(valueOrEmpty(this.documentTermsAndConditions));
 
-        } catch(final Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             errorsLog.addError(paymentEntry, e);
         }
     }
-    
+
     private String valueOrEmpty(final LocalDate value) {
         if (value == null) {
             return "";
@@ -339,7 +339,6 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
         return "";
     }
 
-    
     // @formatter:off
     /* *****************
      * GETTERS & SETTERS
@@ -401,11 +400,11 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
     public void setSettlementNoteDocumentDate(DateTime settlementNoteDocumentDate) {
         this.settlementNoteDocumentDate = settlementNoteDocumentDate;
     }
-    
+
     public String getSettlementOriginDocumentNumber() {
         return settlementOriginDocumentNumber;
     }
-    
+
     public void setSettlementOriginDocumentNumber(String settlementOriginDocumentNumber) {
         this.settlementOriginDocumentNumber = settlementOriginDocumentNumber;
     }
@@ -592,7 +591,22 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
 
     public void setDecimalSeparator(String decimalSeparator) {
         this.decimalSeparator = decimalSeparator;
-    }    
-    
-    
+    }
+
+    public String getDocumentObservations() {
+        return documentObservations;
+    }
+
+    public void setDocumentObservations(String documentObservations) {
+        this.documentObservations = documentObservations;
+    }
+
+    public String getDocumentTermsAndConditions() {
+        return documentTermsAndConditions;
+    }
+
+    public void setDocumentTermsAndConditions(String documentTermsAndConditions) {
+        this.documentTermsAndConditions = documentTermsAndConditions;
+    }
+
 }

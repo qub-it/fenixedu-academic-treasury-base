@@ -46,8 +46,8 @@ import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
 import org.fenixedu.academic.domain.student.RegistrationRegimeType;
+import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent.AcademicTreasuryEventKeys;
@@ -83,8 +83,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
     // @formatter:off
     public static String[] SPREADSHEET_DEBIT_HEADERS =
-            { 
-                    academicTreasuryBundle("label.DebtReportEntryBean.header.identification"),
+            { academicTreasuryBundle("label.DebtReportEntryBean.header.identification"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.entryType"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.versioningCreator"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.creationDate"),
@@ -109,8 +108,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     academicTreasuryBundle("label.DebtReportEntryBean.header.productCode"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.invoiceEntryDescription"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.documentNumber"),
-                    academicTreasuryBundle("label.DebtReportEntryBean.header.documentExportationPending"),
-                    "",// Empty header
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.documentExportationPending"), "",// Empty header
                     academicTreasuryBundle("label.DebtReportEntryBean.header.amountToPay"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountToPay"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountWithInterestToDate"),
@@ -136,12 +134,10 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificationDate"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificateDocumentReference"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.originSettlementNoteForAdvancedCredit"),
-                    academicTreasuryBundle("label.DebtReportEntryBean.header.code")
-            };
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.code") };
 
     public static String[] SPREADSHEET_CREDIT_HEADERS =
-            { 
-                    academicTreasuryBundle("label.DebtReportEntryBean.header.identification"),
+            { academicTreasuryBundle("label.DebtReportEntryBean.header.identification"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.entryType"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.versioningCreator"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.creationDate"),
@@ -169,8 +165,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     academicTreasuryBundle("label.DebtReportEntryBean.header.documentExportationPending"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.debitEntry.identification"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.amountToCredit"),
-                    academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountToCredit"),
-                    "",// Empty Header
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.openAmountToCredit"), "",// Empty Header
                     "",// Empty Header
                     academicTreasuryBundle("label.DebtReportEntryBean.header.payorDebtAcount.vatNumber"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.payorDebtAcount.name"),
@@ -193,8 +188,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificationDate"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificateDocumentReference"),
                     academicTreasuryBundle("label.DebtReportEntryBean.header.originSettlementNoteForAdvancedCredit"),
-                    academicTreasuryBundle("label.DebtReportEntryBean.header.code")
-                    };
+                    academicTreasuryBundle("label.DebtReportEntryBean.header.code") };
     // @formatter:on
 
     private InvoiceEntry invoiceEntry;
@@ -262,10 +256,9 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     private String originSettlementNoteForAdvancedCredit;
 
     private String decimalSeparator;
-    
+
     private String documentObservations;
     private String documentTermsAndConditions;
-    
 
     public DebtReportEntryBean(final InvoiceEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
@@ -322,7 +315,6 @@ public class DebtReportEntryBean implements SpreadsheetRow {
             this.pendingInterestAmount =
                     currency.getValueWithScale(entry.getOpenAmountWithInterests().subtract(entry.getOpenAmount()));
 
-            
             fillERPInformation(entry);
 
             this.completed = true;
@@ -335,7 +327,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
     private void fillERPInformation(final InvoiceEntry entry) {
         ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-        
+
         final Currency currency = entry.getDebtAccount().getFinantialInstitution().getCurrency();
 
         this.closeDate = entry.getFinantialDocument() != null ? entry.getFinantialDocument().getCloseDate() : null;
@@ -367,8 +359,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     advancedCreditNote.getAdvancedPaymentSettlementNote() != null ? advancedCreditNote
                             .getAdvancedPaymentSettlementNote().getUiDocumentNumber() : "";
         }
-        
-        if(entry.getFinantialDocument() != null && treasuryServices.hasCertifiedDocument(entry.getFinantialDocument())) {
+
+        if (entry.getFinantialDocument() != null && treasuryServices.hasCertifiedDocument(entry.getFinantialDocument())) {
             this.erpCertificationDate = treasuryServices.getCertifiedDocumentDate(entry.getFinantialDocument());
             this.erpCertificateDocumentReference = treasuryServices.getCertifiedDocumentNumber(entry.getFinantialDocument());
         }
@@ -413,14 +405,14 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     static EmailAddress personalEmail(final Person person) {
         IAcademicTreasuryPlatformDependentServices implementation =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        
+
         return implementation.pendingOrValidPartyContacts(person, EmailAddress.class) //
-                    .stream() //
-                    .map(EmailAddress.class::cast) //
-                    .filter(e -> Boolean.TRUE.equals(e.getActive())) //
-                    .filter(e -> e.getType() == PartyContactType.PERSONAL) //
-                    .findFirst() //
-                    .orElse(null);
+                .stream() //
+                .map(EmailAddress.class::cast) //
+                .filter(e -> Boolean.TRUE.equals(e.getActive())) //
+                .filter(e -> e.getType() == PartyContactType.PERSONAL) //
+                .findFirst() //
+                .orElse(null);
     }
 
     private void fillAcademicInformation(final InvoiceEntry entry) {
@@ -460,7 +452,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     }
 
                     if (debitEntry.getExecutionSemester() != null) {
-                        this.executionYear = academicTreasuryServices().executionYearOfExecutionSemester(debitEntry.getExecutionSemester()).getQualifiedName();
+                        this.executionYear = academicTreasuryServices()
+                                .executionYearOfExecutionSemester(debitEntry.getExecutionSemester()).getQualifiedName();
                         this.executionSemester = debitEntry.getExecutionSemester().getQualifiedName();
                     }
 
@@ -484,7 +477,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     }
 
                     if (debitEntry.getExecutionSemester() != null) {
-                        this.executionYear = academicTreasuryServices().executionYearOfExecutionSemester(debitEntry.getExecutionSemester()).getQualifiedName();
+                        this.executionYear = academicTreasuryServices()
+                                .executionYearOfExecutionSemester(debitEntry.getExecutionSemester()).getQualifiedName();
                         this.executionSemester = debitEntry.getExecutionSemester().getQualifiedName();
                     }
 
@@ -567,7 +561,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
             }
         }
     }
-    
+
     private IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
         return AcademicTreasuryPlataformDependentServicesFactory.implementation();
     }
@@ -883,6 +877,14 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
     public void setIdentification(String identification) {
         this.identification = identification;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getEntryType() {
@@ -1316,21 +1318,21 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     public void setOriginSettlementNoteForAdvancedCredit(String originSettlementNoteForAdvancedCredit) {
         this.originSettlementNoteForAdvancedCredit = originSettlementNoteForAdvancedCredit;
     }
-    
+
     public String getDocumentObservations() {
         return documentObservations;
     }
-    
+
     public void setDocumentObservations(String documentObservations) {
         this.documentObservations = documentObservations;
     }
-    
+
     public String getDocumentTermsAndConditions() {
         return documentTermsAndConditions;
     }
-    
+
     public void setDocumentTermsAndConditions(String documentTermsAndConditions) {
         this.documentTermsAndConditions = documentTermsAndConditions;
     }
-    
+
 }
