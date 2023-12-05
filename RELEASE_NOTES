@@ -1,3 +1,4 @@
+11.2.1 (05-12-2023)
 - Refactor: Implements properties in debt report bean, to make available for reports [#qubIT-Fenix-4646]
 - Bug Fix: Fix reading the registration last state type description, in AcademicTreasuryEvent#registrationStateDescription [#qubIT-Fenix-4641]
 - Bug Fix: Add missing label translation, about the error of duplicated academic treasury event for registration tuition payment plan [#qubIT-Fenix-4641]
