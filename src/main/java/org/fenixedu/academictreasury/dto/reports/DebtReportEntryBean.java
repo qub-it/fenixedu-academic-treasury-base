@@ -260,6 +260,11 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     private String documentObservations;
     private String documentTermsAndConditions;
 
+    private String finantialEntityCode;
+    private LocalizedString finantialEntityName;
+
+    private BigDecimal netExemptedAmount;
+
     public DebtReportEntryBean(final InvoiceEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
 
@@ -314,6 +319,15 @@ public class DebtReportEntryBean implements SpreadsheetRow {
             this.openAmountWithInterestToDate = currency.getValueWithScale(entry.getOpenAmountWithInterests());
             this.pendingInterestAmount =
                     currency.getValueWithScale(entry.getOpenAmountWithInterests().subtract(entry.getOpenAmount()));
+
+            if (entry.isDebitNoteEntry()) {
+                this.netExemptedAmount = ((DebitEntry) entry).getNetExemptedAmount();
+            }
+
+            if (entry.getAssociatedFinantialEntity() != null) {
+                this.finantialEntityCode = entry.getAssociatedFinantialEntity().getCode();
+                this.finantialEntityName = entry.getAssociatedFinantialEntity().getName();
+            }
 
             fillERPInformation(entry);
 
@@ -1333,6 +1347,30 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
     public void setDocumentTermsAndConditions(String documentTermsAndConditions) {
         this.documentTermsAndConditions = documentTermsAndConditions;
+    }
+
+    public String getFinantialEntityCode() {
+        return finantialEntityCode;
+    }
+
+    public void setFinantialEntityCode(String finantialEntityCode) {
+        this.finantialEntityCode = finantialEntityCode;
+    }
+
+    public LocalizedString getFinantialEntityName() {
+        return finantialEntityName;
+    }
+
+    public void setFinantialEntityName(LocalizedString finantialEntityName) {
+        this.finantialEntityName = finantialEntityName;
+    }
+
+    public BigDecimal getNetExemptedAmount() {
+        return netExemptedAmount;
+    }
+
+    public void setNetExemptedAmount(BigDecimal netExemptedAmount) {
+        this.netExemptedAmount = netExemptedAmount;
     }
 
 }

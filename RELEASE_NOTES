@@ -1,3 +1,5 @@
+- Improvement: Add finantial entity info and net exemption to debts report bean [#qubIT-Fenix-4655]
+
 11.2.1 (05-12-2023)
 - Refactor: Implements properties in debt report bean, to make available for reports [#qubIT-Fenix-4646]
 - Bug Fix: Fix reading the registration last state type description, in AcademicTreasuryEvent#registrationStateDescription [#qubIT-Fenix-4641]
