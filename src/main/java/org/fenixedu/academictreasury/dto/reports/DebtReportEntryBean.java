@@ -548,6 +548,16 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                         this.executionSemester =
                                 treasuryEventTarget.getAcademicTreasuryTargetExecutionSemester().getQualifiedName();
                     }
+                } else if (academicTreasuryEvent.isForCustomAcademicDebt()) {
+                    this.registrationNumber = academicTreasuryEvent.getRegistration().getNumber();
+                    this.degreeType = academicTreasuryServices
+                            .localizedNameOfDegreeType(academicTreasuryEvent.getRegistration().getDegree().getDegreeType());
+                    this.degreeCode = academicTreasuryEvent.getRegistration().getDegree().getCode();
+                    this.degreeName = academicTreasuryEvent.getRegistration().getDegree().getPresentationName();
+                    this.executionYear = academicTreasuryEvent.getExecutionYear().getQualifiedName();
+
+                    fillStudentConditionsInformation(academicTreasuryEvent.getRegistration(),
+                            academicTreasuryEvent.getExecutionYear());
                 }
 
             } else if (debitEntry.getTreasuryEvent() != null) {
