@@ -16,8 +16,8 @@
 	<name>Academic Treasury Base</name>
 
 	<properties>
-		<version.org.fenixedu.bennu>6.0.3-FORK</version.org.fenixedu.bennu>
-		<version.org.fenixedu.qubdocs.reports>2.2.5</version.org.fenixedu.qubdocs.reports>
+		<version.org.fenixedu.bennu>6.3.0-FORK</version.org.fenixedu.bennu>
+		<version.org.fenixedu.qubdocs.reports>2.3.1</version.org.fenixedu.qubdocs.reports>
 	</properties>
 
 	<dependencies>
