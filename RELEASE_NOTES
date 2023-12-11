@@ -1,3 +1,5 @@
+- Improvement: Apply balance transfer service automatically, if the balance transfer service implementation allows [#qubIT-Fenix-4662]
+
 11.2.3 (07-12-2023)
 - Bug Fix: Fill information in debt report for debit entries associated with custom academic debt treasury events [#qubIT-Fenix-4659]
 
