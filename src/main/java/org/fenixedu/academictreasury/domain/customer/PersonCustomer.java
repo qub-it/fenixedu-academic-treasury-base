@@ -959,20 +959,22 @@ public class PersonCustomer extends PersonCustomer_Base {
             newCustomer.get().activateCustomer();
         }
 
-        for (FinantialInstitution finantialInstitution : FinantialInstitution.findAll().collect(Collectors.toSet())) {
-            if (StringUtils.isNotEmpty(finantialInstitution.getBalanceTransferServiceImplementationClass())) {
-                DebtAccount currentPersonCustomerDebtAccount = currentPersonCustomer.getDebtAccountFor(finantialInstitution);
-                DebtAccount newPersonCustomerDebtAccount = newCustomer.get().getDebtAccountFor(finantialInstitution);
+        if (currentPersonCustomer != null && newCustomer.isPresent()) {
+            for (FinantialInstitution finantialInstitution : FinantialInstitution.findAll().collect(Collectors.toSet())) {
+                if (StringUtils.isNotEmpty(finantialInstitution.getBalanceTransferServiceImplementationClass())) {
+                    DebtAccount currentPersonCustomerDebtAccount = currentPersonCustomer.getDebtAccountFor(finantialInstitution);
+                    DebtAccount newPersonCustomerDebtAccount = newCustomer.get().getDebtAccountFor(finantialInstitution);
 
-                if (currentPersonCustomerDebtAccount == null || newPersonCustomerDebtAccount == null) {
-                    continue;
-                }
+                    if (currentPersonCustomerDebtAccount == null || newPersonCustomerDebtAccount == null) {
+                        continue;
+                    }
 
-                BalanceTransferService balanceTransferService =
-                        BalanceTransferService.getService(currentPersonCustomerDebtAccount, newPersonCustomerDebtAccount);
+                    BalanceTransferService balanceTransferService =
+                            BalanceTransferService.getService(currentPersonCustomerDebtAccount, newPersonCustomerDebtAccount);
 
-                if (balanceTransferService.isAutoTransferInSwitchDebtAccountsEnabled()) {
-                    balanceTransferService.transferBalance();
+                    if (balanceTransferService.isAutoTransferInSwitchDebtAccountsEnabled()) {
+                        balanceTransferService.transferBalance();
+                    }
                 }
             }
         }
