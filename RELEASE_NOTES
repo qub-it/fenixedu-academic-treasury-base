@@ -1,3 +1,4 @@
+11.3.1 (12-12-2023)
 - Bug Fix: Fix bug in PersonCustomer#switchCustomer, which prevents the creation of a new debt account [#qubIT-Fenix-4662]
 
 11.3.0 (11-12-2023)
