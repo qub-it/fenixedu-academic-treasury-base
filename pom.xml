@@ -15,28 +15,30 @@
 
 	<name>Academic Treasury Base</name>
 
-	<properties>
-		<version.org.fenixedu.bennu>6.0.3-FORK</version.org.fenixedu.bennu>
-		<version.org.fenixedu.qubdocs.reports>2.2.5</version.org.fenixedu.qubdocs.reports>
-	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.qubit.solution.fenixedu</groupId>
+				<artifactId>fenixedu-oss-dependency-management</artifactId>
+				<version>1</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>com.qubit.solution.fenixedu</groupId>
 			<artifactId>fenixedu-academic-core</artifactId>
-			<version>44.2.0</version>
 			<scope>compile</scope>
 		</dependency>
-
 		<dependency>
 			<groupId>com.qubit.solution.fenixedu</groupId>
 			<artifactId>fenixedu-academic-core</artifactId>
 			<type>test-jar</type>
 			<scope>test</scope>
-			<version>44.2.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.fenixedu</groupId>
 			<artifactId>fenixedu-treasury-base</artifactId>
@@ -45,28 +47,13 @@
 		<dependency>
 			<groupId>org.fenixedu</groupId>
 			<artifactId>fenixedu-qubdocs-reports</artifactId>
-			<version>${version.org.fenixedu.qubdocs.reports}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
 			<version>3.11</version>
 		</dependency>
-
 	</dependencies>
-
-
-	<distributionManagement>
-		<repository>
-			<id>qubIT-oss</id>
-			<url>https://repository-oss.omnis.cloud/nexus/repository/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>qubIT-oss</id>
-			<url>https://repository-oss.omnis.cloud/nexus/repository/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
 
 	<build>
 		<plugins>
