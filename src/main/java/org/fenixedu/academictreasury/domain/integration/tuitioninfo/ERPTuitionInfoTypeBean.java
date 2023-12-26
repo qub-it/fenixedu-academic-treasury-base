@@ -274,7 +274,7 @@ public class ERPTuitionInfoTypeBean implements ITreasuryBean, Serializable {
                     .filter(d -> d.getDegreeType() == this.selectedDegreeType)
 			// TODO Check code Refactor/20210624-MergeWithISCTE
 			// In Refactor/ISCTE it is called d.getExecutionDegreeByYear(executionYear
-                    .filter(d -> d.getExecutionDegreeByAcademicInterval(executionYear.getAcademicInterval()) != null)
+                    .filter(d -> d.findExecutionDegree(executionYear).isPresent())
                     .filter(d -> !this.degrees.contains(d.getDegree()))
                     .filter(d -> !this.degreeTypes.contains(d.getDegree().getDegreeType()))
                     .map((dcp) -> new TreasuryTupleDataSourceBean(dcp.getExternalId(), dcpDescription(dcp)))
