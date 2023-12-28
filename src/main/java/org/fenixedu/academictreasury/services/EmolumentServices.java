@@ -312,9 +312,9 @@ public class EmolumentServices {
 
         if (academicTresuryEvent.isChargedWithDebitEntry()) {
             //Old amount has the amount plus the credit amount plus the direct exempted amount
-            BigDecimal oldtotalAmount = academicTresuryEvent.getAmountWithVatToPay().add(academicTresuryEvent.getCreditAmountWithVat())
-                    .add(DebitEntry.findActive(academicTresuryEvent).map(l -> l.getNetExemptedAmount()).reduce((a, b) -> a.add(b))
-                            .orElse(BigDecimal.ZERO));
+            BigDecimal oldtotalAmount = academicTresuryEvent.getAmountWithVatToPay()
+                    .add(academicTresuryEvent.getCreditAmountWithVat()).add(DebitEntry.findActive(academicTresuryEvent)
+                            .map(l -> l.getNetExemptedAmount()).reduce((a, b) -> a.add(b)).orElse(BigDecimal.ZERO));
             BigDecimal newTotalAmount = academicTariff.amountToPay(academicTresuryEvent);
             //Do nothing, since the value is the same
             if (TreasuryConstants.isEqual(oldtotalAmount, newTotalAmount)) {
@@ -473,7 +473,7 @@ public class EmolumentServices {
         final DebtAccount debtAccount = DebtAccount.findUnique(finantialEntity.getFinantialInstitution(), personCustomer).get();
 
         final AcademicTreasuryEvent academicTreasuryEvent = AcademicTreasuryEvent.createForCustomAcademicDebt(product,
-                registration, executionYear, numberOfUnits, numberOfPages, urgentRequest, when);
+                registration, executionYear, numberOfUnits, numberOfPages, urgentRequest, when, null);
 
         final AcademicTariff academicTariff =
                 AcademicTariff.findMatch(finantialEntity, product, registration.getDegree(), when.toDateTimeAtStartOfDay());

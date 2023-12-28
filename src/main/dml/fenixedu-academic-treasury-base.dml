@@ -694,6 +694,9 @@ class event.AcademicTreasuryEvent extends .org.fenixedu.treasury.domain.event.Tr
 	int customAcademicDebtNumberOfUnits;
 	int customAcademicDebtNumberOfPages;
 	boolean customAcademicDebtUrgent;
+	
+	/* used in custom academic debt */
+	String academicProcessNumber;
 }
 	
 	relation AcademicTreasuryEventPerson {

@@ -1,3 +1,5 @@
+- Refactor: Declare property in DML for academic treasury event, to record the academic process number. To be used with the custom academic debt (WIP) [#qubIT-Fenix-4756]
+
 11.3.2 (18-12-2023)
 - Improvement: Adds fenixedu OSS DM [#qubIT-Omnis-4736]
 - Improvement: Define personal email, institutional email and default email in reimbuserment report entry bean [#qubIT-Fenix-4691]

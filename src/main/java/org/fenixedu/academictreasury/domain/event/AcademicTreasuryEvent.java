@@ -141,11 +141,11 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         checkRules();
     }
 
-    protected AcademicTreasuryEvent(final Product product, final Registration registration, final ExecutionYear executionYear,
-            final int customAcademicDebtNumberOfUnits, final int customAcademicDebtNumberOfPages,
-            final boolean customAcademicDebtUrgent, final LocalDate customAcademicDebtEventDate) {
+    protected AcademicTreasuryEvent(Product product, Registration registration, ExecutionYear executionYear,
+            int customAcademicDebtNumberOfUnits, int customAcademicDebtNumberOfPages, boolean customAcademicDebtUrgent,
+            LocalDate customAcademicDebtEventDate, String academicProcessNumber) {
         init(product, registration, executionYear, customAcademicDebtNumberOfUnits, customAcademicDebtNumberOfPages,
-                customAcademicDebtUrgent, customAcademicDebtEventDate);
+                customAcademicDebtUrgent, customAcademicDebtEventDate, academicProcessNumber);
 
         checkRules();
     }
@@ -279,10 +279,16 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         setTreasuryEventTarget((AbstractDomainObject) target);
     }
 
-    protected void init(final Product product, final Registration registration, final ExecutionYear executionYear,
-            final int customAcademicDebtNumberOfUnits, final int customAcademicDebtNumberOfPages,
-            final boolean customAcademicDebtUrgent, final LocalDate customAcademicDebtEventDate) {
-        super.init(product, nameForCustomAcademicDebt(product, registration, executionYear));
+    protected void init(Product product, Registration registration, ExecutionYear executionYear,
+            int customAcademicDebtNumberOfUnits, int customAcademicDebtNumberOfPages, boolean customAcademicDebtUrgent,
+            LocalDate customAcademicDebtEventDate, String academicProcessNumber) {
+        LocalizedString nameForCustomAcademicDebt = nameForCustomAcademicDebt(product, registration, executionYear);
+
+        if (StringUtils.isNotEmpty(academicProcessNumber)) {
+            nameForCustomAcademicDebt = nameForCustomAcademicDebt.append(" [" + academicProcessNumber + "]");
+        }
+
+        super.init(product, nameForCustomAcademicDebt);
 
         setPerson(registration.getPerson());
         setCustomAcademicDebt(true);
@@ -293,6 +299,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         setCustomAcademicDebtNumberOfPages(customAcademicDebtNumberOfPages);
         setCustomAcademicDebtUrgent(customAcademicDebtUrgent);
         setCustomAcademicDebtEventDate(customAcademicDebtEventDate);
+
+        super.setAcademicProcessNumber(academicProcessNumber);
     }
 
     public static LocalizedString nameForCustomAcademicDebt(final Product product, final Registration registration,
@@ -1089,12 +1097,11 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
      */
     // @formatter: on
 
-    public static AcademicTreasuryEvent createForCustomAcademicDebt(final Product product, final Registration registration,
-            final ExecutionYear executionYear, final int customAcademicDebtNumberOfUnits,
-            final int customAcademicDebtNumberOfPages, final boolean customAcademicDebtUrgent,
-            final LocalDate customAcademicDebtEventDate) {
+    public static AcademicTreasuryEvent createForCustomAcademicDebt(Product product, Registration registration,
+            ExecutionYear executionYear, int customAcademicDebtNumberOfUnits, int customAcademicDebtNumberOfPages,
+            boolean customAcademicDebtUrgent, LocalDate customAcademicDebtEventDate, String academicProcessNumber) {
         return new AcademicTreasuryEvent(product, registration, executionYear, customAcademicDebtNumberOfUnits,
-                customAcademicDebtNumberOfPages, customAcademicDebtUrgent, customAcademicDebtEventDate);
+                customAcademicDebtNumberOfPages, customAcademicDebtUrgent, customAcademicDebtEventDate, academicProcessNumber);
     }
 
     public static Stream<? extends AcademicTreasuryEvent> findForCustomAcademicDebt(final Product product,
