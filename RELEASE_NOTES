@@ -1,3 +1,4 @@
+11.3.3 (28-12-2023)
 - Refactor: Remove usage of execution degree finder by academic interval [#qubIT-Fenix-1590]
 - Refactor: Declare property in DML for academic treasury event, to record the academic process number. To be used with the custom academic debt (WIP) [#qubIT-Fenix-4756]
 
