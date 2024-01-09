@@ -1,3 +1,4 @@
+11.3.5 (09-01-2024)
 - Improvement: Add document certification information in debt reports [#qubIT-Fenix-4794]
 - Bug Fix: Fill information in debt report for debit entries associated with custom academic debt treasury events [#qubIT-Fenix-4794]
 - Improvement Fill settlement report with invoice entry net exemption [#qubIT-Fenix-4794]
