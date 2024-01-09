@@ -51,7 +51,6 @@ import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependent
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
-import org.fenixedu.treasury.domain.Currency;
 import org.fenixedu.treasury.domain.Customer;
 import org.fenixedu.treasury.domain.document.CreditEntry;
 import org.fenixedu.treasury.domain.document.DebitEntry;
@@ -115,7 +114,6 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
     private String responsible;
     private String invoiceEntryIdentification;
     private String invoiceEntryType;
-    private BigDecimal invoiceEntryAmountToPay;
     private String invoiceDocumentNumber;
     private String settlementNoteNumber;
     private DateTime settlementNoteDocumentDate;
@@ -123,7 +121,14 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
     private Boolean settlementNoteAnnuled;
     private Boolean documentExportationPending;
     private Integer settlementEntryOrder;
+
+    private BigDecimal invoiceEntryAmountToPay;
+    private BigDecimal netExemptedAmount;
+    private BigDecimal openAmountToPay;
+
+    // This is the settled amount
     private BigDecimal amount;
+
     private String productCode;
     private String settlementEntryDescription;
     private String customerId;
@@ -153,8 +158,14 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
     private String erpCustomerId;
     private String erpPayorCustomerId;
 
+    private String invoiceEntryCertifiedDocumentNumber;
+    private LocalDate invoiceEntryCertifiedDocumentDate;
+
+    private String settlementNoteCertifiedDocumentNumber;
+    private LocalDate settlementNoteCertifiedDocumentDate;
+
     private String decimalSeparator;
-    
+
     private String documentObservations;
     private String documentTermsAndConditions;
 
@@ -167,8 +178,6 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
         this.settlementNote = (SettlementNote) entry.getFinantialDocument();
 
         try {
-            final Currency currency = this.settlementNote.getDebtAccount().getFinantialInstitution().getCurrency();
-
             this.identification = entry.getExternalId();
             this.creationDate = treasuryServices.versioningCreationDate(entry);
             this.responsible = treasuryServices.versioningCreatorUsername(entry);
@@ -179,17 +188,21 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
             this.settlementNoteAnnuled = settlementNote.isAnnulled();
             this.documentExportationPending = settlementNote.isDocumentToExport();
             this.invoiceEntryType = entryType(entry.getInvoiceEntry());
-            this.invoiceEntryAmountToPay = currency.getValueWithScale(entry.getInvoiceEntry().getAmountWithVat());
             this.invoiceDocumentNumber = entry.getInvoiceEntry().getFinantialDocument().getUiDocumentNumber();
             this.settlementEntryOrder = entry.getEntryOrder();
-            this.amount = settlementNote.getDebtAccount().getFinantialInstitution().getCurrency()
-                    .getValueWithScale(entry.getTotalAmount());
+
+            this.invoiceEntryAmountToPay = entry.getInvoiceEntry().getAmountWithVat();
+            this.netExemptedAmount = entry.getInvoiceEntry().isDebitNoteEntry() ? ((DebitEntry) entry.getInvoiceEntry())
+                    .getNetExemptedAmount() : BigDecimal.ZERO;
+            this.openAmountToPay = entry.getInvoiceEntry().getOpenAmount();
+
+            this.amount = entry.getTotalAmount();
 
             this.productCode = entry.getInvoiceEntry().getProduct().getCode();
             this.settlementEntryDescription = entry.getDescription();
             this.documentObservations = this.settlementNote.getDocumentObservations();
             this.documentTermsAndConditions = this.settlementNote.getDocumentTermsAndConditions();
-            
+
             fillStudentInformation(entry);
 
             fillAcademicInformation(entry.getInvoiceEntry());
@@ -205,6 +218,8 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
     }
 
     private void fillERPInformation(final SettlementEntry entry) {
+        ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
+
         this.closeDate = entry.getFinantialDocument() != null ? entry.getFinantialDocument().getCloseDate() : null;
         this.exportedInLegacyERP =
                 entry.getFinantialDocument() != null ? entry.getFinantialDocument().isExportedInLegacyERP() : false;
@@ -222,6 +237,20 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
             this.erpPayorCustomerId = ((Invoice) entry.getInvoiceEntry().getFinantialDocument()).getPayorDebtAccount()
                     .getCustomer().getErpCustomerId();
         }
+
+        if (treasuryServices.hasCertifiedDocument(entry.getSettlementNote())) {
+            this.settlementNoteCertifiedDocumentNumber = treasuryServices.getCertifiedDocumentNumber(entry.getSettlementNote());
+            this.settlementNoteCertifiedDocumentDate = treasuryServices.getCertifiedDocumentDate(entry.getSettlementNote());
+        }
+
+        if (entry.getInvoiceEntry().getFinantialDocument() != null
+                && treasuryServices.hasCertifiedDocument(entry.getInvoiceEntry().getFinantialDocument())) {
+            this.invoiceEntryCertifiedDocumentNumber =
+                    treasuryServices.getCertifiedDocumentNumber(entry.getInvoiceEntry().getFinantialDocument());
+            this.invoiceEntryCertifiedDocumentDate =
+                    treasuryServices.getCertifiedDocumentDate(entry.getInvoiceEntry().getFinantialDocument());
+        }
+
     }
 
     private void fillAcademicInformation(final InvoiceEntry invoiceEntry) {
@@ -317,6 +346,13 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
                         this.executionSemester =
                                 treasuryEventTarget.getAcademicTreasuryTargetExecutionSemester().getQualifiedName();
                     }
+                } else if (academicTreasuryEvent.isForCustomAcademicDebt()) {
+                    this.registrationNumber = academicTreasuryEvent.getRegistration().getNumber();
+                    this.degreeType = academicTreasuryServices
+                            .localizedNameOfDegreeType(academicTreasuryEvent.getRegistration().getDegree().getDegreeType());
+                    this.degreeCode = academicTreasuryEvent.getRegistration().getDegree().getCode();
+                    this.degreeName = academicTreasuryEvent.getRegistration().getDegree().getPresentationName();
+                    this.executionYear = academicTreasuryEvent.getExecutionYear().getQualifiedName();
                 }
             } else if (debitEntry.getTreasuryEvent() != null) {
                 final TreasuryEvent treasuryEvent = debitEntry.getTreasuryEvent();
@@ -579,14 +615,6 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
         this.invoiceEntryType = invoiceEntryType;
     }
 
-    public BigDecimal getInvoiceEntryAmountToPay() {
-        return invoiceEntryAmountToPay;
-    }
-
-    public void setInvoiceEntryAmountToPay(BigDecimal invoiceEntryAmountToPay) {
-        this.invoiceEntryAmountToPay = invoiceEntryAmountToPay;
-    }
-
     public String getInvoiceDocumentNumber() {
         return invoiceDocumentNumber;
     }
@@ -641,6 +669,30 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
 
     public void setSettlementEntryOrder(Integer settlementEntryOrder) {
         this.settlementEntryOrder = settlementEntryOrder;
+    }
+
+    public BigDecimal getInvoiceEntryAmountToPay() {
+        return invoiceEntryAmountToPay;
+    }
+
+    public void setInvoiceEntryAmountToPay(BigDecimal invoiceEntryAmountToPay) {
+        this.invoiceEntryAmountToPay = invoiceEntryAmountToPay;
+    }
+
+    public BigDecimal getNetExemptedAmount() {
+        return netExemptedAmount;
+    }
+
+    public void setNetExemptedAmount(BigDecimal netExemptedAmount) {
+        this.netExemptedAmount = netExemptedAmount;
+    }
+
+    public BigDecimal getOpenAmountToPay() {
+        return openAmountToPay;
+    }
+
+    public void setOpenAmountToPay(BigDecimal openAmountToPay) {
+        this.openAmountToPay = openAmountToPay;
     }
 
     public BigDecimal getAmount() {
@@ -851,6 +903,38 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
         this.erpPayorCustomerId = erpPayorCustomerId;
     }
 
+    public String getInvoiceEntryCertifiedDocumentNumber() {
+        return invoiceEntryCertifiedDocumentNumber;
+    }
+
+    public void setInvoiceEntryCertifiedDocumentNumber(String invoiceEntryCertifiedDocumentNumber) {
+        this.invoiceEntryCertifiedDocumentNumber = invoiceEntryCertifiedDocumentNumber;
+    }
+
+    public LocalDate getInvoiceEntryCertifiedDocumentDate() {
+        return invoiceEntryCertifiedDocumentDate;
+    }
+
+    public void setInvoiceEntryCertifiedDocumentDate(LocalDate invoiceEntryCertifiedDocumentDate) {
+        this.invoiceEntryCertifiedDocumentDate = invoiceEntryCertifiedDocumentDate;
+    }
+
+    public String getSettlementNoteCertifiedDocumentNumber() {
+        return settlementNoteCertifiedDocumentNumber;
+    }
+
+    public void setSettlementNoteCertifiedDocumentNumber(String settlementNoteCertifiedDocumentNumber) {
+        this.settlementNoteCertifiedDocumentNumber = settlementNoteCertifiedDocumentNumber;
+    }
+
+    public LocalDate getSettlementNoteCertifiedDocumentDate() {
+        return settlementNoteCertifiedDocumentDate;
+    }
+
+    public void setSettlementNoteCertifiedDocumentDate(LocalDate settlementNoteCertifiedDocumentDate) {
+        this.settlementNoteCertifiedDocumentDate = settlementNoteCertifiedDocumentDate;
+    }
+
     public String getDecimalSeparator() {
         return decimalSeparator;
     }
@@ -858,11 +942,11 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
     public void setDecimalSeparator(String decimalSeparator) {
         this.decimalSeparator = decimalSeparator;
     }
-    
+
     public String getDocumentObservations() {
         return documentObservations;
     }
-    
+
     public void setDocumentObservations(String documentObservations) {
         this.documentObservations = documentObservations;
     }
@@ -870,7 +954,7 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
     public String getDocumentTermsAndConditions() {
         return documentTermsAndConditions;
     }
-    
+
     public void setDocumentTermsAndConditions(String documentTermsAndConditions) {
         this.documentTermsAndConditions = documentTermsAndConditions;
     }

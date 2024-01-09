@@ -216,6 +216,8 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     private String degreeType;
     private String degreeCode;
     private String degreeName;
+    private LocalizedString registrationMajorDcpGroupName;
+    private LocalizedString registrationMinorDcpGroupName;
     private String executionYear;
     private String executionSemester;
     private String productCode;
@@ -226,6 +228,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     private String annuledReason;
     private String debitEntryIdentification;
     private BigDecimal amountToPay;
+    private BigDecimal netExemptedAmount;
     private BigDecimal openAmountToPay;
     private BigDecimal openAmountWithInterestToDate;
     private BigDecimal pendingInterestAmount;
@@ -253,6 +256,9 @@ public class DebtReportEntryBean implements SpreadsheetRow {
     private String erpCustomerId;
     private String erpPayorCustomerId;
 
+    private String certifiedDocumentNumber;
+    private LocalDate certifiedDocumentDate;
+
     private String originSettlementNoteForAdvancedCredit;
 
     private String decimalSeparator;
@@ -262,8 +268,6 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
     private String finantialEntityCode;
     private LocalizedString finantialEntityName;
-
-    private BigDecimal netExemptedAmount;
 
     public DebtReportEntryBean(final InvoiceEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
@@ -378,12 +382,14 @@ public class DebtReportEntryBean implements SpreadsheetRow {
             this.erpCertificationDate = treasuryServices.getCertifiedDocumentDate(entry.getFinantialDocument());
             this.erpCertificateDocumentReference = treasuryServices.getCertifiedDocumentNumber(entry.getFinantialDocument());
         }
+
+        if (entry.getFinantialDocument() != null && treasuryServices.hasCertifiedDocument(entry.getFinantialDocument())) {
+            this.certifiedDocumentDate = treasuryServices.getCertifiedDocumentDate(entry.getFinantialDocument());
+            this.certifiedDocumentNumber = treasuryServices.getCertifiedDocumentNumber(entry.getFinantialDocument());
+        }
     }
 
     private void fillStudentInformation(final InvoiceEntry entry) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         final Customer customer = entry.getDebtAccount().getCustomer();
 
         this.customerId = customer.getExternalId();
@@ -442,19 +448,20 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 final AcademicTreasuryEvent academicTreasuryEvent = (AcademicTreasuryEvent) debitEntry.getTreasuryEvent();
 
                 if (academicTreasuryEvent.isForRegistrationTuition()) {
-                    this.registrationNumber = academicTreasuryEvent.getRegistration().getNumber();
-                    this.degreeType = academicTreasuryServices
-                            .localizedNameOfDegreeType(academicTreasuryEvent.getRegistration().getDegree().getDegreeType());
-                    this.degreeCode = academicTreasuryEvent.getRegistration().getDegree().getCode();
-                    this.degreeName = academicTreasuryEvent.getRegistration().getDegree().getPresentationName();
+                    Registration registration = academicTreasuryEvent.getRegistration();
+
+                    this.registrationNumber = registration.getNumber();
+                    this.degreeType =
+                            academicTreasuryServices.localizedNameOfDegreeType(registration.getDegree().getDegreeType());
+                    this.degreeCode = registration.getDegree().getCode();
+                    this.degreeName = registration.getDegree().getPresentationName();
                     this.executionYear = academicTreasuryEvent.getExecutionYear().getQualifiedName();
                     this.tuitionPaymentPlan =
                             AcademicTreasuryEventKeys.valueFor(debitEntry, AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN);
                     this.tuitionPaymentPlanConditions = AcademicTreasuryEventKeys.valueFor(debitEntry,
                             AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN_CONDITIONS);
 
-                    fillStudentConditionsInformation(academicTreasuryEvent.getRegistration(),
-                            academicTreasuryEvent.getExecutionYear());
+                    fillStudentConditionsInformation(registration, academicTreasuryEvent.getExecutionYear());
 
                 } else if (academicTreasuryEvent.isForStandaloneTuition()
                         || academicTreasuryEvent.isForExtracurricularTuition()) {
@@ -501,12 +508,13 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                                 academicTreasuryEvent.getExecutionYear());
                     }
                 } else if (academicTreasuryEvent.isForAcademicTax()) {
+                    Registration registration = academicTreasuryEvent.getRegistration();
 
-                    this.registrationNumber = academicTreasuryEvent.getRegistration().getNumber();
-                    this.degreeType = academicTreasuryServices
-                            .localizedNameOfDegreeType(academicTreasuryEvent.getRegistration().getDegree().getDegreeType());
-                    this.degreeCode = academicTreasuryEvent.getRegistration().getDegree().getCode();
-                    this.degreeName = academicTreasuryEvent.getRegistration().getDegree().getPresentationName();
+                    this.registrationNumber = registration.getNumber();
+                    this.degreeType =
+                            academicTreasuryServices.localizedNameOfDegreeType(registration.getDegree().getDegreeType());
+                    this.degreeCode = registration.getDegree().getCode();
+                    this.degreeName = registration.getDegree().getPresentationName();
                     this.executionYear = academicTreasuryEvent.getExecutionYear().getQualifiedName();
 
                     fillStudentConditionsInformation(academicTreasuryEvent.getRegistration(),
@@ -516,11 +524,12 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
                     final ITreasuryServiceRequest iTreasuryServiceRequest = academicTreasuryEvent.getITreasuryServiceRequest();
 
-                    this.registrationNumber = iTreasuryServiceRequest.getRegistration().getNumber();
-                    this.degreeType = academicTreasuryServices
-                            .localizedNameOfDegreeType(iTreasuryServiceRequest.getRegistration().getDegree().getDegreeType());
-                    this.degreeCode = iTreasuryServiceRequest.getRegistration().getDegree().getCode();
-                    this.degreeName = iTreasuryServiceRequest.getRegistration().getDegree().getPresentationName();
+                    Registration registration = iTreasuryServiceRequest.getRegistration();
+                    this.registrationNumber = registration.getNumber();
+                    this.degreeType =
+                            academicTreasuryServices.localizedNameOfDegreeType(registration.getDegree().getDegreeType());
+                    this.degreeCode = registration.getDegree().getCode();
+                    this.degreeName = registration.getDegree().getPresentationName();
 
                     if (iTreasuryServiceRequest.hasExecutionYear()) {
                         this.executionYear = iTreasuryServiceRequest.getExecutionYear().getQualifiedName();
@@ -549,15 +558,16 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                                 treasuryEventTarget.getAcademicTreasuryTargetExecutionSemester().getQualifiedName();
                     }
                 } else if (academicTreasuryEvent.isForCustomAcademicDebt()) {
-                    this.registrationNumber = academicTreasuryEvent.getRegistration().getNumber();
-                    this.degreeType = academicTreasuryServices
-                            .localizedNameOfDegreeType(academicTreasuryEvent.getRegistration().getDegree().getDegreeType());
-                    this.degreeCode = academicTreasuryEvent.getRegistration().getDegree().getCode();
-                    this.degreeName = academicTreasuryEvent.getRegistration().getDegree().getPresentationName();
+                    Registration registration = academicTreasuryEvent.getRegistration();
+
+                    this.registrationNumber = registration.getNumber();
+                    this.degreeType =
+                            academicTreasuryServices.localizedNameOfDegreeType(registration.getDegree().getDegreeType());
+                    this.degreeCode = registration.getDegree().getCode();
+                    this.degreeName = registration.getDegree().getPresentationName();
                     this.executionYear = academicTreasuryEvent.getExecutionYear().getQualifiedName();
 
-                    fillStudentConditionsInformation(academicTreasuryEvent.getRegistration(),
-                            academicTreasuryEvent.getExecutionYear());
+                    fillStudentConditionsInformation(registration, academicTreasuryEvent.getExecutionYear());
                 }
 
             } else if (debitEntry.getTreasuryEvent() != null) {
@@ -1151,6 +1161,14 @@ public class DebtReportEntryBean implements SpreadsheetRow {
         this.amountToPay = amountToPay;
     }
 
+    public BigDecimal getNetExemptedAmount() {
+        return netExemptedAmount;
+    }
+
+    public void setNetExemptedAmount(BigDecimal netExemptedAmount) {
+        this.netExemptedAmount = netExemptedAmount;
+    }
+
     public BigDecimal getOpenAmountToPay() {
         return openAmountToPay;
     }
@@ -1335,6 +1353,22 @@ public class DebtReportEntryBean implements SpreadsheetRow {
         this.erpPayorCustomerId = erpPayorCustomerId;
     }
 
+    public String getCertifiedDocumentNumber() {
+        return certifiedDocumentNumber;
+    }
+
+    public void setCertifiedDocumentNumber(String certifiedDocumentNumber) {
+        this.certifiedDocumentNumber = certifiedDocumentNumber;
+    }
+
+    public LocalDate getCertifiedDocumentDate() {
+        return certifiedDocumentDate;
+    }
+
+    public void setCertifiedDocumentDate(LocalDate certifiedDocumentDate) {
+        this.certifiedDocumentDate = certifiedDocumentDate;
+    }
+
     public String getOriginSettlementNoteForAdvancedCredit() {
         return originSettlementNoteForAdvancedCredit;
     }
@@ -1373,14 +1407,6 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
     public void setFinantialEntityName(LocalizedString finantialEntityName) {
         this.finantialEntityName = finantialEntityName;
-    }
-
-    public BigDecimal getNetExemptedAmount() {
-        return netExemptedAmount;
-    }
-
-    public void setNetExemptedAmount(BigDecimal netExemptedAmount) {
-        this.netExemptedAmount = netExemptedAmount;
     }
 
 }
