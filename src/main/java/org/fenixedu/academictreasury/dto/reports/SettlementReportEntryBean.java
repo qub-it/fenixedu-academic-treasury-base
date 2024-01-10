@@ -169,6 +169,9 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
     private String documentObservations;
     private String documentTermsAndConditions;
 
+    private String finantialEntityCode;
+    private LocalizedString finantialEntityName;
+
     public SettlementReportEntryBean(final SettlementEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
 
@@ -206,6 +209,11 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
             fillStudentInformation(entry);
 
             fillAcademicInformation(entry.getInvoiceEntry());
+
+            if (entry.getInvoiceEntry().getAssociatedFinantialEntity() != null) {
+                this.finantialEntityCode = entry.getInvoiceEntry().getAssociatedFinantialEntity().getCode();
+                this.finantialEntityName = entry.getInvoiceEntry().getAssociatedFinantialEntity().getName();
+            }
 
             fillERPInformation(entry);
 
@@ -957,5 +965,21 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
 
     public void setDocumentTermsAndConditions(String documentTermsAndConditions) {
         this.documentTermsAndConditions = documentTermsAndConditions;
+    }
+
+    public String getFinantialEntityCode() {
+        return finantialEntityCode;
+    }
+
+    public void setFinantialEntityCode(String finantialEntityCode) {
+        this.finantialEntityCode = finantialEntityCode;
+    }
+
+    public LocalizedString getFinantialEntityName() {
+        return finantialEntityName;
+    }
+
+    public void setFinantialEntityName(LocalizedString finantialEntityName) {
+        this.finantialEntityName = finantialEntityName;
     }
 }
