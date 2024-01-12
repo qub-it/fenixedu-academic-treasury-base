@@ -66,6 +66,7 @@ import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEventPayment;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
 import org.fenixedu.academic.domain.treasury.IImprovementTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.IPaymentReferenceCode;
+import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
 import org.fenixedu.academictreasury.domain.emoluments.AcademicTax;
 import org.fenixedu.academictreasury.domain.emoluments.ServiceRequestMapEntry;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
@@ -887,7 +888,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
     @Override
     public boolean isEventAccountedAsTuition() {
         if (isForTreasuryEventTarget()) {
-            ((IAcademicTreasuryTarget) getTreasuryEventTarget()).isEventAccountedAsTuition();
+            return ((IAcademicTreasuryTarget) getTreasuryEventTarget()).isEventAccountedAsTuition();
         }
 
         return isForRegistrationTuition() || isForStandaloneTuition() || isForExtracurricularTuition();
@@ -1783,4 +1784,31 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         return null;
     }
 
+    // @formatter: off
+    /* ************************************* *
+     * REGISTRATION TUITION SPECIFIC METHODS *
+     * ************************************* */
+    // @formatter: on
+
+    public BigDecimal getRegistrationTuitionAmountToPayIncludingOtherTuitionRelatedEmolumentsAndExcludingInterests() {
+        if (!isForRegistrationTuition()) {
+            throw new RuntimeException(
+                    "error.AcademicTreasuryEvent.getRegistrationTuitionAmountToPayIncludingOtherTuitionRelatedEmolumentsAndExcludingInterests.invalid.event.type");
+        }
+
+        BigDecimal registrationTuitionAmount = getAmountWithVatToPay().subtract(getInterestsAmountToPay());
+
+        BigDecimal otherTuitionAmount = TreasuryBridgeAPIFactory.implementation().getAllAcademicTreasuryEventsList(getPerson()) //
+                .stream() //
+                .map(TreasuryEvent.class::cast) //
+                .filter(t -> t != this) //
+                .filter(t -> !(t instanceof AcademicTreasuryEvent) || !((AcademicTreasuryEvent) t).isForRegistrationTuition()) //
+                .filter(t -> t.isEventAccountedAsTuition()) //
+                .filter(t -> getExecutionYear().getQualifiedName().equals(t.getExecutionYearName())) //
+                .filter(t -> getDegreeCode().equals(t.getDegreeCode())) //
+                .map(t -> t.getAmountWithVatToPay().subtract(t.getInterestsAmountToPay())) //
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return registrationTuitionAmount.add(otherTuitionAmount);
+    }
 }

@@ -1,16 +1,13 @@
 package org.fenixedu.academictreasury.domain.reservationtax;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.Degree;
@@ -26,7 +23,6 @@ import org.fenixedu.academictreasury.domain.academictreasurytarget.AcademicTreas
 import org.fenixedu.academictreasury.domain.academictreasurytarget.AcademicTreasuryTargetCreateDebtBuilder.DebtBuilderWithAmountAndDueDate;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
@@ -220,6 +216,11 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
     }
 
     @Override
+    public boolean isEventAccountedAsTuition() {
+        return isEventDiscountInTuitionFee();
+    }
+
+    @Override
     public boolean isEventDiscountInTuitionFee() {
         return Boolean.TRUE.equals(getReservationTax().getDiscountInTuitionFee());
     }
@@ -250,7 +251,7 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
     public void mergeToTargetPerson(Person targetPerson) {
         setPerson(targetPerson);
     }
-    
+
     // @formatter:off
     /* ********
      * SERVICES
