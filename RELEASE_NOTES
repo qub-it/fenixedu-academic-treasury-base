@@ -1,3 +1,4 @@
+11.3.8 (17-01-2024)
 - Refactor: Change InvoiceEntry::getAssociatedFinantialEntity to InvoiceEntry::getFinantialEntity [#qubIT-Fenix-4587]
 
 11.3.7 (12-01-2024)
