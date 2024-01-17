@@ -210,9 +210,9 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
 
             fillAcademicInformation(entry.getInvoiceEntry());
 
-            if (entry.getInvoiceEntry().getAssociatedFinantialEntity() != null) {
-                this.finantialEntityCode = entry.getInvoiceEntry().getAssociatedFinantialEntity().getCode();
-                this.finantialEntityName = entry.getInvoiceEntry().getAssociatedFinantialEntity().getName();
+            if (entry.getInvoiceEntry().getFinantialEntity() != null) {
+                this.finantialEntityCode = entry.getInvoiceEntry().getFinantialEntity().getCode();
+                this.finantialEntityName = entry.getInvoiceEntry().getFinantialEntity().getName();
             }
 
             fillERPInformation(entry);

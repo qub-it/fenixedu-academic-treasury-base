@@ -328,9 +328,9 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 this.netExemptedAmount = ((DebitEntry) entry).getNetExemptedAmount();
             }
 
-            if (entry.getAssociatedFinantialEntity() != null) {
-                this.finantialEntityCode = entry.getAssociatedFinantialEntity().getCode();
-                this.finantialEntityName = entry.getAssociatedFinantialEntity().getName();
+            if (entry.getFinantialEntity() != null) {
+                this.finantialEntityCode = entry.getFinantialEntity().getCode();
+                this.finantialEntityName = entry.getFinantialEntity().getName();
             }
 
             fillERPInformation(entry);

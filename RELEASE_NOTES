@@ -1,3 +1,5 @@
+- Refactor: Change InvoiceEntry::getAssociatedFinantialEntity to InvoiceEntry::getFinantialEntity [#qubIT-Fenix-4587]
+
 11.3.7 (12-01-2024)
 - Improvement: Add method to AcademicTreasuryEvent, to calculate the registration tuition amount including other events that account for tuition [#UL-IGOT-1569]
 - Bug Fix: Mark reservation tax event target as accounted for tuition, if it will discount in registration tuition amount [#UL-IGOT-1569]
