@@ -59,6 +59,8 @@ import org.fenixedu.treasury.domain.document.InvoiceEntry;
 import org.fenixedu.treasury.domain.document.SettlementEntry;
 import org.fenixedu.treasury.domain.document.SettlementNote;
 import org.fenixedu.treasury.domain.event.TreasuryEvent;
+import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
+import org.fenixedu.treasury.domain.payments.PaymentTransaction;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
@@ -550,6 +552,41 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
         }
 
         return "";
+    }
+
+    /* ******************************************************
+    /* COMPUTATIONS TO MAKE EASY THE BUILDING OF THE REPORT */
+    /* ******************************************************/
+
+    public DebitEntry getAssociatedDebitEntry() {
+        return this.settlementEntry.getInvoiceEntry()
+                .isDebitNoteEntry() ? (DebitEntry) this.settlementEntry.getInvoiceEntry() : null;
+    }
+
+    public CreditEntry getAssociatedCreditEntry() {
+        return this.settlementEntry.getInvoiceEntry()
+                .isCreditNoteEntry() ? (CreditEntry) this.settlementEntry.getInvoiceEntry() : null;
+    }
+
+    public SibsPaymentRequest getAssociatedSibsPaymentRequest() {
+        PaymentTransaction paymentTransaction = this.settlementEntry.getSettlementNote().getPaymentTransaction();
+
+        if (paymentTransaction == null) {
+            return null;
+        }
+
+        return paymentTransaction.getPaymentRequest() instanceof SibsPaymentRequest ? (SibsPaymentRequest) paymentTransaction
+                .getPaymentRequest() : null;
+    }
+
+    public Person getAssociatedPerson() {
+        if (!this.settlementEntry.getDebtAccount().getCustomer().isPersonCustomer()) {
+            return null;
+        }
+
+        PersonCustomer personCustomer = (PersonCustomer) this.settlementEntry.getDebtAccount().getCustomer();
+
+        return personCustomer.getAssociatedPerson();
     }
 
     // @formatter:off

@@ -1,3 +1,5 @@
+- Improvement: Declare methods to get refined entity objects in treasury report beans [#qubIT-Fenix-4794]
+
 11.3.9 (18-01-2024)
 - Refactor: Revert translation of exempted amount in portuguese [#qubIT-Fenix-4748]
 

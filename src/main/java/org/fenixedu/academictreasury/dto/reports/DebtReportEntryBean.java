@@ -882,6 +882,28 @@ public class DebtReportEntryBean implements SpreadsheetRow {
         return "";
     }
 
+    /* ******************************************************
+    /* COMPUTATIONS TO MAKE EASY THE BUILDING OF THE REPORT */
+    /* ******************************************************/
+
+    public DebitEntry getAssociatedDebitEntry() {
+        return this.invoiceEntry.isDebitNoteEntry() ? (DebitEntry) this.invoiceEntry : null;
+    }
+
+    public CreditEntry getAssociatedCreditEntry() {
+        return this.invoiceEntry.isCreditNoteEntry() ? (CreditEntry) this.invoiceEntry : null;
+    }
+
+    public Person getAssociatedPerson() {
+        if (!this.invoiceEntry.getDebtAccount().getCustomer().isPersonCustomer()) {
+            return null;
+        }
+
+        PersonCustomer personCustomer = (PersonCustomer) this.invoiceEntry.getDebtAccount().getCustomer();
+
+        return personCustomer.getAssociatedPerson();
+    }
+
     // @formatter:off
     /* *****************
      * GETTERS & SETTERS
