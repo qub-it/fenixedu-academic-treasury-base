@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 import org.fenixedu.bennu.io.domain.IGenericFile;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Customer;
+import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.FinantialInstitution;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.document.FinantialDocument;
@@ -144,7 +145,7 @@ public class TreasuryPlatformDependentServicesForTests implements ITreasuryPlatf
         // TODO Auto-generated method stub
         return null;
     }
-    
+
     @Override
     public String getCustomerEmail(Customer customer) {
         // TODO Auto-generated method stub
@@ -263,8 +264,8 @@ public class TreasuryPlatformDependentServicesForTests implements ITreasuryPlatf
     }
 
     @Override
-    public InputStream exportDocuments(String templateCode, FinantialInstitution finantialInstitution, LocalDate documentDateFrom,
-            LocalDate documentDateTo) {
+    public InputStream exportDocuments(String templateCode, FinantialInstitution finantialInstitution,
+            FinantialEntity finantialEntity, LocalDate documentDateFrom, LocalDate documentDateTo, String username) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -280,13 +281,13 @@ public class TreasuryPlatformDependentServicesForTests implements ITreasuryPlatf
         // TODO Auto-generated method stub
         return null;
     }
-    
+
     @Override
     public ISaftExporterConfiguration getSaftExporterConfiguration(ERPConfiguration erpConfiguration) {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
     @Override
     public Set<Partial> getHolidays() {
         return Collections.emptySet();
@@ -297,11 +298,11 @@ public class TreasuryPlatformDependentServicesForTests implements ITreasuryPlatf
     @Override
     public void certifyDocument(FinantialDocument finantialDocument) {
     }
-    
+
     @Override
     public void updateCertifiedDocument(FinantialDocument finantialDocument) {
     }
-    
+
     @Override
     public void annulCertifiedDocument(FinantialDocument finantialDocument) {
     }
@@ -315,9 +316,9 @@ public class TreasuryPlatformDependentServicesForTests implements ITreasuryPlatf
     public boolean isProductCertified(Product product) {
         return false;
     }
-    
+
     /* Development or quality mode */
-    
+
     @Override
     public boolean isQualityOrDevelopmentMode() {
         return true;
