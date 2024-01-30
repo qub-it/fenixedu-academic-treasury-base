@@ -35,7 +35,6 @@
  */
 package org.fenixedu.academictreasury.domain.treasury;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -66,7 +65,6 @@ import org.fenixedu.academictreasury.domain.debtGeneration.AcademicDebtGeneratio
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
-import org.fenixedu.academictreasury.domain.tariff.AcademicTariff;
 import org.fenixedu.academictreasury.services.AcademicTaxServices;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
@@ -77,18 +75,12 @@ import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.FinantialInstitution;
 import org.fenixedu.treasury.domain.Product;
-import org.fenixedu.treasury.domain.Vat;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.document.DebitEntry;
-import org.fenixedu.treasury.domain.document.DebitNote;
-import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
-import org.fenixedu.treasury.domain.document.FinantialDocumentType;
 import org.fenixedu.treasury.domain.document.SettlementNote;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform;
 import org.fenixedu.treasury.util.FiscalCodeValidation;
-import org.fenixedu.treasury.util.TreasuryConstants;
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import com.google.common.base.Strings;
@@ -96,9 +88,11 @@ import com.google.common.eventbus.Subscribe;
 
 import pt.ist.fenixframework.FenixFramework;
 
+@Deprecated
 public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
-    private static class AcademicProduct implements ITreasuryProduct {
+    @Deprecated
+    public static class AcademicProduct implements ITreasuryProduct {
 
         private Product product;
 
@@ -125,9 +119,14 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         public boolean equals(Object obj) {
             return (obj instanceof AcademicProduct) && ((AcademicProduct) obj).product == this.product;
         }
+
+        public Product getProduct() {
+            return product;
+        }
     }
 
-    private static class TreasuryEntity implements ITreasuryEntity {
+    @Deprecated
+    public static class TreasuryEntity implements ITreasuryEntity {
 
         private FinantialEntity finantialEntity;
 
@@ -154,9 +153,14 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         public boolean equals(Object obj) {
             return (obj instanceof TreasuryEntity) && ((TreasuryEntity) obj).finantialEntity == this.finantialEntity;
         }
+
+        public FinantialEntity getFinantialEntity() {
+            return finantialEntity;
+        }
     }
 
-    private static class PaymentCodePoolImpl implements IPaymentCodePool {
+    @Deprecated
+    public static class PaymentCodePoolImpl implements IPaymentCodePool {
 
         private DigitalPaymentPlatform digitalPaymentPlatform;
 
@@ -189,9 +193,14 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
             return obj != null && obj instanceof PaymentCodePoolImpl
                     && ((PaymentCodePoolImpl) obj).digitalPaymentPlatform == this.digitalPaymentPlatform;
         }
+
+        public DigitalPaymentPlatform getDigitalPaymentPlatform() {
+            return digitalPaymentPlatform;
+        }
     }
 
-    private static class TreasuryCustomer implements ITreasuryCustomer {
+    @Deprecated
+    public static class TreasuryCustomer implements ITreasuryCustomer {
 
         private PersonCustomer personCustomer;
 
@@ -219,9 +228,14 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         public String getUiFiscalNumber() {
             return personCustomer.getUiFiscalNumber();
         }
+
+        public PersonCustomer getPersonCustomer() {
+            return personCustomer;
+        }
     }
 
-    private static class TreasuryDebtAccount implements ITreasuryDebtAccount {
+    @Deprecated
+    public static class TreasuryDebtAccount implements ITreasuryDebtAccount {
 
         private DebtAccount debtAccount;
 
@@ -234,6 +248,9 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
             return debtAccount.getExternalId();
         }
 
+        public DebtAccount getDebtAccount() {
+            return debtAccount;
+        }
     }
 
     private HandleSettlementNotePayment handleSettlementNotePayment = new HandleSettlementNotePayment();
@@ -396,178 +413,6 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
         if (event != null) {
             event.annulDebts(reason);
         }
-    }
-
-    @Override
-    // TODO: Use AcademicTreasuryTargetCreateDebtBuilder class
-    @Deprecated
-    public IAcademicTreasuryEvent createDebt(final ITreasuryEntity treasuryEntity, final ITreasuryProduct treasuryProduct,
-            final IAcademicTreasuryTarget target, final LocalDate when, final boolean createPaymentCode,
-            final IPaymentCodePool paymentCodePool, final int numberOfUnits, final int numberOfPages) {
-
-        final FinantialEntity finantialEntity = ((TreasuryEntity) treasuryEntity).finantialEntity;
-        final Product product = ((AcademicProduct) treasuryProduct).product;
-        final DigitalPaymentPlatform platform = ((PaymentCodePoolImpl) paymentCodePool).digitalPaymentPlatform;
-
-        return createDebt(finantialEntity, product, target, when, createPaymentCode, platform, numberOfUnits, numberOfPages);
-    }
-
-    // TODO: Use AcademicTreasuryTargetCreateDebtBuilder class
-    @Deprecated
-    public IAcademicTreasuryEvent createDebt(final FinantialEntity finantialEntity, final Product product,
-            final IAcademicTreasuryTarget target, final LocalDate when, final boolean createPaymentCode,
-            final DigitalPaymentPlatform platform, final int numberOfUnits, final int numberOfPages) {
-
-        IAcademicTreasuryPlatformDependentServices implementation =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        final FinantialInstitution finantialInstitution = finantialEntity.getFinantialInstitution();
-        final DocumentNumberSeries documentNumberSeries =
-                DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
-        final DateTime now = new DateTime();
-        final Vat vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, new DateTime()).get();
-        final Person person = target.getAcademicTreasuryTargetPerson();
-
-        PersonCustomer personCustomer = implementation.personCustomer(person);
-        if (personCustomer == null) {
-            personCustomer = PersonCustomer.createWithCurrentFiscalInformation(person);
-        }
-
-        DebtAccount debtAccount = DebtAccount.findUnique(finantialInstitution, personCustomer).orElse(null);
-        if (debtAccount == null) {
-            debtAccount = DebtAccount.create(finantialInstitution, personCustomer);
-        }
-
-        AcademicTreasuryEvent treasuryEvent = (AcademicTreasuryEvent) getAcademicTreasuryEventForTarget(target);
-
-        if (treasuryEvent == null) {
-            treasuryEvent = AcademicTreasuryEvent.createForAcademicTreasuryEventTarget(product, target);
-        }
-
-        if (treasuryEvent.isCharged()) {
-            return treasuryEvent;
-        }
-
-        AcademicTariff academicTariff = null;
-        if (target.getAcademicTreasuryTargetDegree() != null) {
-            academicTariff = AcademicTariff.findMatch(finantialEntity, product, target.getAcademicTreasuryTargetDegree(),
-                    when.toDateTimeAtStartOfDay());
-        } else {
-            academicTariff =
-                    AcademicTariff.findMatch(finantialEntity, product, when.toDateTimeAtStartOfDay());
-        }
-
-        if (academicTariff == null) {
-            throw new AcademicTreasuryDomainException("error.EmolumentServices.tariff.not.found",
-                    when.toString(TreasuryConstants.DATE_FORMAT_YYYY_MM_DD));
-        }
-
-        final LocalDate dueDate = academicTariff.dueDate(when);
-        final DebitNote debitNote = DebitNote.create(debtAccount, documentNumberSeries, now);
-
-        final BigDecimal amount = academicTariff.amountToPay(numberOfUnits, numberOfPages);
-        final DebitEntry debitEntry = DebitEntry.create(Optional.of(debitNote), debtAccount, treasuryEvent, vat, amount, dueDate,
-                target.getAcademicTreasuryTargetPropertiesMap(), product,
-                target.getAcademicTreasuryTargetDescription().getContent(TreasuryConstants.DEFAULT_LANGUAGE), BigDecimal.ONE,
-                academicTariff.getInterestRate(), when.toDateTimeAtStartOfDay());
-
-        if (createPaymentCode) {
-            createPaymentReferenceCode(platform, debitEntry, when);
-        }
-
-        return treasuryEvent;
-    }
-
-    @Override
-    // TODO: Use AcademicTreasuryTargetCreateDebtBuilder class
-    @Deprecated
-    public IAcademicTreasuryEvent createDebt(final ITreasuryEntity treasuryEntity, final ITreasuryProduct treasuryProduct,
-            final IAcademicTreasuryTarget target, final BigDecimal amount, final LocalDate when, final LocalDate dueDate,
-            final boolean createPaymentCode, final IPaymentCodePool paymentCodePool) {
-        IAcademicTreasuryPlatformDependentServices implementation =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        final FinantialInstitution finantialInstitution =
-                ((TreasuryEntity) treasuryEntity).finantialEntity.getFinantialInstitution();
-        final DocumentNumberSeries documentNumberSeries =
-                DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
-        final DateTime now = new DateTime();
-        final Product product = ((AcademicProduct) treasuryProduct).product;
-        final Vat vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, when.toDateTimeAtStartOfDay()).get();
-        final DigitalPaymentPlatform platform = ((PaymentCodePoolImpl) paymentCodePool).digitalPaymentPlatform;
-        final Person person = target.getAcademicTreasuryTargetPerson();
-
-        PersonCustomer personCustomer = implementation.personCustomer(person);
-        if (personCustomer == null) {
-            personCustomer = PersonCustomer.createWithCurrentFiscalInformation(person);
-        }
-
-        DebtAccount debtAccount = DebtAccount.findUnique(finantialInstitution, personCustomer).orElse(null);
-        if (debtAccount == null) {
-            debtAccount = DebtAccount.create(finantialInstitution, personCustomer);
-        }
-
-        AcademicTreasuryEvent treasuryEvent = (AcademicTreasuryEvent) getAcademicTreasuryEventForTarget(target);
-
-        if (treasuryEvent == null) {
-            treasuryEvent = AcademicTreasuryEvent.createForAcademicTreasuryEventTarget(product, target);
-        }
-
-        final DebitNote debitNote = DebitNote.create(debtAccount, documentNumberSeries, now);
-        final DebitEntry debitEntry = DebitEntry.create(Optional.of(debitNote), debtAccount, treasuryEvent, vat, amount, dueDate,
-                target.getAcademicTreasuryTargetPropertiesMap(), product,
-                target.getAcademicTreasuryTargetDescription().getContent(TreasuryConstants.DEFAULT_LANGUAGE), BigDecimal.ONE,
-                null, when.toDateTimeAtStartOfDay());
-
-        if (createPaymentCode) {
-            createPaymentReferenceCode(platform, debitEntry, when);
-        }
-
-        return treasuryEvent;
-    }
-
-    // TODO: Use AcademicTreasuryTargetCreateDebtBuilder class
-    @Deprecated
-    public IAcademicTreasuryEvent createDebt(final FinantialEntity finantialEntity, final Product product,
-            final IAcademicTreasuryTarget target, final BigDecimal amount, final LocalDate when, final LocalDate dueDate,
-            final boolean createPaymentCode, final DigitalPaymentPlatform platform) {
-        IAcademicTreasuryPlatformDependentServices implementation =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        final FinantialInstitution finantialInstitution = finantialEntity.getFinantialInstitution();
-        final DocumentNumberSeries documentNumberSeries =
-                DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
-        final DateTime now = new DateTime();
-        final Vat vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, when.toDateTimeAtStartOfDay()).get();
-        final Person person = target.getAcademicTreasuryTargetPerson();
-
-        PersonCustomer personCustomer = implementation.personCustomer(person);
-        if (personCustomer == null) {
-            personCustomer = PersonCustomer.createWithCurrentFiscalInformation(person);
-        }
-
-        DebtAccount debtAccount = DebtAccount.findUnique(finantialInstitution, personCustomer).orElse(null);
-        if (debtAccount == null) {
-            debtAccount = DebtAccount.create(finantialInstitution, personCustomer);
-        }
-
-        AcademicTreasuryEvent treasuryEvent = (AcademicTreasuryEvent) getAcademicTreasuryEventForTarget(target);
-
-        if (treasuryEvent == null) {
-            treasuryEvent = AcademicTreasuryEvent.createForAcademicTreasuryEventTarget(product, target);
-        }
-
-        final DebitNote debitNote = DebitNote.create(debtAccount, documentNumberSeries, now);
-        final DebitEntry debitEntry = DebitEntry.create(Optional.of(debitNote), debtAccount, treasuryEvent, vat, amount, dueDate,
-                target.getAcademicTreasuryTargetPropertiesMap(), product,
-                target.getAcademicTreasuryTargetDescription().getContent(TreasuryConstants.DEFAULT_LANGUAGE), BigDecimal.ONE,
-                null, when.toDateTimeAtStartOfDay());
-
-        if (createPaymentCode) {
-            createPaymentReferenceCode(platform, debitEntry, when);
-        }
-
-        return treasuryEvent;
     }
 
     private SibsPaymentRequest createPaymentReferenceCode(final DigitalPaymentPlatform platform, DebitEntry debitEntry,
@@ -739,11 +584,11 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
         FinantialEntity finantialEntity =
                 academicTreasuryServices.finantialEntityOfDegree(registration.getDegree(), new LocalDate());
-        
-        if(finantialEntity == null) {
+
+        if (finantialEntity == null) {
             return null;
         }
-        
+
         FinantialInstitution finantialInstitution = finantialEntity.getFinantialInstitution();
 
         DebtAccount debtAccount = DebtAccount.findUnique(finantialInstitution, customer).orElse(null);

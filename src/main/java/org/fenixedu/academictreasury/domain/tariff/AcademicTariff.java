@@ -41,7 +41,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -97,11 +96,10 @@ public class AcademicTariff extends AcademicTariff_Base {
     }
 
     @Override
-    protected void init(FinantialEntity finantialEntity, Product product, DateTime beginDate,
-            DateTime endDate, DueDateCalculationType dueDateCalculationType, LocalDate fixedDueDate,
-            int numberOfDaysAfterCreationForDueDate, boolean applyInterests, InterestRateType interestRateType,
-            int numberOfDaysAfterDueDate, boolean applyInFirstWorkday, int maximumDaysToApplyPenalty,
-            BigDecimal interestFixedAmount, BigDecimal rate) {
+    protected void init(FinantialEntity finantialEntity, Product product, DateTime beginDate, DateTime endDate,
+            DueDateCalculationType dueDateCalculationType, LocalDate fixedDueDate, int numberOfDaysAfterCreationForDueDate,
+            boolean applyInterests, InterestRateType interestRateType, int numberOfDaysAfterDueDate, boolean applyInFirstWorkday,
+            int maximumDaysToApplyPenalty, BigDecimal interestFixedAmount, BigDecimal rate) {
         throw new RuntimeException("wrong call");
     }
 
@@ -273,10 +271,10 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         super.setApplyInterests(bean.isApplyInterests());
 
-        if(!getApplyInterests() && getInterestRate() != null) {
+        if (!getApplyInterests() && getInterestRate() != null) {
             getInterestRate().delete();
         }
-        
+
         checkRules();
     }
 
@@ -484,9 +482,10 @@ public class AcademicTariff extends AcademicTariff_Base {
         final Map<String, String> fillPriceProperties =
                 fillPriceCommonPropertiesForAcademicServiceRequest(debtAccount, academicTreasuryEvent, when);
 
-        return DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent, vat, amount, dueDate,
+        return DebitEntry.create(getFinantialEntity(), debtAccount, academicTreasuryEvent, vat, amount, dueDate,
                 fillPriceProperties, getProduct(), debitEntryName.getContent(TreasuryConstants.DEFAULT_LANGUAGE),
-                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay());
+                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay(), false, false,
+                null);
     }
 
     public DebitEntry createDebitEntryForAcademicTax(final DebtAccount debtAccount,
@@ -512,9 +511,10 @@ public class AcademicTariff extends AcademicTariff_Base {
         final Map<String, String> fillPriceProperties =
                 fillPricePropertiesForAcademicTax(debtAccount, academicTreasuryEvent, when);
 
-        return DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent, vat, amount, dueDate,
+        return DebitEntry.create(getFinantialEntity(), debtAccount, academicTreasuryEvent, vat, amount, dueDate,
                 fillPriceProperties, getProduct(), debitEntryName.getContent(TreasuryConstants.DEFAULT_LANGUAGE),
-                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay());
+                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay(), false, false,
+                null);
     }
 
     public DebitEntry createDebitEntryForCustomAcademicDebt(final DebtAccount debtAccount,
@@ -529,16 +529,17 @@ public class AcademicTariff extends AcademicTariff_Base {
         final Vat vat = vat(when);
         final BigDecimal amount = amountToPay(academicTreasuryEvent);
 
-        if(!TreasuryConstants.isPositive(amount)) {
-            throw new AcademicTreasuryDomainException("error.AcademicTariff.createDebitEntryForCustomAcademicDebt.amount.to.pay.not.positive");
+        if (!TreasuryConstants.isPositive(amount)) {
+            throw new AcademicTreasuryDomainException(
+                    "error.AcademicTariff.createDebitEntryForCustomAcademicDebt.amount.to.pay.not.positive");
         }
-        
+
         final Map<String, String> fillPriceProperties =
                 fillPricePropertiesForAcademicTax(debtAccount, academicTreasuryEvent, when);
 
-        return DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent, vat, amount, dueDate,
+        return DebitEntry.create(getFinantialEntity(), debtAccount, academicTreasuryEvent, vat, amount, dueDate,
                 fillPriceProperties, getProduct(), debitEntryName.getContent(), TreasuryConstants.DEFAULT_QUANTITY,
-                this.getInterestRate(), when.toDateTimeAtStartOfDay());
+                this.getInterestRate(), when.toDateTimeAtStartOfDay(), false, false, null);
     }
 
     public DebitEntry createDebitEntryForImprovement(final DebtAccount debtAccount,
@@ -565,9 +566,9 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         final Map<String, String> fillPriceProperties = fillPriceProperties(academicTreasuryEvent, enrolmentEvaluation);
 
-        final DebitEntry debitEntry = DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent, vat,
-                amount, dueDate, fillPriceProperties, getProduct(), debitEntryName.getContent(TreasuryConstants.DEFAULT_LANGUAGE),
-                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), new DateTime());
+        final DebitEntry debitEntry = DebitEntry.create(getFinantialEntity(), debtAccount, academicTreasuryEvent, vat, amount,
+                dueDate, fillPriceProperties, getProduct(), debitEntryName.getContent(TreasuryConstants.DEFAULT_LANGUAGE),
+                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), new DateTime(), false, false, null);
 
         academicTreasuryEvent.associateEnrolmentEvaluation(debitEntry, enrolmentEvaluation);
 
@@ -916,8 +917,8 @@ public class AcademicTariff extends AcademicTariff_Base {
         return null;
     }
 
-    protected static AcademicTariff findMatch(FinantialEntity finantialEntity, Product product,
-            DegreeType degreeType, DateTime when) {
+    protected static AcademicTariff findMatch(FinantialEntity finantialEntity, Product product, DegreeType degreeType,
+            DateTime when) {
         if (degreeType == null) {
             throw new RuntimeException("degreeType is null. wrong findMatch call");
         }
@@ -925,9 +926,8 @@ public class AcademicTariff extends AcademicTariff_Base {
         {
             // Fallback to degreeType
             Set<? extends AcademicTariff> activeTariffs =
-                    findActive(finantialEntity, product, degreeType, when)
-                            .filter(e -> e.getDegree() == null).filter(e -> e.getCycleType() == null)
-                            .collect(Collectors.<AcademicTariff> toSet());
+                    findActive(finantialEntity, product, degreeType, when).filter(e -> e.getDegree() == null)
+                            .filter(e -> e.getCycleType() == null).collect(Collectors.<AcademicTariff> toSet());
 
             if (activeTariffs.size() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.findActive.more.than.one");
@@ -950,9 +950,8 @@ public class AcademicTariff extends AcademicTariff_Base {
         {
             // With the most specific conditions tariff was not found. Fallback to degree
 
-            Set<? extends AcademicTariff> activeTariffs =
-                    findActive(finantialEntity, product, degreeType, degree, when)
-                            .filter(e -> e.getCycleType() == null).collect(Collectors.<AcademicTariff> toSet());
+            Set<? extends AcademicTariff> activeTariffs = findActive(finantialEntity, product, degreeType, degree, when)
+                    .filter(e -> e.getCycleType() == null).collect(Collectors.<AcademicTariff> toSet());
 
             if (activeTariffs.size() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.findActive.more.than.one");

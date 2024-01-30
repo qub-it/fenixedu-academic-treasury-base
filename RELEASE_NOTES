@@ -1,3 +1,7 @@
+- Refactor: Change invocation of DebitEntry#create method to pass the finantial entity [#qubIT-Fenix-4587]
+- Refactor: Remove deprecated ITreasuryBridgeAPI#createDebt [#qubIT-Fenix-4912]
+- Bug Fix: Set of academical act blocking off and block academic acts on debt in standalone and extracurricular debit entries [#qubIT-Fenix-4914]
+
 11.3.11 (24-01-2024)
 - Refactor: Refactor ITreasuryPlatformDependentServices implementation [#qubIT-Fenix-4794]
 

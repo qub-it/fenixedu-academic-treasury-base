@@ -37,7 +37,6 @@ package org.fenixedu.academictreasury.domain.academictreasurytarget;
 
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.Optional;
 
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
@@ -158,10 +157,10 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             }
 
             var debitNote = DebitNote.create(debtAccount, documentNumberSeries, now);
-            var debitEntry = DebitEntry.create(Optional.of(debitNote), debtAccount, treasuryEvent, vat, amount, dueDate,
+            var debitEntry = DebitEntry.create(finantialEntity, debtAccount, treasuryEvent, vat, amount, dueDate,
                     target.getAcademicTreasuryTargetPropertiesMap(), product,
                     target.getAcademicTreasuryTargetDescription().getContent(TreasuryConstants.DEFAULT_LANGUAGE), BigDecimal.ONE,
-                    null, when.toDateTimeAtStartOfDay());
+                    null, when.toDateTimeAtStartOfDay(), false, false, debitNote);
 
             if (this.interestRateType != null) {
                 InterestRate.createForDebitEntry(debitEntry, this.interestRateType, 1, false, 0, this.interestFixedAmount, null);
@@ -299,10 +298,10 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             var debitNote = DebitNote.create(debtAccount, documentNumberSeries, now);
 
             var amount = academicTariff.amountToPay(this.numberOfUnits, 0, this.applyLanguageRate, this.urgentRequest);
-            var debitEntry = DebitEntry.create(Optional.of(debitNote), debtAccount, treasuryEvent, vat, amount, dueDate,
+            var debitEntry = DebitEntry.create(finantialEntity, debtAccount, treasuryEvent, vat, amount, dueDate,
                     target.getAcademicTreasuryTargetPropertiesMap(), product,
                     target.getAcademicTreasuryTargetDescription().getContent(TreasuryConstants.DEFAULT_LANGUAGE), BigDecimal.ONE,
-                    academicTariff.getInterestRate(), when.toDateTimeAtStartOfDay());
+                    academicTariff.getInterestRate(), when.toDateTimeAtStartOfDay(), false, false, debitNote);
 
             if (createPaymentCode) {
                 createPaymentReferenceCode(debitEntry, dueDate);

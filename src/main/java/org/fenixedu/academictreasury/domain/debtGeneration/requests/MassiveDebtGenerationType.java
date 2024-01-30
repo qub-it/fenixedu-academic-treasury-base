@@ -38,56 +38,57 @@ package org.fenixedu.academictreasury.domain.debtGeneration.requests;
 import java.util.stream.Stream;
 
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
-import pt.ist.fenixframework.FenixFramework;
 
 import com.google.common.base.Strings;
 
+import pt.ist.fenixframework.FenixFramework;
+
 public class MassiveDebtGenerationType extends MassiveDebtGenerationType_Base {
-    
+
     public MassiveDebtGenerationType() {
         super();
         setDomainRoot(FenixFramework.getDomainRoot());
     }
-    
+
     public MassiveDebtGenerationType(final String name, final String implementationClass) {
         this();
-        
+
         setName(name);
         setImplementationClass(implementationClass);
         setActive(false);
-        
+
         checkRules();
     }
 
     private void checkRules() {
-        if(getDomainRoot() == null) {
+        if (getDomainRoot() == null) {
             throw new AcademicTreasuryDomainException("error.MassiveDebtGenerationType.bennu.required");
         }
-        
-        if(Strings.isNullOrEmpty(getName())) {
+
+        if (Strings.isNullOrEmpty(getName())) {
             throw new AcademicTreasuryDomainException("error.MassiveDebtGenerationType.name.required");
         }
-        
-        if(Strings.isNullOrEmpty(getImplementationClass())) {
+
+        if (Strings.isNullOrEmpty(getImplementationClass())) {
             throw new AcademicTreasuryDomainException("error.MassiveDebtGenerationType.implementationClass.required");
         }
-        
+
         // To check the class name given
         implementation();
     }
-    
+
     public boolean isActive() {
         return getActive();
     }
-    
+
     public boolean isExecutionRequired() {
         return implementation().isExecutionYearRequired();
     }
-    
+
     public boolean isForAcademicTaxRequired() {
         return implementation().isForAcademicTaxRequired();
     }
-    
+
     public boolean isDebtDateRequired() {
         return implementation().isDebtDateRequired();
     }
@@ -99,7 +100,7 @@ public class MassiveDebtGenerationType extends MassiveDebtGenerationType_Base {
     public boolean isFinantialInstitutionRequired() {
         return implementation().isFinantialInstitutionRequired();
     }
-    
+
     public IMassiveDebtGenerationStrategy implementation() {
         Class<IMassiveDebtGenerationStrategy> clazz;
         try {
@@ -110,25 +111,36 @@ public class MassiveDebtGenerationType extends MassiveDebtGenerationType_Base {
         }
     }
 
+    public void delete() {
+        if (!getMassiveDebtGenerationRequestFilesSet().isEmpty()) {
+            throw new IllegalStateException(
+                    "it is not possible to delete this configuration due to existing generation request files");
+        }
+
+        setDomainRoot(null);
+
+        deleteDomainObject();
+    }
+
     // @formatter:off
     /* ********
      * SERVICES
      * ********
      */
     // @formatter:on
-    
+
     public static Stream<MassiveDebtGenerationType> findAll() {
         return FenixFramework.getDomainRoot().getMassiveDebtGenerationTypesSet().stream();
     }
-    
+
     public static Stream<MassiveDebtGenerationType> findByClassName(final String className) {
         return findAll().filter(t -> t.getImplementationClass().equals(className));
     }
-    
+
     public static Stream<MassiveDebtGenerationType> findAllActive() {
         return findAll().filter(m -> m.isActive());
     }
-    
+
     public static MassiveDebtGenerationType create(final String name, final String implementationClass) {
         return new MassiveDebtGenerationType(name, implementationClass);
     }

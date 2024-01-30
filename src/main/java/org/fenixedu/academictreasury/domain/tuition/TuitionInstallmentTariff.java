@@ -64,7 +64,6 @@ import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.Vat;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.document.DebitEntry;
-import org.fenixedu.treasury.domain.document.DebitNote;
 import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
 import org.fenixedu.treasury.domain.tariff.InterestRate;
 import org.fenixedu.treasury.domain.tariff.InterestRateType;
@@ -672,10 +671,14 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         final Map<String, String> fillPriceProperties =
                 fillPricePropertiesForRegistration(academicTreasuryEvent, dueDate, when, calculatorsMap);
 
-        final DebitEntry debitEntry = DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent,
-                vat(when), amount, dueDate, fillPriceProperties, getProduct(),
-                installmentName(academicTreasuryEvent.getRegistration()).getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE),
-                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay());
+        FinantialEntity finantialEntity = getTuitionPaymentPlan().getFinantialEntity();
+        final DebitEntry debitEntry =
+                DebitEntry.create(finantialEntity, debtAccount, academicTreasuryEvent, vat(when), amount, dueDate,
+                        fillPriceProperties, getProduct(),
+                        installmentName(academicTreasuryEvent.getRegistration()).getContent(
+                                AcademicTreasuryConstants.DEFAULT_LANGUAGE),
+                        AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay(), false,
+                        false, null);
 
         if (isAcademicalActBlockingOff()) {
             debitEntry.markAcademicalActBlockingSuspension();
@@ -716,10 +719,14 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         final Map<String, String> fillPriceProperties =
                 fillPricePropertiesForRegistration(academicTreasuryEvent, dueDate, when, calculatorsMap);
 
-        final DebitEntry debitEntry = DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent,
-                vat(when), amount, dueDate, fillPriceProperties, getProduct(),
-                installmentName(academicTreasuryEvent.getRegistration()).getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE),
-                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay());
+        FinantialEntity finantialEntity = getTuitionPaymentPlan().getFinantialEntity();
+        final DebitEntry debitEntry =
+                DebitEntry.create(finantialEntity, debtAccount, academicTreasuryEvent, vat(when), amount, dueDate,
+                        fillPriceProperties, getProduct(),
+                        installmentName(academicTreasuryEvent.getRegistration()).getContent(
+                                AcademicTreasuryConstants.DEFAULT_LANGUAGE),
+                        AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay(), false,
+                        false, null);
 
         if (isAcademicalActBlockingOff()) {
             debitEntry.markAcademicalActBlockingSuspension();
@@ -756,11 +763,11 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
                 "label.RegistrationTuitionService.recalculation.installmentName.prefix");
         String installmentName =
                 installmentName(academicTreasuryEvent.getRegistration()).getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE);
-        
-        DebitEntry debitEntry =
-                DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent, vat(when), recalculatedAmount,
-                        recalculationDueDate, fillPriceProperties, getProduct(), recalculationLabel + " " + installmentName,
-                        AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay());
+
+        DebitEntry debitEntry = DebitEntry.create(getTuitionPaymentPlan().getFinantialEntity(), debtAccount,
+                academicTreasuryEvent, vat(when), recalculatedAmount, recalculationDueDate, fillPriceProperties, getProduct(),
+                recalculationLabel + " " + installmentName, AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(),
+                when.toDateTimeAtStartOfDay(), false, false, null);
 
         if (isAcademicalActBlockingOff()) {
             debitEntry.markAcademicalActBlockingSuspension();
@@ -793,10 +800,20 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         final Map<String, String> fillPriceProperties = fillPricePropertiesForStandaloneOrExtracurricular(academicTreasuryEvent,
                 standaloneEnrolment, dueDate, calculatorsMap);
 
-        final DebitEntry debitEntry = DebitEntry.create(Optional.<DebitNote> empty(), debtAccount, academicTreasuryEvent,
-                vat(when), amount, dueDate, fillPriceProperties, getProduct(),
+        FinantialEntity finantialEntity = getTuitionPaymentPlan().getFinantialEntity();
+        final DebitEntry debitEntry = DebitEntry.create(finantialEntity, debtAccount, academicTreasuryEvent, vat(when), amount,
+                dueDate, fillPriceProperties, getProduct(),
                 standaloneDebitEntryName(standaloneEnrolment).getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE),
-                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay());
+                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay(), false, false,
+                null);
+
+        if (isAcademicalActBlockingOff()) {
+            debitEntry.markAcademicalActBlockingSuspension();
+        }
+
+        if (isBlockAcademicActsOnDebt()) {
+            debitEntry.markBlockAcademicActsOnDebt();
+        }
 
         academicTreasuryEvent.associateEnrolment(debitEntry, standaloneEnrolment);
 
@@ -821,10 +838,22 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         final Map<String, String> fillPriceProperties = fillPricePropertiesForStandaloneOrExtracurricular(academicTreasuryEvent,
                 extracurricularEnrolment, dueDate, calculatorsMap);
 
-        final DebitEntry debitEntry = DebitEntry.create(Optional.empty(), debtAccount, academicTreasuryEvent, vat(when), amount,
-                dueDate, fillPriceProperties, getProduct(),
-                extracurricularDebitEntryName(extracurricularEnrolment).getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE),
-                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay());
+        FinantialEntity finantialEntity = getTuitionPaymentPlan().getFinantialEntity();
+        final DebitEntry debitEntry =
+                DebitEntry.create(finantialEntity, debtAccount, academicTreasuryEvent, vat(when), amount, dueDate,
+                        fillPriceProperties, getProduct(),
+                        extracurricularDebitEntryName(extracurricularEnrolment).getContent(
+                                AcademicTreasuryConstants.DEFAULT_LANGUAGE),
+                        AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay(), false,
+                        false, null);
+
+        if (isAcademicalActBlockingOff()) {
+            debitEntry.markAcademicalActBlockingSuspension();
+        }
+
+        if (isBlockAcademicActsOnDebt()) {
+            debitEntry.markBlockAcademicActsOnDebt();
+        }
 
         academicTreasuryEvent.associateEnrolment(debitEntry, extracurricularEnrolment);
 
