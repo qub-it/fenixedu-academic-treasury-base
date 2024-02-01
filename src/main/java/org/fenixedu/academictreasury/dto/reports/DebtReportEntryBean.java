@@ -435,17 +435,25 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 .orElse(null);
     }
 
-    private void fillAcademicInformation(final InvoiceEntry entry) {
+    private void fillAcademicInformation(final InvoiceEntry invoiceEntry) {
         final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
-        final DebitEntry debitEntry = entry.isDebitNoteEntry() ? (DebitEntry) entry : ((CreditEntry) entry).getDebitEntry();
+        DebitEntry debitEntry =
+                invoiceEntry.isDebitNoteEntry() ? (DebitEntry) invoiceEntry : ((CreditEntry) invoiceEntry).getDebitEntry();
 
+        TreasuryEvent treasuryEvent = null;
         if (debitEntry != null) {
+            treasuryEvent = debitEntry.getTreasuryEvent();
+        } else if (invoiceEntry.isCreditNoteEntry()) {
+            treasuryEvent = ((CreditEntry) invoiceEntry).getTreasuryEvent();
+        }
+
+        if (treasuryEvent != null) {
 
             // Degree && ExecutionYear && ExecutionInterval
-            if (debitEntry.getTreasuryEvent() != null && debitEntry.getTreasuryEvent() instanceof AcademicTreasuryEvent) {
-                final AcademicTreasuryEvent academicTreasuryEvent = (AcademicTreasuryEvent) debitEntry.getTreasuryEvent();
+            if (treasuryEvent instanceof AcademicTreasuryEvent) {
+                final AcademicTreasuryEvent academicTreasuryEvent = (AcademicTreasuryEvent) treasuryEvent;
 
                 if (academicTreasuryEvent.isForRegistrationTuition()) {
                     Registration registration = academicTreasuryEvent.getRegistration();
@@ -456,32 +464,37 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     this.degreeCode = registration.getDegree().getCode();
                     this.degreeName = registration.getDegree().getPresentationName();
                     this.executionYear = academicTreasuryEvent.getExecutionYear().getQualifiedName();
-                    this.tuitionPaymentPlan =
-                            AcademicTreasuryEventKeys.valueFor(debitEntry, AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN);
-                    this.tuitionPaymentPlanConditions = AcademicTreasuryEventKeys.valueFor(debitEntry,
-                            AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN_CONDITIONS);
+
+                    if (debitEntry != null) {
+                        this.tuitionPaymentPlan =
+                                AcademicTreasuryEventKeys.valueFor(debitEntry, AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN);
+                        this.tuitionPaymentPlanConditions = AcademicTreasuryEventKeys.valueFor(debitEntry,
+                                AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN_CONDITIONS);
+                    }
 
                     fillStudentConditionsInformation(registration, academicTreasuryEvent.getExecutionYear());
 
                 } else if (academicTreasuryEvent.isForStandaloneTuition()
                         || academicTreasuryEvent.isForExtracurricularTuition()) {
-                    if (debitEntry.getCurricularCourse() != null) {
+                    if (debitEntry != null && debitEntry.getCurricularCourse() != null) {
                         this.degreeType = academicTreasuryServices
                                 .localizedNameOfDegreeType(debitEntry.getCurricularCourse().getDegree().getDegreeType());
                         this.degreeCode = debitEntry.getCurricularCourse().getDegree().getCode();
                         this.degreeName = debitEntry.getCurricularCourse().getDegree().getPresentationName();
                     }
 
-                    if (debitEntry.getExecutionSemester() != null) {
+                    if (debitEntry != null && debitEntry.getExecutionSemester() != null) {
                         this.executionYear = academicTreasuryServices()
                                 .executionYearOfExecutionSemester(debitEntry.getExecutionSemester()).getQualifiedName();
                         this.executionSemester = debitEntry.getExecutionSemester().getQualifiedName();
                     }
 
-                    this.tuitionPaymentPlan =
-                            AcademicTreasuryEventKeys.valueFor(debitEntry, AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN);
-                    this.tuitionPaymentPlanConditions = AcademicTreasuryEventKeys.valueFor(debitEntry,
-                            AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN_CONDITIONS);
+                    if (debitEntry != null) {
+                        this.tuitionPaymentPlan =
+                                AcademicTreasuryEventKeys.valueFor(debitEntry, AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN);
+                        this.tuitionPaymentPlanConditions = AcademicTreasuryEventKeys.valueFor(debitEntry,
+                                AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN_CONDITIONS);
+                    }
 
                     if (academicTreasuryEvent.getRegistration() != null && academicTreasuryEvent.getExecutionYear() != null) {
                         fillStudentConditionsInformation(academicTreasuryEvent.getRegistration(),
@@ -490,14 +503,14 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     }
 
                 } else if (academicTreasuryEvent.isForImprovementTax()) {
-                    if (debitEntry.getCurricularCourse() != null) {
+                    if (debitEntry != null && debitEntry.getCurricularCourse() != null) {
                         this.degreeType = academicTreasuryServices
                                 .localizedNameOfDegreeType(debitEntry.getCurricularCourse().getDegree().getDegreeType());
                         this.degreeCode = debitEntry.getCurricularCourse().getDegree().getCode();
                         this.degreeName = debitEntry.getCurricularCourse().getDegree().getPresentationName();
                     }
 
-                    if (debitEntry.getExecutionSemester() != null) {
+                    if (debitEntry != null && debitEntry.getExecutionSemester() != null) {
                         this.executionYear = academicTreasuryServices()
                                 .executionYearOfExecutionSemester(debitEntry.getExecutionSemester()).getQualifiedName();
                         this.executionSemester = debitEntry.getExecutionSemester().getQualifiedName();
@@ -537,7 +550,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                                 iTreasuryServiceRequest.getExecutionYear());
                     }
                 } else if (academicTreasuryEvent.isForTreasuryEventTarget()) {
-                    final IAcademicTreasuryTarget treasuryEventTarget =
+                    IAcademicTreasuryTarget treasuryEventTarget =
                             (IAcademicTreasuryTarget) academicTreasuryEvent.getTreasuryEventTarget();
 
                     if (treasuryEventTarget.getAcademicTreasuryTargetRegistration() != null) {
@@ -569,10 +582,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
 
                     fillStudentConditionsInformation(registration, academicTreasuryEvent.getExecutionYear());
                 }
-
-            } else if (debitEntry.getTreasuryEvent() != null) {
-                final TreasuryEvent treasuryEvent = debitEntry.getTreasuryEvent();
-
+            } else {
                 if (!Strings.isNullOrEmpty(treasuryEvent.getDegreeCode())) {
                     this.degreeCode = treasuryEvent.getDegreeCode();
                 }
@@ -586,11 +596,11 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 }
             }
 
-            if (Strings.isNullOrEmpty(this.degreeCode)) {
+            if (debitEntry != null && Strings.isNullOrEmpty(this.degreeCode)) {
                 this.degreeCode = debitEntry.getDegreeCode();
             }
 
-            if (Strings.isNullOrEmpty(this.executionYear)) {
+            if (debitEntry != null && Strings.isNullOrEmpty(this.executionYear)) {
                 this.executionYear = debitEntry.getExecutionYearName();
             }
         }
