@@ -567,7 +567,6 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
     }
 
     @Override
-    @Atomic
     public LocalDate getTreasuryEventDate() {
         final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();

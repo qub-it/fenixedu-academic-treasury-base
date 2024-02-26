@@ -1,3 +1,5 @@
+- Bug Fix: Remove atomic annotation in AcademicTreasuryEvent#getTreasuryEventDate method, which should be readonly [#ISCTE-FENIXEDU-419]
+
 11.4.1 (01-02-2024)
 - Improvement: Print credit entry academic information, if it is associated with treasury event [#qubIT-Fenix-4928]
 
