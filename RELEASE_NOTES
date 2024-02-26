@@ -1,3 +1,4 @@
+11.4.2 (26-02-2024)
 - Bug Fix: Remove atomic annotation in AcademicTreasuryEvent#getTreasuryEventDate method, which should be readonly [#ISCTE-FENIXEDU-419]
 
 11.4.1 (01-02-2024)
