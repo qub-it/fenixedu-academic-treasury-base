@@ -228,10 +228,11 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                         if (TreasuryConstants.isPositive(netAmountToCredit)) {
                             String reason = TreasuryConstants
                                     .treasuryBundle("label.RegistrationTuitionService.tuitionRecalculationReason");
-                            d.creditDebitEntry(netAmountToCredit, reason, false);
+                            Map<TreasuryExemption, BigDecimal> creditExemptionsMap =
+                                    d.calculateDefaultNetExemptedAmountsToCreditMap(netAmountToCredit);
+                            d.creditDebitEntry(netAmountToCredit, reason, false, creditExemptionsMap);
 
-                            if (!TreasuryConstants.isPositive(d.getAvailableNetAmountForCredit())
-                                    && !TreasuryConstants.isPositive(d.getNetExemptedAmount())) {
+                            if (isToBeAnnuledInTreasuryEvent(d)) {
                                 // The net amount of debit entry is zero, which means can be annuled in academic treasury event
                                 d.annulOnEvent();
                             }
@@ -347,6 +348,15 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                 .filter(isToCalculateInstallmentProduct) //
                 .map(func) //
                 .reduce(Boolean.FALSE, Boolean::logicalOr);
+    }
+
+    private boolean isToBeAnnuledInTreasuryEvent(DebitEntry debitEntry) {
+        BigDecimal netExemptedAmount = debitEntry.getNetExemptedAmount();
+        BigDecimal creditedNetExemptedAmount = debitEntry.getCreditEntriesSet().stream().filter(c -> !c.isAnnulled())
+                .map(c -> c.getNetExemptedAmount()).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return !TreasuryConstants.isPositive(debitEntry.getAvailableNetAmountForCredit())
+                && !TreasuryConstants.isPositive(netExemptedAmount.subtract(creditedNetExemptedAmount));
     }
 
     private boolean isThereAreRemovalOrDecrementsInExemptions(TuitionInstallmentTariff tariff,
@@ -842,9 +852,9 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                                 vat.getTaxRate(), getNetAmountAlreadyDebited(product).negate(),
                                 getNetAmountAlreadyExempted(product).negate(), new HashMap<>(), currency);
 
-                TuitionDebitEntryBean recalculationBean = new TuitionDebitEntryBean(installmentOrder, tariff,
-                        installmentName, recalculationDueDate, vat.getTaxRate(), originalBean.getAmount(),
-                        originalBean.getExemptedAmount(), new HashMap<>(), currency);
+                TuitionDebitEntryBean recalculationBean = new TuitionDebitEntryBean(installmentOrder, tariff, installmentName,
+                        recalculationDueDate, vat.getTaxRate(), originalBean.getAmount(), originalBean.getExemptedAmount(),
+                        new HashMap<>(), currency);
 
                 BigDecimal recurringAmountToExempt = getAndDecrementFromDiscountMap(_discountExemptionsMapForOnlyThisInstallment,
                         originalBean.getExemptedAmount(), new HashMap<>());
@@ -857,7 +867,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
             }
 
             throw new IllegalStateException("reculation: do not know how to handle this case???");
-        } else if(!isTuitionInstallmentCharged(product) || this.isForCalculationsOfOriginalAmounts) {
+        } else if (!isTuitionInstallmentCharged(product) || this.isForCalculationsOfOriginalAmounts) {
             BigDecimal tuitionInstallmentAmountToPay = tariff.amountToPay(this);
 
             if (!TreasuryConstants.isPositive(tuitionInstallmentAmountToPay)) {

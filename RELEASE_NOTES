@@ -1,3 +1,5 @@
+- Refactor: Change invocation to create credit entries due to support for credit over exemptions [#qubIT-Fenix-5102]
+
 11.4.2 (26-02-2024)
 - Bug Fix: Remove atomic annotation in AcademicTreasuryEvent#getTreasuryEventDate method, which should be readonly [#ISCTE-FENIXEDU-419]
 
