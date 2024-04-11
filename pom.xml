@@ -44,10 +44,6 @@
 			<artifactId>fenixedu-treasury-base</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.fenixedu</groupId>
-			<artifactId>fenixedu-qubdocs-reports</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
 			<version>3.11</version>
