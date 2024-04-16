@@ -1,3 +1,4 @@
+11.5.1 (16-04-2024)
 - Bug Fix: Remove the logic of academic service request debt annulment, if before and after price amounts are different [#UL-FD-2063]
 
 11.5.0 (15-04-2024)
