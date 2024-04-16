@@ -1,3 +1,5 @@
+- Bug Fix: Remove the logic of academic service request debt annulment, if before and after price amounts are different [#UL-FD-2063]
+
 11.5.0 (15-04-2024)
 - Refactor: Change invocation to create credit entries due to support for credit over exemptions [#qubIT-Fenix-5102]
 

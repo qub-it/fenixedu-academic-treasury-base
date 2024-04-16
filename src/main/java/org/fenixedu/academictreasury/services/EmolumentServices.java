@@ -311,18 +311,17 @@ public class EmolumentServices {
         final AcademicTreasuryEvent academicTresuryEvent = findAcademicTreasuryEvent(iTreasuryServiceRequest);
 
         if (academicTresuryEvent.isChargedWithDebitEntry()) {
-            //Old amount has the amount plus the credit amount plus the direct exempted amount
-            BigDecimal oldtotalAmount = academicTresuryEvent.getAmountWithVatToPay()
-                    .add(academicTresuryEvent.getCreditAmountWithVat()).add(DebitEntry.findActive(academicTresuryEvent)
-                            .map(l -> l.getNetExemptedAmount()).reduce((a, b) -> a.add(b)).orElse(BigDecimal.ZERO));
-            BigDecimal newTotalAmount = academicTariff.amountToPay(academicTresuryEvent);
-            //Do nothing, since the value is the same
-            if (TreasuryConstants.isEqual(oldtotalAmount, newTotalAmount)) {
-                return false;
-            }
-            //Annul debit entries, since new ones will be created to reflect the service request's changes
-            String reason = academicTreasuryBundle("info.EmolumentServices.serviceRequest.change.value.anull.debit.entries");
-            academicTresuryEvent.annulAllDebitEntries(reason);
+            // ANIL 2024-04-16: Before this date, this service compared the amount
+            // that was charged and what is charging now. If it was different
+            // then an annulment was issued, and a new debit entry was created
+            //
+            // This is misleading for the end users, because they perceived
+            // as erratic behaviour by the system. And it should not
+            // annul debit entries that are already paid
+            //
+            // Now if it is charged then do nothing
+
+            return false;
         }
 
         final DebtAccount personDebtAccount = DebtAccount.findUnique(finantialInstitution, personCustomer).orElse(null);
