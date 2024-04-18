@@ -38,6 +38,9 @@ package org.fenixedu.academictreasury.services.reports;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 
+import java.util.Optional;
+import java.util.function.Function;
+
 public class DocumentPrinter {
     private static AcademicDocumentPrinterInterface SINGLETON;
 
@@ -49,21 +52,17 @@ public class DocumentPrinter {
     public static final String PDF = org.fenixedu.treasury.services.reports.DocumentPrinter.PDF;
     public static final String ODT = org.fenixedu.treasury.services.reports.DocumentPrinter.ODT;
 
+    private static <T extends Object> T apply(Function<AcademicDocumentPrinterInterface, T> function) {
+        return Optional.ofNullable(SINGLETON).map(function).orElseThrow(() -> new RuntimeException("Feature not available"));
+    }
+
     //https://github.com/qub-it/fenixedu-qubdocs-reports/blob/master/src/main/java/org/fenixedu/academic/util/report/DocumentPrinter.java
     public static byte[] printRegistrationTuititionPaymentPlan(Registration registration, String outputMimeType) {
-        if(SINGLETON != null) {
-            return SINGLETON.printRegistrationTuititionPaymentPlan(registration, outputMimeType);
-        } else {
-            throw new RuntimeException("Feature not available");
-        }
+        return apply(dp -> dp.printRegistrationTuititionPaymentPlan(registration,outputMimeType));
     }
 
     public static byte[] printRegistrationTuititionPaymentPlan(final DebtAccount debtAccount, String outputMimeType) {
-        if (SINGLETON != null) {
-            return SINGLETON.printRegistrationTuititionPaymentPlan(debtAccount, outputMimeType);
-        } else {
-            throw new RuntimeException("Feature not available");
-        }
+        return apply(dp -> dp.printRegistrationTuititionPaymentPlan(debtAccount,outputMimeType));
     }
 
 }
