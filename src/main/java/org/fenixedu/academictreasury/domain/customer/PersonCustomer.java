@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -64,6 +65,7 @@ import org.fenixedu.treasury.domain.FiscalDataUpdateLog;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.debt.balancetransfer.BalanceTransferService;
 import org.fenixedu.treasury.domain.document.DebitEntry;
+import org.fenixedu.treasury.domain.document.InvoiceEntry;
 import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
 import org.fenixedu.treasury.dto.AdhocCustomerBean;
@@ -988,6 +990,25 @@ public class PersonCustomer extends PersonCustomer_Base {
         }
 
         return CustomerType.findByCode(STUDENT_CODE).findFirst().get();
+    }
+
+    public static Set<InvoiceEntry> getAllPendingInvoiceEntriesForPerson(Person person) {
+        List<PersonCustomer> result = new ArrayList<PersonCustomer>();
+
+        Optional.ofNullable(PersonCustomer.activePersonCustomer(person)).ifPresent(p -> result.add(p));
+        result.addAll(PersonCustomer.inactivePersonCustomers(person));
+
+        Set<InvoiceEntry> invoiceEntries = result.stream().flatMap(f -> f.getDebtAccountsSet().stream())
+                .flatMap(f2 -> f2.getPendingInvoiceEntriesSet().stream()).map(InvoiceEntry.class::cast)
+                .collect(Collectors.toSet());
+
+        final Comparator<? super InvoiceEntry> INVOICE_ENTRY_COMPARATOR = Comparator.comparing(InvoiceEntry::getDueDate)
+                .thenComparing(InvoiceEntry::getDescription).thenComparing(InvoiceEntry::getExternalId);
+
+        Set<InvoiceEntry> resultSorted = new TreeSet<InvoiceEntry>(INVOICE_ENTRY_COMPARATOR);
+        resultSorted.addAll(invoiceEntries);
+
+        return resultSorted;
     }
 
 }

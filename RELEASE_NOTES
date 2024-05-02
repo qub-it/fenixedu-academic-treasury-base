@@ -1,3 +1,7 @@
+- Refactor: Bring to PersonCustomer#getAllPendingInvoiceEntriesForPerson, the logic from module qubedu.module.academic-treasury-ui [#qubIT-Fenix-5207]
+- Bug Fix: Fill the property DebtReportEntryBean#netExemptedAmount for credit entries also [#qubIT-Fenix-5223]
+- Bug Fix: Declare two additional properties in DebtReportEntryBean and SettlementReportEntryBean, to present associated exemptions in different repor columns [#qubIT-Fenix-5223]
+
 11.6.0 (19-04-2024)
 - Refactor: Refactors code to isolate qub-docs dependency [#qubIT-Fenix-5085]
 
