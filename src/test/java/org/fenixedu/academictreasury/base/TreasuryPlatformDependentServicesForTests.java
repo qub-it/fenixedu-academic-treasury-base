@@ -153,6 +153,16 @@ public class TreasuryPlatformDependentServicesForTests implements ITreasuryPlatf
     }
 
     @Override
+    public void setCurrentApplicationUser(String username) {
+        // Do nothing
+    }
+
+    @Override
+    public void removeCurrentApplicationUser() {
+        // Do nothing
+    }
+
+    @Override
     public Locale defaultLocale() {
         return TreasuryConstants.DEFAULT_LANGUAGE;
     }
