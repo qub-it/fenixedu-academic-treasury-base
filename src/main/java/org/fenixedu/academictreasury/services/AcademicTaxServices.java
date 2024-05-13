@@ -38,10 +38,10 @@ package org.fenixedu.academictreasury.services;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
@@ -63,10 +63,14 @@ import org.fenixedu.treasury.domain.Vat;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.DebitNote;
+import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
+import org.fenixedu.treasury.domain.document.FinantialDocumentType;
 import org.fenixedu.treasury.util.TreasuryConstants;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 import pt.ist.fenixframework.Atomic;
 
@@ -94,16 +98,18 @@ public class AcademicTaxServices {
                 debtDate.toDateTimeAtStartOfDay());
     }
 
-    public static AcademicDebitEntryBean calculateAcademicTaxForDefaultFinantialEntity(
-            final Registration registration, final ExecutionYear executionYear, final AcademicTax academicTax,
-            final LocalDate debtDate, final boolean forceCreation) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        
-        final FinantialEntity finantialEntity = academicTreasuryServices.finantialEntityOfDegree(registration.getDegree(), debtDate);
-        
+    public static AcademicDebitEntryBean calculateAcademicTaxForDefaultFinantialEntity(final Registration registration,
+            final ExecutionYear executionYear, final AcademicTax academicTax, final LocalDate debtDate,
+            final boolean forceCreation) {
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
+        final FinantialEntity finantialEntity =
+                academicTreasuryServices.finantialEntityOfDegree(registration.getDegree(), debtDate);
+
         return calculateAcademicTax(finantialEntity, registration, executionYear, academicTax, debtDate, forceCreation);
     }
-    
+
     public static AcademicDebitEntryBean calculateAcademicTax(final FinantialEntity finantialEntity,
             final Registration registration, final ExecutionYear executionYear, final AcademicTax academicTax,
             final LocalDate debtDate, final boolean forceCreation) {
@@ -124,7 +130,7 @@ public class AcademicTaxServices {
             throw new AcademicTreasuryDomainException("error.AcademicTaxServices.calculateAcademicTax.tariff.not.found",
                     debtDate.toString(TreasuryConstants.DATE_FORMAT));
         }
-        
+
         final LocalizedString debitEntryName = AcademicTreasuryEvent.nameForAcademicTax(academicTax, registration, executionYear);
         final LocalDate dueDate = academicTariff.dueDate(debtDate);
         final Vat vat = academicTariff.vat(debtDate);
@@ -151,13 +157,16 @@ public class AcademicTaxServices {
                 AcademicTreasuryPlataformDependentServicesFactory.implementation();
         final LocalDate enrolmentDate = possibleEnrolmentDate(registration, executionYear);
 
-        final FinantialEntity finantialEntity = academicTreasuryServices.finantialEntityOfDegree(registration.getDegree(), enrolmentDate);
+        final FinantialEntity finantialEntity =
+                academicTreasuryServices.finantialEntityOfDegree(registration.getDegree(), enrolmentDate);
         return createAcademicTax(finantialEntity, registration, executionYear, academicTax, enrolmentDate, forceCreation);
     }
 
     private static LocalDate possibleEnrolmentDate(Registration registration, ExecutionYear executionYear) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        final RegistrationDataByExecutionYear data = academicTreasuryServices.findRegistrationDataByExecutionYear(registration, executionYear);
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        final RegistrationDataByExecutionYear data =
+                academicTreasuryServices.findRegistrationDataByExecutionYear(registration, executionYear);
 
         if (data != null && data.getEnrolmentDate() != null) {
             return data.getEnrolmentDate();
@@ -210,7 +219,8 @@ public class AcademicTaxServices {
 
             final PersonCustomer personCustomer = PersonCustomer.findUnique(person, addressFiscalCountryCode, fiscalNumber).get();
             if (!personCustomer.isActive()) {
-                throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active", addressFiscalCountryCode, fiscalNumber);
+                throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active", addressFiscalCountryCode,
+                        fiscalNumber);
             }
 
             if (!DebtAccount.findUnique(finantialEntity.getFinantialInstitution(), personCustomer).isPresent()) {
@@ -295,12 +305,14 @@ public class AcademicTaxServices {
 
     public static AcademicDebitEntryBean calculateImprovementTaxForDefaultEntity(final EnrolmentEvaluation enrolmentEvaluation,
             final LocalDate debtDate) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        
-        final FinantialEntity finantialEntity = academicTreasuryServices.finantialEntityOfDegree(enrolmentEvaluation.getEnrolment().getRegistration().getDegree(), debtDate);
-        
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
+        final FinantialEntity finantialEntity = academicTreasuryServices
+                .finantialEntityOfDegree(enrolmentEvaluation.getEnrolment().getRegistration().getDegree(), debtDate);
+
         return calculateImprovementTax(finantialEntity, enrolmentEvaluation, debtDate);
-        
+
     }
 
     public static AcademicDebitEntryBean calculateImprovementTax(final FinantialEntity finantialEntity,
@@ -342,13 +354,16 @@ public class AcademicTaxServices {
     }
 
     @Atomic
-    public static boolean createImprovementTaxForDefaultFinantialEntity(final EnrolmentEvaluation enrolmentEvaluation, final LocalDate when) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        final FinantialEntity finantialEntity = academicTreasuryServices.finantialEntityOfDegree(enrolmentEvaluation.getRegistration().getDegree(), when);
-        
-        return createImprovementTax(finantialEntity, enrolmentEvaluation, when); 
+    public static boolean createImprovementTaxForDefaultFinantialEntity(final EnrolmentEvaluation enrolmentEvaluation,
+            final LocalDate when) {
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+        final FinantialEntity finantialEntity =
+                academicTreasuryServices.finantialEntityOfDegree(enrolmentEvaluation.getRegistration().getDegree(), when);
+
+        return createImprovementTax(finantialEntity, enrolmentEvaluation, when);
     }
-    
+
     @Atomic
     public static boolean createImprovementTax(final FinantialEntity finantialEntity,
             final EnrolmentEvaluation enrolmentEvaluation, final LocalDate when) {
@@ -395,7 +410,8 @@ public class AcademicTaxServices {
 
             final PersonCustomer personCustomer = PersonCustomer.findUnique(person, addressFiscalCountryCode, fiscalNumber).get();
             if (!personCustomer.isActive()) {
-                throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active", addressFiscalCountryCode, fiscalNumber);
+                throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active", addressFiscalCountryCode,
+                        fiscalNumber);
             }
 
             AcademicTreasuryEvent.createForImprovementTuition(registration, executionYear);
@@ -413,6 +429,19 @@ public class AcademicTaxServices {
 
         final DebitEntry debitEntry =
                 academicTariff.createDebitEntryForImprovement(debtAccount, academicTreasuryEvent, enrolmentEvaluation);
+
+        if (debitEntry != null) {
+            DocumentNumberSeries defaultDocumentNumberSeries = DocumentNumberSeries
+                    .findUniqueDefault(FinantialDocumentType.findForDebitNote(), debtAccount.getFinantialInstitution()).get();
+            final DebitNote debitNote = DebitNote.create(academicTariff.getFinantialEntity(), debtAccount, null,
+                    defaultDocumentNumberSeries, new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
+
+            debitNote.addDebitNoteEntries(Lists.newArrayList(debitEntry));
+
+            if (AcademicTreasurySettings.getInstance().isCloseServiceRequestEmolumentsWithDebitNote()) {
+                debitNote.closeDocument();
+            }
+        }
 
         return debitEntry != null;
     }

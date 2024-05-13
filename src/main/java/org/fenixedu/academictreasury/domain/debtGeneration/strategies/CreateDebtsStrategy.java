@@ -37,6 +37,7 @@ package org.fenixedu.academictreasury.domain.debtGeneration.strategies;
 
 import static org.fenixedu.academictreasury.domain.debtGeneration.IAcademicDebtGenerationRuleStrategy.findActiveDebitEntries;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,7 +70,6 @@ import org.fenixedu.treasury.domain.document.FinantialDocumentType;
 import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.settings.TreasurySettings;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
-import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -340,7 +340,7 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                 if (!entry.isCreateDebt()) {
                     return null;
                 }
-                
+
                 boolean forceCreation = entry.isCreateDebt() && entry.isForceCreation()
                         && registration.getLastRegistrationState(executionYear) != null
                         && registration.getLastRegistrationState(executionYear).isActive()
@@ -383,10 +383,10 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                     return null;
                 }
 
-                boolean isRegistrationToPayGratuities = TuitionServices.isToPayRegistrationTuition(registration, rule.getExecutionYear());
-                
-                boolean forceCreation = entry.isCreateDebt() && entry.isForceCreation()
-                        && isRegistrationToPayGratuities
+                boolean isRegistrationToPayGratuities =
+                        TuitionServices.isToPayRegistrationTuition(registration, rule.getExecutionYear());
+
+                boolean forceCreation = entry.isCreateDebt() && entry.isForceCreation() && isRegistrationToPayGratuities
                         && registration.getLastRegistrationState(executionYear) != null
                         && registration.getLastRegistrationState(executionYear).isActive()
                         && (!entry.isLimitToRegisteredOnExecutionYear() || registration.isFirstTime(rule.getExecutionYear()));
@@ -473,7 +473,8 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                             DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(),
                                     debtAccountOwnerOfDebitNote.getFinantialInstitution()).get();
 
-                    DebitNote debitNote = DebitNote.create(debitEntry.getDebtAccount(), documentNumberSeries, new DateTime());
+                    DebitNote debitNote = DebitNote.create(debitEntry.getFinantialEntity(), debitEntry.getDebtAccount(), null,
+                            documentNumberSeries, new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
 
                     if (debtAccountOwnerOfDebitNote != debitEntry.getDebtAccount()) {
                         debitNote.updatePayorDebtAccount(debtAccountOwnerOfDebitNote);

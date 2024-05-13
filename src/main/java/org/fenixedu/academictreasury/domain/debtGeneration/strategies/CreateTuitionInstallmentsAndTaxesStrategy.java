@@ -29,15 +29,11 @@ import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependent
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.treasury.domain.Product;
-import org.fenixedu.treasury.domain.ProductGroup;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.DebitNote;
 import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
-import org.fenixedu.treasury.domain.event.TreasuryEvent;
-import org.fenixedu.treasury.domain.settings.TreasurySettings;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -112,7 +108,7 @@ public class CreateTuitionInstallmentsAndTaxesStrategy implements IAcademicDebtG
     public boolean isAggregateAllOrNothingDefaultValue() {
         return false;
     }
-    
+
     @Override
     @Atomic(mode = TxMode.READ)
     public List<AcademicDebtGenerationProcessingResult> process(AcademicDebtGenerationRule rule) {
@@ -240,7 +236,8 @@ public class CreateTuitionInstallmentsAndTaxesStrategy implements IAcademicDebtG
                             DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(),
                                     debtAccountOwnerOfDebitNote.getFinantialInstitution()).get();
 
-                    DebitNote debitNote = DebitNote.create(debitEntry.getDebtAccount(), documentNumberSeries, new DateTime());
+                    DebitNote debitNote = DebitNote.create(debitEntry.getFinantialEntity(), debitEntry.getDebtAccount(), null,
+                            documentNumberSeries, new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
 
                     if (debtAccountOwnerOfDebitNote != debitEntry.getDebtAccount()) {
                         debitNote.updatePayorDebtAccount(debtAccountOwnerOfDebitNote);
@@ -261,7 +258,7 @@ public class CreateTuitionInstallmentsAndTaxesStrategy implements IAcademicDebtG
                 }
             }
         }
-        
+
     }
 
     private DebitEntry grabOrCreateDebitEntryForAcademicTax(AcademicDebtGenerationRule rule, Registration registration,
@@ -428,7 +425,8 @@ public class CreateTuitionInstallmentsAndTaxesStrategy implements IAcademicDebtG
                             DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(),
                                     debtAccountOwnerOfDebitNote.getFinantialInstitution()).get();
 
-                    DebitNote debitNote = DebitNote.create(debitEntry.getDebtAccount(), documentNumberSeries, new DateTime());
+                    DebitNote debitNote = DebitNote.create(debitEntry.getFinantialEntity(), debitEntry.getDebtAccount(), null,
+                            documentNumberSeries, new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
 
                     if (debtAccountOwnerOfDebitNote != debitEntry.getDebtAccount()) {
                         debitNote.updatePayorDebtAccount(debtAccountOwnerOfDebitNote);

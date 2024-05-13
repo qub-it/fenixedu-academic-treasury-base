@@ -70,7 +70,7 @@ import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.DebitNote;
 import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
-import org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform;
+import org.fenixedu.treasury.domain.paymentcodes.integration.ISibsPaymentCodePoolService;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -256,6 +256,7 @@ public class EmolumentServices {
     }
 
     @Atomic
+    @Deprecated
     public static boolean createAcademicServiceRequestEmolument(final FinantialEntity finantialEntity,
             final ITreasuryServiceRequest iTreasuryServiceRequest, final LocalDate when) {
 
@@ -336,9 +337,10 @@ public class EmolumentServices {
             throw new AcademicTreasuryDomainException("error.EmolumentServices.academicServiceRequest.amount.equals.to.zero");
         }
 
-        final DebitNote debitNote = DebitNote.create(personDebtAccount, DocumentNumberSeries
-                .findUniqueDefault(FinantialDocumentType.findForDebitNote(), personDebtAccount.getFinantialInstitution()).get(),
-                new DateTime());
+        DocumentNumberSeries defaultDocumentNumberSeries = DocumentNumberSeries
+                .findUniqueDefault(FinantialDocumentType.findForDebitNote(), personDebtAccount.getFinantialInstitution()).get();
+        final DebitNote debitNote = DebitNote.create(academicTariff.getFinantialEntity(), personDebtAccount, null,
+                defaultDocumentNumberSeries, new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
 
         debitNote.addDebitNoteEntries(Collections.singletonList(debitEntry));
 
@@ -347,19 +349,14 @@ public class EmolumentServices {
         }
 
         if (serviceRequestMapEntry.getGeneratePaymentCode()) {
-            DigitalPaymentPlatform platform = finantialEntity.getFinantialInstitution().getDefaultDigitalPaymentPlatform();
+            ISibsPaymentCodePoolService platform = ISibsPaymentCodePoolService.getDefaultDigitalPaymentPlatform(finantialEntity);
             if (platform == null) {
                 throw new AcademicTreasuryDomainException(
                         "error.EmolumentServices.academicServiceRequest.paymentCodePool.is.required");
             }
 
-            if (!platform.isSibsPaymentCodeServiceSupported()) {
-                throw new AcademicTreasuryDomainException(
-                        "error.EmolumentServices.academicServiceRequest.digitalPaymentPlatform.does.not.support.sibs.payment.codes");
-            }
-
-            platform.castToSibsPaymentCodePoolService().createSibsPaymentRequest(debitEntry.getDebtAccount(),
-                    Collections.singleton(debitEntry), Collections.emptySet());
+            platform.createSibsPaymentRequest(debitEntry.getDebtAccount(), Collections.singleton(debitEntry),
+                    Collections.emptySet());
         }
 
         return true;

@@ -37,6 +37,7 @@ package org.fenixedu.academictreasury.domain.debtGeneration.strategies;
 
 import static org.fenixedu.academictreasury.domain.debtGeneration.IAcademicDebtGenerationRuleStrategy.findActiveDebitEntries;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -275,9 +276,11 @@ public class CloseDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
         for (DebitEntry debitEntry : result) {
             if (debitEntry.getFinantialDocument() == null) {
                 DebtAccount debtAccount = debitEntry.getDebtAccount();
-                DebitNote debitNote = DebitNote.create(debtAccount, DocumentNumberSeries
-                        .findUniqueDefault(FinantialDocumentType.findForDebitNote(), debtAccount.getFinantialInstitution()).get(),
-                        new DateTime());
+                DocumentNumberSeries defaultDocumentNumberSeries = DocumentNumberSeries
+                        .findUniqueDefault(FinantialDocumentType.findForDebitNote(), debtAccount.getFinantialInstitution()).get();
+                DebitNote debitNote = DebitNote.create(debitEntry.getFinantialEntity(), debtAccount, null,
+                        defaultDocumentNumberSeries, new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
+
                 debitEntry.setFinantialDocument(debitNote);
             }
         }

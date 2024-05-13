@@ -37,6 +37,7 @@ package org.fenixedu.academictreasury.domain.debtGeneration.strategies;
 
 import static org.fenixedu.academictreasury.domain.debtGeneration.IAcademicDebtGenerationRuleStrategy.findActiveDebitEntries;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,12 +58,14 @@ import org.fenixedu.academictreasury.services.AcademicTaxServices;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
+import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.DebitNote;
 import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -239,7 +242,7 @@ public class AggregateDebtsStrategy implements IAcademicDebtGenerationRuleStrate
             return;
         }
 
-        final DebitNote debitNote = grabPreparingOrCreateDebitNote(debitEntries);
+        final DebitNote debitNote = grabPreparingOrCreateDebitNote(rule, debitEntries);
 
         for (final DebitEntry debitEntry : debitEntries) {
             if (debitEntry.getFinantialDocument() == null) {
@@ -331,7 +334,7 @@ public class AggregateDebtsStrategy implements IAcademicDebtGenerationRuleStrate
         return findActiveDebitEntries(personCustomer, t, product).filter(d -> d.isInDebt()).findFirst().orElse(null);
     }
 
-    private DebitNote grabPreparingOrCreateDebitNote(final Set<DebitEntry> debitEntries) {
+    private DebitNote grabPreparingOrCreateDebitNote(final AcademicDebtGenerationRule rule, final Set<DebitEntry> debitEntries) {
 
         for (final DebitEntry debitEntry : debitEntries) {
             if (debitEntry.getFinantialDocument() != null && debitEntry.getFinantialDocument().isPreparing()) {
@@ -339,12 +342,17 @@ public class AggregateDebtsStrategy implements IAcademicDebtGenerationRuleStrate
             }
         }
 
-        final DebitNote debitNote =
-                DebitNote
-                        .create(debitEntries.iterator().next().getDebtAccount(),
-                                DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(),
-                                        debitEntries.iterator().next().getDebtAccount().getFinantialInstitution()).get(),
-                                new DateTime());
+        DocumentNumberSeries defaultDocumentNumberSeries =
+                DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(),
+                        debitEntries.iterator().next().getDebtAccount().getFinantialInstitution()).get();
+        FinantialEntity finantialEntity = rule.getFinantialEntity();
+
+        if (finantialEntity == null && !debitEntries.isEmpty()) {
+            finantialEntity = debitEntries.iterator().next().getFinantialEntity();
+        }
+
+        final DebitNote debitNote = DebitNote.create(finantialEntity, debitEntries.iterator().next().getDebtAccount(), null,
+                defaultDocumentNumberSeries, new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
 
         return debitNote;
     }

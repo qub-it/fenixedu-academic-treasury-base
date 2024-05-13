@@ -1,3 +1,9 @@
+- Refactor: Debit note receive finantial entity and payor debt account [#qubIT-Fenix-4587]
+- Refactor: Use ISibsPaymentCodePoolService#getDefaultDigitalPaymentPlatform method, to get default payment code pool for finantial entity [#qubIT-Fenix-4587]
+- Refactor: Associate FinantialEntity to AcademicTreasuryEvent [#qubIT-Fenix-4587]
+- Bug Fix: Create sibs payment request for ReservationTaxEventTarget, by finantial entity [#qubIT-Fenix-4587]
+- Refactor: In method AcademicTariff#createDebitEntryForImprovement, do not create debit note. Instead create in AcademicTaxServices#createImprovementTax [#qubIT-Fenix-4587]
+
 11.7.0 (02-05-2024)
 - Refactor: Bring to PersonCustomer#getAllPendingInvoiceEntriesForPerson, the logic from module qubedu.module.academic-treasury-ui [#qubIT-Fenix-5207]
 - Bug Fix: Fill the property DebtReportEntryBean#netExemptedAmount for credit entries also [#qubIT-Fenix-5223]

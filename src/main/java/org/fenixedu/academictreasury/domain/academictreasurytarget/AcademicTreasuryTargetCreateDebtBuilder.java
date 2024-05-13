@@ -156,7 +156,8 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
                 treasuryEvent = AcademicTreasuryEvent.createForAcademicTreasuryEventTarget(product, target);
             }
 
-            var debitNote = DebitNote.create(debtAccount, documentNumberSeries, now);
+            var debitNote = DebitNote.create(finantialEntity, debtAccount, null, documentNumberSeries, now, now.toLocalDate(),
+                    null, Collections.emptyMap(), null, null);
             var debitEntry = DebitEntry.create(finantialEntity, debtAccount, treasuryEvent, vat, amount, dueDate,
                     target.getAcademicTreasuryTargetPropertiesMap(), product,
                     target.getAcademicTreasuryTargetDescription().getContent(TreasuryConstants.DEFAULT_LANGUAGE), BigDecimal.ONE,
@@ -295,7 +296,8 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             }
 
             var dueDate = academicTariff.dueDate(when);
-            var debitNote = DebitNote.create(debtAccount, documentNumberSeries, now);
+            var debitNote = DebitNote.create(finantialEntity, debtAccount, null, documentNumberSeries, now, now.toLocalDate(),
+                    null, Collections.emptyMap(), null, null);
 
             var amount = academicTariff.amountToPay(this.numberOfUnits, 0, this.applyLanguageRate, this.urgentRequest);
             var debitEntry = DebitEntry.create(finantialEntity, debtAccount, treasuryEvent, vat, amount, dueDate,

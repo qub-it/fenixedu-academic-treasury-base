@@ -65,7 +65,6 @@ import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependent
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.treasury.domain.Customer;
 import org.fenixedu.treasury.domain.FinantialEntity;
-import org.fenixedu.treasury.domain.FinantialInstitution;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.ProductGroup;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
@@ -272,24 +271,12 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
         }
 
         DebtAccount debtAccount = debitEntries.iterator().next().getDebtAccount();
-        getDefaultDigitalPaymentPlatform(debtAccount, rule.getFinantialEntity()).createSibsPaymentRequest(debtAccount,
-                debitEntries, Collections.emptySet());
+        ISibsPaymentCodePoolService.getDefaultDigitalPaymentPlatform(rule.getFinantialEntity())
+                .createSibsPaymentRequest(debtAccount, debitEntries, Collections.emptySet());
 
         if (rule.getAcademicTaxDueDateAlignmentType() != null) {
             FenixFramework.atomic(() -> rule.getAcademicTaxDueDateAlignmentType().applyDueDate(rule, debitEntries));
         }
-    }
-
-    private ISibsPaymentCodePoolService getDefaultDigitalPaymentPlatform(DebtAccount debtAccount,
-            FinantialEntity finantialEntity) {
-        FinantialInstitution finantialInstitution = debtAccount.getFinantialInstitution();
-
-        if (Boolean.TRUE.equals(finantialInstitution.getLimitPaymentRequestsByFinantialEntity())) {
-            return finantialEntity.getDefaultDigitalPaymentPlatform().castToSibsPaymentCodePoolService();
-        }
-
-        return finantialInstitution.getDefaultDigitalPaymentPlatform().castToSibsPaymentCodePoolService();
-
     }
 
     private Set<Customer> referencedCustomers(Set<DebitEntry> debitEntries) {

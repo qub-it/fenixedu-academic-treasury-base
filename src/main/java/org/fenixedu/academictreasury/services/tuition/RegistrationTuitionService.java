@@ -40,6 +40,7 @@ import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Currency;
+import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.FinantialInstitution;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.Vat;
@@ -216,7 +217,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                 if (TreasuryConstants.isNegative(differenceNetAmount) && TreasuryConstants.isZero(differenceInNetExemptedAmount)
                         && isExemptionsMapAreEqual(tariff, academicTreasuryEvent, originalBean)) {
                     // Close the debit entries and credit with the differenceAmount
-                    closeDebitEntriesInDebitNote(academicTreasuryEvent, tariff.getProduct());
+                    closeDebitEntriesInDebitNote(tariff.getFinantialEntity(), academicTreasuryEvent, tariff.getProduct());
 
                     BigDecimal remainingAmountToCredit = differenceNetAmount.negate();
                     List<DebitEntry> debitEntriesToCreditList = DebitEntry.findActive(academicTreasuryEvent, product)
@@ -308,7 +309,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                     // of installment and create again
 
                     // TODO: Consider the annullment of debit entry, instead of closing and crediting
-                    closeDebitEntriesInDebitNote(academicTreasuryEvent, tariff.getProduct());
+                    closeDebitEntriesInDebitNote(tariff.getFinantialEntity(), academicTreasuryEvent, tariff.getProduct());
                     revertExemptionAmountsFromAcademicTreasuryToDiscountExemptionsMapForAllInstallments(tariff);
 
                     DebitEntry.findActive(academicTreasuryEvent, product)
@@ -436,7 +437,8 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                 exemptionsToApplyMap);
     }
 
-    private void closeDebitEntriesInDebitNote(AcademicTreasuryEvent academicTreasuryEvent, Product product) {
+    private void closeDebitEntriesInDebitNote(FinantialEntity finantialEntity, AcademicTreasuryEvent academicTreasuryEvent,
+            Product product) {
         Predicate<DebitEntry> isDebitEntryInPreparingDocument =
                 de -> de.getFinantialDocument() != null && de.getFinantialDocument().isPreparing();
 
@@ -450,7 +452,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
             DebtAccount debitEntryDebtAccount = de.getPayorDebtAccount() != null ? de.getPayorDebtAccount() : de.getDebtAccount();
 
             DebitNote newlyDebitNote = preparingDebitNotesMapByDebtAccount.computeIfAbsent(debitEntryDebtAccount,
-                    da -> createDebitNoteForPayorDebtAccount(de.getDebtAccount(), da));
+                    da -> createDebitNoteForPayorDebtAccount(finantialEntity, de.getDebtAccount(), da));
 
             preparingDebitNotesMapByDebtAccount.put(debitEntryDebtAccount, newlyDebitNote);
             de.setFinantialDocument(newlyDebitNote);
@@ -459,13 +461,15 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
         preparingDebitNotesMapByDebtAccount.values().forEach(note -> note.closeDocument());
     }
 
-    private DebitNote createDebitNoteForPayorDebtAccount(DebtAccount studentDebtAccount, DebtAccount debitEntryDebtAccount) {
+    private DebitNote createDebitNoteForPayorDebtAccount(FinantialEntity finantialEntity, DebtAccount studentDebtAccount,
+            DebtAccount debitEntryDebtAccount) {
         DebtAccount payorDebtAccount = studentDebtAccount != debitEntryDebtAccount ? debitEntryDebtAccount : null;
         FinantialInstitution finantialInstitution = studentDebtAccount.getFinantialInstitution();
 
-        return DebitNote.create(studentDebtAccount, payorDebtAccount,
-                DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get(),
-                new DateTime(), new LocalDate(), null);
+        DocumentNumberSeries defaultDocumentNumberSeries =
+                DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
+        return DebitNote.create(finantialEntity, studentDebtAccount, payorDebtAccount, defaultDocumentNumberSeries,
+                new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
     }
 
     private void revertExemptionAmountsFromAcademicTreasuryToDiscountExemptionsMapForAllInstallments(

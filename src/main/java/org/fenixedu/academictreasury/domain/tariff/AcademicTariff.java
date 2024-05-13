@@ -56,7 +56,6 @@ import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent.AcademicTreasuryEventKeys;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.serviceRequests.ITreasuryServiceRequest;
-import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.dto.tariff.AcademicTariffBean;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
@@ -68,9 +67,6 @@ import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.Vat;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.document.DebitEntry;
-import org.fenixedu.treasury.domain.document.DebitNote;
-import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
-import org.fenixedu.treasury.domain.document.FinantialDocumentType;
 import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
 import org.fenixedu.treasury.domain.tariff.InterestRate;
 import org.fenixedu.treasury.domain.tariff.InterestRateType;
@@ -82,7 +78,6 @@ import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import pt.ist.fenixframework.Atomic;
@@ -571,18 +566,6 @@ public class AcademicTariff extends AcademicTariff_Base {
                 AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), new DateTime(), false, false, null);
 
         academicTreasuryEvent.associateEnrolmentEvaluation(debitEntry, enrolmentEvaluation);
-
-        if (debitEntry != null) {
-            final DebitNote debitNote = DebitNote.create(debtAccount, DocumentNumberSeries
-                    .findUniqueDefault(FinantialDocumentType.findForDebitNote(), debtAccount.getFinantialInstitution()).get(),
-                    new DateTime());
-
-            debitNote.addDebitNoteEntries(Lists.newArrayList(debitEntry));
-
-            if (AcademicTreasurySettings.getInstance().isCloseServiceRequestEmolumentsWithDebitNote()) {
-                debitNote.closeDocument();
-            }
-        }
 
         return debitEntry;
     }

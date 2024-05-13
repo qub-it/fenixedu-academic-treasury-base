@@ -113,16 +113,17 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         setCustomAcademicDebt(false);
     }
 
+    @Deprecated
     protected AcademicTreasuryEvent(final ITreasuryServiceRequest iTreasuryServiceRequest) {
         this();
-        init(iTreasuryServiceRequest.getPerson(), iTreasuryServiceRequest,
+        initForTreasuryServiceRequest(iTreasuryServiceRequest.getPerson(), iTreasuryServiceRequest,
                 ServiceRequestMapEntry.findProduct(iTreasuryServiceRequest));
     }
 
     protected AcademicTreasuryEvent(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup, final Product product,
             final Registration registration, final ExecutionYear executionYear) {
         this();
-        init(tuitionPaymentPlanGroup, product, registration, executionYear);
+        initForTuition(tuitionPaymentPlanGroup, product, registration, executionYear);
 
         checkRules();
     }
@@ -130,14 +131,14 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
     protected AcademicTreasuryEvent(final AcademicTax academicTax, final Registration registration,
             final ExecutionYear executionYear) {
         this();
-        init(academicTax, registration, executionYear);
+        initForAcademicTax(academicTax, registration, executionYear);
 
         checkRules();
     }
 
     protected AcademicTreasuryEvent(final Product product, final IAcademicTreasuryTarget target) {
         this();
-        init(product, target);
+        initAcademicTreasuryEventTarget(product, target);
 
         checkRules();
     }
@@ -145,19 +146,36 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
     protected AcademicTreasuryEvent(Product product, Registration registration, ExecutionYear executionYear,
             int customAcademicDebtNumberOfUnits, int customAcademicDebtNumberOfPages, boolean customAcademicDebtUrgent,
             LocalDate customAcademicDebtEventDate, String academicProcessNumber) {
-        init(product, registration, executionYear, customAcademicDebtNumberOfUnits, customAcademicDebtNumberOfPages,
-                customAcademicDebtUrgent, customAcademicDebtEventDate, academicProcessNumber);
+        initForCustomAcademicDebt(product, registration, executionYear, customAcademicDebtNumberOfUnits,
+                customAcademicDebtNumberOfPages, customAcademicDebtUrgent, customAcademicDebtEventDate, academicProcessNumber);
 
         checkRules();
     }
 
     @Override
-    protected void init(final Product product, final LocalizedString name) {
+    protected void init(FinantialEntity finantialEntity, Product product, LocalizedString name) {
         throw new RuntimeException("wrong call");
     }
 
-    protected void init(final Person person, final ITreasuryServiceRequest iTreasuryServiceRequest, final Product product) {
-        super.init(product, nameForAcademicServiceRequest(product, iTreasuryServiceRequest));
+    @Deprecated
+    private void initForTreasuryServiceRequest(final Person person, final ITreasuryServiceRequest iTreasuryServiceRequest,
+            final Product product) {
+        LocalDate eventDate =
+                iTreasuryServiceRequest.getRequestDate() != null ? iTreasuryServiceRequest.getRequestDate().toLocalDate() : null;
+
+        if (eventDate == null) {
+            eventDate = new LocalDate();
+        }
+
+        Degree degree = iTreasuryServiceRequest.getRegistration().getDegree();
+        FinantialEntity finantialEntity =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation().finantialEntityOfDegree(degree, eventDate);
+
+        if (finantialEntity == null && FinantialEntity.findAll().count() == 1) {
+            finantialEntity = FinantialEntity.findAll().iterator().next();
+        }
+
+        super.init(finantialEntity, product, nameForAcademicServiceRequest(product, iTreasuryServiceRequest));
 
         setPerson(person);
         setITreasuryServiceRequest(iTreasuryServiceRequest);
@@ -208,9 +226,34 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         return result;
     }
 
-    protected void init(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup, final Product product,
+    private void initForTuition(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup, final Product product,
             final Registration registration, final ExecutionYear executionYear) {
-        super.init(product, nameForTuition(product, registration, executionYear));
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
+        final RegistrationDataByExecutionYear data =
+                academicTreasuryServices.findRegistrationDataByExecutionYear(registration, executionYear);
+
+        LocalDate eventDate = null;
+        if (data != null && data.getEnrolmentDate() != null) {
+            eventDate = data.getEnrolmentDate();
+        } else {
+            eventDate = executionYear.getBeginLocalDate();
+        }
+
+        if (eventDate == null) {
+            eventDate = new LocalDate();
+        }
+
+        Degree degree = registration.getDegree();
+        FinantialEntity finantialEntity =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation().finantialEntityOfDegree(degree, eventDate);
+
+        if (finantialEntity == null && FinantialEntity.findAll().count() == 1) {
+            finantialEntity = FinantialEntity.findAll().iterator().next();
+        }
+
+        super.init(finantialEntity, product, nameForTuition(product, registration, executionYear));
 
         setPerson(registration.getPerson());
         setTuitionPaymentPlanGroup(tuitionPaymentPlanGroup);
@@ -236,8 +279,34 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         return result;
     }
 
-    protected void init(final AcademicTax academicTax, final Registration registration, final ExecutionYear executionYear) {
-        super.init(academicTax.getProduct(), nameForAcademicTax(academicTax, registration, executionYear));
+    private void initForAcademicTax(final AcademicTax academicTax, final Registration registration,
+            final ExecutionYear executionYear) {
+        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
+        final RegistrationDataByExecutionYear data =
+                academicTreasuryServices.findRegistrationDataByExecutionYear(registration, executionYear);
+
+        LocalDate eventDate = null;
+        if (data != null && data.getEnrolmentDate() != null) {
+            eventDate = data.getEnrolmentDate();
+        } else {
+            eventDate = executionYear.getBeginLocalDate();
+        }
+
+        if (eventDate == null) {
+            eventDate = new LocalDate();
+        }
+
+        Degree degree = registration.getDegree();
+        FinantialEntity finantialEntity =
+                AcademicTreasuryPlataformDependentServicesFactory.implementation().finantialEntityOfDegree(degree, eventDate);
+
+        if (finantialEntity == null && FinantialEntity.findAll().count() == 1) {
+            finantialEntity = FinantialEntity.findAll().iterator().next();
+        }
+
+        super.init(finantialEntity, academicTax.getProduct(), nameForAcademicTax(academicTax, registration, executionYear));
 
         setAcademicTax(academicTax);
         setPerson(registration.getPerson());
@@ -269,18 +338,34 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         return result;
     }
 
-    protected void init(final Product product, final IAcademicTreasuryTarget target) {
+    private void initAcademicTreasuryEventTarget(final Product product, final IAcademicTreasuryTarget target) {
         if (target == null) {
             throw new AcademicTreasuryDomainException("error.AcademicTreasuryEvent.target.required");
         }
 
-        super.init(product, target.getAcademicTreasuryTargetDescription());
+        FinantialEntity finantialEntity = null;
+        if (target.getAcademicTreasuryTargetDegree() != null) {
+            LocalDate eventDate = target.getAcademicTreasuryTargetEventDate();
+
+            if (eventDate == null) {
+                eventDate = new LocalDate();
+            }
+
+            finantialEntity = AcademicTreasuryPlataformDependentServicesFactory.implementation()
+                    .finantialEntityOfDegree(target.getAcademicTreasuryTargetDegree(), eventDate);
+        }
+
+        if (finantialEntity == null && FinantialEntity.findAll().count() == 1) {
+            finantialEntity = FinantialEntity.findAll().iterator().next();
+        }
+
+        super.init(finantialEntity, product, target.getAcademicTreasuryTargetDescription());
 
         setPerson(target.getAcademicTreasuryTargetPerson());
         setTreasuryEventTarget((AbstractDomainObject) target);
     }
 
-    protected void init(Product product, Registration registration, ExecutionYear executionYear,
+    private void initForCustomAcademicDebt(Product product, Registration registration, ExecutionYear executionYear,
             int customAcademicDebtNumberOfUnits, int customAcademicDebtNumberOfPages, boolean customAcademicDebtUrgent,
             LocalDate customAcademicDebtEventDate, String academicProcessNumber) {
         LocalizedString nameForCustomAcademicDebt = nameForCustomAcademicDebt(product, registration, executionYear);
@@ -289,7 +374,23 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
             nameForCustomAcademicDebt = nameForCustomAcademicDebt.append(" [" + academicProcessNumber + "]");
         }
 
-        super.init(product, nameForCustomAcademicDebt);
+        LocalDate eventDate = customAcademicDebtEventDate;
+        if (eventDate == null) {
+            eventDate = executionYear.getBeginLocalDate();
+        }
+
+        if (eventDate == null) {
+            eventDate = new LocalDate();
+        }
+
+        FinantialEntity finantialEntity = AcademicTreasuryPlataformDependentServicesFactory.implementation()
+                .finantialEntityOfDegree(registration.getDegree(), eventDate);
+
+        if (finantialEntity == null && FinantialEntity.findAll().count() == 1) {
+            finantialEntity = FinantialEntity.findAll().iterator().next();
+        }
+
+        super.init(finantialEntity, product, nameForCustomAcademicDebt);
 
         setPerson(registration.getPerson());
         setCustomAcademicDebt(true);
@@ -954,6 +1055,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         return find(iTreasuryServiceRequest).findFirst();
     }
 
+    @Deprecated
     public static AcademicTreasuryEvent createForAcademicServiceRequest(ITreasuryServiceRequest iTreasuryServiceRequest) {
         return new AcademicTreasuryEvent(iTreasuryServiceRequest);
     }
@@ -1780,7 +1882,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
             return finantialEntityOfDegree;
         }
 
-        return null;
+        return super.getAssociatedFinantialEntity();
     }
 
     // @formatter: off
