@@ -1,3 +1,5 @@
+- Bug Fix: Validate if there active customers with same fiscal number, only for active customers in Customer#checkRules [#qubIT-Fenix-5307]
+
 11.8.0 (13-05-2024)
 - Refactor: Debit note receive finantial entity and payor debt account [#qubIT-Fenix-4587]
 - Refactor: Use ISibsPaymentCodePoolService#getDefaultDigitalPaymentPlatform method, to get default payment code pool for finantial entity [#qubIT-Fenix-4587]

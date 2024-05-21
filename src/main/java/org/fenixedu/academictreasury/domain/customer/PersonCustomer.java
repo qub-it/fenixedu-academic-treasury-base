@@ -165,19 +165,25 @@ public class PersonCustomer extends PersonCustomer_Base {
                     "error.PersonCustomer.default.fiscal.number.applied.only.to.default.country");
         }
 
-        if (!TreasuryConstants.isDefaultCountry(getAddressCountryCode()) || !DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber())) {
-            final Set<Customer> customers = findByFiscalInformation(getAddressCountryCode(), getFiscalNumber()) //
-                    .filter(c -> c.isPersonCustomer()) //
-                    .filter(c -> c.isActive()) //
-                    .collect(Collectors.<Customer> toSet());
+        // ANIL 2024-05-21
+        //
+        // Validate only of the customer is active
+        if (isActive()) {
+            if (!TreasuryConstants.isDefaultCountry(getAddressCountryCode())
+                    || !DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber())) {
+                final Set<Customer> customers = findByFiscalInformation(getAddressCountryCode(), getFiscalNumber()) //
+                        .filter(c -> c.isPersonCustomer()) //
+                        .filter(c -> c.isActive()) //
+                        .collect(Collectors.<Customer> toSet());
 
-            if (customers.size() > 1) {
-                final Customer self = this;
-                final Set<String> otherCustomers =
-                        customers.stream().filter(c -> c != self).map(c -> c.getName()).collect(Collectors.<String> toSet());
+                if (customers.size() > 1) {
+                    final Customer self = this;
+                    final Set<String> otherCustomers =
+                            customers.stream().filter(c -> c != self).map(c -> c.getName()).collect(Collectors.<String> toSet());
 
-                throw new TreasuryDomainException("error.Customer.customer.with.fiscal.information.exists",
-                        Joiner.on(", ").join(otherCustomers));
+                    throw new TreasuryDomainException("error.Customer.customer.with.fiscal.information.exists",
+                            Joiner.on(", ").join(otherCustomers));
+                }
             }
         }
 
