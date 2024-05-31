@@ -1,3 +1,5 @@
+- Improvement: Support scheduling for academic debt generation rules [#qubIT-Fenix-5345]
+
 11.8.1 (21-05-2024)
 - Bug Fix: Validate if there active customers with same fiscal number, only for active customers in Customer#checkRules [#qubIT-Fenix-5307]
 

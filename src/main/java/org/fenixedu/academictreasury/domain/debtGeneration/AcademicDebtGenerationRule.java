@@ -60,6 +60,7 @@ import org.fenixedu.academictreasury.dto.debtGeneration.AcademicDebtGenerationRu
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
 import org.fenixedu.treasury.util.TreasuryConstants;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -195,8 +196,8 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         if (getDomainRoot() == null) {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.bennu.required");
         }
-        
-        if(getFinantialEntity() == null) {
+
+        if (getFinantialEntity() == null) {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.finantialEntity.required");
         }
 
@@ -232,6 +233,13 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.minimumAmountForPaymentCode.invalid",
                     getMinimumAmountForPaymentCode().toString());
         }
+
+        if (getStartExecutionDate() != null && getEndExecutionDate() != null) {
+            if (getEndExecutionDate().isBefore(getStartExecutionDate())) {
+                throw new AcademicTreasuryDomainException(
+                        "error.AcademicDebtGenerationRule.endExecutionDate.isBefore.startExecutionDate");
+            }
+        }
     }
 
     public List<AcademicDebtGenerationRuleEntry> getOrderedAcademicDebtGenerationRuleEntries() {
@@ -242,6 +250,22 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
 
     public boolean isActive() {
         return getActive();
+    }
+
+    public boolean isAbleToRunUnderSchedule(DateTime when) {
+        if (getStartExecutionDate() != null && when.isBefore(getStartExecutionDate())) {
+            return false;
+        }
+
+        if (getEndExecutionDate() != null && when.isAfter(getEndExecutionDate())) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean isAbleToRunUnderScheduleNow() {
+        return isAbleToRunUnderSchedule(new DateTime());
     }
 
     public boolean isBackgroundExecution() {
@@ -321,7 +345,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         getDegreeCurricularPlansSet().clear();
         setFinantialEntity(null);
         setExecutionYear(null);
-        
+
         while (getAcademicDebtGenerationRuleEntriesSet().size() > 0) {
             getAcademicDebtGenerationRuleEntriesSet().iterator().next().delete();
         }
@@ -516,10 +540,8 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         return FenixFramework.getDomainRoot().getAcademicDebtGenerationRuleSet().stream();
     }
 
-    public static Stream<AcademicDebtGenerationRule> find(AcademicDebtGenerationRuleType type,
-            ExecutionYear executionYear) {
-        return findAll()
-                .filter(r -> r.getExecutionYear() == executionYear)
+    public static Stream<AcademicDebtGenerationRule> find(AcademicDebtGenerationRuleType type, ExecutionYear executionYear) {
+        return findAll().filter(r -> r.getExecutionYear() == executionYear)
                 .filter(r -> r.getAcademicDebtGenerationRuleType() == type);
     }
 
@@ -558,27 +580,29 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     }
 
     public static List<AcademicDebtGenerationProcessingResult> runAllActive(final boolean runOnlyWithBackgroundExecution,
-            Consumer<List<AcademicDebtGenerationProcessingResult>> ruleExecutionCallback,
-            AcademicDebtGenerationRuleType typeArg,
-            FinantialEntity finantialEntityArg,
-            ExecutionYear executionYearArg) {
+            Consumer<List<AcademicDebtGenerationProcessingResult>> ruleExecutionCallback, AcademicDebtGenerationRuleType typeArg,
+            FinantialEntity finantialEntityArg, ExecutionYear executionYearArg) {
         final List<Future<List<AcademicDebtGenerationProcessingResult>>> futureList = Lists.newArrayList();
 
         final ExecutorService exService = Executors.newSingleThreadExecutor();
         for (final AcademicDebtGenerationRuleType type : AcademicDebtGenerationRuleType.findAll()
                 .sorted(AcademicDebtGenerationRuleType.COMPARE_BY_ORDER_NUMBER).collect(Collectors.toList())) {
-            
-            if(typeArg != null && typeArg != type) {
+
+            if (typeArg != null && typeArg != type) {
                 continue;
             }
-            
+
             for (final AcademicDebtGenerationRule academicDebtGenerationRule : AcademicDebtGenerationRule.findActiveByType(type)
                     .sorted(COMPARE_BY_ORDER_NUMBER).collect(Collectors.toList())) {
 
-                if(finantialEntityArg != null && academicDebtGenerationRule.getFinantialEntity() != finantialEntityArg) {
+                if (!academicDebtGenerationRule.isAbleToRunUnderScheduleNow()) {
                     continue;
                 }
-                
+
+                if (finantialEntityArg != null && academicDebtGenerationRule.getFinantialEntity() != finantialEntityArg) {
+                    continue;
+                }
+
                 if (executionYearArg != null && academicDebtGenerationRule.getExecutionYear() != executionYearArg) {
                     continue;
                 }
@@ -619,6 +643,10 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
                     continue;
                 }
 
+                if (!academicDebtGenerationRule.isAbleToRunUnderScheduleNow()) {
+                    continue;
+                }
+
                 final RuleCallable exec = new RuleCallable(academicDebtGenerationRule, registration, null);
                 futureList.add(exService.submit(exec));
             }
@@ -655,6 +683,10 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
                     continue;
                 }
 
+                if (!academicDebtGenerationRule.isAbleToRunUnderScheduleNow()) {
+                    continue;
+                }
+
                 final RuleCallable exec = new RuleCallable(academicDebtGenerationRule, registration, null);
                 futureList.add(exService.submit(exec));
             }
@@ -677,6 +709,10 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
             final AcademicDebtGenerationRule rule) {
 
         if (!rule.isActive()) {
+            throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.not.active");
+        }
+
+        if (!rule.isAbleToRunUnderScheduleNow()) {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.not.active");
         }
 
@@ -736,6 +772,13 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
             final List<AcademicDebtGenerationProcessingResult> result = Lists.newArrayList();
 
             final AcademicDebtGenerationRule rule = FenixFramework.getDomainObject(academicDebtGenerationRuleId);
+
+            if (!rule.isAbleToRunUnderScheduleNow()) {
+                // ANIL 2024-05-29 : The rule is scheduled but not
+                // able to run now. Silently ignore
+                return result;
+            }
+
             try {
                 if (!Strings.isNullOrEmpty(registrationId)) {
                     final Registration registration = FenixFramework.getDomainObject(registrationId);
@@ -751,10 +794,10 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
                 e.printStackTrace();
             }
 
-            if(ruleExecutionCallback != null) {
+            if (ruleExecutionCallback != null) {
                 ruleExecutionCallback.accept(result);
             }
-            
+
             return result;
         }
     }

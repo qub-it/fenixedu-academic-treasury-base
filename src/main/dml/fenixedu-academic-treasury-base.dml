@@ -851,6 +851,8 @@ class debtGeneration.AcademicDebtGenerationRule {
 	AcademicTaxDueDateAlignmentType academicTaxDueDateAlignmentType;
 	BigDecimalAT minimumAmountForPaymentCode;
 	AcademicDebtEntriesAggregationInDebitNoteType entriesAggregationInDebitNoteType;
+	DateTime startExecutionDate;
+	DateTime endExecutionDate;
 }
 
 	relation AcademicDebtGenerationRuleGenerationRuleType {
