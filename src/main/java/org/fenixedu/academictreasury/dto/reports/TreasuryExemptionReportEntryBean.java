@@ -36,6 +36,7 @@
 package org.fenixedu.academictreasury.dto.reports;
 
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
+import static com.qubit.qubEdu.module.base.util.XLSxUtil.*;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
@@ -305,41 +306,41 @@ public class TreasuryExemptionReportEntryBean extends AbstractReportEntryBean {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
         
         try {
-            row.createCell(0).setCellValue(identification);
+            STRING_CELL.createCellWithValue(row, 0, identification);
 
             if (!completed) {
-                row.createCell(1).setCellValue(academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                STRING_CELL.createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            row.createCell(i++).setCellValue(valueOrEmpty(versioningCreator));
-            row.createCell(i++).setCellValue(valueOrEmpty(creationDate));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(versioningCreator));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(creationDate));
             
-            row.createCell(i++).setCellValue(valueOrEmpty(customerId));
-            row.createCell(i++).setCellValue(valueOrEmpty(debtAccountId));
-            row.createCell(i++).setCellValue(valueOrEmpty(customerName));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.identificationType));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.identificationNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.vatNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.studentNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.registrationNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(customerId));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(debtAccountId));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(customerName));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.identificationType));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.identificationNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.vatNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.studentNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.registrationNumber));
             
-            row.createCell(i++).setCellValue(valueOrEmpty(debitEntryId));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.documentNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(debitEntryDescription));
-            row.createCell(i++).setCellValue(valueOrEmpty(exemptedAmount));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(debitEntryId));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.documentNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(debitEntryDescription));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(exemptedAmount));
             
-            row.createCell(i++).setCellValue(valueOrEmpty(this.exemptionTypeCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.exemptionTypeDescription));
-            row.createCell(i++).setCellValue(valueOrEmpty(reason));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.exemptionTypeCode));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.exemptionTypeDescription));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(reason));
             
-            row.createCell(i++).setCellValue(valueOrEmpty(degreeType));
-            row.createCell(i++).setCellValue(valueOrEmpty(degreeCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(degreeName));
-            row.createCell(i++).setCellValue(valueOrEmpty(executionYear));
-            row.createCell(i++).setCellValue(valueOrEmpty(executionSemester));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(degreeType));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(degreeCode));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(degreeName));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(executionYear));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(executionSemester));
             
         } catch (final Exception e) {
             e.printStackTrace();

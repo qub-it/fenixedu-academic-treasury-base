@@ -35,6 +35,7 @@
  */
 package org.fenixedu.academictreasury.domain.integration.tuitioninfo;
 
+import static com.qubit.qubEdu.module.base.util.XLSxUtil.*;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
@@ -81,7 +82,6 @@ import com.google.common.collect.Lists;
 
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
-import pt.ist.fenixframework.FenixFramework;
 
 public class ERPTuitionInfo extends ERPTuitionInfo_Base {
 
@@ -368,26 +368,26 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
         @Override
         public void writeCellValues(final Row row, final IErrorsLog log) {
             int i = 0;
-            
-            row.createCell(i++).setCellValue(executionDate);
-            
-            row.createCell(i++).setCellValue(studentNumber);
-            row.createCell(i++).setCellValue(studentName);
-            row.createCell(i++).setCellValue(customerFiscalNumber);
 
-            row.createCell(i++).setCellValue(erpTuitionInfoTypeCode);
-            row.createCell(i++).setCellValue(erpTuitionInfoTypeName);
-            row.createCell(i++).setCellValue(executionYearQualifiedName);
+            STRING_CELL.createCellWithValue(row, i++, executionDate);
             
-            row.createCell(i++).setCellValue(erpTuitionInfoExternalId);
-            row.createCell(i++).setCellValue(erpTuitionInfoCreationDate);
-            row.createCell(i++).setCellValue(erpTuitionInfoUpdateDate);
-            row.createCell(i++).setCellValue(erpTuitionInfoDocumentNumber);
-            row.createCell(i++).setCellValue(totalAmount);
-            row.createCell(i++).setCellValue(deltaAmount);
+            STRING_CELL.createCellWithValue(row, i++, studentNumber);
+            STRING_CELL.createCellWithValue(row, i++, studentName);
+            STRING_CELL.createCellWithValue(row, i++, customerFiscalNumber);
+
+            STRING_CELL.createCellWithValue(row, i++, erpTuitionInfoTypeCode);
+            STRING_CELL.createCellWithValue(row, i++, erpTuitionInfoTypeName);
+            STRING_CELL.createCellWithValue(row, i++, executionYearQualifiedName);
             
-            row.createCell(i++).setCellValue(errorOccured);
-            row.createCell(i++).setCellValue(errorDescription);
+            STRING_CELL.createCellWithValue(row, i++, erpTuitionInfoExternalId);
+            STRING_CELL.createCellWithValue(row, i++, erpTuitionInfoCreationDate);
+            STRING_CELL.createCellWithValue(row, i++, erpTuitionInfoUpdateDate);
+            STRING_CELL.createCellWithValue(row, i++, erpTuitionInfoDocumentNumber);
+            STRING_CELL.createCellWithValue(row, i++, totalAmount);
+            STRING_CELL.createCellWithValue(row, i++, deltaAmount);
+            
+            STRING_CELL.createCellWithValue(row, i++, errorOccured);
+            STRING_CELL.createCellWithValue(row, i++, errorDescription);
         }
     }
     

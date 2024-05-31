@@ -35,6 +35,7 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
+import static com.qubit.qubEdu.module.base.util.XLSxUtil.*;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import org.apache.poi.ss.usermodel.Row;
@@ -121,30 +122,30 @@ public class ProductReportEntryBean extends AbstractReportEntryBean {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
 
         try {
-            row.createCell(0).setCellValue(identification);
+            STRING_CELL.createCellWithValue(row, 0, identification);
 
             if (!completed) {
-                row.createCell(1).setCellValue(academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                STRING_CELL.createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            row.createCell(i++).setCellValue(valueOrEmpty(groupCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(group));
-            row.createCell(i++).setCellValue(valueOrEmpty(code));
-            row.createCell(i++).setCellValue(valueOrEmpty(descriptionPt));
-            row.createCell(i++).setCellValue(valueOrEmpty(descriptionEn));
-            row.createCell(i++).setCellValue(valueOrEmpty(unitOfMeasurePt));
-            row.createCell(i++).setCellValue(valueOrEmpty(unitOfMeasureEn));
-            row.createCell(i++).setCellValue(valueOrEmpty(active));
-            row.createCell(i++).setCellValue(valueOrEmpty(legacy));
-            row.createCell(i++).setCellValue(valueOrEmpty(tuitionInstallmentOrder));
-            row.createCell(i++).setCellValue(valueOrEmpty(vatTypeCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(vatType));
-            row.createCell(i++).setCellValue(valueOrEmpty(exemptionReasonCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(exemptionReason));
-            row.createCell(i++).setCellValue(valueOrEmpty(finantialInstitution));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(groupCode));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(group));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(code));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(descriptionPt));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(descriptionEn));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(unitOfMeasurePt));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(unitOfMeasureEn));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(active));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(legacy));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(tuitionInstallmentOrder));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(vatTypeCode));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(vatType));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(exemptionReasonCode));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(exemptionReason));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(finantialInstitution));
             
         } catch (final Exception e) {
             e.printStackTrace();

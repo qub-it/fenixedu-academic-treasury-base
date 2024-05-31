@@ -35,6 +35,7 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
+import static com.qubit.qubEdu.module.base.util.XLSxUtil.*;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import org.apache.poi.ss.usermodel.Row;
@@ -137,27 +138,28 @@ public class AcademicActBlockingSuspensionReportEntryBean extends AbstractReport
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
 
         try {
-            row.createCell(0).setCellValue(identification);
+            STRING_CELL.createCellWithValue(row, 0, identification);
 
             if (!completed) {
-                row.createCell(1).setCellValue(academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                STRING_CELL.createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
-            row.createCell(i++).setCellValue(valueOrEmpty(versioningCreator));
-            row.createCell(i++).setCellValue(valueOrEmpty(creationDate));
-            row.createCell(i++).setCellValue(valueOrEmpty(name));
-            row.createCell(i++).setCellValue(valueOrEmpty(identificationType));
-            row.createCell(i++).setCellValue(valueOrEmpty(identificationNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(vatNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(email));
-            row.createCell(i++).setCellValue(valueOrEmpty(address));
-            row.createCell(i++).setCellValue(valueOrEmpty(addressCountryCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(studentNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(beginDate));
-            row.createCell(i++).setCellValue(valueOrEmpty(endDate));
-            row.createCell(i++).setCellValue(valueOrEmpty(reason));
+
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(versioningCreator));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(creationDate));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(name));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(identificationType));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(identificationNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(vatNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(email));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(address));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(addressCountryCode));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(studentNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(beginDate));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(endDate));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(reason));
 
         } catch (final Exception e) {
             e.printStackTrace();

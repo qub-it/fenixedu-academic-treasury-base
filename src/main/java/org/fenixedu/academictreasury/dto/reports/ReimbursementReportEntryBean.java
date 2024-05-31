@@ -35,6 +35,7 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
+import static com.qubit.qubEdu.module.base.util.XLSxUtil.*;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
@@ -236,14 +237,14 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
 
             int i = 1;
 
-            row.createCell(i++).setCellValue(valueOrEmpty(creationDate));
-            row.createCell(i++).setCellValue(valueOrEmpty(responsible));
-            row.createCell(i++).setCellValue(valueOrEmpty(settlementNoteNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(settlementNoteDocumentDate));
-            row.createCell(i++).setCellValue(valueOrEmpty(paymentDate));
-            row.createCell(i++).setCellValue(valueOrEmpty(settlementNoteAnnuled));
-            row.createCell(i++).setCellValue(valueOrEmpty(documentExportationPending));
-            row.createCell(i++).setCellValue(valueOrEmpty(paymentMethod));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(creationDate));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(responsible));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(settlementNoteNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(settlementNoteDocumentDate));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(paymentDate));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(settlementNoteAnnuled));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(documentExportationPending));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(paymentMethod));
 
             {
                 String value = amount != null ? amount.toString() : "";
@@ -251,23 +252,23 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
                     value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                 }
 
-                row.createCell(i++).setCellValue(value);
+                STRING_CELL.createCellWithValue(row, i++, value);
             }
 
-            row.createCell(i++).setCellValue(customerId);
-            row.createCell(i++).setCellValue(debtAccountId);
-            row.createCell(i++).setCellValue(valueOrEmpty(name));
-            row.createCell(i++).setCellValue(valueOrEmpty(identificationType));
-            row.createCell(i++).setCellValue(valueOrEmpty(identificationNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(vatNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(institutionalOrDefaultEmail));
-            row.createCell(i++).setCellValue(valueOrEmpty(address));
-            row.createCell(i++).setCellValue(valueOrEmpty(studentNumber));
+            STRING_CELL.createCellWithValue(row, i++, customerId);
+            STRING_CELL.createCellWithValue(row, i++, debtAccountId);
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(name));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(identificationType));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(identificationNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(vatNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(institutionalOrDefaultEmail));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(address));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(studentNumber));
 
-            row.createCell(i++).setCellValue(valueOrEmpty(this.documentObservations));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.documentTermsAndConditions));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.documentObservations));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.documentTermsAndConditions));
 
-            row.createCell(i++).setCellValue(valueOrEmpty(this.reimbursementStateDescription));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.reimbursementStateDescription));
 
         } catch (final Exception e) {
             e.printStackTrace();

@@ -36,6 +36,7 @@
 package org.fenixedu.academictreasury.dto.reports;
 
 
+import static com.qubit.qubEdu.module.base.util.XLSxUtil.*;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
@@ -136,30 +137,30 @@ public class SibsTransactionDetailEntryBean extends AbstractReportEntryBean {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
         
         try {
-            row.createCell(0).setCellValue(identification);
+            STRING_CELL.createCellWithValue(row, 0, identification);
             
             if (!completed) {
-                row.createCell(1).setCellValue(academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                STRING_CELL.createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            row.createCell(i++).setCellValue(valueOrEmpty(versioningCreator));
-            row.createCell(i++).setCellValue(valueOrEmpty(creationDate));
-            row.createCell(i++).setCellValue(valueOrEmpty(whenProcessed));
-            row.createCell(i++).setCellValue(valueOrEmpty(whenRegistered));
-            row.createCell(i++).setCellValue(valueOrEmpty(amountPayed));
-            row.createCell(i++).setCellValue(valueOrEmpty(sibsEntityReferenceCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(sibsPaymentReferenceCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(sibsTransactionId));
-            row.createCell(i++).setCellValue(valueOrEmpty(debtAccountId));
-            row.createCell(i++).setCellValue(valueOrEmpty(customerId));
-            row.createCell(i++).setCellValue(valueOrEmpty(businessIdentification));
-            row.createCell(i++).setCellValue(valueOrEmpty(fiscalNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(customerName));
-            row.createCell(i++).setCellValue(valueOrEmpty(settlementDocumentNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(comments));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(versioningCreator));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(creationDate));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(whenProcessed));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(whenRegistered));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(amountPayed));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(sibsEntityReferenceCode));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(sibsPaymentReferenceCode));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(sibsTransactionId));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(debtAccountId));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(customerId));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(businessIdentification));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(fiscalNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(customerName));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(settlementDocumentNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(comments));
             
         } catch(final Exception e) {
             e.printStackTrace();

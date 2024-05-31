@@ -35,6 +35,7 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
+import static com.qubit.qubEdu.module.base.util.XLSxUtil.*;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
@@ -195,30 +196,31 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
 
         try {
-            row.createCell(0).setCellValue(identification);
+
+            STRING_CELL.createCellWithValue(row, 0, identification);
 
             if (!completed) {
-                row.createCell(1).setCellValue(academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                STRING_CELL.createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            row.createCell(i++).setCellValue(versioningCreator);
-            row.createCell(i++).setCellValue(valueOrEmpty(creationDate));
-            row.createCell(i++).setCellValue(valueOrEmpty(customerId));
-            row.createCell(i++).setCellValue(valueOrEmpty(debtAccountId));
-            row.createCell(i++).setCellValue(valueOrEmpty(name));
-            row.createCell(i++).setCellValue(valueOrEmpty(identificationType));
-            row.createCell(i++).setCellValue(valueOrEmpty(identificationNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(vatNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(email));
-            row.createCell(i++).setCellValue(valueOrEmpty(address));
-            row.createCell(i++).setCellValue(valueOrEmpty(addressCountryCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(studentNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(entityCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(referenceCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(finantialDocumentNumber));
+            STRING_CELL.createCellWithValue(row, i++, versioningCreator);
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(creationDate));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(customerId));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(debtAccountId));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(name));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(identificationType));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(identificationNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(vatNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(email));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(address));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(addressCountryCode));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(studentNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(entityCode));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(referenceCode));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(finantialDocumentNumber));
 
             {
 
@@ -228,11 +230,11 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
                     value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                 }
                 
-                row.createCell(i++).setCellValue(valueOrEmpty(value));
+                STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(value));
             }
-            row.createCell(i++).setCellValue(valueOrEmpty(description));
-            row.createCell(i++).setCellValue(valueOrEmpty(targetType));
-            row.createCell(i++).setCellValue(valueOrEmpty(state));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(description));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(targetType));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(state));
 
         } catch (final Exception e) {
             e.printStackTrace();

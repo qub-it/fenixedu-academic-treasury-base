@@ -35,6 +35,7 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
+import static com.qubit.qubEdu.module.base.util.XLSxUtil.*;
 import static org.fenixedu.academictreasury.dto.reports.DebtReportEntryBean.personalEmail;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
@@ -234,25 +235,24 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
 
         try {
-            row.createCell(0).setCellValue(identification);
+            STRING_CELL.createCellWithValue(row, 0, identification);
 
             if (!completed) {
-                row.createCell(1)
-                        .setCellValue(academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                STRING_CELL.createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            row.createCell(i++).setCellValue(valueOrEmpty(this.creationDate));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.responsible));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.settlementNoteNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.settlementNoteDocumentDate));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.settlementOriginDocumentNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.paymentDate));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.settlementNoteAnnuled));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.documentExportationPending));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.paymentMethod));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.creationDate));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.responsible));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.settlementNoteNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.settlementNoteDocumentDate));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.settlementOriginDocumentNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.paymentDate));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.settlementNoteAnnuled));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.documentExportationPending));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.paymentMethod));
 
             {
                 String value = amount != null ? amount.toString() : "";
@@ -261,25 +261,25 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
                     value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                 }
 
-                row.createCell(i++).setCellValue(value);
+                STRING_CELL.createCellWithValue(row, i++, value);
             }
 
-            row.createCell(i++).setCellValue(customerId);
-            row.createCell(i++).setCellValue(debtAccountId);
-            row.createCell(i++).setCellValue(valueOrEmpty(name));
-            row.createCell(i++).setCellValue(valueOrEmpty(identificationType));
-            row.createCell(i++).setCellValue(valueOrEmpty(identificationNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(vatNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(institutionalOrDefaultEmail));
-            row.createCell(i++).setCellValue(valueOrEmpty(address));
-            row.createCell(i++).setCellValue(valueOrEmpty(studentNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(closeDate));
+            STRING_CELL.createCellWithValue(row, i++, customerId);
+            STRING_CELL.createCellWithValue(row, i++, debtAccountId);
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(name));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(identificationType));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(identificationNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(vatNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(institutionalOrDefaultEmail));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(address));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(studentNumber));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(closeDate));
 
-            row.createCell(i++).setCellValue(valueOrEmpty(erpCertificationDate));
-            row.createCell(i++).setCellValue(valueOrEmpty(erpCertificateDocumentReference));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(erpCertificationDate));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(erpCertificateDocumentReference));
 
-            row.createCell(i++).setCellValue(valueOrEmpty(this.documentObservations));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.documentTermsAndConditions));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.documentObservations));
+            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.documentTermsAndConditions));
 
         } catch (final Exception e) {
             e.printStackTrace();
