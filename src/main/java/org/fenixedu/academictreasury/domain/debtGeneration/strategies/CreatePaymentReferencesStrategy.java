@@ -73,6 +73,7 @@ import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.domain.paymentcodes.integration.ISibsPaymentCodePoolService;
 import org.fenixedu.treasury.domain.settings.TreasurySettings;
+import org.fenixedu.treasury.domain.treasurydebtprocess.TreasuryDebtProcessMainService;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -338,7 +339,8 @@ public class CreatePaymentReferencesStrategy implements IAcademicDebtGenerationR
             }
         }
 
-        return debitEntries;
+        return debitEntries.stream().filter(de -> !TreasuryDebtProcessMainService.isBlockingPaymentInFrontend(de))
+                .collect(Collectors.toSet());
     }
 
     private static Collection<? extends DebitEntry> grabDebitEntriesForNonCurricularGroupGroupTuition(

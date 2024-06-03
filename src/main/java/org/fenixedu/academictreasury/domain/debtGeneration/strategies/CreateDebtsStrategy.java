@@ -213,11 +213,24 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
             return true;
         }
 
-        // Discard registrations not active and with no enrolments
+        // Discard registrations not active
+        //
+        // ANIL 2024-06-03: Accept even if the last registration state is not active
+        //
+        // In the situations where in the execution year, the registration had:
+        //  - Day 1: an active state like registered
+        //  - Day 2: an inactive state like annuled
+        //
+        // the registration#hasAnyActiveState(year) will return true and accepted
+        // to process the this strategy because it might be necessary to run this 
+        // rule if the student had enrolments in year, even if the
+        // registration was annuled after
+        //
         if (!registration.hasAnyActiveState(year)) {
             return true;
         }
 
+        // and with no enrolments
         if (registration.getRegistrationDataByExecutionYearSet().stream().noneMatch(i -> i.getExecutionYear() == year)) {
 
             // only return is this rule has not entry that forces creation
@@ -341,6 +354,16 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                     return null;
                 }
 
+                // ANIL 2024-06-03: 
+                // If forcing is true, the last registration state must be 
+                // ative. Or else the system would create debts for registrations
+                // that are no longer active, and many non active registrations
+                // without enrolments would have debts.
+                //
+                // This is different for not forcing and instead relying in the enrolments,
+                // where the student has to pay something, due to his short
+                // attendance in courses.
+
                 boolean forceCreation = entry.isCreateDebt() && entry.isForceCreation()
                         && registration.getLastRegistrationState(executionYear) != null
                         && registration.getLastRegistrationState(executionYear).isActive()
@@ -385,6 +408,16 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
 
                 boolean isRegistrationToPayGratuities =
                         TuitionServices.isToPayRegistrationTuition(registration, rule.getExecutionYear());
+
+                // ANIL 2024-06-03: 
+                // If forcing is true, the last registration state must be 
+                // ative. Or else the system would create debts for registrations
+                // that are no longer active, and many non active registrations
+                // without enrolments would have debts.
+                //
+                // This is different for not forcing and instead relying in the enrolments,
+                // where the student has to pay something, due to his short
+                // attendance in courses.
 
                 boolean forceCreation = entry.isCreateDebt() && entry.isForceCreation() && isRegistrationToPayGratuities
                         && registration.getLastRegistrationState(executionYear) != null
