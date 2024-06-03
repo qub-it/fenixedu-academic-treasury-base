@@ -1,0 +1,106 @@
+package org.fenixedu.academictreasury.domain;
+
+external class .org.fenixedu.treasury.domain.TreasuryFile;
+
+/* --- DebtReportRequestResultFileDomainObject --- */
+
+	/* This is a replacement for existings treasury files. It should not be used */
+	class reports.TreasuryFileForDebtReportRequestResultFile extends .org.fenixedu.treasury.domain.TreasuryFile {
+	}
+
+	relation DebtReportRequestResultFileTreasuryFile {
+		.org.fenixedu.treasury.domain.TreasuryFile playsRole treasuryFile {
+			multiplicity 1..1;
+		}
+		
+		reports.DebtReportRequestResultFile playsRole {
+			multiplicity *;
+		}
+	}
+	
+	
+/* --- DebtReportRequestResultErrorsFileDomainObject --- */
+
+	/* This is a replacement for existings treasury files. It should not be used */
+	class reports.TreasuryFileForDebtReportRequestResultErrorsFile extends .org.fenixedu.treasury.domain.TreasuryFile {
+	}
+	 
+	
+	relation DebtReportRequestResultErrorsFileTreasuryFile {
+		.org.fenixedu.treasury.domain.TreasuryFile playsRole treasuryFile {
+			multiplicity 1..1;
+		}
+		
+		reports.DebtReportRequestResultErrorsFile playsRole {
+			multiplicity *;
+		}
+	}
+	
+/* --- MassiveDebtGenerationRequestFileDomainObject --- */	
+	
+	/* This is a replacement for existings treasury files. It should not be used */
+	class debtGeneration.requests.TreasuryFileForMassiveDebtGenerationRequestFile extends .org.fenixedu.treasury.domain.TreasuryFile {
+	}
+	
+	relation MassiveDebtGenerationRequestFileTreasuryFile {
+	
+		.org.fenixedu.treasury.domain.TreasuryFile playsRole treasuryFile {
+			multiplicity 1..1;
+		}
+		
+		debtGeneration.requests.MassiveDebtGenerationRequestFile playsRole {
+			multiplicity *;
+		}
+	}
+	
+
+/* --- ExemptionsGenerationRequestFile ---*/
+
+	/* This is a replacement for existings treasury files. It should not be used */
+	class exemptions.requests.TreasuryFileForExemptionsGenerationRequestFile extends .org.fenixedu.treasury.domain.TreasuryFile {
+	}
+	
+	relation ExemptionsGenerationRequestFileTreasuryFile {
+	
+		.org.fenixedu.treasury.domain.TreasuryFile playsRole treasuryFile {
+			multiplicity 1..1;
+		}
+		
+		exemptions.requests.ExemptionsGenerationRequestFile playsRole {
+			multiplicity *;
+		}
+	}
+	
+
+/* --- TreasuryImportFileDomainObject ---*/
+
+	/* This is a replacement for existings treasury files. It should not be used */
+	class importation.TreasuryFileForTreasuryImportFile extends .org.fenixedu.treasury.domain.TreasuryFile {
+	}
+	
+	relation TreasuryImportFileTreasuryFile {
+		
+		.org.fenixedu.treasury.domain.TreasuryFile playsRole treasuryFile {
+			multiplicity 1..1;
+		}
+		
+		importation.TreasuryImportFile playsRole treasuryImportFiles {
+			multiplicity *;
+		}
+	}
+	
+/* ERPTuitionInfoCreationReportFileDomainObject */
+
+	/* This is a replacement for existings treasury files. It should not be used */
+	class integration.TreasuryFileForERPTuitionInfoCreationReportFile extends .org.fenixedu.treasury.domain.TreasuryFile {
+	}
+	
+	relation ERPTuitionInfoCreationReportFileTreasuryFile {
+		.org.fenixedu.treasury.domain.TreasuryFile playsRole treasuryFile {
+			multiplicity 1..1;
+		}
+		
+		integration.ERPTuitionInfoCreationReportFile playsRole erpTuitionInfoCreationReportFiles {
+			multiplicity *;
+		}
+	}
