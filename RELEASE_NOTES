@@ -1,3 +1,4 @@
+11.10.1 (04-06-2024)
 - Bug Fix: Apply payment blocking validation from debt processes, when generating reference codes with academic debt generation rules [#qubIT-Fenix-5130]
 
 11.10.0 (03-06-2024)
