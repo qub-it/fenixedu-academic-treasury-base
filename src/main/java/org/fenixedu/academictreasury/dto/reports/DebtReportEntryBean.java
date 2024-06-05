@@ -38,9 +38,6 @@ package org.fenixedu.academictreasury.dto.reports;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -71,7 +68,6 @@ import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.Invoice;
 import org.fenixedu.treasury.domain.document.InvoiceEntry;
 import org.fenixedu.treasury.domain.event.TreasuryEvent;
-import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.services.integration.erp.sap.SAPExporter;
@@ -914,30 +910,6 @@ public class DebtReportEntryBean implements SpreadsheetRow {
         PersonCustomer personCustomer = (PersonCustomer) this.invoiceEntry.getDebtAccount().getCustomer();
 
         return personCustomer.getAssociatedPerson();
-    }
-
-    // ANIL 2024-05-02
-    //
-    // This is a workaround I found to present the same information but in 
-    // different columns, in the report
-    public Set<TreasuryExemption> getTreasuryExemptionsSetToPresentCode() {
-        if (this.invoiceEntry.isDebitNoteEntry()) {
-            return ((DebitEntry) this.invoiceEntry).getTreasuryExemptionsSet();
-        } else if (this.invoiceEntry.isCreditNoteEntry()) {
-            return ((CreditEntry) this.invoiceEntry).getCreditTreasuryExemptionsSet().stream()
-                    .map(cte -> cte.getTreasuryExemption()).collect(Collectors.toSet());
-
-        }
-
-        return Collections.emptySet();
-    }
-
-    // ANIL 2024-05-02
-    //
-    // This is a workaround I found to present the same information but in 
-    // different columns, in the report
-    public Set<TreasuryExemption> getTreasuryExemptionsSetToPresentName() {
-        return getTreasuryExemptionsSetToPresentCode();
     }
 
     // @formatter:off
