@@ -1,3 +1,4 @@
+11.10.2 (11-06-2024)
 - Refactor: Remove property methods of report bean, not used by any report [#qubIT-Fenix-5276]
 - Improvement: Declare property methods in PersonCustomer to get the global due in debt amount [#qubIT-Fenix-5352]
 
