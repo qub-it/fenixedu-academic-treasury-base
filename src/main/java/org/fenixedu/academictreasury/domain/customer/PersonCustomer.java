@@ -610,6 +610,29 @@ public class PersonCustomer extends PersonCustomer_Base {
     }
 
     @Override
+    public BigDecimal getGlobalDueInDebt() {
+        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
+
+        BigDecimal globalDueInDebt = BigDecimal.ZERO;
+
+        final Person person = isActive() ? getPerson() : getPersonForInactivePersonCustomer();
+
+        if (services.personCustomer(person) != null) {
+            for (final DebtAccount debtAccount : services.personCustomer(person).getDebtAccountsSet()) {
+                globalDueInDebt = globalDueInDebt.add(debtAccount.getDueInDebt());
+            }
+        }
+
+        for (final PersonCustomer personCustomer : services.inactivePersonCustomers(person)) {
+            for (final DebtAccount debtAccount : personCustomer.getDebtAccountsSet()) {
+                globalDueInDebt = globalDueInDebt.add(debtAccount.getDueInDebt());
+            }
+        }
+
+        return globalDueInDebt;
+    }
+
+    @Override
     public Set<Customer> getAllCustomers() {
         return PersonCustomer.find(getAssociatedPerson()).collect(Collectors.<Customer> toSet());
     }

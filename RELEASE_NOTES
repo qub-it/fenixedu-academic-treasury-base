@@ -1,4 +1,5 @@
 - Refactor: Remove property methods of report bean, not used by any report [#qubIT-Fenix-5276]
+- Improvement: Declare property methods in PersonCustomer to get the global due in debt amount [#qubIT-Fenix-5352]
 
 11.10.1 (04-06-2024)
 - Bug Fix: Apply payment blocking validation from debt processes, when generating reference codes with academic debt generation rules [#qubIT-Fenix-5130]
