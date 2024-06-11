@@ -137,30 +137,30 @@ public class SibsTransactionDetailEntryBean extends AbstractReportEntryBean {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
         
         try {
-            STRING_CELL.createCellWithValue(row, 0, identification);
+            createTextCellWithValue(row, 0, identification);
             
             if (!completed) {
-                STRING_CELL.createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                createTextCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(versioningCreator));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(creationDate));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(whenProcessed));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(whenRegistered));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(amountPayed));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(sibsEntityReferenceCode));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(sibsPaymentReferenceCode));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(sibsTransactionId));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(debtAccountId));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(customerId));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(businessIdentification));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(fiscalNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(customerName));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(settlementDocumentNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(comments));
+            createTextCellWithValue(row, i++, valueOrEmpty(versioningCreator));
+            createTextCellWithValue(row, i++, valueOrEmpty(creationDate));
+            createTextCellWithValue(row, i++, valueOrEmpty(whenProcessed));
+            createTextCellWithValue(row, i++, valueOrEmpty(whenRegistered));
+            createTextCellWithValue(row, i++, valueOrEmpty(amountPayed));
+            createTextCellWithValue(row, i++, valueOrEmpty(sibsEntityReferenceCode));
+            createTextCellWithValue(row, i++, valueOrEmpty(sibsPaymentReferenceCode));
+            createTextCellWithValue(row, i++, valueOrEmpty(sibsTransactionId));
+            createTextCellWithValue(row, i++, valueOrEmpty(debtAccountId));
+            createTextCellWithValue(row, i++, valueOrEmpty(customerId));
+            createTextCellWithValue(row, i++, valueOrEmpty(businessIdentification));
+            createTextCellWithValue(row, i++, valueOrEmpty(fiscalNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(customerName));
+            createTextCellWithValue(row, i++, valueOrEmpty(settlementDocumentNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(comments));
             
         } catch(final Exception e) {
             e.printStackTrace();

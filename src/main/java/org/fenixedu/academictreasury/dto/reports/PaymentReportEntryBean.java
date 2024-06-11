@@ -235,24 +235,24 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
 
         try {
-            STRING_CELL.createCellWithValue(row, 0, identification);
+            createTextCellWithValue(row, 0, identification);
 
             if (!completed) {
-                STRING_CELL.createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                createTextCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.creationDate));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.responsible));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.settlementNoteNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.settlementNoteDocumentDate));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.settlementOriginDocumentNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.paymentDate));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.settlementNoteAnnuled));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.documentExportationPending));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.paymentMethod));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.creationDate));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.responsible));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.settlementNoteNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.settlementNoteDocumentDate));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.settlementOriginDocumentNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.paymentDate));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.settlementNoteAnnuled));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.documentExportationPending));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.paymentMethod));
 
             {
                 String value = amount != null ? amount.toString() : "";
@@ -261,25 +261,25 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
                     value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                 }
 
-                STRING_CELL.createCellWithValue(row, i++, value);
+                createTextCellWithValue(row, i++, value);
             }
 
-            STRING_CELL.createCellWithValue(row, i++, customerId);
-            STRING_CELL.createCellWithValue(row, i++, debtAccountId);
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(name));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(identificationType));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(identificationNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(vatNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(institutionalOrDefaultEmail));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(address));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(studentNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(closeDate));
+            createTextCellWithValue(row, i++, customerId);
+            createTextCellWithValue(row, i++, debtAccountId);
+            createTextCellWithValue(row, i++, valueOrEmpty(name));
+            createTextCellWithValue(row, i++, valueOrEmpty(identificationType));
+            createTextCellWithValue(row, i++, valueOrEmpty(identificationNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(vatNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(institutionalOrDefaultEmail));
+            createTextCellWithValue(row, i++, valueOrEmpty(address));
+            createTextCellWithValue(row, i++, valueOrEmpty(studentNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(closeDate));
 
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(erpCertificationDate));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(erpCertificateDocumentReference));
+            createTextCellWithValue(row, i++, valueOrEmpty(erpCertificationDate));
+            createTextCellWithValue(row, i++, valueOrEmpty(erpCertificateDocumentReference));
 
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.documentObservations));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.documentTermsAndConditions));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.documentObservations));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.documentTermsAndConditions));
 
         } catch (final Exception e) {
             e.printStackTrace();

@@ -122,30 +122,30 @@ public class ProductReportEntryBean extends AbstractReportEntryBean {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
 
         try {
-            STRING_CELL.createCellWithValue(row, 0, identification);
+            createTextCellWithValue(row, 0, identification);
 
             if (!completed) {
-                STRING_CELL.createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                createTextCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(groupCode));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(group));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(code));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(descriptionPt));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(descriptionEn));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(unitOfMeasurePt));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(unitOfMeasureEn));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(active));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(legacy));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(tuitionInstallmentOrder));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(vatTypeCode));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(vatType));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(exemptionReasonCode));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(exemptionReason));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(finantialInstitution));
+            createTextCellWithValue(row, i++, valueOrEmpty(groupCode));
+            createTextCellWithValue(row, i++, valueOrEmpty(group));
+            createTextCellWithValue(row, i++, valueOrEmpty(code));
+            createTextCellWithValue(row, i++, valueOrEmpty(descriptionPt));
+            createTextCellWithValue(row, i++, valueOrEmpty(descriptionEn));
+            createTextCellWithValue(row, i++, valueOrEmpty(unitOfMeasurePt));
+            createTextCellWithValue(row, i++, valueOrEmpty(unitOfMeasureEn));
+            createTextCellWithValue(row, i++, valueOrEmpty(active));
+            createTextCellWithValue(row, i++, valueOrEmpty(legacy));
+            createTextCellWithValue(row, i++, valueOrEmpty(tuitionInstallmentOrder));
+            createTextCellWithValue(row, i++, valueOrEmpty(vatTypeCode));
+            createTextCellWithValue(row, i++, valueOrEmpty(vatType));
+            createTextCellWithValue(row, i++, valueOrEmpty(exemptionReasonCode));
+            createTextCellWithValue(row, i++, valueOrEmpty(exemptionReason));
+            createTextCellWithValue(row, i++, valueOrEmpty(finantialInstitution));
             
         } catch (final Exception e) {
             e.printStackTrace();

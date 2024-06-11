@@ -306,41 +306,41 @@ public class TreasuryExemptionReportEntryBean extends AbstractReportEntryBean {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
         
         try {
-            STRING_CELL.createCellWithValue(row, 0, identification);
+            createTextCellWithValue(row, 0, identification);
 
             if (!completed) {
-                STRING_CELL.createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                createTextCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(versioningCreator));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(creationDate));
+            createTextCellWithValue(row, i++, valueOrEmpty(versioningCreator));
+            createTextCellWithValue(row, i++, valueOrEmpty(creationDate));
             
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(customerId));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(debtAccountId));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(customerName));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.identificationType));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.identificationNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.vatNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.studentNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.registrationNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(customerId));
+            createTextCellWithValue(row, i++, valueOrEmpty(debtAccountId));
+            createTextCellWithValue(row, i++, valueOrEmpty(customerName));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.identificationType));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.identificationNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.vatNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.studentNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.registrationNumber));
             
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(debitEntryId));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.documentNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(debitEntryDescription));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(exemptedAmount));
+            createTextCellWithValue(row, i++, valueOrEmpty(debitEntryId));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.documentNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(debitEntryDescription));
+            createTextCellWithValue(row, i++, valueOrEmpty(exemptedAmount));
             
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.exemptionTypeCode));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.exemptionTypeDescription));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(reason));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.exemptionTypeCode));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.exemptionTypeDescription));
+            createTextCellWithValue(row, i++, valueOrEmpty(reason));
             
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(degreeType));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(degreeCode));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(degreeName));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(executionYear));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(executionSemester));
+            createTextCellWithValue(row, i++, valueOrEmpty(degreeType));
+            createTextCellWithValue(row, i++, valueOrEmpty(degreeCode));
+            createTextCellWithValue(row, i++, valueOrEmpty(degreeName));
+            createTextCellWithValue(row, i++, valueOrEmpty(executionYear));
+            createTextCellWithValue(row, i++, valueOrEmpty(executionSemester));
             
         } catch (final Exception e) {
             e.printStackTrace();

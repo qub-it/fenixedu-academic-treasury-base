@@ -138,28 +138,28 @@ public class AcademicActBlockingSuspensionReportEntryBean extends AbstractReport
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
 
         try {
-            STRING_CELL.createCellWithValue(row, 0, identification);
+            createTextCellWithValue(row, 0, identification);
 
             if (!completed) {
-                STRING_CELL.createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                createTextCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(versioningCreator));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(creationDate));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(name));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(identificationType));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(identificationNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(vatNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(email));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(address));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(addressCountryCode));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(studentNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(beginDate));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(endDate));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(reason));
+            createTextCellWithValue(row, i++, valueOrEmpty(versioningCreator));
+            createTextCellWithValue(row, i++, valueOrEmpty(creationDate));
+            createTextCellWithValue(row, i++, valueOrEmpty(name));
+            createTextCellWithValue(row, i++, valueOrEmpty(identificationType));
+            createTextCellWithValue(row, i++, valueOrEmpty(identificationNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(vatNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(email));
+            createTextCellWithValue(row, i++, valueOrEmpty(address));
+            createTextCellWithValue(row, i++, valueOrEmpty(addressCountryCode));
+            createTextCellWithValue(row, i++, valueOrEmpty(studentNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(beginDate));
+            createTextCellWithValue(row, i++, valueOrEmpty(endDate));
+            createTextCellWithValue(row, i++, valueOrEmpty(reason));
 
         } catch (final Exception e) {
             e.printStackTrace();

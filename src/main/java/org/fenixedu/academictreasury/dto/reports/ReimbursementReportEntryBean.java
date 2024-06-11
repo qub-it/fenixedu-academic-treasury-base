@@ -237,14 +237,14 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
 
             int i = 1;
 
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(creationDate));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(responsible));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(settlementNoteNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(settlementNoteDocumentDate));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(paymentDate));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(settlementNoteAnnuled));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(documentExportationPending));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(paymentMethod));
+            createTextCellWithValue(row, i++, valueOrEmpty(creationDate));
+            createTextCellWithValue(row, i++, valueOrEmpty(responsible));
+            createTextCellWithValue(row, i++, valueOrEmpty(settlementNoteNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(settlementNoteDocumentDate));
+            createTextCellWithValue(row, i++, valueOrEmpty(paymentDate));
+            createTextCellWithValue(row, i++, valueOrEmpty(settlementNoteAnnuled));
+            createTextCellWithValue(row, i++, valueOrEmpty(documentExportationPending));
+            createTextCellWithValue(row, i++, valueOrEmpty(paymentMethod));
 
             {
                 String value = amount != null ? amount.toString() : "";
@@ -252,23 +252,23 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
                     value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                 }
 
-                STRING_CELL.createCellWithValue(row, i++, value);
+                createTextCellWithValue(row, i++, value);
             }
 
-            STRING_CELL.createCellWithValue(row, i++, customerId);
-            STRING_CELL.createCellWithValue(row, i++, debtAccountId);
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(name));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(identificationType));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(identificationNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(vatNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(institutionalOrDefaultEmail));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(address));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(studentNumber));
+            createTextCellWithValue(row, i++, customerId);
+            createTextCellWithValue(row, i++, debtAccountId);
+            createTextCellWithValue(row, i++, valueOrEmpty(name));
+            createTextCellWithValue(row, i++, valueOrEmpty(identificationType));
+            createTextCellWithValue(row, i++, valueOrEmpty(identificationNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(vatNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(institutionalOrDefaultEmail));
+            createTextCellWithValue(row, i++, valueOrEmpty(address));
+            createTextCellWithValue(row, i++, valueOrEmpty(studentNumber));
 
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.documentObservations));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.documentTermsAndConditions));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.documentObservations));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.documentTermsAndConditions));
 
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(this.reimbursementStateDescription));
+            createTextCellWithValue(row, i++, valueOrEmpty(this.reimbursementStateDescription));
 
         } catch (final Exception e) {
             e.printStackTrace();

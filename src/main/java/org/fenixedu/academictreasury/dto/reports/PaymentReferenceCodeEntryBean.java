@@ -197,30 +197,30 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
 
         try {
 
-            STRING_CELL.createCellWithValue(row, 0, identification);
+            createTextCellWithValue(row, 0, identification);
 
             if (!completed) {
-                STRING_CELL.createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                createTextCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            STRING_CELL.createCellWithValue(row, i++, versioningCreator);
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(creationDate));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(customerId));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(debtAccountId));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(name));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(identificationType));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(identificationNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(vatNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(email));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(address));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(addressCountryCode));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(studentNumber));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(entityCode));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(referenceCode));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(finantialDocumentNumber));
+            createTextCellWithValue(row, i++, versioningCreator);
+            createTextCellWithValue(row, i++, valueOrEmpty(creationDate));
+            createTextCellWithValue(row, i++, valueOrEmpty(customerId));
+            createTextCellWithValue(row, i++, valueOrEmpty(debtAccountId));
+            createTextCellWithValue(row, i++, valueOrEmpty(name));
+            createTextCellWithValue(row, i++, valueOrEmpty(identificationType));
+            createTextCellWithValue(row, i++, valueOrEmpty(identificationNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(vatNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(email));
+            createTextCellWithValue(row, i++, valueOrEmpty(address));
+            createTextCellWithValue(row, i++, valueOrEmpty(addressCountryCode));
+            createTextCellWithValue(row, i++, valueOrEmpty(studentNumber));
+            createTextCellWithValue(row, i++, valueOrEmpty(entityCode));
+            createTextCellWithValue(row, i++, valueOrEmpty(referenceCode));
+            createTextCellWithValue(row, i++, valueOrEmpty(finantialDocumentNumber));
 
             {
 
@@ -230,11 +230,11 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
                     value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                 }
                 
-                STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(value));
+                createTextCellWithValue(row, i++, valueOrEmpty(value));
             }
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(description));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(targetType));
-            STRING_CELL.createCellWithValue(row, i++, valueOrEmpty(state));
+            createTextCellWithValue(row, i++, valueOrEmpty(description));
+            createTextCellWithValue(row, i++, valueOrEmpty(targetType));
+            createTextCellWithValue(row, i++, valueOrEmpty(state));
 
         } catch (final Exception e) {
             e.printStackTrace();
