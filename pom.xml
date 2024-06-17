@@ -10,7 +10,7 @@
 
 	<groupId>org.fenixedu</groupId>
 	<artifactId>fenixedu-academic-treasury-base</artifactId>
-	<version>11.10.2</version>
+	<version>11.11.0</version>
 	<packaging>jar</packaging>
 
 	<name>Academic Treasury Base</name>
@@ -20,7 +20,7 @@
 			<dependency>
 				<groupId>com.qubit.solution.fenixedu</groupId>
 				<artifactId>fenixedu-oss-dependency-management</artifactId>
-				<version>168</version>
+				<version>170</version>
 				<scope>import</scope>
 				<type>pom</type>
 			</dependency>
