@@ -37,6 +37,8 @@ package org.fenixedu.academictreasury.dto.reports;
 
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
+import java.math.BigDecimal;
+
 import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.reports.DebtReportRequest;
@@ -56,27 +58,30 @@ import com.google.common.base.Strings;
 public class DebtAccountReportEntryBean implements SpreadsheetRow {
 
     // @formatter:off
-    public static String[] SPREADSHEET_HEADERS = { 
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identification"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.versioningCreator"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.creationDate"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.finantialInstitutionName"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.customerId"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.code"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.customerActive"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.name"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identificationType"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identificationNumber"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.vatNumber"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.email"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.address"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.addressCountryCode"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.studentNumber"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.vatNumberValid"),
-            academicTreasuryBundle("label.DebtAccountReportEntryBean.header.totalInDebt") };
+    public static String[] SPREADSHEET_HEADERS =
+            { academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identification"),
+                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.versioningCreator"),
+                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.creationDate"),
+                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.finantialInstitutionName"),
+                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.customerId"),
+                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.code"),
+                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.customerActive"),
+                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.name"),
+                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identificationType"),
+                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identificationNumber"),
+                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.vatNumber"),
+                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.email"),
+                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.address"),
+                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.addressCountryCode"),
+                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.studentNumber"),
+                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.vatNumberValid"),
+                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.totalInDebt") };
     // @formatter:on
 
     final DebtAccount debtAccount;
+
+    private PersonCustomer personCustomer;
+
     boolean completed = false;
 
     private String identification;
@@ -95,16 +100,23 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
     private String addressCountryCode;
     private Integer studentNumber;
     private boolean vatNumberValid;
-    private String totalInDebt;
+    private BigDecimal totalInDebt;
+    private BigDecimal dueInDebt;
+
+    private String decimalSeparator;
 
     public DebtAccountReportEntryBean(final DebtAccount debtAccount, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
 
-        final String decimalSeparator = request.getDecimalSeparator();
+        this.decimalSeparator = request != null ? request.getDecimalSeparator() : DebtReportRequest.DOT;
 
         this.debtAccount = debtAccount;
 
         try {
+            if (this.debtAccount.getCustomer().isPersonCustomer()) {
+                this.personCustomer = (PersonCustomer) this.debtAccount.getCustomer();
+            }
+
             this.identification = debtAccount.getExternalId();
             this.versioningCreator = treasuryServices.versioningCreatorUsername(debtAccount);
             this.creationDate = treasuryServices.versioningCreationDate(debtAccount);
@@ -155,12 +167,8 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             this.vatNumberValid = FiscalCodeValidation.isValidFiscalNumber(debtAccount.getCustomer().getAddressCountryCode(),
                     debtAccount.getCustomer().getFiscalNumber());
 
-            this.totalInDebt = debtAccount.getFinantialInstitution().getCurrency().getValueWithScale(debtAccount.getTotalInDebt())
-                    .toString();
-
-            if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
-                this.totalInDebt = this.totalInDebt.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
-            }
+            this.totalInDebt = debtAccount.getTotalInDebt();
+            this.dueInDebt = debtAccount.getDueInDebt();
 
             this.completed = true;
         } catch (final Exception e) {
@@ -177,7 +185,8 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             row.createCell(0).setCellValue(this.identification);
 
             if (!this.completed) {
-                row.createCell(1).setCellValue(academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                row.createCell(1)
+                        .setCellValue(academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
@@ -198,7 +207,13 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             row.createCell(i++).setCellValue(valueOrEmpty(this.addressCountryCode));
             row.createCell(i++).setCellValue(valueOrEmpty(this.studentNumber));
             row.createCell(i++).setCellValue(valueOrEmpty(this.vatNumberValid));
-            row.createCell(i++).setCellValue(this.totalInDebt.toString());
+
+            if (DebtReportRequest.COMMA.equals(this.decimalSeparator)) {
+                row.createCell(i++)
+                        .setCellValue(this.totalInDebt.toString().replace(DebtReportRequest.DOT, DebtReportRequest.COMMA));
+            } else {
+                row.createCell(i++).setCellValue(this.totalInDebt.toString());
+            }
 
         } catch (final Exception e) {
             e.printStackTrace();
@@ -248,6 +263,174 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
         }
 
         return "";
+    }
+
+    /**
+     * GETTERS AND SETTERS
+     */
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
+    public String getIdentification() {
+        return identification;
+    }
+
+    public void setIdentification(String identification) {
+        this.identification = identification;
+    }
+
+    public String getVersioningCreator() {
+        return versioningCreator;
+    }
+
+    public void setVersioningCreator(String versioningCreator) {
+        this.versioningCreator = versioningCreator;
+    }
+
+    public DateTime getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(DateTime creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public String getFinantialInstitutionName() {
+        return finantialInstitutionName;
+    }
+
+    public void setFinantialInstitutionName(String finantialInstitutionName) {
+        this.finantialInstitutionName = finantialInstitutionName;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
+
+    public String getCustomerCode() {
+        return customerCode;
+    }
+
+    public void setCustomerCode(String customerCode) {
+        this.customerCode = customerCode;
+    }
+
+    public boolean isCustomerActive() {
+        return customerActive;
+    }
+
+    public void setCustomerActive(boolean customerActive) {
+        this.customerActive = customerActive;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getIdentificationType() {
+        return identificationType;
+    }
+
+    public void setIdentificationType(String identificationType) {
+        this.identificationType = identificationType;
+    }
+
+    public String getIdentificationNumber() {
+        return identificationNumber;
+    }
+
+    public void setIdentificationNumber(String identificationNumber) {
+        this.identificationNumber = identificationNumber;
+    }
+
+    public String getVatNumber() {
+        return vatNumber;
+    }
+
+    public void setVatNumber(String vatNumber) {
+        this.vatNumber = vatNumber;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getAddressCountryCode() {
+        return addressCountryCode;
+    }
+
+    public void setAddressCountryCode(String addressCountryCode) {
+        this.addressCountryCode = addressCountryCode;
+    }
+
+    public Integer getStudentNumber() {
+        return studentNumber;
+    }
+
+    public void setStudentNumber(Integer studentNumber) {
+        this.studentNumber = studentNumber;
+    }
+
+    public boolean isVatNumberValid() {
+        return vatNumberValid;
+    }
+
+    public void setVatNumberValid(boolean vatNumberValid) {
+        this.vatNumberValid = vatNumberValid;
+    }
+
+    public BigDecimal getTotalInDebt() {
+        return totalInDebt;
+    }
+
+    public void setTotalInDebt(BigDecimal totalInDebt) {
+        this.totalInDebt = totalInDebt;
+    }
+
+    public BigDecimal getDueInDebt() {
+        return dueInDebt;
+    }
+
+    public void setDueInDebt(BigDecimal dueInDebt) {
+        this.dueInDebt = dueInDebt;
+    }
+
+    public DebtAccount getDebtAccount() {
+        return debtAccount;
+    }
+
+    public PersonCustomer getPersonCustomer() {
+        return personCustomer;
+    }
+
+    public void setPersonCustomer(PersonCustomer personCustomer) {
+        this.personCustomer = personCustomer;
     }
 
 }
