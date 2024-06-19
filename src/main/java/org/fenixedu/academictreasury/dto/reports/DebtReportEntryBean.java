@@ -35,7 +35,7 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
-import static com.qubit.qubEdu.module.base.util.XLSxUtil.*;
+import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
@@ -651,41 +651,41 @@ public class DebtReportEntryBean implements SpreadsheetRow {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
 
         try {
-            createTextCellWithValue(row, 0, valueOrEmpty(identification));
+            createCellWithValue(row, 0, valueOrEmpty(identification));
 
             if (!completed) {
-                createTextCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             if (invoiceEntry.isDebitNoteEntry()) {
                 int i = 1;
 
-                createTextCellWithValue(row, i++, valueOrEmpty(entryType));
-                createTextCellWithValue(row, i++, valueOrEmpty(versioningCreator));
-                createTextCellWithValue(row, i++, valueOrEmpty(creationDate));
-                createTextCellWithValue(row, i++, entryDate.toString(AcademicTreasuryConstants.DATE_TIME_FORMAT_YYYY_MM_DD));
-                createTextCellWithValue(row, i++, dueDate.toString(AcademicTreasuryConstants.DATE_FORMAT_YYYY_MM_DD));
-                createTextCellWithValue(row, i++, valueOrEmpty(customerId));
-                createTextCellWithValue(row, i++, valueOrEmpty(debtAccountId));
-                createTextCellWithValue(row, i++, valueOrEmpty(name));
-                createTextCellWithValue(row, i++, valueOrEmpty(identificationType));
-                createTextCellWithValue(row, i++, valueOrEmpty(identificationNumber));
-                createTextCellWithValue(row, i++, valueOrEmpty(vatNumber));
-                createTextCellWithValue(row, i++, valueOrEmpty(institutionalOrDefaultEmail));
-                createTextCellWithValue(row, i++, valueOrEmpty(this.personalEmail));
-                createTextCellWithValue(row, i++, valueOrEmpty(address));
-                createTextCellWithValue(row, i++, valueOrEmpty(studentNumber));
-                createTextCellWithValue(row, i++, valueOrEmpty(registrationNumber));
-                createTextCellWithValue(row, i++, valueOrEmpty(degreeType));
-                createTextCellWithValue(row, i++, valueOrEmpty(degreeCode));
-                createTextCellWithValue(row, i++, valueOrEmpty(degreeName));
-                createTextCellWithValue(row, i++, valueOrEmpty(executionYear));
-                createTextCellWithValue(row, i++, valueOrEmpty(executionSemester));
-                createTextCellWithValue(row, i++, valueOrEmpty(productCode));
-                createTextCellWithValue(row, i++, valueOrEmpty(invoiceEntryDescription));
-                createTextCellWithValue(row, i++, valueOrEmpty(documentNumber));
-                createTextCellWithValue(row, i++, valueOrEmpty(documentExportationPending));
+                createCellWithValue(row, i++, valueOrEmpty(entryType));
+                createCellWithValue(row, i++, valueOrEmpty(versioningCreator));
+                createCellWithValue(row, i++, valueOrEmpty(creationDate));
+                createCellWithValue(row, i++, entryDate.toString(AcademicTreasuryConstants.DATE_TIME_FORMAT_YYYY_MM_DD));
+                createCellWithValue(row, i++, dueDate.toString(AcademicTreasuryConstants.DATE_FORMAT_YYYY_MM_DD));
+                createCellWithValue(row, i++, valueOrEmpty(customerId));
+                createCellWithValue(row, i++, valueOrEmpty(debtAccountId));
+                createCellWithValue(row, i++, valueOrEmpty(name));
+                createCellWithValue(row, i++, valueOrEmpty(identificationType));
+                createCellWithValue(row, i++, valueOrEmpty(identificationNumber));
+                createCellWithValue(row, i++, valueOrEmpty(vatNumber));
+                createCellWithValue(row, i++, valueOrEmpty(institutionalOrDefaultEmail));
+                createCellWithValue(row, i++, valueOrEmpty(this.personalEmail));
+                createCellWithValue(row, i++, valueOrEmpty(address));
+                createCellWithValue(row, i++, valueOrEmpty(studentNumber));
+                createCellWithValue(row, i++, valueOrEmpty(registrationNumber));
+                createCellWithValue(row, i++, valueOrEmpty(degreeType));
+                createCellWithValue(row, i++, valueOrEmpty(degreeCode));
+                createCellWithValue(row, i++, valueOrEmpty(degreeName));
+                createCellWithValue(row, i++, valueOrEmpty(executionYear));
+                createCellWithValue(row, i++, valueOrEmpty(executionSemester));
+                createCellWithValue(row, i++, valueOrEmpty(productCode));
+                createCellWithValue(row, i++, valueOrEmpty(invoiceEntryDescription));
+                createCellWithValue(row, i++, valueOrEmpty(documentNumber));
+                createCellWithValue(row, i++, valueOrEmpty(documentExportationPending));
                 i++;
 
                 {
@@ -693,7 +693,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
                         value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                     }
-                    createTextCellWithValue(row, i++, valueOrEmpty(value));
+                    createCellWithValue(row, i++, valueOrEmpty(value));
                 }
 
                 {
@@ -701,7 +701,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
                         value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                     }
-                    createTextCellWithValue(row, i++, valueOrEmpty(value));
+                    createCellWithValue(row, i++, valueOrEmpty(value));
                 }
 
                 {
@@ -709,7 +709,7 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
                         value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                     }
-                    createTextCellWithValue(row, i++, valueOrEmpty(value));
+                    createCellWithValue(row, i++, valueOrEmpty(value));
                 }
 
                 {
@@ -717,75 +717,75 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
                         value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                     }
-                    createTextCellWithValue(row, i++, valueOrEmpty(value));
+                    createCellWithValue(row, i++, valueOrEmpty(value));
                 }
 
-                createTextCellWithValue(row, i++, valueOrEmpty(payorDebtAccountVatNumber));
-                createTextCellWithValue(row, i++, valueOrEmpty(payorDebtAccountName));
-                createTextCellWithValue(row, i++, valueOrEmpty(agreement));
-                createTextCellWithValue(row, i++, valueOrEmpty(ingression));
-                createTextCellWithValue(row, i++, valueOrEmpty(firstTimeStudent));
-                createTextCellWithValue(row, i++, valueOrEmpty(partialRegime));
-                createTextCellWithValue(row, i++, valueOrEmpty(statutes));
-                createTextCellWithValue(row, i++, valueOrEmpty(numberOfNormalEnrolments));
-                createTextCellWithValue(row, i++, valueOrEmpty(numberOfStandaloneEnrolments));
-                createTextCellWithValue(row, i++, valueOrEmpty(numberOfExtracurricularEnrolments));
-                createTextCellWithValue(row, i++, valueOrEmpty(tuitionPaymentPlan));
-                createTextCellWithValue(row, i++, valueOrEmpty(tuitionPaymentPlanConditions));
-                createTextCellWithValue(row, i++, valueOrEmpty(annuled));
-                createTextCellWithValue(row, i++, valueOrEmpty(annuledReason));
-                createTextCellWithValue(row, i++, valueOrEmpty(closeDate));
+                createCellWithValue(row, i++, valueOrEmpty(payorDebtAccountVatNumber));
+                createCellWithValue(row, i++, valueOrEmpty(payorDebtAccountName));
+                createCellWithValue(row, i++, valueOrEmpty(agreement));
+                createCellWithValue(row, i++, valueOrEmpty(ingression));
+                createCellWithValue(row, i++, valueOrEmpty(firstTimeStudent));
+                createCellWithValue(row, i++, valueOrEmpty(partialRegime));
+                createCellWithValue(row, i++, valueOrEmpty(statutes));
+                createCellWithValue(row, i++, valueOrEmpty(numberOfNormalEnrolments));
+                createCellWithValue(row, i++, valueOrEmpty(numberOfStandaloneEnrolments));
+                createCellWithValue(row, i++, valueOrEmpty(numberOfExtracurricularEnrolments));
+                createCellWithValue(row, i++, valueOrEmpty(tuitionPaymentPlan));
+                createCellWithValue(row, i++, valueOrEmpty(tuitionPaymentPlanConditions));
+                createCellWithValue(row, i++, valueOrEmpty(annuled));
+                createCellWithValue(row, i++, valueOrEmpty(annuledReason));
+                createCellWithValue(row, i++, valueOrEmpty(closeDate));
 
                 {
                     String value = openAmountAtERPStartDate != null ? openAmountAtERPStartDate.toString() : "";
                     if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
                         value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                     }
-                    createTextCellWithValue(row, i++, valueOrEmpty(value));
+                    createCellWithValue(row, i++, valueOrEmpty(value));
                 }
 
-                createTextCellWithValue(row, i++, valueOrEmpty(exportedInLegacyERP));
-                createTextCellWithValue(row, i++, valueOrEmpty(legacyERPCertificateDocumentReference));
-                createTextCellWithValue(row, i++, valueOrEmpty(erpCertificationDate));
-                createTextCellWithValue(row, i++, valueOrEmpty(erpCertificateDocumentReference));
-                createTextCellWithValue(row, i++, valueOrEmpty(originSettlementNoteForAdvancedCredit));
-                createTextCellWithValue(row, i++, valueOrEmpty(this.code));
+                createCellWithValue(row, i++, valueOrEmpty(exportedInLegacyERP));
+                createCellWithValue(row, i++, valueOrEmpty(legacyERPCertificateDocumentReference));
+                createCellWithValue(row, i++, valueOrEmpty(erpCertificationDate));
+                createCellWithValue(row, i++, valueOrEmpty(erpCertificateDocumentReference));
+                createCellWithValue(row, i++, valueOrEmpty(originSettlementNoteForAdvancedCredit));
+                createCellWithValue(row, i++, valueOrEmpty(this.code));
 
             } else if (invoiceEntry.isCreditNoteEntry()) {
                 int i = 1;
-                createTextCellWithValue(row, i++, valueOrEmpty(entryType));
-                createTextCellWithValue(row, i++, valueOrEmpty(versioningCreator));
-                createTextCellWithValue(row, i++, valueOrEmpty(creationDate));
-                createTextCellWithValue(row, i++, entryDate.toString(AcademicTreasuryConstants.DATE_TIME_FORMAT_YYYY_MM_DD));
-                createTextCellWithValue(row, i++, dueDate.toString(AcademicTreasuryConstants.DATE_FORMAT_YYYY_MM_DD));
-                createTextCellWithValue(row, i++, valueOrEmpty(customerId));
-                createTextCellWithValue(row, i++, valueOrEmpty(debtAccountId));
-                createTextCellWithValue(row, i++, valueOrEmpty(name));
-                createTextCellWithValue(row, i++, valueOrEmpty(identificationType));
-                createTextCellWithValue(row, i++, valueOrEmpty(identificationNumber));
-                createTextCellWithValue(row, i++, valueOrEmpty(vatNumber));
-                createTextCellWithValue(row, i++, valueOrEmpty(institutionalOrDefaultEmail));
-                createTextCellWithValue(row, i++, valueOrEmpty(this.personalEmail));
-                createTextCellWithValue(row, i++, valueOrEmpty(address));
-                createTextCellWithValue(row, i++, valueOrEmpty(studentNumber));
-                createTextCellWithValue(row, i++, valueOrEmpty(registrationNumber));
-                createTextCellWithValue(row, i++, valueOrEmpty(degreeType));
-                createTextCellWithValue(row, i++, valueOrEmpty(degreeCode));
-                createTextCellWithValue(row, i++, valueOrEmpty(degreeName));
-                createTextCellWithValue(row, i++, valueOrEmpty(executionYear));
-                createTextCellWithValue(row, i++, valueOrEmpty(executionSemester));
-                createTextCellWithValue(row, i++, valueOrEmpty(productCode));
-                createTextCellWithValue(row, i++, valueOrEmpty(invoiceEntryDescription));
-                createTextCellWithValue(row, i++, valueOrEmpty(documentNumber));
-                createTextCellWithValue(row, i++, valueOrEmpty(documentExportationPending));
-                createTextCellWithValue(row, i++, valueOrEmpty(debitEntryIdentification));
+                createCellWithValue(row, i++, valueOrEmpty(entryType));
+                createCellWithValue(row, i++, valueOrEmpty(versioningCreator));
+                createCellWithValue(row, i++, valueOrEmpty(creationDate));
+                createCellWithValue(row, i++, entryDate.toString(AcademicTreasuryConstants.DATE_TIME_FORMAT_YYYY_MM_DD));
+                createCellWithValue(row, i++, dueDate.toString(AcademicTreasuryConstants.DATE_FORMAT_YYYY_MM_DD));
+                createCellWithValue(row, i++, valueOrEmpty(customerId));
+                createCellWithValue(row, i++, valueOrEmpty(debtAccountId));
+                createCellWithValue(row, i++, valueOrEmpty(name));
+                createCellWithValue(row, i++, valueOrEmpty(identificationType));
+                createCellWithValue(row, i++, valueOrEmpty(identificationNumber));
+                createCellWithValue(row, i++, valueOrEmpty(vatNumber));
+                createCellWithValue(row, i++, valueOrEmpty(institutionalOrDefaultEmail));
+                createCellWithValue(row, i++, valueOrEmpty(this.personalEmail));
+                createCellWithValue(row, i++, valueOrEmpty(address));
+                createCellWithValue(row, i++, valueOrEmpty(studentNumber));
+                createCellWithValue(row, i++, valueOrEmpty(registrationNumber));
+                createCellWithValue(row, i++, valueOrEmpty(degreeType));
+                createCellWithValue(row, i++, valueOrEmpty(degreeCode));
+                createCellWithValue(row, i++, valueOrEmpty(degreeName));
+                createCellWithValue(row, i++, valueOrEmpty(executionYear));
+                createCellWithValue(row, i++, valueOrEmpty(executionSemester));
+                createCellWithValue(row, i++, valueOrEmpty(productCode));
+                createCellWithValue(row, i++, valueOrEmpty(invoiceEntryDescription));
+                createCellWithValue(row, i++, valueOrEmpty(documentNumber));
+                createCellWithValue(row, i++, valueOrEmpty(documentExportationPending));
+                createCellWithValue(row, i++, valueOrEmpty(debitEntryIdentification));
 
                 {
                     String value = amountToPay != null ? amountToPay.toString() : "";
                     if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
                         value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                     }
-                    createTextCellWithValue(row, i++, valueOrEmpty(value));
+                    createCellWithValue(row, i++, valueOrEmpty(value));
                 }
 
                 {
@@ -793,42 +793,42 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                     if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
                         value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                     }
-                    createTextCellWithValue(row, i++, valueOrEmpty(value));
+                    createCellWithValue(row, i++, valueOrEmpty(value));
                 }
 
-                createTextCellWithValue(row, i++, "");
-                createTextCellWithValue(row, i++, "");
+                createCellWithValue(row, i++, "");
+                createCellWithValue(row, i++, "");
 
-                createTextCellWithValue(row, i++, valueOrEmpty(payorDebtAccountVatNumber));
-                createTextCellWithValue(row, i++, valueOrEmpty(payorDebtAccountName));
-                createTextCellWithValue(row, i++, valueOrEmpty(agreement));
-                createTextCellWithValue(row, i++, valueOrEmpty(ingression));
-                createTextCellWithValue(row, i++, valueOrEmpty(firstTimeStudent));
-                createTextCellWithValue(row, i++, valueOrEmpty(partialRegime));
-                createTextCellWithValue(row, i++, valueOrEmpty(statutes));
-                createTextCellWithValue(row, i++, valueOrEmpty(numberOfNormalEnrolments));
-                createTextCellWithValue(row, i++, valueOrEmpty(numberOfStandaloneEnrolments));
-                createTextCellWithValue(row, i++, valueOrEmpty(numberOfExtracurricularEnrolments));
-                createTextCellWithValue(row, i++, valueOrEmpty(tuitionPaymentPlan));
-                createTextCellWithValue(row, i++, valueOrEmpty(tuitionPaymentPlanConditions));
-                createTextCellWithValue(row, i++, valueOrEmpty(annuled));
-                createTextCellWithValue(row, i++, valueOrEmpty(annuledReason));
-                createTextCellWithValue(row, i++, valueOrEmpty(closeDate));
+                createCellWithValue(row, i++, valueOrEmpty(payorDebtAccountVatNumber));
+                createCellWithValue(row, i++, valueOrEmpty(payorDebtAccountName));
+                createCellWithValue(row, i++, valueOrEmpty(agreement));
+                createCellWithValue(row, i++, valueOrEmpty(ingression));
+                createCellWithValue(row, i++, valueOrEmpty(firstTimeStudent));
+                createCellWithValue(row, i++, valueOrEmpty(partialRegime));
+                createCellWithValue(row, i++, valueOrEmpty(statutes));
+                createCellWithValue(row, i++, valueOrEmpty(numberOfNormalEnrolments));
+                createCellWithValue(row, i++, valueOrEmpty(numberOfStandaloneEnrolments));
+                createCellWithValue(row, i++, valueOrEmpty(numberOfExtracurricularEnrolments));
+                createCellWithValue(row, i++, valueOrEmpty(tuitionPaymentPlan));
+                createCellWithValue(row, i++, valueOrEmpty(tuitionPaymentPlanConditions));
+                createCellWithValue(row, i++, valueOrEmpty(annuled));
+                createCellWithValue(row, i++, valueOrEmpty(annuledReason));
+                createCellWithValue(row, i++, valueOrEmpty(closeDate));
 
                 {
                     String value = openAmountAtERPStartDate != null ? openAmountAtERPStartDate.toString() : "";
                     if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
                         value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                     }
-                    createTextCellWithValue(row, i++, valueOrEmpty(value));
+                    createCellWithValue(row, i++, valueOrEmpty(value));
                 }
 
-                createTextCellWithValue(row, i++, valueOrEmpty(exportedInLegacyERP));
-                createTextCellWithValue(row, i++, valueOrEmpty(legacyERPCertificateDocumentReference));
-                createTextCellWithValue(row, i++, valueOrEmpty(erpCertificationDate));
-                createTextCellWithValue(row, i++, valueOrEmpty(erpCertificateDocumentReference));
-                createTextCellWithValue(row, i++, valueOrEmpty(originSettlementNoteForAdvancedCredit));
-                createTextCellWithValue(row, i++, valueOrEmpty(this.code));
+                createCellWithValue(row, i++, valueOrEmpty(exportedInLegacyERP));
+                createCellWithValue(row, i++, valueOrEmpty(legacyERPCertificateDocumentReference));
+                createCellWithValue(row, i++, valueOrEmpty(erpCertificationDate));
+                createCellWithValue(row, i++, valueOrEmpty(erpCertificateDocumentReference));
+                createCellWithValue(row, i++, valueOrEmpty(originSettlementNoteForAdvancedCredit));
+                createCellWithValue(row, i++, valueOrEmpty(this.code));
 
             }
 

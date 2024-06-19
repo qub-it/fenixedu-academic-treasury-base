@@ -35,7 +35,7 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
-import static com.qubit.qubEdu.module.base.util.XLSxUtil.*;
+import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import org.apache.poi.ss.usermodel.Row;
@@ -43,15 +43,11 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academictreasury.domain.academicalAct.AcademicActBlockingSuspension;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
-import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
-import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-
-import com.google.common.base.Strings;
 
 public class AcademicActBlockingSuspensionReportEntryBean extends AbstractReportEntryBean {
 
@@ -138,28 +134,28 @@ public class AcademicActBlockingSuspensionReportEntryBean extends AbstractReport
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
 
         try {
-            createTextCellWithValue(row, 0, identification);
+            createCellWithValue(row, 0, identification);
 
             if (!completed) {
-                createTextCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            createTextCellWithValue(row, i++, valueOrEmpty(versioningCreator));
-            createTextCellWithValue(row, i++, valueOrEmpty(creationDate));
-            createTextCellWithValue(row, i++, valueOrEmpty(name));
-            createTextCellWithValue(row, i++, valueOrEmpty(identificationType));
-            createTextCellWithValue(row, i++, valueOrEmpty(identificationNumber));
-            createTextCellWithValue(row, i++, valueOrEmpty(vatNumber));
-            createTextCellWithValue(row, i++, valueOrEmpty(email));
-            createTextCellWithValue(row, i++, valueOrEmpty(address));
-            createTextCellWithValue(row, i++, valueOrEmpty(addressCountryCode));
-            createTextCellWithValue(row, i++, valueOrEmpty(studentNumber));
-            createTextCellWithValue(row, i++, valueOrEmpty(beginDate));
-            createTextCellWithValue(row, i++, valueOrEmpty(endDate));
-            createTextCellWithValue(row, i++, valueOrEmpty(reason));
+            createCellWithValue(row, i++, valueOrEmpty(versioningCreator));
+            createCellWithValue(row, i++, valueOrEmpty(creationDate));
+            createCellWithValue(row, i++, valueOrEmpty(name));
+            createCellWithValue(row, i++, valueOrEmpty(identificationType));
+            createCellWithValue(row, i++, valueOrEmpty(identificationNumber));
+            createCellWithValue(row, i++, valueOrEmpty(vatNumber));
+            createCellWithValue(row, i++, valueOrEmpty(email));
+            createCellWithValue(row, i++, valueOrEmpty(address));
+            createCellWithValue(row, i++, valueOrEmpty(addressCountryCode));
+            createCellWithValue(row, i++, valueOrEmpty(studentNumber));
+            createCellWithValue(row, i++, valueOrEmpty(beginDate));
+            createCellWithValue(row, i++, valueOrEmpty(endDate));
+            createCellWithValue(row, i++, valueOrEmpty(reason));
 
         } catch (final Exception e) {
             e.printStackTrace();

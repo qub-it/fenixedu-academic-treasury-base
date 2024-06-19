@@ -35,7 +35,7 @@
  */
 package org.fenixedu.academictreasury.domain.integration.tuitioninfo;
 
-import static com.qubit.qubEdu.module.base.util.XLSxUtil.createTextCellWithValue;
+import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
@@ -368,25 +368,25 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
         public void writeCellValues(final Row row, final IErrorsLog log) {
             int i = 0;
 
-            createTextCellWithValue(row, i++, executionDate);
+            createCellWithValue(row, i++, executionDate);
 
-            createTextCellWithValue(row, i++, studentNumber);
-            createTextCellWithValue(row, i++, studentName);
-            createTextCellWithValue(row, i++, customerFiscalNumber);
+            createCellWithValue(row, i++, studentNumber);
+            createCellWithValue(row, i++, studentName);
+            createCellWithValue(row, i++, customerFiscalNumber);
 
-            createTextCellWithValue(row, i++, erpTuitionInfoTypeCode);
-            createTextCellWithValue(row, i++, erpTuitionInfoTypeName);
-            createTextCellWithValue(row, i++, executionYearQualifiedName);
+            createCellWithValue(row, i++, erpTuitionInfoTypeCode);
+            createCellWithValue(row, i++, erpTuitionInfoTypeName);
+            createCellWithValue(row, i++, executionYearQualifiedName);
 
-            createTextCellWithValue(row, i++, erpTuitionInfoExternalId);
-            createTextCellWithValue(row, i++, erpTuitionInfoCreationDate);
-            createTextCellWithValue(row, i++, erpTuitionInfoUpdateDate);
-            createTextCellWithValue(row, i++, erpTuitionInfoDocumentNumber);
-            createTextCellWithValue(row, i++, totalAmount);
-            createTextCellWithValue(row, i++, deltaAmount);
+            createCellWithValue(row, i++, erpTuitionInfoExternalId);
+            createCellWithValue(row, i++, erpTuitionInfoCreationDate);
+            createCellWithValue(row, i++, erpTuitionInfoUpdateDate);
+            createCellWithValue(row, i++, erpTuitionInfoDocumentNumber);
+            createCellWithValue(row, i++, totalAmount);
+            createCellWithValue(row, i++, deltaAmount);
 
-            createTextCellWithValue(row, i++, errorOccured);
-            createTextCellWithValue(row, i++, errorDescription);
+            createCellWithValue(row, i++, errorOccured);
+            createCellWithValue(row, i++, errorDescription);
         }
     }
 

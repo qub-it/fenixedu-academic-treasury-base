@@ -35,7 +35,7 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
-import static com.qubit.qubEdu.module.base.util.XLSxUtil.*;
+import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
@@ -183,36 +183,36 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
 
         try {
-            createTextCellWithValue(row, 0, this.identification);
+            createCellWithValue(row, 0, this.identification);
 
             if (!this.completed) {
-                createTextCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            createTextCellWithValue(row, i++, this.versioningCreator);
-            createTextCellWithValue(row, i++, valueOrEmpty(this.creationDate));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.finantialInstitutionName));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.customerId));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.customerCode));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.customerActive));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.name));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.identificationType));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.identificationNumber));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.vatNumber));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.email));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.address));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.addressCountryCode));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.studentNumber));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.vatNumberValid));
-            createTextCellWithValue(row, i++, this.totalInDebt.toString());
+            createCellWithValue(row, i++, this.versioningCreator);
+            createCellWithValue(row, i++, valueOrEmpty(this.creationDate));
+            createCellWithValue(row, i++, valueOrEmpty(this.finantialInstitutionName));
+            createCellWithValue(row, i++, valueOrEmpty(this.customerId));
+            createCellWithValue(row, i++, valueOrEmpty(this.customerCode));
+            createCellWithValue(row, i++, valueOrEmpty(this.customerActive));
+            createCellWithValue(row, i++, valueOrEmpty(this.name));
+            createCellWithValue(row, i++, valueOrEmpty(this.identificationType));
+            createCellWithValue(row, i++, valueOrEmpty(this.identificationNumber));
+            createCellWithValue(row, i++, valueOrEmpty(this.vatNumber));
+            createCellWithValue(row, i++, valueOrEmpty(this.email));
+            createCellWithValue(row, i++, valueOrEmpty(this.address));
+            createCellWithValue(row, i++, valueOrEmpty(this.addressCountryCode));
+            createCellWithValue(row, i++, valueOrEmpty(this.studentNumber));
+            createCellWithValue(row, i++, valueOrEmpty(this.vatNumberValid));
+            createCellWithValue(row, i++, this.totalInDebt.toString());
 
             if (DebtReportRequest.COMMA.equals(this.decimalSeparator)) {
-                createTextCellWithValue(row, i++, this.totalInDebt.toString().replace(DebtReportRequest.DOT, DebtReportRequest.COMMA));
+                createCellWithValue(row, i++, this.totalInDebt.toString().replace(DebtReportRequest.DOT, DebtReportRequest.COMMA));
             } else {
-                createTextCellWithValue(row, i++, this.totalInDebt.toString());
+                createCellWithValue(row, i++, this.totalInDebt.toString());
             }
 
         } catch (final Exception e) {

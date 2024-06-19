@@ -35,19 +35,15 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
-
-import static com.qubit.qubEdu.module.base.util.XLSxUtil.*;
+import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
-import java.math.BigDecimal;
 import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academictreasury.domain.reports.DebtReportRequest;
 import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
-import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentCodeTransaction;
-import org.fenixedu.treasury.domain.paymentcodes.SibsTransactionDetail;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
@@ -137,30 +133,30 @@ public class SibsTransactionDetailEntryBean extends AbstractReportEntryBean {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
         
         try {
-            createTextCellWithValue(row, 0, identification);
+            createCellWithValue(row, 0, identification);
             
             if (!completed) {
-                createTextCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            createTextCellWithValue(row, i++, valueOrEmpty(versioningCreator));
-            createTextCellWithValue(row, i++, valueOrEmpty(creationDate));
-            createTextCellWithValue(row, i++, valueOrEmpty(whenProcessed));
-            createTextCellWithValue(row, i++, valueOrEmpty(whenRegistered));
-            createTextCellWithValue(row, i++, valueOrEmpty(amountPayed));
-            createTextCellWithValue(row, i++, valueOrEmpty(sibsEntityReferenceCode));
-            createTextCellWithValue(row, i++, valueOrEmpty(sibsPaymentReferenceCode));
-            createTextCellWithValue(row, i++, valueOrEmpty(sibsTransactionId));
-            createTextCellWithValue(row, i++, valueOrEmpty(debtAccountId));
-            createTextCellWithValue(row, i++, valueOrEmpty(customerId));
-            createTextCellWithValue(row, i++, valueOrEmpty(businessIdentification));
-            createTextCellWithValue(row, i++, valueOrEmpty(fiscalNumber));
-            createTextCellWithValue(row, i++, valueOrEmpty(customerName));
-            createTextCellWithValue(row, i++, valueOrEmpty(settlementDocumentNumber));
-            createTextCellWithValue(row, i++, valueOrEmpty(comments));
+            createCellWithValue(row, i++, valueOrEmpty(versioningCreator));
+            createCellWithValue(row, i++, valueOrEmpty(creationDate));
+            createCellWithValue(row, i++, valueOrEmpty(whenProcessed));
+            createCellWithValue(row, i++, valueOrEmpty(whenRegistered));
+            createCellWithValue(row, i++, valueOrEmpty(amountPayed));
+            createCellWithValue(row, i++, valueOrEmpty(sibsEntityReferenceCode));
+            createCellWithValue(row, i++, valueOrEmpty(sibsPaymentReferenceCode));
+            createCellWithValue(row, i++, valueOrEmpty(sibsTransactionId));
+            createCellWithValue(row, i++, valueOrEmpty(debtAccountId));
+            createCellWithValue(row, i++, valueOrEmpty(customerId));
+            createCellWithValue(row, i++, valueOrEmpty(businessIdentification));
+            createCellWithValue(row, i++, valueOrEmpty(fiscalNumber));
+            createCellWithValue(row, i++, valueOrEmpty(customerName));
+            createCellWithValue(row, i++, valueOrEmpty(settlementDocumentNumber));
+            createCellWithValue(row, i++, valueOrEmpty(comments));
             
         } catch(final Exception e) {
             e.printStackTrace();

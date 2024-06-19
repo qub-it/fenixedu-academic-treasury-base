@@ -35,7 +35,7 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
-import static com.qubit.qubEdu.module.base.util.XLSxUtil.*;
+import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import org.apache.poi.ss.usermodel.Row;
@@ -122,30 +122,30 @@ public class ProductReportEntryBean extends AbstractReportEntryBean {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
 
         try {
-            createTextCellWithValue(row, 0, identification);
+            createCellWithValue(row, 0, identification);
 
             if (!completed) {
-                createTextCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            createTextCellWithValue(row, i++, valueOrEmpty(groupCode));
-            createTextCellWithValue(row, i++, valueOrEmpty(group));
-            createTextCellWithValue(row, i++, valueOrEmpty(code));
-            createTextCellWithValue(row, i++, valueOrEmpty(descriptionPt));
-            createTextCellWithValue(row, i++, valueOrEmpty(descriptionEn));
-            createTextCellWithValue(row, i++, valueOrEmpty(unitOfMeasurePt));
-            createTextCellWithValue(row, i++, valueOrEmpty(unitOfMeasureEn));
-            createTextCellWithValue(row, i++, valueOrEmpty(active));
-            createTextCellWithValue(row, i++, valueOrEmpty(legacy));
-            createTextCellWithValue(row, i++, valueOrEmpty(tuitionInstallmentOrder));
-            createTextCellWithValue(row, i++, valueOrEmpty(vatTypeCode));
-            createTextCellWithValue(row, i++, valueOrEmpty(vatType));
-            createTextCellWithValue(row, i++, valueOrEmpty(exemptionReasonCode));
-            createTextCellWithValue(row, i++, valueOrEmpty(exemptionReason));
-            createTextCellWithValue(row, i++, valueOrEmpty(finantialInstitution));
+            createCellWithValue(row, i++, valueOrEmpty(groupCode));
+            createCellWithValue(row, i++, valueOrEmpty(group));
+            createCellWithValue(row, i++, valueOrEmpty(code));
+            createCellWithValue(row, i++, valueOrEmpty(descriptionPt));
+            createCellWithValue(row, i++, valueOrEmpty(descriptionEn));
+            createCellWithValue(row, i++, valueOrEmpty(unitOfMeasurePt));
+            createCellWithValue(row, i++, valueOrEmpty(unitOfMeasureEn));
+            createCellWithValue(row, i++, valueOrEmpty(active));
+            createCellWithValue(row, i++, valueOrEmpty(legacy));
+            createCellWithValue(row, i++, valueOrEmpty(tuitionInstallmentOrder));
+            createCellWithValue(row, i++, valueOrEmpty(vatTypeCode));
+            createCellWithValue(row, i++, valueOrEmpty(vatType));
+            createCellWithValue(row, i++, valueOrEmpty(exemptionReasonCode));
+            createCellWithValue(row, i++, valueOrEmpty(exemptionReason));
+            createCellWithValue(row, i++, valueOrEmpty(finantialInstitution));
             
         } catch (final Exception e) {
             e.printStackTrace();

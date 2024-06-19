@@ -35,7 +35,7 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
-import static com.qubit.qubEdu.module.base.util.XLSxUtil.*;
+import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
@@ -237,14 +237,14 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
 
             int i = 1;
 
-            createTextCellWithValue(row, i++, valueOrEmpty(creationDate));
-            createTextCellWithValue(row, i++, valueOrEmpty(responsible));
-            createTextCellWithValue(row, i++, valueOrEmpty(settlementNoteNumber));
-            createTextCellWithValue(row, i++, valueOrEmpty(settlementNoteDocumentDate));
-            createTextCellWithValue(row, i++, valueOrEmpty(paymentDate));
-            createTextCellWithValue(row, i++, valueOrEmpty(settlementNoteAnnuled));
-            createTextCellWithValue(row, i++, valueOrEmpty(documentExportationPending));
-            createTextCellWithValue(row, i++, valueOrEmpty(paymentMethod));
+            createCellWithValue(row, i++, valueOrEmpty(creationDate));
+            createCellWithValue(row, i++, valueOrEmpty(responsible));
+            createCellWithValue(row, i++, valueOrEmpty(settlementNoteNumber));
+            createCellWithValue(row, i++, valueOrEmpty(settlementNoteDocumentDate));
+            createCellWithValue(row, i++, valueOrEmpty(paymentDate));
+            createCellWithValue(row, i++, valueOrEmpty(settlementNoteAnnuled));
+            createCellWithValue(row, i++, valueOrEmpty(documentExportationPending));
+            createCellWithValue(row, i++, valueOrEmpty(paymentMethod));
 
             {
                 String value = amount != null ? amount.toString() : "";
@@ -252,23 +252,23 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
                     value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                 }
 
-                createTextCellWithValue(row, i++, value);
+                createCellWithValue(row, i++, value);
             }
 
-            createTextCellWithValue(row, i++, customerId);
-            createTextCellWithValue(row, i++, debtAccountId);
-            createTextCellWithValue(row, i++, valueOrEmpty(name));
-            createTextCellWithValue(row, i++, valueOrEmpty(identificationType));
-            createTextCellWithValue(row, i++, valueOrEmpty(identificationNumber));
-            createTextCellWithValue(row, i++, valueOrEmpty(vatNumber));
-            createTextCellWithValue(row, i++, valueOrEmpty(institutionalOrDefaultEmail));
-            createTextCellWithValue(row, i++, valueOrEmpty(address));
-            createTextCellWithValue(row, i++, valueOrEmpty(studentNumber));
+            createCellWithValue(row, i++, customerId);
+            createCellWithValue(row, i++, debtAccountId);
+            createCellWithValue(row, i++, valueOrEmpty(name));
+            createCellWithValue(row, i++, valueOrEmpty(identificationType));
+            createCellWithValue(row, i++, valueOrEmpty(identificationNumber));
+            createCellWithValue(row, i++, valueOrEmpty(vatNumber));
+            createCellWithValue(row, i++, valueOrEmpty(institutionalOrDefaultEmail));
+            createCellWithValue(row, i++, valueOrEmpty(address));
+            createCellWithValue(row, i++, valueOrEmpty(studentNumber));
 
-            createTextCellWithValue(row, i++, valueOrEmpty(this.documentObservations));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.documentTermsAndConditions));
+            createCellWithValue(row, i++, valueOrEmpty(this.documentObservations));
+            createCellWithValue(row, i++, valueOrEmpty(this.documentTermsAndConditions));
 
-            createTextCellWithValue(row, i++, valueOrEmpty(this.reimbursementStateDescription));
+            createCellWithValue(row, i++, valueOrEmpty(this.reimbursementStateDescription));
 
         } catch (final Exception e) {
             e.printStackTrace();

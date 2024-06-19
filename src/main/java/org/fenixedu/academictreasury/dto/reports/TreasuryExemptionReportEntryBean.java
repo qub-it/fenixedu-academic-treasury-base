@@ -35,8 +35,8 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
+import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
-import static com.qubit.qubEdu.module.base.util.XLSxUtil.*;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
@@ -306,41 +306,41 @@ public class TreasuryExemptionReportEntryBean extends AbstractReportEntryBean {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
         
         try {
-            createTextCellWithValue(row, 0, identification);
+            createCellWithValue(row, 0, identification);
 
             if (!completed) {
-                createTextCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            createTextCellWithValue(row, i++, valueOrEmpty(versioningCreator));
-            createTextCellWithValue(row, i++, valueOrEmpty(creationDate));
+            createCellWithValue(row, i++, valueOrEmpty(versioningCreator));
+            createCellWithValue(row, i++, valueOrEmpty(creationDate));
             
-            createTextCellWithValue(row, i++, valueOrEmpty(customerId));
-            createTextCellWithValue(row, i++, valueOrEmpty(debtAccountId));
-            createTextCellWithValue(row, i++, valueOrEmpty(customerName));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.identificationType));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.identificationNumber));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.vatNumber));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.studentNumber));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.registrationNumber));
+            createCellWithValue(row, i++, valueOrEmpty(customerId));
+            createCellWithValue(row, i++, valueOrEmpty(debtAccountId));
+            createCellWithValue(row, i++, valueOrEmpty(customerName));
+            createCellWithValue(row, i++, valueOrEmpty(this.identificationType));
+            createCellWithValue(row, i++, valueOrEmpty(this.identificationNumber));
+            createCellWithValue(row, i++, valueOrEmpty(this.vatNumber));
+            createCellWithValue(row, i++, valueOrEmpty(this.studentNumber));
+            createCellWithValue(row, i++, valueOrEmpty(this.registrationNumber));
             
-            createTextCellWithValue(row, i++, valueOrEmpty(debitEntryId));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.documentNumber));
-            createTextCellWithValue(row, i++, valueOrEmpty(debitEntryDescription));
-            createTextCellWithValue(row, i++, valueOrEmpty(exemptedAmount));
+            createCellWithValue(row, i++, valueOrEmpty(debitEntryId));
+            createCellWithValue(row, i++, valueOrEmpty(this.documentNumber));
+            createCellWithValue(row, i++, valueOrEmpty(debitEntryDescription));
+            createCellWithValue(row, i++, valueOrEmpty(exemptedAmount));
             
-            createTextCellWithValue(row, i++, valueOrEmpty(this.exemptionTypeCode));
-            createTextCellWithValue(row, i++, valueOrEmpty(this.exemptionTypeDescription));
-            createTextCellWithValue(row, i++, valueOrEmpty(reason));
+            createCellWithValue(row, i++, valueOrEmpty(this.exemptionTypeCode));
+            createCellWithValue(row, i++, valueOrEmpty(this.exemptionTypeDescription));
+            createCellWithValue(row, i++, valueOrEmpty(reason));
             
-            createTextCellWithValue(row, i++, valueOrEmpty(degreeType));
-            createTextCellWithValue(row, i++, valueOrEmpty(degreeCode));
-            createTextCellWithValue(row, i++, valueOrEmpty(degreeName));
-            createTextCellWithValue(row, i++, valueOrEmpty(executionYear));
-            createTextCellWithValue(row, i++, valueOrEmpty(executionSemester));
+            createCellWithValue(row, i++, valueOrEmpty(degreeType));
+            createCellWithValue(row, i++, valueOrEmpty(degreeCode));
+            createCellWithValue(row, i++, valueOrEmpty(degreeName));
+            createCellWithValue(row, i++, valueOrEmpty(executionYear));
+            createCellWithValue(row, i++, valueOrEmpty(executionSemester));
             
         } catch (final Exception e) {
             e.printStackTrace();

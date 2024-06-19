@@ -41,20 +41,22 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.qubit.qubEdu.module.base.util.SheetProcessor;
-import com.qubit.qubEdu.module.base.util.XLSxUtil;
+import com.qubit.terra.framework.tools.excel.ExcelUtil;
+import com.qubit.terra.framework.tools.excel.SheetProcessor;
+import com.qubit.terra.framework.tools.excel.XlsType;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.google.common.collect.Lists;
 
 public class ExcelUtils {
     private static class TreasuryDefaultExcelSheetProcessor extends SheetProcessor {
 
-        final List<List<String>> spreadsheetContent = new ArrayList<List<String>>();
+        List<List<String>> spreadsheetContent;
+
+        final List<ExcelSheet> result = Lists.newArrayList();
 
         public TreasuryDefaultExcelSheetProcessor(int maxCols) {
             super();
@@ -91,29 +93,36 @@ public class ExcelUtils {
             });
         }
 
+        @Override
+        protected void beforeSheetProcess(Sheet sheet) {
+            super.beforeSheetProcess(sheet);
+            this.spreadsheetContent =  new ArrayList<List<String>>();
+        }
+
         public List<List<String>> getSpreadsheetContent() {
             return spreadsheetContent;
+        }
+
+        @Override
+        protected void afterSheetProcess(Sheet sheet) {
+            super.afterSheetProcess(sheet);
+            this.result.add(new ExcelSheet(sheet.getSheetName(), getSpreadsheetContent()));
+        }
+
+        public List<ExcelSheet> getResult() {
+            return this.result;
         }
     }
 	
     public static List<List<String>> readExcel(final InputStream stream, int maxCols) throws IOException {
         TreasuryDefaultExcelSheetProcessor sheetProcessor = new TreasuryDefaultExcelSheetProcessor(maxCols);
-        XLSxUtil.importExcel(stream, sheetProcessor, maxCols);
+        ExcelUtil.importExcel(XlsType.XLSX, stream, sheetProcessor, maxCols);
         return sheetProcessor.getSpreadsheetContent();
     }
     
 	public static List<ExcelSheet> readExcelSheets(final InputStream stream, int maxCols) throws IOException {
-        
-	    XSSFWorkbook wb = new XSSFWorkbook(stream);
-        TreasuryDefaultExcelSheetProcessor sheetProcessor;
-	    final List<ExcelSheet> result = Lists.newArrayList();
-        for(int k = 0; k < wb.getNumberOfSheets(); k++) {
-            XSSFSheet sheet = wb.getSheetAt(k);
-            sheetProcessor = new TreasuryDefaultExcelSheetProcessor(maxCols);
-            XLSxUtil.importExcel(stream, sheetProcessor, maxCols);
-            result.add(new ExcelSheet(sheet.getSheetName(), sheetProcessor.getSpreadsheetContent()));
-        }
-        
-        return result;
+        TreasuryDefaultExcelSheetProcessor sheetProcessor = new TreasuryDefaultExcelSheetProcessor(maxCols);
+        ExcelUtil.importExcel(XlsType.XLSX, stream, sheetProcessor, maxCols);
+        return sheetProcessor.getResult();
 	}
 }
