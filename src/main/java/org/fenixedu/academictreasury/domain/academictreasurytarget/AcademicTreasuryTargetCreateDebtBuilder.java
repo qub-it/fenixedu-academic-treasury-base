@@ -56,6 +56,7 @@ import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.domain.paymentcodes.integration.ISibsPaymentCodePoolService;
+import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
 import org.fenixedu.treasury.domain.tariff.InterestRate;
 import org.fenixedu.treasury.domain.tariff.InterestRateType;
 import org.fenixedu.treasury.util.TreasuryConstants;
@@ -261,7 +262,6 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             var documentNumberSeries =
                     DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
             var now = new DateTime();
-            var vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, new DateTime()).get();
             var person = target.getAcademicTreasuryTargetPerson();
 
             var personCustomer = AcademicTreasuryPlataformDependentServicesFactory.implementation().personCustomer(person);
@@ -296,6 +296,14 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             }
 
             var dueDate = academicTariff.dueDate(when);
+
+            var effectiveWhen = when;
+            if (DueDateCalculationType.FIXED_DATE == academicTariff.getDueDateCalculationType() && dueDate.isBefore(when)) {
+                effectiveWhen = dueDate;
+            }
+
+            var vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, effectiveWhen.toDateTimeAtStartOfDay())
+                    .get();
             var debitNote = DebitNote.create(finantialEntity, debtAccount, null, documentNumberSeries, now, now.toLocalDate(),
                     null, Collections.emptyMap(), null, null);
 
@@ -303,7 +311,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             var debitEntry = DebitEntry.create(finantialEntity, debtAccount, treasuryEvent, vat, amount, dueDate,
                     target.getAcademicTreasuryTargetPropertiesMap(), product,
                     target.getAcademicTreasuryTargetDescription().getContent(TreasuryConstants.DEFAULT_LANGUAGE), BigDecimal.ONE,
-                    academicTariff.getInterestRate(), when.toDateTimeAtStartOfDay(), false, false, debitNote);
+                    academicTariff.getInterestRate(), effectiveWhen.toDateTimeAtStartOfDay(), false, false, debitNote);
 
             if (createPaymentCode) {
                 createPaymentReferenceCode(debitEntry, dueDate);

@@ -461,13 +461,18 @@ public class AcademicTariff extends AcademicTariff_Base {
     }
 
     public DebitEntry createDebitEntryForAcademicServiceRequest(final DebtAccount debtAccount,
-            final AcademicTreasuryEvent academicTreasuryEvent, final LocalDate when) {
+            final AcademicTreasuryEvent academicTreasuryEvent, LocalDate when) {
         if (!academicTreasuryEvent.isForAcademicServiceRequest()) {
             throw new RuntimeException("wrong call");
         }
 
         final BigDecimal amount = amountToPay(academicTreasuryEvent);
         final LocalDate dueDate = dueDate(when);
+
+        if (DueDateCalculationType.FIXED_DATE == getDueDateCalculationType() && dueDate.isBefore(when)) {
+            when = dueDate;
+        }
+
         final LocalizedString debitEntryName =
                 academicServiceRequestDebitEntryName(academicTreasuryEvent.getITreasuryServiceRequest());
         final Vat vat = vat(when);
@@ -491,12 +496,17 @@ public class AcademicTariff extends AcademicTariff_Base {
     }
 
     public DebitEntry createDebitEntryForAcademicTax(final DebtAccount debtAccount,
-            final AcademicTreasuryEvent academicTreasuryEvent, final LocalDate when) {
+            final AcademicTreasuryEvent academicTreasuryEvent, LocalDate when) {
         if (!academicTreasuryEvent.isForAcademicTax() || academicTreasuryEvent.isImprovementTax()) {
             throw new RuntimeException("wrong call");
         }
 
         final LocalDate dueDate = dueDate(when);
+
+        if (DueDateCalculationType.FIXED_DATE == getDueDateCalculationType() && dueDate.isBefore(when)) {
+            when = dueDate;
+        }
+
         final LocalizedString debitEntryName = academicTaxDebitEntryName(academicTreasuryEvent);
         final Vat vat = vat(when);
         final BigDecimal amount = amountToPay(academicTreasuryEvent);
@@ -513,12 +523,17 @@ public class AcademicTariff extends AcademicTariff_Base {
     }
 
     public DebitEntry createDebitEntryForCustomAcademicDebt(final DebtAccount debtAccount,
-            final AcademicTreasuryEvent academicTreasuryEvent, final LocalDate when) {
+            final AcademicTreasuryEvent academicTreasuryEvent, LocalDate when) {
         if (!academicTreasuryEvent.isForCustomAcademicDebt()) {
             throw new RuntimeException("wrong call");
         }
 
         final LocalDate dueDate = dueDate(when);
+
+        if (DueDateCalculationType.FIXED_DATE == getDueDateCalculationType() && dueDate.isBefore(when)) {
+            when = dueDate;
+        }
+
         final LocalizedString debitEntryName = AcademicTreasuryEvent.nameForCustomAcademicDebt(academicTreasuryEvent.getProduct(),
                 academicTreasuryEvent.getRegistration(), academicTreasuryEvent.getExecutionYear());
         final Vat vat = vat(when);
@@ -544,8 +559,7 @@ public class AcademicTariff extends AcademicTariff_Base {
     }
 
     public DebitEntry createDebitEntryForImprovement(final DebtAccount debtAccount,
-            final AcademicTreasuryEvent academicTreasuryEvent, final EnrolmentEvaluation enrolmentEvaluation,
-            final LocalDate when) {
+            final AcademicTreasuryEvent academicTreasuryEvent, final EnrolmentEvaluation enrolmentEvaluation, LocalDate when) {
 
         if (!academicTreasuryEvent.isForImprovementTax()) {
             throw new RuntimeException("wrong call");
@@ -554,6 +568,11 @@ public class AcademicTariff extends AcademicTariff_Base {
         final LocalizedString debitEntryName =
                 improvementDebitEntryName(academicTreasuryEvent.getAcademicTax(), enrolmentEvaluation);
         final LocalDate dueDate = dueDate(when);
+
+        if (DueDateCalculationType.FIXED_DATE == getDueDateCalculationType() && dueDate.isBefore(when)) {
+            when = dueDate;
+        }
+
         final Vat vat = vat(when);
         final BigDecimal amount = amountToPay(academicTreasuryEvent, enrolmentEvaluation);
 
