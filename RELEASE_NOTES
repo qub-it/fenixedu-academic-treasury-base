@@ -1,3 +1,4 @@
+11.14.0 (20-06-2024)
 - Improvement: Add more info to the result of debt generation rule execution and if there was a change in data [#qubIT-Fenix-5420] 
 - Improvement: Debt generation rule strategy to annul debit entries [#qubIT-Fenix-5420]
 
