@@ -153,7 +153,7 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                         new AcademicDebtGenerationProcessingResult(rule, registration);
                 resultList.add(result);
                 try {
-                    processDebtsForRegistration(rule, registration);
+                    processDebtsForRegistration(rule, registration, result);
                     result.markProcessingEndDateTime();
                 } catch (final AcademicTreasuryDomainException e) {
                     result.markException(e);
@@ -183,7 +183,7 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                 return Lists.newArrayList();
             }
 
-            processDebtsForRegistration(rule, registration);
+            processDebtsForRegistration(rule, registration, result);
             result.markProcessingEndDateTime();
         } catch (final AcademicTreasuryDomainException e) {
             result.markException(e);
@@ -247,7 +247,8 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
     }
 
     @Atomic(mode = TxMode.WRITE)
-    private void processDebtsForRegistration(final AcademicDebtGenerationRule rule, final Registration registration) {
+    private void processDebtsForRegistration(final AcademicDebtGenerationRule rule, final Registration registration,
+            AcademicDebtGenerationProcessingResult processingResult) {
 
         // For each product try to grab or create if requested
         final Set<DebitEntry> debitEntries = Sets.newHashSet();
@@ -258,10 +259,10 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
             final Product product = entry.getProduct();
 
             if (AcademicTreasurySettings.getInstance().getTuitionProductGroup() == product.getProductGroup()) {
-                grabbedDebitEntry = grabOrCreateDebitEntryForTuition(rule, registration, entry);
+                grabbedDebitEntry = grabOrCreateDebitEntryForTuition(rule, registration, entry, processingResult);
             } else if (AcademicTax.findUnique(product).isPresent()) {
                 // Check if the product is an academic tax
-                grabbedDebitEntry = grabOrCreateDebitEntryForAcademicTax(rule, registration, entry);
+                grabbedDebitEntry = grabOrCreateDebitEntryForAcademicTax(rule, registration, entry, processingResult);
             }
 
             if (grabbedDebitEntry != null) {
@@ -342,7 +343,7 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
     }
 
     private DebitEntry grabOrCreateDebitEntryForAcademicTax(AcademicDebtGenerationRule rule, Registration registration,
-            AcademicDebtGenerationRuleEntry entry) {
+            AcademicDebtGenerationRuleEntry entry, AcademicDebtGenerationProcessingResult processingResult) {
         Product product = entry.getProduct();
         ExecutionYear executionYear = rule.getExecutionYear();
         AcademicTax academicTax = AcademicTax.findUnique(product).get();
@@ -369,8 +370,13 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                         && registration.getLastRegistrationState(executionYear).isActive()
                         && (!entry.isLimitToRegisteredOnExecutionYear() || registration.isFirstTime(rule.getExecutionYear()));
 
-                AcademicTaxServices.createAcademicTaxForEnrolmentDateAndDefaultFinantialEntity(registration, executionYear,
-                        academicTax, forceCreation);
+                boolean createdEnrolment = AcademicTaxServices.createAcademicTaxForEnrolmentDateAndDefaultFinantialEntity(
+                        registration, executionYear, academicTax, forceCreation);
+
+                if (createdEnrolment) {
+                    processingResult.markRuleMadeUpdates();
+                    processingResult.appendRemarks("\t" + entry.getProduct().getCode());
+                }
             }
         }
 
@@ -391,7 +397,7 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
     }
 
     private DebitEntry grabOrCreateDebitEntryForTuition(final AcademicDebtGenerationRule rule, final Registration registration,
-            final AcademicDebtGenerationRuleEntry entry) {
+            final AcademicDebtGenerationRuleEntry entry, AcademicDebtGenerationProcessingResult processingResult) {
         final Product product = entry.getProduct();
         final ExecutionYear executionYear = rule.getExecutionYear();
 
@@ -431,13 +437,23 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
                     } else if (lastRegisteredStateDate.isAfter(new LocalDate())) {
                         return null;
                     } else {
-                        TuitionServices.createInferedTuitionForRegistration(registration, executionYear, lastRegisteredStateDate,
-                                forceCreation);
+                        boolean createdTuitions = TuitionServices.createInferedTuitionForRegistration(registration, executionYear,
+                                lastRegisteredStateDate, forceCreation);
+
+                        if (createdTuitions) {
+                            processingResult.markRuleMadeUpdates();
+                            processingResult.appendRemarks("\t" + entry.getProduct().getCode());
+                        }
                     }
                 } else {
                     final LocalDate enrolmentDate = TuitionServices.enrolmentDate(registration, executionYear, forceCreation);
-                    TuitionServices.createInferedTuitionForRegistration(registration, executionYear, enrolmentDate,
-                            forceCreation);
+                    boolean createdTuitions = TuitionServices.createInferedTuitionForRegistration(registration, executionYear,
+                            enrolmentDate, forceCreation);
+
+                    if (createdTuitions) {
+                        processingResult.markRuleMadeUpdates();
+                        processingResult.appendRemarks("\t" + entry.getProduct().getCode());
+                    }
                 }
             }
         }

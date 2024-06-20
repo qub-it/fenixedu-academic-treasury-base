@@ -44,16 +44,21 @@ public class AcademicDebtGenerationProcessingResult implements Serializable {
 
     private AcademicDebtGenerationRule academicDebtGenerationRule;
     private Registration registration;
-    
+
     private Exception exception;
 
     private DateTime processingStartDate;
     private DateTime processingEndDate;
-    
+
+    private boolean ruleMadeUpdates;
+    private String remarks;
+
     public AcademicDebtGenerationProcessingResult(final AcademicDebtGenerationRule rule, final Registration registration) {
         this.processingStartDate = new DateTime();
         this.academicDebtGenerationRule = rule;
         this.registration = registration;
+        this.ruleMadeUpdates = false;
+        this.remarks = "";
     }
 
     public void markProcessingEndDateTime() {
@@ -63,32 +68,48 @@ public class AcademicDebtGenerationProcessingResult implements Serializable {
     public void markException(final Exception e) {
         this.exception = e;
     }
-    
+
+    public void appendRemarks(String remarks) {
+        this.remarks = "\t" + (this.remarks + "\n" + remarks).trim();
+    }
+
+    public void markRuleMadeUpdates() {
+        this.ruleMadeUpdates = true;
+    }
+
     // @formatter:off
     /* *****************
      * GETTERS & SETTERS
      * *****************
      */
     // @formatter:on
-    
+
     public AcademicDebtGenerationRule getAcademicDebtGenerationRule() {
         return academicDebtGenerationRule;
     }
-    
+
     public Registration getRegistration() {
         return registration;
     }
-    
+
     public Exception getException() {
         return exception;
     }
-    
+
     public DateTime getProcessingStartDate() {
         return processingStartDate;
     }
-    
+
     public DateTime getProcessingEndDate() {
         return processingEndDate;
     }
-    
+
+    public boolean isRuleMadeUpdates() {
+        return ruleMadeUpdates;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    };
+
 }
