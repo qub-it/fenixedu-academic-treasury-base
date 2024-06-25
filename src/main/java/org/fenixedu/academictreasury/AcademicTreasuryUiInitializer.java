@@ -8,13 +8,11 @@ import org.fenixedu.academic.domain.treasury.ITreasuryBridgeAPI;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.EmolumentServices;
 import org.fenixedu.academictreasury.services.FenixEduAcademicTreasuryPlatformDependentServices;
-import org.fenixedu.academictreasury.services.accesscontrol.spi.AcademicTreasuryAccessControlExtension;
 import org.fenixedu.academictreasury.services.signals.AcademicServiceRequestCancelOrRejectHandler;
 import org.fenixedu.academictreasury.services.signals.ExtracurricularEnrolmentHandler;
 import org.fenixedu.academictreasury.services.signals.ImprovementEnrolmentHandler;
 import org.fenixedu.academictreasury.services.signals.StandaloneEnrolmentHandler;
 import org.fenixedu.bennu.core.signals.Signal;
-import org.fenixedu.treasury.services.accesscontrol.TreasuryAccessControlAPI;
 
 @WebListener
 public class AcademicTreasuryUiInitializer implements ServletContextListener {
@@ -25,8 +23,6 @@ public class AcademicTreasuryUiInitializer implements ServletContextListener {
 
     @Override
     public void contextInitialized(final ServletContextEvent arg0) {
-        TreasuryAccessControlAPI.registerExtension(new AcademicTreasuryAccessControlExtension());
-        
         AcademicTreasuryPlataformDependentServicesFactory
                 .registerImplementation(new FenixEduAcademicTreasuryPlatformDependentServices());
 

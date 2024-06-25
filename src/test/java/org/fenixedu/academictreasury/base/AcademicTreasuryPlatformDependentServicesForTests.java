@@ -231,12 +231,6 @@ public class AcademicTreasuryPlatformDependentServicesForTests implements IAcade
     }
 
     @Override
-    public Optional<FinantialEntity> finantialEntity(AdministrativeOffice administrativeOffice) {
-        // TODO Auto-generated method stub
-        return Optional.empty();
-    }
-
-    @Override
     public Optional<FinantialEntity> finantialEntity(Unit unit) {
         return FinantialEntity.findAll().findFirst();
     }

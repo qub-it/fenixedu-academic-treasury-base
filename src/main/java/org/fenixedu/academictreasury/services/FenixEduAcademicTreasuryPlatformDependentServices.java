@@ -303,9 +303,7 @@ public class FenixEduAcademicTreasuryPlatformDependentServices implements IAcade
 
     @Override
     public Set<Degree> readDegrees(FinantialEntity finantialEntity) {
-        if (finantialEntity.getAdministrativeOffice() != null) {
-            return finantialEntity.getAdministrativeOffice().getAdministratedDegrees();
-        } else if (finantialEntity.getUnit() != null) {
+        if (finantialEntity.getUnit() != null) {
             return finantialEntity.getUnit().getAllSubUnits().stream() //
                     .filter(u -> u.isDegreeUnit()) //
                     .filter(u -> u.getDegree() != null) //
@@ -329,15 +327,6 @@ public class FenixEduAcademicTreasuryPlatformDependentServices implements IAcade
      * 
      */
     public FinantialEntity finantialEntityOfDegree(Degree degree, LocalDate when) {
-        FinantialEntity finantialEntity = null;
-        if (degree.getAdministrativeOffice() != null) {
-            finantialEntity = degree.getAdministrativeOffice().getFinantialEntity();
-        } 
-        
-        if(finantialEntity != null) {
-            return finantialEntity;
-        }
-        
         // Look at the organizational structure
         Unit degreeUnit = degree.getUnit();
 
@@ -345,37 +334,30 @@ public class FenixEduAcademicTreasuryPlatformDependentServices implements IAcade
             return null;
         }
 
-        List<FinantialEntity> candidateFinantialEntities = degreeUnit.getAllParentUnits().stream()
-                .map(parent -> parent.getFinantialEntity())
-                .filter(Objects::nonNull)
-                .sorted(FinantialEntity.COMPARE_BY_NAME)
-                .collect(Collectors.toList());
+        List<FinantialEntity> candidateFinantialEntities =
+                degreeUnit.getAllParentUnits().stream().map(parent -> parent.getFinantialEntity()).filter(Objects::nonNull)
+                        .sorted(FinantialEntity.COMPARE_BY_NAME).collect(Collectors.toList());
 
-        if(candidateFinantialEntities.size() == 1) {
+        if (candidateFinantialEntities.size() == 1) {
             // There is no ambiguity. The degree descendent of one unit
             // associated with the finantial entity
-            
+
             return candidateFinantialEntities.iterator().next();
-        } else if(candidateFinantialEntities.size() > 1) {
+        } else if (candidateFinantialEntities.size() > 1) {
             // The degree is descendent of more than one unit
             // associated with the finantial entity
             //
             // We need to untie and find which finantial entity
             // is responsible for finantial entity
-            
+
             // TODO: Find with a specific accountability type?
             // It is not desirable to return the first ordered
             // alphabetically
-            
+
             return candidateFinantialEntities.iterator().next();
         }
-        
-        return null;
-    }
 
-    @Override
-    public Optional<FinantialEntity> finantialEntity(AdministrativeOffice administrativeOffice) {
-        return Optional.ofNullable(administrativeOffice.getFinantialEntity());
+        return null;
     }
 
     @Override

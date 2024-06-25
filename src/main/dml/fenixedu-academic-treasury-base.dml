@@ -25,7 +25,6 @@ valueType org.fenixedu.commons.i18n.LocalizedString as LocalizedStringAT {
 	internalizeWith fromJson();
 }
 
-external class .org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 external class .org.fenixedu.academic.domain.candidacy.IngressionType;
 external class .org.fenixedu.academic.domain.CompetenceCourse;
 external class .org.fenixedu.academic.domain.CurricularCourse;
@@ -52,19 +51,9 @@ external class .org.fenixedu.academic.domain.organizationalStructure.Unit;
 
 
 /* ----------------------------------------
- * FinantialEntity and AdministrativeOffice
+ * FinantialEntity and Unit
  * ----------------------------------------
  */
-
-	relation FinatialEntityAdministrativeOffice {
-		.org.fenixedu.treasury.domain.FinantialEntity playsRole finantialEntity {
-			multiplicity 0..1;
-		}
-		
-		.org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice playsRole administrativeOffice {
-			multiplicity 0..1;
-		}
-	}
 
 	relation FinantialEntityUnit {
 		.org.fenixedu.treasury.domain.FinantialEntity playsRole finantialEntity {
@@ -124,17 +113,6 @@ class tariff.AcademicTariff extends .org.fenixedu.treasury.domain.tariff.Tariff 
 	boolean blockAcademicActsOnDebt;
 }
 
-	relation AcademicTariffAdministrativeOffice {
-		
-		.org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice playsRole administrativeOffice {
-			multiplicity 0..1;
-		}
-		
-		tariff.AcademicTariff playsRole academicTariffs {
-			multiplicity *;
-		}
-	}
-	
 	relation AcademicTariffDegreeType {
 		
 		.org.fenixedu.academic.domain.degree.DegreeType playsRole degreeType {

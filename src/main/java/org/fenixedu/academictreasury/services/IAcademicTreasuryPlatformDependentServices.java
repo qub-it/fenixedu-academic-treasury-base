@@ -161,9 +161,6 @@ public interface IAcademicTreasuryPlatformDependentServices {
 
     FinantialEntity finantialEntityOfDegree(Degree degree, LocalDate when);
 
-    @Deprecated
-    Optional<FinantialEntity> finantialEntity(AdministrativeOffice administrativeOffice);
-
     Optional<FinantialEntity> finantialEntity(Unit unit);
 
     @Deprecated

@@ -281,7 +281,6 @@ public class AcademicTariff extends AcademicTariff_Base {
     @Override
     @Atomic
     public void delete() {
-        setAdministrativeOffice(null);
         setDegreeType(null);
         setDegree(null);
 
@@ -903,10 +902,10 @@ public class AcademicTariff extends AcademicTariff_Base {
         }
 
         // Fallback to product only in finantial entity
-        final Set<? extends AcademicTariff> activeTariffs =
-                findActive(finantialEntity, product, when).filter(e -> e.getAdministrativeOffice() == null)
-                        .filter(e -> e.getDegreeType() == null).filter(e -> e.getDegree() == null)
-                        .filter(e -> e.getCycleType() == null).collect(Collectors.<AcademicTariff> toSet());
+        final Set<? extends AcademicTariff> activeTariffs = findActive(finantialEntity, product, when) //
+                .filter(e -> e.getDegreeType() == null) //
+                .filter(e -> e.getDegree() == null).filter(e -> e.getCycleType() == null) //
+                .collect(Collectors.<AcademicTariff> toSet());
 
         if (activeTariffs.size() > 1) {
             throw new AcademicTreasuryDomainException("error.AcademicTariff.findActive.more.than.one");
