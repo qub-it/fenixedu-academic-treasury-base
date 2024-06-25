@@ -39,8 +39,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.CurricularYear;
@@ -51,7 +49,6 @@ import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.contacts.PartyContact;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
@@ -187,10 +184,6 @@ public interface IAcademicTreasuryPlatformDependentServices {
 
     String localizedNameOfEnrolment(Enrolment enrolment, Locale locale);
 
-    String localizedNameOfAdministrativeOffice(AdministrativeOffice administrativeOffice);
-
-    String localizedNameOfAdministrativeOffice(AdministrativeOffice administrativeOffice, Locale locale);
-
     /* **********************
      * Student & Registration
      * ********************** */
@@ -204,8 +197,6 @@ public interface IAcademicTreasuryPlatformDependentServices {
     RegistrationRegimeType registrationRegimeType(Registration registration, ExecutionYear executionYear);
 
     Set<StatuteType> statutesTypesValidOnAnyExecutionSemesterFor(Registration registration, ExecutionInterval executionInterval);
-
-    Stream<AdministrativeOffice> findAdministrativeOfficesByPredicate(Predicate<AdministrativeOffice> predicate);
 
     /* *******************
      * Execution Intervals

@@ -44,9 +44,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.CurricularYear;
@@ -58,7 +56,6 @@ import org.fenixedu.academic.domain.ExecutionDegree;
 import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.contacts.PartyContact;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
@@ -73,7 +70,6 @@ import org.fenixedu.academic.domain.student.RegistrationRegimeType;
 import org.fenixedu.academic.domain.student.StatuteType;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
-import org.fenixedu.bennu.core.domain.Bennu;
 import org.fenixedu.commons.i18n.I18N;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.joda.time.LocalDate;
@@ -411,16 +407,6 @@ public class FenixEduAcademicTreasuryPlatformDependentServices implements IAcade
         return enrolment.getName().getContent(locale);
     }
 
-    @Override
-    public String localizedNameOfAdministrativeOffice(AdministrativeOffice administrativeOffice) {
-        return administrativeOffice.getName().getContent();
-    }
-
-    @Override
-    public String localizedNameOfAdministrativeOffice(AdministrativeOffice administrativeOffice, Locale locale) {
-        return administrativeOffice.getName().getContent(locale);
-    }
-
     /* **********************
      * Student & Registration
      * ********************** */
@@ -492,11 +478,6 @@ public class FenixEduAcademicTreasuryPlatformDependentServices implements IAcade
     static public Collection<StatuteType> findVisibleStatuteTypes(final Registration registration,
             final ExecutionInterval executionInterval) {
         return findStatuteTypes(registration, executionInterval).stream().filter(s -> s.getVisible()).collect(Collectors.toSet());
-    }
-
-    @Override
-    public Stream<AdministrativeOffice> findAdministrativeOfficesByPredicate(Predicate<AdministrativeOffice> predicate) {
-        return Bennu.getInstance().getAdministrativeOfficesSet().stream().filter(predicate);
     }
 
     /* *******************

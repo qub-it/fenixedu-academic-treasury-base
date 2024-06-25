@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.CurricularYear;
@@ -19,7 +17,6 @@ import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.administrativeOffice.AdministrativeOffice;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.contacts.PartyContact;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
@@ -280,18 +277,6 @@ public class AcademicTreasuryPlatformDependentServicesForTests implements IAcade
     }
 
     @Override
-    public String localizedNameOfAdministrativeOffice(AdministrativeOffice administrativeOffice) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String localizedNameOfAdministrativeOffice(AdministrativeOffice administrativeOffice, Locale locale) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public RegistrationDataByExecutionYear findRegistrationDataByExecutionYear(Registration registration,
             ExecutionYear executionYear) {
         // TODO Auto-generated method stub
@@ -360,12 +345,6 @@ public class AcademicTreasuryPlatformDependentServicesForTests implements IAcade
     static public Collection<StatuteType> findVisibleStatuteTypes(final Registration registration,
             final ExecutionInterval executionInterval) {
         return findStatuteTypes(registration, executionInterval).stream().filter(s -> s.getVisible()).collect(Collectors.toSet());
-    }
-
-    @Override
-    public Stream<AdministrativeOffice> findAdministrativeOfficesByPredicate(Predicate<AdministrativeOffice> predicate) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
