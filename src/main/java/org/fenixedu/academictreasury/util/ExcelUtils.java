@@ -40,6 +40,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import com.qubit.terra.framework.tools.excel.ExcelUtil;
 import com.qubit.terra.framework.tools.excel.SheetProcessor;
@@ -47,6 +48,7 @@ import com.qubit.terra.framework.tools.excel.XlsType;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 
 import com.google.common.collect.Lists;
@@ -54,12 +56,14 @@ import com.google.common.collect.Lists;
 public class ExcelUtils {
     private static class TreasuryDefaultExcelSheetProcessor extends SheetProcessor {
 
+        private final boolean readAllSheets;
         List<List<String>> spreadsheetContent;
 
         final List<ExcelSheet> result = Lists.newArrayList();
 
-        public TreasuryDefaultExcelSheetProcessor(int maxCols) {
+        public TreasuryDefaultExcelSheetProcessor(int maxCols, boolean readAllSheets) {
             super();
+            this.readAllSheets = readAllSheets;
             setRowProcessor(row -> {
                 final ArrayList<String> rowContent = new ArrayList<String>();
                 spreadsheetContent.add(rowContent);
@@ -96,7 +100,7 @@ public class ExcelUtils {
         @Override
         protected void beforeSheetProcess(Sheet sheet) {
             super.beforeSheetProcess(sheet);
-            this.spreadsheetContent =  new ArrayList<List<String>>();
+            this.spreadsheetContent = new ArrayList<>();
         }
 
         public List<List<String>> getSpreadsheetContent() {
@@ -112,16 +116,28 @@ public class ExcelUtils {
         public List<ExcelSheet> getResult() {
             return this.result;
         }
+
+        @Override
+        protected Function<Workbook, List<Sheet>> getSheetsToProcessSupplier() {
+            return readAllSheets ? workbook -> {
+                int numberOfSheets = workbook.getNumberOfSheets();
+                List<Sheet> sheets = new ArrayList<>(numberOfSheets);
+                for (int i = 0; i < numberOfSheets; i++) {
+                    sheets.add(workbook.getSheetAt(i));
+                }
+                return sheets;
+            } : super.getSheetsToProcessSupplier();
+        }
     }
 	
     public static List<List<String>> readExcel(final InputStream stream, int maxCols) throws IOException {
-        TreasuryDefaultExcelSheetProcessor sheetProcessor = new TreasuryDefaultExcelSheetProcessor(maxCols);
+        TreasuryDefaultExcelSheetProcessor sheetProcessor = new TreasuryDefaultExcelSheetProcessor(maxCols, false);
         ExcelUtil.importExcel(XlsType.XLSX, stream, sheetProcessor, maxCols);
         return sheetProcessor.getSpreadsheetContent();
     }
     
 	public static List<ExcelSheet> readExcelSheets(final InputStream stream, int maxCols) throws IOException {
-        TreasuryDefaultExcelSheetProcessor sheetProcessor = new TreasuryDefaultExcelSheetProcessor(maxCols);
+        TreasuryDefaultExcelSheetProcessor sheetProcessor = new TreasuryDefaultExcelSheetProcessor(maxCols, true);
         ExcelUtil.importExcel(XlsType.XLSX, stream, sheetProcessor, maxCols);
         return sheetProcessor.getResult();
 	}
