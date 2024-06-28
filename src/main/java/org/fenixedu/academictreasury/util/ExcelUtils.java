@@ -132,12 +132,14 @@ public class ExcelUtils {
 	
     public static List<List<String>> readExcel(final InputStream stream, int maxCols) throws IOException {
         TreasuryDefaultExcelSheetProcessor sheetProcessor = new TreasuryDefaultExcelSheetProcessor(maxCols, false);
+        sheetProcessor.setIncludeHeader(true);
         ExcelUtil.importExcel(XlsType.XLSX, stream, sheetProcessor, maxCols);
         return sheetProcessor.getSpreadsheetContent();
     }
     
 	public static List<ExcelSheet> readExcelSheets(final InputStream stream, int maxCols) throws IOException {
         TreasuryDefaultExcelSheetProcessor sheetProcessor = new TreasuryDefaultExcelSheetProcessor(maxCols, true);
+        sheetProcessor.setIncludeHeader(true);
         ExcelUtil.importExcel(XlsType.XLSX, stream, sheetProcessor, maxCols);
         return sheetProcessor.getResult();
 	}
