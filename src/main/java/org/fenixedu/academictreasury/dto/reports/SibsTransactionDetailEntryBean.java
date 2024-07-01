@@ -35,18 +35,15 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
-
+import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
-import java.math.BigDecimal;
 import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academictreasury.domain.reports.DebtReportRequest;
 import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
-import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentCodeTransaction;
-import org.fenixedu.treasury.domain.paymentcodes.SibsTransactionDetail;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
@@ -136,30 +133,30 @@ public class SibsTransactionDetailEntryBean extends AbstractReportEntryBean {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
         
         try {
-            row.createCell(0).setCellValue(identification);
+            createCellWithValue(row, 0, identification);
             
             if (!completed) {
-                row.createCell(1).setCellValue(academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            row.createCell(i++).setCellValue(valueOrEmpty(versioningCreator));
-            row.createCell(i++).setCellValue(valueOrEmpty(creationDate));
-            row.createCell(i++).setCellValue(valueOrEmpty(whenProcessed));
-            row.createCell(i++).setCellValue(valueOrEmpty(whenRegistered));
-            row.createCell(i++).setCellValue(valueOrEmpty(amountPayed));
-            row.createCell(i++).setCellValue(valueOrEmpty(sibsEntityReferenceCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(sibsPaymentReferenceCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(sibsTransactionId));
-            row.createCell(i++).setCellValue(valueOrEmpty(debtAccountId));
-            row.createCell(i++).setCellValue(valueOrEmpty(customerId));
-            row.createCell(i++).setCellValue(valueOrEmpty(businessIdentification));
-            row.createCell(i++).setCellValue(valueOrEmpty(fiscalNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(customerName));
-            row.createCell(i++).setCellValue(valueOrEmpty(settlementDocumentNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(comments));
+            createCellWithValue(row, i++, valueOrEmpty(versioningCreator));
+            createCellWithValue(row, i++, valueOrEmpty(creationDate));
+            createCellWithValue(row, i++, valueOrEmpty(whenProcessed));
+            createCellWithValue(row, i++, valueOrEmpty(whenRegistered));
+            createCellWithValue(row, i++, valueOrEmpty(amountPayed));
+            createCellWithValue(row, i++, valueOrEmpty(sibsEntityReferenceCode));
+            createCellWithValue(row, i++, valueOrEmpty(sibsPaymentReferenceCode));
+            createCellWithValue(row, i++, valueOrEmpty(sibsTransactionId));
+            createCellWithValue(row, i++, valueOrEmpty(debtAccountId));
+            createCellWithValue(row, i++, valueOrEmpty(customerId));
+            createCellWithValue(row, i++, valueOrEmpty(businessIdentification));
+            createCellWithValue(row, i++, valueOrEmpty(fiscalNumber));
+            createCellWithValue(row, i++, valueOrEmpty(customerName));
+            createCellWithValue(row, i++, valueOrEmpty(settlementDocumentNumber));
+            createCellWithValue(row, i++, valueOrEmpty(comments));
             
         } catch(final Exception e) {
             e.printStackTrace();

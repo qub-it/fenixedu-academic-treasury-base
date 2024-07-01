@@ -1,10 +1,10 @@
 /**
  * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/>
  * All rights reserved.
- *
+ * <p>
  * Redistribution and use in source and binary forms, without modification, are permitted
  * provided that the following conditions are met:
- *
+ * <p>
  * * Redistributions of source code must retain the above copyright notice, this list of
  * conditions and the following disclaimer.
  * * Redistributions in binary form must reproduce the above copyright notice, this list
@@ -23,7 +23,7 @@
  * Universidade de Lisboa FenixEdu(™)’s implementation projects.
  * * This license and conditions of redistribution of source code/binary can only be reviewed
  * by the Steering Comittee of FenixEdu(™) <http://www.fenixedu.org/>.
- *
+ * <p>
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
  * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
  * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL “Quorum Born IT” BE
@@ -35,6 +35,7 @@
  */
 package org.fenixedu.academictreasury.domain.integration.tuitioninfo;
 
+import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
@@ -81,7 +82,6 @@ import com.google.common.collect.Lists;
 
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
-import pt.ist.fenixframework.FenixFramework;
 
 public class ERPTuitionInfo extends ERPTuitionInfo_Base {
 
@@ -278,7 +278,6 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
         checkRules();
     }
 
-    
     public Optional<ERPTuitionInfoExportOperation> getLastERPExportOperation() {
         if (getErpTuitionInfoExportOperationsSet().isEmpty()) {
             return Optional.empty();
@@ -287,7 +286,7 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
         return getErpTuitionInfoExportOperationsSet().stream()
                 .sorted(ERPTuitionInfoExportOperation.COMPARE_BY_VERSIONING_CREATION_DATE.reversed()).findFirst();
     }
-    
+
     // @formatter:off
     /* ********
      * SERVICES
@@ -354,75 +353,77 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
         private String erpTuitionInfoTypeCode;
         private String erpTuitionInfoTypeName;
         private String executionYearQualifiedName;
-        
+
         private String erpTuitionInfoExternalId;
         private String erpTuitionInfoCreationDate;
         private String erpTuitionInfoUpdateDate;
         private String erpTuitionInfoDocumentNumber;
         private String totalAmount;
         private String deltaAmount;
-        
+
         private String errorOccured;
         private String errorDescription;
-        
+
         @Override
         public void writeCellValues(final Row row, final IErrorsLog log) {
             int i = 0;
-            
-            row.createCell(i++).setCellValue(executionDate);
-            
-            row.createCell(i++).setCellValue(studentNumber);
-            row.createCell(i++).setCellValue(studentName);
-            row.createCell(i++).setCellValue(customerFiscalNumber);
 
-            row.createCell(i++).setCellValue(erpTuitionInfoTypeCode);
-            row.createCell(i++).setCellValue(erpTuitionInfoTypeName);
-            row.createCell(i++).setCellValue(executionYearQualifiedName);
-            
-            row.createCell(i++).setCellValue(erpTuitionInfoExternalId);
-            row.createCell(i++).setCellValue(erpTuitionInfoCreationDate);
-            row.createCell(i++).setCellValue(erpTuitionInfoUpdateDate);
-            row.createCell(i++).setCellValue(erpTuitionInfoDocumentNumber);
-            row.createCell(i++).setCellValue(totalAmount);
-            row.createCell(i++).setCellValue(deltaAmount);
-            
-            row.createCell(i++).setCellValue(errorOccured);
-            row.createCell(i++).setCellValue(errorDescription);
+            createCellWithValue(row, i++, executionDate);
+
+            createCellWithValue(row, i++, studentNumber);
+            createCellWithValue(row, i++, studentName);
+            createCellWithValue(row, i++, customerFiscalNumber);
+
+            createCellWithValue(row, i++, erpTuitionInfoTypeCode);
+            createCellWithValue(row, i++, erpTuitionInfoTypeName);
+            createCellWithValue(row, i++, executionYearQualifiedName);
+
+            createCellWithValue(row, i++, erpTuitionInfoExternalId);
+            createCellWithValue(row, i++, erpTuitionInfoCreationDate);
+            createCellWithValue(row, i++, erpTuitionInfoUpdateDate);
+            createCellWithValue(row, i++, erpTuitionInfoDocumentNumber);
+            createCellWithValue(row, i++, totalAmount);
+            createCellWithValue(row, i++, deltaAmount);
+
+            createCellWithValue(row, i++, errorOccured);
+            createCellWithValue(row, i++, errorDescription);
         }
     }
-    
-    public static void triggerTuitionInfoCalculation(Predicate<ERPTuitionInfoType> erpTuitionInfoTypeFilterPredicate, Predicate<PersonCustomer> personCustomerPredicate) {
-        if(!ERPTuitionInfoSettings.getInstance().isExportationActive()) {
+
+    public static void triggerTuitionInfoCalculation(Predicate<ERPTuitionInfoType> erpTuitionInfoTypeFilterPredicate,
+            Predicate<PersonCustomer> personCustomerPredicate) {
+        if (!ERPTuitionInfoSettings.getInstance().isExportationActive()) {
             throw new AcademicTreasuryDomainException("error.ERPTuitionInfo.exportation.active.disabled");
         }
-        
-        if(erpTuitionInfoTypeFilterPredicate == null) {
+
+        if (erpTuitionInfoTypeFilterPredicate == null) {
             erpTuitionInfoTypeFilterPredicate = t -> true;
         }
-        
-        if(personCustomerPredicate == null) {
+
+        if (personCustomerPredicate == null) {
             personCustomerPredicate = t -> true;
         }
-        
+
         List<Callable<ERPTuitionInfo>> callablesList = Lists.newArrayList();
 
         final List<ERPTuitionInfoCalculationReportEntry> reportEntries = Collections.synchronizedList(Lists.newArrayList());
         for (final ExecutionYear executionYear : ERPTuitionInfoSettings.getInstance().getActiveExecutionYearsSet()) {
-            for (final ERPTuitionInfoType type : ERPTuitionInfoType.findActiveForExecutionYear(executionYear).collect(Collectors.toSet())) {
-                
-                if(!erpTuitionInfoTypeFilterPredicate.test(type)) {
+            for (final ERPTuitionInfoType type : ERPTuitionInfoType.findActiveForExecutionYear(executionYear)
+                    .collect(Collectors.toSet())) {
+
+                if (!erpTuitionInfoTypeFilterPredicate.test(type)) {
                     continue;
                 }
-                
+
                 for (final PersonCustomer customer : PersonCustomer.findAll().collect(Collectors.<PersonCustomer> toSet())) {
-                    if(customer.getAssociatedPerson().getStudent() == null) {
+                    if (customer.getAssociatedPerson().getStudent() == null) {
                         continue;
                     }
-                    
-                    if(!personCustomerPredicate.test(customer)) {
+
+                    if (!personCustomerPredicate.test(customer)) {
                         continue;
                     }
-                    
+
                     callablesList.add(createTuitionInformationCallable(customer, type, reportEntries));
                 }
             }
@@ -433,7 +434,7 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
             executor.invokeAll(callablesList);
             executor.shutdown();
             executor.awaitTermination(3, TimeUnit.HOURS);
-            
+
         } catch (final InterruptedException e) {
         } finally {
             writeSpreadsheet(reportEntries);
@@ -442,71 +443,68 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
 
     private static void writeSpreadsheet(final List<ERPTuitionInfoCalculationReportEntry> reportEntries) {
         final Spreadsheet spreadsheet = new Spreadsheet() {
-            
+
             @Override
             public ExcelSheet[] getSheets() {
-                return new ExcelSheet[] {
-                        new ExcelSheet() {
-                            
-                            @Override
-                            public Stream<? extends SpreadsheetRow> getRows() {
-                                return reportEntries.stream();
-                            }
-                            
-                            @Override
-                            public String getName() {
-                                return academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.sheet.name");
-                            }
-                            
-                            @Override
-                            public String[] getHeaders() {
-                                return new String[] {
-                                        academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.executionDate"),
-                                        academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.studentNumber"),
-                                        academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.studentName"),
-                                        academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.customerFiscalNumber"),
-                                        academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.erpTuitionInfoTypeCode"),
-                                        academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.erpTuitionInfoTypeName"),
-                                        academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.executionYearQualifiedName"),
-                                        academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.erpTuitionInfoExternalId"),
-                                        academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.erpTuitionInfoCreationDate"),
-                                        academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.erpTuitionInfoUpdateDate"),
-                                        academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.erpTuitionInfoDocumentNumber"),
-                                        academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.totalAmount"),
-                                        academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.deltaAmount"),
-                                        academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.errorOccured"),
-                                        academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.errorDescription")
-                                };
-                            }
-                        }
-                };
+                return new ExcelSheet[] { new ExcelSheet() {
+
+                    @Override
+                    public Stream<? extends SpreadsheetRow> getRows() {
+                        return reportEntries.stream();
+                    }
+
+                    @Override
+                    public String getName() {
+                        return academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.sheet.name");
+                    }
+
+                    @Override
+                    public String[] getHeaders() {
+                        return new String[] { academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.executionDate"),
+                                academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.studentNumber"),
+                                academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.studentName"),
+                                academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.customerFiscalNumber"),
+                                academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.erpTuitionInfoTypeCode"),
+                                academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.erpTuitionInfoTypeName"),
+                                academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.executionYearQualifiedName"),
+                                academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.erpTuitionInfoExternalId"),
+                                academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.erpTuitionInfoCreationDate"),
+                                academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.erpTuitionInfoUpdateDate"),
+                                academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.erpTuitionInfoDocumentNumber"),
+                                academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.totalAmount"),
+                                academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.deltaAmount"),
+                                academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.errorOccured"),
+                                academicTreasuryBundle("label.ERPTuitionInfoCalculationReportEntry.errorDescription") };
+                    }
+                } };
             }
         };
 
         final byte[] spreadsheetContent = Spreadsheet.buildSpreadsheetContent(spreadsheet, null);
-        
+
         final DateTime now = new DateTime();
-        final String filename = academicTreasuryBundle("label.ERPTuitionInfoCreationReportFile.filename", now.toString("yyyyMMddHHmmss"));
+        final String filename =
+                academicTreasuryBundle("label.ERPTuitionInfoCreationReportFile.filename", now.toString("yyyyMMddHHmmss"));
         ERPTuitionInfoCreationReportFile.create(filename, filename, spreadsheetContent);
-        
+
     }
-    
+
     public static void triggerTuitionExportationToERP(Predicate<ERPTuitionInfo> erpTuitionInfoPredicate) {
-        if(!ERPTuitionInfoSettings.getInstance().isExportationActive()) {
+        if (!ERPTuitionInfoSettings.getInstance().isExportationActive()) {
             throw new AcademicTreasuryDomainException("error.ERPTuitionInfo.exportation.active.disabled");
         }
-        
-        if(erpTuitionInfoPredicate == null) {
+
+        if (erpTuitionInfoPredicate == null) {
             erpTuitionInfoPredicate = t -> true;
         }
-        
+
         final List<Callable<ERPTuitionInfo>> callablesList = Lists.newArrayList();
         for (ERPTuitionInfo info : ERPTuitionInfo.findPendingToExport().collect(Collectors.toSet())) {
-            if(erpTuitionInfoPredicate.test(info)) {
+            if (erpTuitionInfoPredicate.test(info)) {
                 callablesList.add(exportTuitionInformationCallable(info));
             }
         }
-        
+
         try {
             final ExecutorService executor = Executors.newSingleThreadExecutor();
             executor.invokeAll(callablesList);
@@ -523,22 +521,21 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
     @Atomic(mode = TxMode.WRITE)
     public static ERPTuitionInfo exportTuitionInformation(final PersonCustomer customer, final ERPTuitionInfoType type) {
 
-        if(!ERPTuitionInfoSettings.getInstance().isExportationActive()) {
+        if (!ERPTuitionInfoSettings.getInstance().isExportationActive()) {
             throw new AcademicTreasuryDomainException("error.ERPTuitionInfo.exportation.active.disabled");
         }
-        
+
         final ExecutionYear executionYear = type.getExecutionYear();
-        
+
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         final Set<AcademicTreasuryEvent> treasuryEventsSet = AcademicTreasuryEvent.find(customer.getAssociatedPerson())
-                .filter(e -> e.getExecutionYear() == executionYear)
-                .collect(Collectors.<AcademicTreasuryEvent> toSet());
+                .filter(e -> e.getExecutionYear() == executionYear).collect(Collectors.<AcademicTreasuryEvent> toSet());
 
         academicTreasuryEventLoop: for (final AcademicTreasuryEvent event : treasuryEventsSet) {
 
             for (final ERPTuitionInfoTypeAcademicEntry academicEntry : type.getErpTuitionInfoTypeAcademicEntriesSet()) {
-                if(academicEntry.isAppliedOnAcademicTreasuryEvent(event, executionYear)) {
+                if (academicEntry.isAppliedOnAcademicTreasuryEvent(event, executionYear)) {
                     totalAmount = totalAmount.add(event.getAmountWithVatToPay(customer))
                             .subtract(event.getInterestsAmountToPay(customer, null));
                     continue academicTreasuryEventLoop;
@@ -553,9 +550,10 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
         if (findUniquePendingToExport(customer, type).isPresent()) {
             final ERPTuitionInfo pendingErpTuitionInfo = findUniquePendingToExport(customer, type).get();
 
-            throw new ERPTuitionInfoPendingException("error.ERPTuitionInfo.pending.to.export", pendingErpTuitionInfo.getUiDocumentNumber());
+            throw new ERPTuitionInfoPendingException("error.ERPTuitionInfo.pending.to.export",
+                    pendingErpTuitionInfo.getUiDocumentNumber());
         }
-        
+
         if (AcademicTreasuryConstants.isZero(deltaAmount)) {
             throw new ERPTuitionInfoNoDifferencesException("error.ErpTuitionInfo.no.differences.from.last.successul.exportation");
         }
@@ -564,7 +562,7 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
                 executionYear.getEndLocalDate(), lastIntegratedWithSuccess.orElse(null));
     }
 
-    protected static Callable<ERPTuitionInfo> createTuitionInformationCallable(final PersonCustomer customer, 
+    protected static Callable<ERPTuitionInfo> createTuitionInformationCallable(final PersonCustomer customer,
             final ERPTuitionInfoType type, final List<ERPTuitionInfoCalculationReportEntry> reportEntries) {
         return new Callable<ERPTuitionInfo>() {
 
@@ -574,13 +572,13 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
             @Override
             @Atomic(mode = TxMode.READ)
             public ERPTuitionInfo call() throws Exception {
-                if(!ERPTuitionInfoSettings.getInstance().isExportationActive()) {
+                if (!ERPTuitionInfoSettings.getInstance().isExportationActive()) {
                     throw new AcademicTreasuryDomainException("error.ERPTuitionInfo.exportation.active.disabled");
                 }
-                
+
                 ERPTuitionInfoCalculationReportEntry reportEntry = new ERPTuitionInfoCalculationReportEntry();
                 reportEntries.add(reportEntry);
-                
+
                 try {
                     final PersonCustomer c = FenixFramework.getDomainObject(customerId);
                     final ERPTuitionInfoType t = FenixFramework.getDomainObject(erpTuitionInfoTypeId);
@@ -594,67 +592,71 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
                     reportEntry.erpTuitionInfoTypeCode = t.getErpTuitionInfoProduct().getCode();
                     reportEntry.erpTuitionInfoTypeName = t.getErpTuitionInfoProduct().getName();
                     reportEntry.executionYearQualifiedName = t.getExecutionYear().getQualifiedName();
-                    
+
                     final ERPTuitionInfo erpTuitionInfo = exportTuitionInformation(c, t);
 
                     reportEntry.erpTuitionInfoExternalId = erpTuitionInfo.getExternalId();
-                    reportEntry.erpTuitionInfoCreationDate = TreasuryPlataformDependentServicesFactory.implementation().versioningCreationDate(erpTuitionInfo).toString(AcademicTreasuryConstants.DATE_TIME_FORMAT_YYYY_MM_DD);
-                    
-                    final DateTime versioningUpdateDate = TreasuryPlataformDependentServicesFactory.implementation().versioningUpdateDate(erpTuitionInfo);
-                    reportEntry.erpTuitionInfoUpdateDate = versioningUpdateDate != null ? versioningUpdateDate.toString(AcademicTreasuryConstants.DATE_TIME_FORMAT_YYYY_MM_DD) : "";
+                    reportEntry.erpTuitionInfoCreationDate =
+                            TreasuryPlataformDependentServicesFactory.implementation().versioningCreationDate(erpTuitionInfo)
+                                    .toString(AcademicTreasuryConstants.DATE_TIME_FORMAT_YYYY_MM_DD);
+
+                    final DateTime versioningUpdateDate =
+                            TreasuryPlataformDependentServicesFactory.implementation().versioningUpdateDate(erpTuitionInfo);
+                    reportEntry.erpTuitionInfoUpdateDate = versioningUpdateDate != null ? versioningUpdateDate
+                            .toString(AcademicTreasuryConstants.DATE_TIME_FORMAT_YYYY_MM_DD) : "";
                     reportEntry.erpTuitionInfoDocumentNumber = erpTuitionInfo.getUiDocumentNumber();
 
                     reportEntry.totalAmount = erpTuitionInfo.getTuitionTotalAmount().toString();
                     reportEntry.deltaAmount = erpTuitionInfo.getTuitionDeltaAmount().toString();
-                    
+
                     return erpTuitionInfo;
-                } catch(final ERPTuitionInfoNoDifferencesException e) {
+                } catch (final ERPTuitionInfoNoDifferencesException e) {
                     reportEntries.remove(reportEntry);
-                    
+
                     throw e;
-                } catch(final AcademicTreasuryDomainException e) {
+                } catch (final AcademicTreasuryDomainException e) {
                     reportEntry.errorOccured = Boolean.TRUE.toString();
                     reportEntry.errorDescription = e.getLocalizedMessage();
 
                     throw e;
-                } catch(final TreasuryDomainException e) {
+                } catch (final TreasuryDomainException e) {
                     reportEntry.errorOccured = Boolean.TRUE.toString();
                     reportEntry.errorDescription = e.getLocalizedMessage();
 
                     throw e;
-                } catch(final Throwable e) {
+                } catch (final Throwable e) {
                     reportEntry.errorOccured = Boolean.TRUE.toString();
                     reportEntry.errorDescription = e.getClass().getSimpleName() + " - " + e.getMessage();
-                    
-                    final List<String> exceptionStackTraceList = Lists.newArrayList(ExceptionUtils.getFullStackTrace(e).split("\n"));
-                    reportEntry.errorDescription += "\n" + String.join("\n", exceptionStackTraceList.subList(0, Integer.min(exceptionStackTraceList.size(), 5)));
-                    
+
+                    final List<String> exceptionStackTraceList =
+                            Lists.newArrayList(ExceptionUtils.getFullStackTrace(e).split("\n"));
+                    reportEntry.errorDescription += "\n" + String.join("\n",
+                            exceptionStackTraceList.subList(0, Integer.min(exceptionStackTraceList.size(), 5)));
+
                     throw e;
                 }
-                
+
             }
         };
     }
-    
+
     protected static Callable<ERPTuitionInfo> exportTuitionInformationCallable(final ERPTuitionInfo erpTuitionInfo) {
-        if(!ERPTuitionInfoSettings.getInstance().isExportationActive()) {
+        if (!ERPTuitionInfoSettings.getInstance().isExportationActive()) {
             throw new AcademicTreasuryDomainException("error.ERPTuitionInfo.exportation.active.disabled");
         }
-        
+
         return new Callable<ERPTuitionInfo>() {
             private String erpTuitionInfoId = erpTuitionInfo.getExternalId();
-            
+
             @Override
             @Atomic(mode = TxMode.READ)
             public ERPTuitionInfo call() throws Exception {
                 final ERPTuitionInfo info = FenixFramework.getDomainObject(erpTuitionInfoId);
-                
+
                 info.export();
                 return info;
             }
         };
     }
-
-
 
 }

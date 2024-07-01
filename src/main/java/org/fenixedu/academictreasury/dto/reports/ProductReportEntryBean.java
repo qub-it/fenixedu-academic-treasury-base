@@ -35,6 +35,7 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
+import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import org.apache.poi.ss.usermodel.Row;
@@ -121,30 +122,30 @@ public class ProductReportEntryBean extends AbstractReportEntryBean {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
 
         try {
-            row.createCell(0).setCellValue(identification);
+            createCellWithValue(row, 0, identification);
 
             if (!completed) {
-                row.createCell(1).setCellValue(academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            row.createCell(i++).setCellValue(valueOrEmpty(groupCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(group));
-            row.createCell(i++).setCellValue(valueOrEmpty(code));
-            row.createCell(i++).setCellValue(valueOrEmpty(descriptionPt));
-            row.createCell(i++).setCellValue(valueOrEmpty(descriptionEn));
-            row.createCell(i++).setCellValue(valueOrEmpty(unitOfMeasurePt));
-            row.createCell(i++).setCellValue(valueOrEmpty(unitOfMeasureEn));
-            row.createCell(i++).setCellValue(valueOrEmpty(active));
-            row.createCell(i++).setCellValue(valueOrEmpty(legacy));
-            row.createCell(i++).setCellValue(valueOrEmpty(tuitionInstallmentOrder));
-            row.createCell(i++).setCellValue(valueOrEmpty(vatTypeCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(vatType));
-            row.createCell(i++).setCellValue(valueOrEmpty(exemptionReasonCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(exemptionReason));
-            row.createCell(i++).setCellValue(valueOrEmpty(finantialInstitution));
+            createCellWithValue(row, i++, valueOrEmpty(groupCode));
+            createCellWithValue(row, i++, valueOrEmpty(group));
+            createCellWithValue(row, i++, valueOrEmpty(code));
+            createCellWithValue(row, i++, valueOrEmpty(descriptionPt));
+            createCellWithValue(row, i++, valueOrEmpty(descriptionEn));
+            createCellWithValue(row, i++, valueOrEmpty(unitOfMeasurePt));
+            createCellWithValue(row, i++, valueOrEmpty(unitOfMeasureEn));
+            createCellWithValue(row, i++, valueOrEmpty(active));
+            createCellWithValue(row, i++, valueOrEmpty(legacy));
+            createCellWithValue(row, i++, valueOrEmpty(tuitionInstallmentOrder));
+            createCellWithValue(row, i++, valueOrEmpty(vatTypeCode));
+            createCellWithValue(row, i++, valueOrEmpty(vatType));
+            createCellWithValue(row, i++, valueOrEmpty(exemptionReasonCode));
+            createCellWithValue(row, i++, valueOrEmpty(exemptionReason));
+            createCellWithValue(row, i++, valueOrEmpty(finantialInstitution));
             
         } catch (final Exception e) {
             e.printStackTrace();

@@ -35,6 +35,7 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
+import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
@@ -182,37 +183,36 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
 
         try {
-            row.createCell(0).setCellValue(this.identification);
+            createCellWithValue(row, 0, this.identification);
 
             if (!this.completed) {
-                row.createCell(1)
-                        .setCellValue(academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
+                createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
             }
 
             int i = 1;
 
-            row.createCell(i++).setCellValue(this.versioningCreator);
-            row.createCell(i++).setCellValue(valueOrEmpty(this.creationDate));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.finantialInstitutionName));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.customerId));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.customerCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.customerActive));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.name));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.identificationType));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.identificationNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.vatNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.email));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.address));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.addressCountryCode));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.studentNumber));
-            row.createCell(i++).setCellValue(valueOrEmpty(this.vatNumberValid));
+            createCellWithValue(row, i++, this.versioningCreator);
+            createCellWithValue(row, i++, valueOrEmpty(this.creationDate));
+            createCellWithValue(row, i++, valueOrEmpty(this.finantialInstitutionName));
+            createCellWithValue(row, i++, valueOrEmpty(this.customerId));
+            createCellWithValue(row, i++, valueOrEmpty(this.customerCode));
+            createCellWithValue(row, i++, valueOrEmpty(this.customerActive));
+            createCellWithValue(row, i++, valueOrEmpty(this.name));
+            createCellWithValue(row, i++, valueOrEmpty(this.identificationType));
+            createCellWithValue(row, i++, valueOrEmpty(this.identificationNumber));
+            createCellWithValue(row, i++, valueOrEmpty(this.vatNumber));
+            createCellWithValue(row, i++, valueOrEmpty(this.email));
+            createCellWithValue(row, i++, valueOrEmpty(this.address));
+            createCellWithValue(row, i++, valueOrEmpty(this.addressCountryCode));
+            createCellWithValue(row, i++, valueOrEmpty(this.studentNumber));
+            createCellWithValue(row, i++, valueOrEmpty(this.vatNumberValid));
+            createCellWithValue(row, i++, this.totalInDebt.toString());
 
             if (DebtReportRequest.COMMA.equals(this.decimalSeparator)) {
-                row.createCell(i++)
-                        .setCellValue(this.totalInDebt.toString().replace(DebtReportRequest.DOT, DebtReportRequest.COMMA));
+                createCellWithValue(row, i++, this.totalInDebt.toString().replace(DebtReportRequest.DOT, DebtReportRequest.COMMA));
             } else {
-                row.createCell(i++).setCellValue(this.totalInDebt.toString());
+                createCellWithValue(row, i++, this.totalInDebt.toString());
             }
 
         } catch (final Exception e) {
