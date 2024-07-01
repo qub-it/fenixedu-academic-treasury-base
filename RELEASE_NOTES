@@ -1,4 +1,4 @@
-- Refactor: Uses createCell method from XlsxUtil [#qubIT-Omnis-5961]
+- Refactor: Uses createCell method from ExcelUtil [#qubIT-Omnis-5961]
 
 11.15.0 (26-06-2024)
 - Refactor: Dissociate from AdministrativeOffice deprecated entity [#qubIT-Fenix-5448]
