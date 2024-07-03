@@ -49,7 +49,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFCell;
 
 import com.google.common.collect.Lists;
 
@@ -85,10 +84,10 @@ public class ExcelUtils {
                         continue;
                     }
 
-                    if (XSSFCell.CELL_TYPE_NUMERIC == cell.getCellType() && DateUtil.isCellDateFormatted(cell)) {
+                    if (Cell.CELL_TYPE_NUMERIC == cell.getCellType() && DateUtil.isCellDateFormatted(cell)) {
                         rowContent.add(new SimpleDateFormat("dd/MM/yyyy HH:mm").format(cell.getDateCellValue()));
                     } else {
-                        cell.setCellType(XSSFCell.CELL_TYPE_STRING);
+                        cell.setCellType(Cell.CELL_TYPE_STRING);
                         String value = cell.getStringCellValue();
                         rowContent.add(value);
                     }
