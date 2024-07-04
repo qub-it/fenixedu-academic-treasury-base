@@ -277,7 +277,7 @@ public class CloseDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
             if (debitEntry.getFinantialDocument() == null) {
                 DebtAccount debtAccount = debitEntry.getDebtAccount();
                 DocumentNumberSeries defaultDocumentNumberSeries = DocumentNumberSeries
-                        .findUniqueDefault(FinantialDocumentType.findForDebitNote(), debtAccount.getFinantialInstitution()).get();
+                        .findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(), rule.getFinantialEntity());
                 DebitNote debitNote = DebitNote.create(debitEntry.getFinantialEntity(), debtAccount, null,
                         defaultDocumentNumberSeries, new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
 

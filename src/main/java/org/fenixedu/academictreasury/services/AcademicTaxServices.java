@@ -431,8 +431,8 @@ public class AcademicTaxServices {
                 academicTariff.createDebitEntryForImprovement(debtAccount, academicTreasuryEvent, enrolmentEvaluation);
 
         if (debitEntry != null) {
-            DocumentNumberSeries defaultDocumentNumberSeries = DocumentNumberSeries
-                    .findUniqueDefault(FinantialDocumentType.findForDebitNote(), debtAccount.getFinantialInstitution()).get();
+            DocumentNumberSeries defaultDocumentNumberSeries =
+                    DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(), finantialEntity);
             final DebitNote debitNote = DebitNote.create(academicTariff.getFinantialEntity(), debtAccount, null,
                     defaultDocumentNumberSeries, new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
 

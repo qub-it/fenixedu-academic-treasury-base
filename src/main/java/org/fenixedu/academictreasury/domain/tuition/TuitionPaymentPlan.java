@@ -477,8 +477,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         }
 
         if (createdDebitEntries) {
-            DocumentNumberSeries defaultDocumentNumberSeries = DocumentNumberSeries
-                    .findUniqueDefault(FinantialDocumentType.findForDebitNote(), debtAccount.getFinantialInstitution()).get();
+            DocumentNumberSeries defaultDocumentNumberSeries =
+                    DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(), getFinantialEntity());
             final DebitNote debitNote = DebitNote.create(getFinantialEntity(), debtAccount, null, defaultDocumentNumberSeries,
                     new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
 
@@ -558,8 +558,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         }
 
         if (createdDebitEntries) {
-            DocumentNumberSeries defaultDocumentNumberSeries = DocumentNumberSeries
-                    .findUniqueDefault(FinantialDocumentType.findForDebitNote(), debtAccount.getFinantialInstitution()).get();
+            DocumentNumberSeries defaultDocumentNumberSeries =
+                    DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(), getFinantialEntity());
             final DebitNote debitNote = DebitNote.create(getFinantialEntity(), debtAccount, null, defaultDocumentNumberSeries,
                     new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
 

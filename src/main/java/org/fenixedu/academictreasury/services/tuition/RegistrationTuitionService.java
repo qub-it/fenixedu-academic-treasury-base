@@ -527,7 +527,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
         FinantialInstitution finantialInstitution = studentDebtAccount.getFinantialInstitution();
 
         DocumentNumberSeries defaultDocumentNumberSeries =
-                DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
+                DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(), finantialEntity);
         return DebitNote.create(finantialEntity, studentDebtAccount, payorDebtAccount, defaultDocumentNumberSeries,
                 new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
     }
