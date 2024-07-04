@@ -137,7 +137,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
 
             var finantialInstitution = finantialEntity.getFinantialInstitution();
             var documentNumberSeries =
-                    DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
+                    DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(), finantialEntity);
             var now = new DateTime();
             var vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, new DateTime()).get();
             var person = target.getAcademicTreasuryTargetPerson();
@@ -260,7 +260,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             var api = TreasuryBridgeAPIFactory.implementation();
             var finantialInstitution = finantialEntity.getFinantialInstitution();
             var documentNumberSeries =
-                    DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(), finantialInstitution).get();
+                    DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(), finantialEntity);
             var now = new DateTime();
             var person = target.getAcademicTreasuryTargetPerson();
 

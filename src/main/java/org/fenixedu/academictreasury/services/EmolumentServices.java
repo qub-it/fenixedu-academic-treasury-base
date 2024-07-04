@@ -337,8 +337,8 @@ public class EmolumentServices {
             throw new AcademicTreasuryDomainException("error.EmolumentServices.academicServiceRequest.amount.equals.to.zero");
         }
 
-        DocumentNumberSeries defaultDocumentNumberSeries = DocumentNumberSeries
-                .findUniqueDefault(FinantialDocumentType.findForDebitNote(), personDebtAccount.getFinantialInstitution()).get();
+        DocumentNumberSeries defaultDocumentNumberSeries =
+                DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(), finantialEntity);
         final DebitNote debitNote = DebitNote.create(academicTariff.getFinantialEntity(), personDebtAccount, null,
                 defaultDocumentNumberSeries, new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
 
