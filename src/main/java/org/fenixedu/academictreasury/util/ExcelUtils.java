@@ -45,10 +45,7 @@ import java.util.function.Function;
 import com.qubit.terra.framework.tools.excel.ExcelUtil;
 import com.qubit.terra.framework.tools.excel.SheetProcessor;
 import com.qubit.terra.framework.tools.excel.XlsType;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 
 import com.google.common.collect.Lists;
 
@@ -84,10 +81,10 @@ public class ExcelUtils {
                         continue;
                     }
 
-                    if (Cell.CELL_TYPE_NUMERIC == cell.getCellType() && DateUtil.isCellDateFormatted(cell)) {
+                    if (CellType.NUMERIC == cell.getCellType() && DateUtil.isCellDateFormatted(cell)) {
                         rowContent.add(new SimpleDateFormat("dd/MM/yyyy HH:mm").format(cell.getDateCellValue()));
                     } else {
-                        cell.setCellType(Cell.CELL_TYPE_STRING);
+                        cell.setCellType(CellType.STRING);
                         String value = cell.getStringCellValue();
                         rowContent.add(value);
                     }

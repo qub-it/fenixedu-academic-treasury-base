@@ -1,3 +1,5 @@
+- Improvement: Removes old poi types to fix compilation [#qubIT-Omnis-6199]
+
 11.17.0 (03-07-2024)
 - Improvement: Refactors code due to poi upgrade [#qubIT-Omnis-6199]
 
