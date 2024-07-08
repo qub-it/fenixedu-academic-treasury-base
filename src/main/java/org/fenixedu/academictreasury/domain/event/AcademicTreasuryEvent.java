@@ -853,6 +853,9 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         } else if (isForTreasuryEventTarget()
                 && ((IAcademicTreasuryTarget) getTreasuryEventTarget()).getAcademicTreasuryTargetDegree() != null) {
             return ((IAcademicTreasuryTarget) getTreasuryEventTarget()).getAcademicTreasuryTargetDegree();
+        } else if (isForAcademicServiceRequest() && getITreasuryServiceRequest() != null
+                && getITreasuryServiceRequest().getRegistration() != null) {
+            degree = getITreasuryServiceRequest().getRegistration().getDegree();
         }
 
         return degree;
