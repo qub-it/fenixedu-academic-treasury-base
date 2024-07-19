@@ -41,23 +41,14 @@ import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.acade
 import java.math.BigDecimal;
 
 import org.apache.poi.ss.usermodel.Row;
-import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
-import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.student.RegistrationRegimeType;
-import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
-import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
-import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent.AcademicTreasuryEventKeys;
 import org.fenixedu.academictreasury.domain.reports.DebtReportRequest;
 import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
-import org.fenixedu.academictreasury.domain.serviceRequests.ITreasuryServiceRequest;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
-import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Currency;
@@ -68,7 +59,6 @@ import org.fenixedu.treasury.domain.document.CreditNote;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.Invoice;
 import org.fenixedu.treasury.domain.document.InvoiceEntry;
-import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.services.integration.erp.sap.SAPExporter;
@@ -80,7 +70,7 @@ import org.joda.time.LocalDate;
 
 import com.google.common.base.Strings;
 
-public class DebtReportEntryBean implements SpreadsheetRow {
+public class DebtReportEntryBean implements SpreadsheetRow, IFinantialReportEntryCommonMethods {
 
     // @formatter:off
     public static String[] SPREADSHEET_DEBIT_HEADERS =
@@ -434,177 +424,6 @@ public class DebtReportEntryBean implements SpreadsheetRow {
                 .orElse(null);
     }
 
-    private void fillAcademicInformation(final InvoiceEntry invoiceEntry) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        DebitEntry debitEntry =
-                invoiceEntry.isDebitNoteEntry() ? (DebitEntry) invoiceEntry : ((CreditEntry) invoiceEntry).getDebitEntry();
-
-        TreasuryEvent treasuryEvent = null;
-        if (debitEntry != null) {
-            treasuryEvent = debitEntry.getTreasuryEvent();
-        } else if (invoiceEntry.isCreditNoteEntry()) {
-            treasuryEvent = ((CreditEntry) invoiceEntry).getTreasuryEvent();
-        }
-
-        if (treasuryEvent != null) {
-
-            // Degree && ExecutionYear && ExecutionInterval
-            if (treasuryEvent instanceof AcademicTreasuryEvent) {
-                final AcademicTreasuryEvent academicTreasuryEvent = (AcademicTreasuryEvent) treasuryEvent;
-
-                if (academicTreasuryEvent.isForRegistrationTuition()) {
-                    Registration registration = academicTreasuryEvent.getRegistration();
-
-                    this.registrationNumber = registration.getNumber();
-                    this.degreeType =
-                            academicTreasuryServices.localizedNameOfDegreeType(registration.getDegree().getDegreeType());
-                    this.degreeCode = registration.getDegree().getCode();
-                    this.degreeName = registration.getDegree().getPresentationName();
-                    this.executionYear = academicTreasuryEvent.getExecutionYear().getQualifiedName();
-
-                    if (debitEntry != null) {
-                        this.tuitionPaymentPlan =
-                                AcademicTreasuryEventKeys.valueFor(debitEntry, AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN);
-                        this.tuitionPaymentPlanConditions = AcademicTreasuryEventKeys.valueFor(debitEntry,
-                                AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN_CONDITIONS);
-                    }
-
-                    fillStudentConditionsInformation(registration, academicTreasuryEvent.getExecutionYear());
-
-                } else if (academicTreasuryEvent.isForStandaloneTuition()
-                        || academicTreasuryEvent.isForExtracurricularTuition()) {
-                    if (debitEntry != null && debitEntry.getCurricularCourse() != null) {
-                        this.degreeType = academicTreasuryServices
-                                .localizedNameOfDegreeType(debitEntry.getCurricularCourse().getDegree().getDegreeType());
-                        this.degreeCode = debitEntry.getCurricularCourse().getDegree().getCode();
-                        this.degreeName = debitEntry.getCurricularCourse().getDegree().getPresentationName();
-                    }
-
-                    if (debitEntry != null && debitEntry.getExecutionSemester() != null) {
-                        this.executionYear = academicTreasuryServices()
-                                .executionYearOfExecutionSemester(debitEntry.getExecutionSemester()).getQualifiedName();
-                        this.executionSemester = debitEntry.getExecutionSemester().getQualifiedName();
-                    }
-
-                    if (debitEntry != null) {
-                        this.tuitionPaymentPlan =
-                                AcademicTreasuryEventKeys.valueFor(debitEntry, AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN);
-                        this.tuitionPaymentPlanConditions = AcademicTreasuryEventKeys.valueFor(debitEntry,
-                                AcademicTreasuryEventKeys.TUITION_PAYMENT_PLAN_CONDITIONS);
-                    }
-
-                    if (academicTreasuryEvent.getRegistration() != null && academicTreasuryEvent.getExecutionYear() != null) {
-                        fillStudentConditionsInformation(academicTreasuryEvent.getRegistration(),
-                                academicTreasuryEvent.getExecutionYear());
-
-                    }
-
-                } else if (academicTreasuryEvent.isForImprovementTax()) {
-                    if (debitEntry != null && debitEntry.getCurricularCourse() != null) {
-                        this.degreeType = academicTreasuryServices
-                                .localizedNameOfDegreeType(debitEntry.getCurricularCourse().getDegree().getDegreeType());
-                        this.degreeCode = debitEntry.getCurricularCourse().getDegree().getCode();
-                        this.degreeName = debitEntry.getCurricularCourse().getDegree().getPresentationName();
-                    }
-
-                    if (debitEntry != null && debitEntry.getExecutionSemester() != null) {
-                        this.executionYear = academicTreasuryServices()
-                                .executionYearOfExecutionSemester(debitEntry.getExecutionSemester()).getQualifiedName();
-                        this.executionSemester = debitEntry.getExecutionSemester().getQualifiedName();
-                    }
-
-                    if (academicTreasuryEvent.getRegistration() != null && academicTreasuryEvent.getExecutionYear() != null) {
-                        fillStudentConditionsInformation(academicTreasuryEvent.getRegistration(),
-                                academicTreasuryEvent.getExecutionYear());
-                    }
-                } else if (academicTreasuryEvent.isForAcademicTax()) {
-                    Registration registration = academicTreasuryEvent.getRegistration();
-
-                    this.registrationNumber = registration.getNumber();
-                    this.degreeType =
-                            academicTreasuryServices.localizedNameOfDegreeType(registration.getDegree().getDegreeType());
-                    this.degreeCode = registration.getDegree().getCode();
-                    this.degreeName = registration.getDegree().getPresentationName();
-                    this.executionYear = academicTreasuryEvent.getExecutionYear().getQualifiedName();
-
-                    fillStudentConditionsInformation(academicTreasuryEvent.getRegistration(),
-                            academicTreasuryEvent.getExecutionYear());
-
-                } else if (academicTreasuryEvent.isForAcademicServiceRequest()) {
-
-                    final ITreasuryServiceRequest iTreasuryServiceRequest = academicTreasuryEvent.getITreasuryServiceRequest();
-
-                    Registration registration = iTreasuryServiceRequest.getRegistration();
-                    this.registrationNumber = registration.getNumber();
-                    this.degreeType =
-                            academicTreasuryServices.localizedNameOfDegreeType(registration.getDegree().getDegreeType());
-                    this.degreeCode = registration.getDegree().getCode();
-                    this.degreeName = registration.getDegree().getPresentationName();
-
-                    if (iTreasuryServiceRequest.hasExecutionYear()) {
-                        this.executionYear = iTreasuryServiceRequest.getExecutionYear().getQualifiedName();
-                        fillStudentConditionsInformation(iTreasuryServiceRequest.getRegistration(),
-                                iTreasuryServiceRequest.getExecutionYear());
-                    }
-                } else if (academicTreasuryEvent.isForTreasuryEventTarget()) {
-                    IAcademicTreasuryTarget treasuryEventTarget =
-                            (IAcademicTreasuryTarget) academicTreasuryEvent.getTreasuryEventTarget();
-
-                    if (treasuryEventTarget.getAcademicTreasuryTargetRegistration() != null) {
-                        this.registrationNumber = treasuryEventTarget.getAcademicTreasuryTargetRegistration().getNumber();
-                        this.degreeType = treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree().getDegreeType()
-                                .getName().getContent();
-                        this.degreeCode = treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree().getCode();
-                        this.degreeName =
-                                treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree().getPresentationName();
-                    }
-
-                    if (treasuryEventTarget.getAcademicTreasuryTargetExecutionYear() != null) {
-                        this.executionYear = treasuryEventTarget.getAcademicTreasuryTargetExecutionYear().getQualifiedName();
-                    }
-
-                    if (treasuryEventTarget.getAcademicTreasuryTargetExecutionSemester() != null) {
-                        this.executionSemester =
-                                treasuryEventTarget.getAcademicTreasuryTargetExecutionSemester().getQualifiedName();
-                    }
-                } else if (academicTreasuryEvent.isForCustomAcademicDebt()) {
-                    Registration registration = academicTreasuryEvent.getRegistration();
-
-                    this.registrationNumber = registration.getNumber();
-                    this.degreeType =
-                            academicTreasuryServices.localizedNameOfDegreeType(registration.getDegree().getDegreeType());
-                    this.degreeCode = registration.getDegree().getCode();
-                    this.degreeName = registration.getDegree().getPresentationName();
-                    this.executionYear = academicTreasuryEvent.getExecutionYear().getQualifiedName();
-
-                    fillStudentConditionsInformation(registration, academicTreasuryEvent.getExecutionYear());
-                }
-            } else {
-                if (!Strings.isNullOrEmpty(treasuryEvent.getDegreeCode())) {
-                    this.degreeCode = treasuryEvent.getDegreeCode();
-                }
-
-                if (!Strings.isNullOrEmpty(treasuryEvent.getDegreeName())) {
-                    this.degreeName = treasuryEvent.getDegreeName();
-                }
-
-                if (!Strings.isNullOrEmpty(treasuryEvent.getExecutionYearName())) {
-                    this.executionYear = treasuryEvent.getExecutionYearName();
-                }
-            }
-
-            if (debitEntry != null && Strings.isNullOrEmpty(this.degreeCode)) {
-                this.degreeCode = debitEntry.getDegreeCode();
-            }
-
-            if (debitEntry != null && Strings.isNullOrEmpty(this.executionYear)) {
-                this.executionYear = debitEntry.getExecutionYearName();
-            }
-        }
-    }
-
     private IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
         return AcademicTreasuryPlataformDependentServicesFactory.implementation();
     }
@@ -617,33 +436,6 @@ public class DebtReportEntryBean implements SpreadsheetRow {
         }
 
         return null;
-    }
-
-    private void fillStudentConditionsInformation(final Registration registration, final ExecutionYear executionYear) {
-        final IAcademicTreasuryPlatformDependentServices academicServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        this.firstTimeStudent = registration.isFirstTime(executionYear);
-        this.partialRegime =
-                academicServices.registrationRegimeType(registration, executionYear) == RegistrationRegimeType.PARTIAL_TIME;
-        this.statutes = statutes(registration, executionYear);
-        this.agreement = academicServices.registrationProtocol(registration).getDescription();
-        IngressionType ingressionType = academicServices.ingression(registration);
-        this.ingression = ingressionType != null ? ingressionType.getDescription() : null;
-
-        this.numberOfNormalEnrolments = TuitionServices.normalEnrolmentsIncludingAnnuled(registration, executionYear).size();
-        this.numberOfStandaloneEnrolments =
-                TuitionServices.standaloneEnrolmentsIncludingAnnuled(registration, executionYear).size();
-        this.numberOfExtracurricularEnrolments =
-                TuitionServices.extracurricularEnrolmentsIncludingAnnuled(registration, executionYear).size();
-    }
-
-    private String statutes(final Registration registration, final ExecutionYear executionYear) {
-        final IAcademicTreasuryPlatformDependentServices services =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        return services.statutesTypesValidOnAnyExecutionSemesterFor(registration, executionYear).stream()
-                .map(s -> s != null ? services.localizedNameOfStatuteType(s) : "").reduce((a, c) -> c + ", " + a).orElse(null);
     }
 
     @Override

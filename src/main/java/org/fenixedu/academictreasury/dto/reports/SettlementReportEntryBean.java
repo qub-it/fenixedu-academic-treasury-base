@@ -45,12 +45,9 @@ import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
-import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.reports.DebtReportRequest;
 import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
-import org.fenixedu.academictreasury.domain.serviceRequests.ITreasuryServiceRequest;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
@@ -62,7 +59,6 @@ import org.fenixedu.treasury.domain.document.Invoice;
 import org.fenixedu.treasury.domain.document.InvoiceEntry;
 import org.fenixedu.treasury.domain.document.SettlementEntry;
 import org.fenixedu.treasury.domain.document.SettlementNote;
-import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.domain.payments.PaymentTransaction;
@@ -75,7 +71,7 @@ import org.joda.time.LocalDate;
 
 import com.google.common.base.Strings;
 
-public class SettlementReportEntryBean implements SpreadsheetRow {
+public class SettlementReportEntryBean implements SpreadsheetRow, IFinantialReportEntryCommonMethods {
 
     public static String[] SPREADSHEET_HEADERS =
             { academicTreasuryBundle("label.SettlementReportEntryBean.header.identification"),
@@ -155,6 +151,17 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
     private String degreeName;
     private String executionYear;
     private String executionSemester;
+
+    private LocalizedString agreement;
+    private LocalizedString ingression;
+    private Boolean firstTimeStudent;
+    private Boolean partialRegime;
+    private String statutes;
+    private Integer numberOfNormalEnrolments;
+    private Integer numberOfStandaloneEnrolments;
+    private Integer numberOfExtracurricularEnrolments;
+    private String tuitionPaymentPlan;
+    private String tuitionPaymentPlanConditions;
 
     private DateTime closeDate;
     private Boolean exportedInLegacyERP;
@@ -266,138 +273,6 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
                     treasuryServices.getCertifiedDocumentDate(entry.getInvoiceEntry().getFinantialDocument());
         }
 
-    }
-
-    private void fillAcademicInformation(final InvoiceEntry invoiceEntry) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        DebitEntry debitEntry =
-                invoiceEntry.isDebitNoteEntry() ? (DebitEntry) invoiceEntry : ((CreditEntry) invoiceEntry).getDebitEntry();
-
-        TreasuryEvent treasuryEvent = null;
-        if (debitEntry != null) {
-            treasuryEvent = debitEntry.getTreasuryEvent();
-        } else if (invoiceEntry.isCreditNoteEntry()) {
-            treasuryEvent = ((CreditEntry) invoiceEntry).getTreasuryEvent();
-        }
-
-        if (treasuryEvent != null) {
-
-            // Degree && ExecutionYear && ExecutionInterval
-            if (treasuryEvent instanceof AcademicTreasuryEvent) {
-                final AcademicTreasuryEvent academicTreasuryEvent = (AcademicTreasuryEvent) treasuryEvent;
-
-                if (academicTreasuryEvent.isForRegistrationTuition()) {
-                    this.registrationNumber = academicTreasuryEvent.getRegistration().getNumber();
-                    this.degreeType = academicTreasuryServices
-                            .localizedNameOfDegreeType(academicTreasuryEvent.getRegistration().getDegree().getDegreeType());
-                    this.degreeCode = academicTreasuryEvent.getRegistration().getDegree().getCode();
-                    this.degreeName = academicTreasuryEvent.getRegistration().getDegree().getPresentationName();
-                    this.executionYear = academicTreasuryEvent.getExecutionYear().getQualifiedName();
-
-                } else if (academicTreasuryEvent.isForStandaloneTuition()
-                        || academicTreasuryEvent.isForExtracurricularTuition()) {
-                    if (debitEntry != null && debitEntry.getCurricularCourse() != null) {
-                        this.degreeType = academicTreasuryServices
-                                .localizedNameOfDegreeType(debitEntry.getCurricularCourse().getDegree().getDegreeType());
-                        this.degreeCode = debitEntry.getCurricularCourse().getDegree().getCode();
-                        this.degreeName = debitEntry.getCurricularCourse().getDegree().getPresentationName();
-                    }
-
-                    if (debitEntry != null && debitEntry.getExecutionSemester() != null) {
-                        this.executionYear = academicTreasuryServices()
-                                .executionYearOfExecutionSemester(debitEntry.getExecutionSemester()).getQualifiedName();
-                        this.executionSemester = debitEntry.getExecutionSemester().getQualifiedName();
-                    }
-
-                } else if (academicTreasuryEvent.isForImprovementTax()) {
-                    if (debitEntry != null && debitEntry.getCurricularCourse() != null) {
-                        this.degreeType = academicTreasuryServices
-                                .localizedNameOfDegreeType(debitEntry.getCurricularCourse().getDegree().getDegreeType());
-                        this.degreeCode = debitEntry.getCurricularCourse().getDegree().getCode();
-                        this.degreeName = debitEntry.getCurricularCourse().getDegree().getPresentationName();
-                    }
-
-                    if (debitEntry != null && debitEntry.getExecutionSemester() != null) {
-                        this.executionYear = academicTreasuryServices()
-                                .executionYearOfExecutionSemester(debitEntry.getExecutionSemester()).getQualifiedName();
-                        this.executionSemester = debitEntry.getExecutionSemester().getQualifiedName();
-                    }
-
-                } else if (academicTreasuryEvent.isForAcademicTax()) {
-
-                    this.registrationNumber = academicTreasuryEvent.getRegistration().getNumber();
-                    this.degreeType = academicTreasuryServices
-                            .localizedNameOfDegreeType(academicTreasuryEvent.getRegistration().getDegree().getDegreeType());
-                    this.degreeCode = academicTreasuryEvent.getRegistration().getDegree().getCode();
-                    this.degreeName = academicTreasuryEvent.getRegistration().getDegree().getPresentationName();
-                    this.executionYear = academicTreasuryEvent.getExecutionYear().getQualifiedName();
-
-                } else if (academicTreasuryEvent.isForAcademicServiceRequest()) {
-
-                    final ITreasuryServiceRequest iTreasuryServiceRequest = academicTreasuryEvent.getITreasuryServiceRequest();
-
-                    this.registrationNumber = iTreasuryServiceRequest.getRegistration().getNumber();
-                    this.degreeType = academicTreasuryServices
-                            .localizedNameOfDegreeType(iTreasuryServiceRequest.getRegistration().getDegree().getDegreeType());
-                    this.degreeCode = iTreasuryServiceRequest.getRegistration().getDegree().getCode();
-                    this.degreeName = iTreasuryServiceRequest.getRegistration().getDegree().getPresentationName();
-
-                    if (iTreasuryServiceRequest.hasExecutionYear()) {
-                        this.executionYear = iTreasuryServiceRequest.getExecutionYear().getQualifiedName();
-                    }
-                } else if (academicTreasuryEvent.isForTreasuryEventTarget()) {
-                    IAcademicTreasuryTarget treasuryEventTarget =
-                            (IAcademicTreasuryTarget) academicTreasuryEvent.getTreasuryEventTarget();
-
-                    if (treasuryEventTarget.getAcademicTreasuryTargetRegistration() != null) {
-                        this.registrationNumber = treasuryEventTarget.getAcademicTreasuryTargetRegistration().getNumber();
-                        this.degreeType = treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree().getDegreeType()
-                                .getName().getContent();
-                        this.degreeCode = treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree().getCode();
-                        this.degreeName =
-                                treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree().getPresentationName();
-                    }
-
-                    if (treasuryEventTarget.getAcademicTreasuryTargetExecutionYear() != null) {
-                        this.executionYear = treasuryEventTarget.getAcademicTreasuryTargetExecutionYear().getQualifiedName();
-                    }
-
-                    if (treasuryEventTarget.getAcademicTreasuryTargetExecutionSemester() != null) {
-                        this.executionSemester =
-                                treasuryEventTarget.getAcademicTreasuryTargetExecutionSemester().getQualifiedName();
-                    }
-                } else if (academicTreasuryEvent.isForCustomAcademicDebt()) {
-                    this.registrationNumber = academicTreasuryEvent.getRegistration().getNumber();
-                    this.degreeType = academicTreasuryServices
-                            .localizedNameOfDegreeType(academicTreasuryEvent.getRegistration().getDegree().getDegreeType());
-                    this.degreeCode = academicTreasuryEvent.getRegistration().getDegree().getCode();
-                    this.degreeName = academicTreasuryEvent.getRegistration().getDegree().getPresentationName();
-                    this.executionYear = academicTreasuryEvent.getExecutionYear().getQualifiedName();
-                }
-            } else {
-                if (!Strings.isNullOrEmpty(treasuryEvent.getDegreeCode())) {
-                    this.degreeCode = treasuryEvent.getDegreeCode();
-                }
-
-                if (!Strings.isNullOrEmpty(treasuryEvent.getDegreeName())) {
-                    this.degreeName = treasuryEvent.getDegreeName();
-                }
-
-                if (!Strings.isNullOrEmpty(treasuryEvent.getExecutionYearName())) {
-                    this.executionYear = treasuryEvent.getExecutionYearName();
-                }
-            }
-
-            if (debitEntry != null && Strings.isNullOrEmpty(this.degreeCode)) {
-                this.degreeCode = debitEntry.getDegreeCode();
-            }
-
-            if (debitEntry != null && Strings.isNullOrEmpty(this.executionYear)) {
-                this.executionYear = debitEntry.getExecutionYearName();
-            }
-        }
     }
 
     private IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
@@ -1051,4 +926,85 @@ public class SettlementReportEntryBean implements SpreadsheetRow {
     public void setFinantialEntityName(LocalizedString finantialEntityName) {
         this.finantialEntityName = finantialEntityName;
     }
+
+    public LocalizedString getAgreement() {
+        return agreement;
+    }
+
+    public void setAgreement(LocalizedString agreement) {
+        this.agreement = agreement;
+    }
+
+    public LocalizedString getIngression() {
+        return ingression;
+    }
+
+    public void setIngression(LocalizedString ingression) {
+        this.ingression = ingression;
+    }
+
+    public Boolean getFirstTimeStudent() {
+        return firstTimeStudent;
+    }
+
+    public void setFirstTimeStudent(Boolean firstTimeStudent) {
+        this.firstTimeStudent = firstTimeStudent;
+    }
+
+    public Boolean getPartialRegime() {
+        return partialRegime;
+    }
+
+    public void setPartialRegime(Boolean partialRegime) {
+        this.partialRegime = partialRegime;
+    }
+
+    public String getStatutes() {
+        return statutes;
+    }
+
+    public void setStatutes(String statutes) {
+        this.statutes = statutes;
+    }
+
+    public Integer getNumberOfNormalEnrolments() {
+        return numberOfNormalEnrolments;
+    }
+
+    public void setNumberOfNormalEnrolments(Integer numberOfNormalEnrolments) {
+        this.numberOfNormalEnrolments = numberOfNormalEnrolments;
+    }
+
+    public Integer getNumberOfStandaloneEnrolments() {
+        return numberOfStandaloneEnrolments;
+    }
+
+    public void setNumberOfStandaloneEnrolments(Integer numberOfStandaloneEnrolments) {
+        this.numberOfStandaloneEnrolments = numberOfStandaloneEnrolments;
+    }
+
+    public Integer getNumberOfExtracurricularEnrolments() {
+        return numberOfExtracurricularEnrolments;
+    }
+
+    public void setNumberOfExtracurricularEnrolments(Integer numberOfExtracurricularEnrolments) {
+        this.numberOfExtracurricularEnrolments = numberOfExtracurricularEnrolments;
+    }
+
+    public String getTuitionPaymentPlan() {
+        return tuitionPaymentPlan;
+    }
+
+    public void setTuitionPaymentPlan(String tuitionPaymentPlan) {
+        this.tuitionPaymentPlan = tuitionPaymentPlan;
+    }
+
+    public String getTuitionPaymentPlanConditions() {
+        return tuitionPaymentPlanConditions;
+    }
+
+    public void setTuitionPaymentPlanConditions(String tuitionPaymentPlanConditions) {
+        this.tuitionPaymentPlanConditions = tuitionPaymentPlanConditions;
+    }
+
 }
