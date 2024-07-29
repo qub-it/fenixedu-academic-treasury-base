@@ -85,7 +85,7 @@ public class AnnulPendingDebtsGenerationRuleStrategy implements IAcademicDebtGen
 
         final List<AcademicDebtGenerationProcessingResult> resultList = Lists.newArrayList();
         for (final DegreeCurricularPlan degreeCurricularPlan : rule.getDegreeCurricularPlansSet()) {
-            for (final Registration registration : degreeCurricularPlan.getRegistrations()) {
+            for (final Registration registration : getRegistrations(degreeCurricularPlan)) {
 
                 if (isToDiscard(rule, registration)) {
                     continue;
@@ -108,6 +108,11 @@ public class AnnulPendingDebtsGenerationRuleStrategy implements IAcademicDebtGen
         }
 
         return resultList;
+    }
+
+    private Set<Registration> getRegistrations(DegreeCurricularPlan degreeCurricularPlan) {
+        return degreeCurricularPlan.getStudentCurricularPlansSet().stream().map(s -> s.getRegistration())
+                .collect(Collectors.toSet());
     }
 
     @Override
