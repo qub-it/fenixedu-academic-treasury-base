@@ -1,3 +1,4 @@
+11.17.5 (29-07-2024)
 - Bug Fix: Consider all registration states when executing the anull debit entries generation rule [#qubIT-Fenix-5538]
 
 11.17.4 (19-07-2024)
