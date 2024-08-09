@@ -35,6 +35,7 @@
  */
 package org.fenixedu.academictreasury.domain.debtGeneration;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -665,44 +666,59 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         return returnResult;
     }
 
+    private static List<AcademicDebtGenerationRule> rules = null;
+
+    private static List<AcademicDebtGenerationRule> getRules() {
+        if (rules == null) {
+            rules = AcademicDebtGenerationRuleType.findAll().flatMap(t -> AcademicDebtGenerationRule.findActiveByType(t))
+                    .sorted(COMPARE_BY_ORDER_NUMBER).collect(Collectors.toList());
+        }
+        return rules;
+    }
+
     public static List<AcademicDebtGenerationProcessingResult> runAllActiveForRegistrationAndExecutionYear(
             final Registration registration, final ExecutionYear executionYear, final boolean runOnlyWithBackgroundExecution) {
-        final List<Future<List<AcademicDebtGenerationProcessingResult>>> futureList = Lists.newArrayList();
+        final List<RuleCallable> rulesToCall = new ArrayList<>();
 
         final ExecutorService exService = Executors.newSingleThreadExecutor();
-        for (final AcademicDebtGenerationRuleType type : AcademicDebtGenerationRuleType.findAll()
-                .sorted(AcademicDebtGenerationRuleType.COMPARE_BY_ORDER_NUMBER).collect(Collectors.toList())) {
-            for (final AcademicDebtGenerationRule academicDebtGenerationRule : AcademicDebtGenerationRule.findActiveByType(type)
-                    .sorted(COMPARE_BY_ORDER_NUMBER).collect(Collectors.toList())) {
 
-                if (runOnlyWithBackgroundExecution && !academicDebtGenerationRule.isBackgroundExecution()) {
-                    continue;
-                }
+        for (final AcademicDebtGenerationRule academicDebtGenerationRule : getRules()) {
 
-                if (academicDebtGenerationRule.getExecutionYear() != executionYear) {
-                    continue;
-                }
-
-                if (!academicDebtGenerationRule.isAbleToRunUnderScheduleNow()) {
-                    continue;
-                }
-
-                final RuleCallable exec = new RuleCallable(academicDebtGenerationRule, registration, null);
-                futureList.add(exService.submit(exec));
+            if (runOnlyWithBackgroundExecution && !academicDebtGenerationRule.isBackgroundExecution()) {
+                continue;
             }
+
+            if (academicDebtGenerationRule.getExecutionYear() != executionYear) {
+                continue;
+            }
+
+            if (!academicDebtGenerationRule.isAbleToRunUnderScheduleNow()) {
+                continue;
+            }
+
+            rulesToCall.add(new RuleCallable(academicDebtGenerationRule, registration, null));
         }
+
+        Future<List<AcademicDebtGenerationProcessingResult>> future = exService.submit(() -> processRules(rulesToCall));
 
         exService.shutdown();
 
         final List<AcademicDebtGenerationProcessingResult> returnResult = Lists.newArrayList();
-        for (Future<List<AcademicDebtGenerationProcessingResult>> future : futureList) {
-            try {
-                returnResult.addAll(future.get());
-            } catch (InterruptedException | ExecutionException e) {
-            }
+        try {
+            returnResult.addAll(future.get());
+        } catch (InterruptedException | ExecutionException e) {
         }
 
         return returnResult;
+    }
+
+    @Atomic(mode = TxMode.READ)
+    private static List<AcademicDebtGenerationProcessingResult> processRules(List<RuleCallable> rulesToCall) {
+        List<AcademicDebtGenerationProcessingResult> result = new ArrayList<>();
+        for (RuleCallable rule : rulesToCall) {
+            result.addAll(rule.call());
+        }
+        return result;
     }
 
     public static List<AcademicDebtGenerationProcessingResult> runAcademicDebtGenerationRule(
