@@ -63,8 +63,6 @@ import pt.ist.esw.advice.pt.ist.fenixframework.AtomicInstance;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
 
-import org.fenixedu.academic.domain.student.registrationStates.RegistrationStateTypeEnum;
-
 public class BasicAcademicTreasuryUtils {
 
     public static void startup(Callable<?> startup) {
@@ -187,8 +185,7 @@ public class BasicAcademicTreasuryUtils {
     public static Registration findOrCreateRegistration() {
         RegistrationStateType.findByCode(RegistrationStateType.REGISTERED_CODE).ifPresentOrElse(t -> {
         }, () -> {
-            RegistrationStateType.create(RegistrationStateType.REGISTERED_CODE, ls("Registered"), true,
-                    RegistrationStateTypeEnum.REGISTERED);
+            RegistrationStateType.create(RegistrationStateType.REGISTERED_CODE, ls("Registered"), true, null);
         });
 
         if (findOrCreateStudent().getRegistrationsFor(findOrCreateDegree()).isEmpty()) {
