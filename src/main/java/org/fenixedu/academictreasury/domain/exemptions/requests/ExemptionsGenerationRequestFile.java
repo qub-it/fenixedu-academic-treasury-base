@@ -49,6 +49,7 @@ import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.student.registrationStates.RegistrationState;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.emoluments.AcademicTax;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
@@ -491,7 +492,8 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
 
         Registration result = null;
         for (final Registration registration : Registration.readByNumber(registrationNumber)) {
-            if (registration.getLastStateTypeEnum() == null || !registration.getLastStateTypeEnum().isActive()) {
+            final RegistrationState lastRegistrationState = registration.getLastRegistrationState(executionYear);
+            if (lastRegistrationState == null || !lastRegistrationState.isActive()) {
                 continue;
             }
 

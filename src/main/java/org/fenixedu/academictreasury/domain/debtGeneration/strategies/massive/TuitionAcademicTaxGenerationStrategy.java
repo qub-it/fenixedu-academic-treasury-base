@@ -45,6 +45,7 @@ import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.student.registrationStates.RegistrationState;
 import org.fenixedu.academictreasury.domain.debtGeneration.requests.IMassiveDebtGenerationStrategy;
 import org.fenixedu.academictreasury.domain.debtGeneration.requests.MassiveDebtGenerationRequestFile;
 import org.fenixedu.academictreasury.domain.debtGeneration.requests.MassiveDebtGenerationRequestFileBean;
@@ -273,7 +274,8 @@ public class TuitionAcademicTaxGenerationStrategy implements IMassiveDebtGenerat
             final Degree degree, final String dcpName, final int rowNum) {
         Registration result = null;
         for (final Registration registration : Registration.readByNumber(registrationNumber)) {
-            if (registration.getLastStateTypeEnum() == null || !registration.getLastStateTypeEnum().isActive()) {
+            final RegistrationState lastRegistrationState = registration.getLastRegistrationState(executionYear);
+            if (lastRegistrationState == null || !lastRegistrationState.isActive()) {
                 continue;
             }
 
