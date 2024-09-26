@@ -216,27 +216,84 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                 // This is the case where we only need to create a credit
                 if (TreasuryConstants.isNegative(differenceNetAmount) && TreasuryConstants.isZero(differenceInNetExemptedAmount)
                         && isExemptionsMapAreEqual(tariff, academicTreasuryEvent, originalBean)) {
-                    // Close the debit entries and credit with the differenceAmount
-                    closeDebitEntriesInDebitNote(tariff.getFinantialEntity(), academicTreasuryEvent, tariff.getProduct());
+
+                    // ANIL 2024-09-26 (#qub....)
+                    //
+                    // Before this date, the algorithm was closing the debit entries, which is not 
+                    // acceptable for some schools. Now do not close and let the algorithm decide
+                    // if it has to simply annul or create a credit entry if it is already closed
 
                     BigDecimal remainingAmountToCredit = differenceNetAmount.negate();
                     List<DebitEntry> debitEntriesToCreditList = DebitEntry.findActive(academicTreasuryEvent, product)
                             .sorted(DebitEntry.COMPARE_BY_EXTERNAL_ID.reversed()).collect(Collectors.toList());
+
                     for (DebitEntry d : debitEntriesToCreditList) {
                         BigDecimal netAmountToCredit = remainingAmountToCredit.min(d.getAvailableNetAmountForCredit());
                         remainingAmountToCredit = netAmountToCredit.subtract(netAmountToCredit);
 
                         if (TreasuryConstants.isPositive(netAmountToCredit)) {
-                            String reason = TreasuryConstants
-                                    .treasuryBundle("label.RegistrationTuitionService.tuitionRecalculationReason");
-                            Map<TreasuryExemption, BigDecimal> creditExemptionsMap =
-                                    d.calculateDefaultNetExemptedAmountsToCreditMap(netAmountToCredit);
-                            d.creditDebitEntry(netAmountToCredit, reason, false, creditExemptionsMap);
+                            // ANIL 2024-09-26 (#qub....)
+                            //
+                            // Distinguish between debit entry in preparing state or closed
 
-                            if (isToBeAnnuledInTreasuryEvent(d)) {
-                                // The net amount of debit entry is zero, which means can be annuled in academic treasury event
-                                d.annulOnEvent();
+                            if (d.getFinantialDocument() == null || d.getFinantialDocument().isPreparing()) {
+                                // When it is preparing, we proceed with the following
+                                //
+                                // 1. Remove the debit entry from the debit note, if it is associated
+                                DebitNote debitNote = d.getDebitNote();
+
+                                if (d.getDebitNote() != null) {
+                                    d.removeFromDocument();
+                                }
+
+                                // 2. Calculate the exempted amounts to credit
+
+                                Map<TreasuryExemption, BigDecimal> creditExemptionsMap =
+                                        d.calculateDefaultNetExemptedAmountsToCreditMap(netAmountToCredit);
+
+                                // 3. Create the debitEntry with the amount equals to the following formula
+                                // netAmount + netExemptedAmount - netAmountToCredit
+
+                                BigDecimal newNetAmount =
+                                        d.getNetAmount().add(d.getNetExemptedAmount()).subtract(netAmountToCredit);
+
+                                DebitEntry newDebitEntry = DebitEntry.create(d.getFinantialEntity(), d.getDebtAccount(),
+                                        d.getTreasuryEvent(), d.getVat(), //
+                                        newNetAmount, d.getDueDate(), d.getPropertiesMap(), d.getProduct(), //
+                                        d.getDescription(), BigDecimal.ONE, d.getInterestRate(), d.getEntryDateTime(), //
+                                        d.isAcademicalActBlockingSuspension(), d.isBlockAcademicActsOnDebt(), debitNote);
+
+                                d.getTreasuryExemptionsSet().forEach(exemption -> {
+                                    BigDecimal newExemptionAmount = exemption.getNetExemptedAmount();
+
+                                    if (creditExemptionsMap.containsKey(exemption)) {
+                                        newExemptionAmount = newExemptionAmount.subtract(creditExemptionsMap.get(exemption));
+                                    }
+
+                                    TreasuryExemption.create(exemption.getTreasuryExemptionType(), exemption.getReason(),
+                                            newExemptionAmount, newDebitEntry);
+                                });
+
+                                // 4. Annul the debit entry
+                                d.annulOnlyThisDebitEntryAndInterestsInBusinessContext(TreasuryConstants
+                                        .treasuryBundle("label.RegistrationTuitionService.tuitionRecalculationReason"));
+
+                            } else if (d.getFinantialDocument().isClosed()) {
+                                String reason = TreasuryConstants
+                                        .treasuryBundle("label.RegistrationTuitionService.tuitionRecalculationReason");
+                                Map<TreasuryExemption, BigDecimal> creditExemptionsMap =
+                                        d.calculateDefaultNetExemptedAmountsToCreditMap(netAmountToCredit);
+                                d.creditDebitEntry(netAmountToCredit, reason, false, creditExemptionsMap);
+
+                                if (isToBeAnnuledInTreasuryEvent(d)) {
+                                    // The net amount of debit entry is zero, which means can be annuled in academic treasury event
+                                    d.annulOnEvent();
+                                }
+
+                            } else {
+                                throw new IllegalStateException("how to handle this case?");
                             }
+
                         }
                     }
 
@@ -308,8 +365,11 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                     // the difference in the exemption is different than zero. Then we have to annul the all debit entries
                     // of installment and create again
 
-                    // TODO: Consider the annullment of debit entry, instead of closing and crediting
-                    closeDebitEntriesInDebitNote(tariff.getFinantialEntity(), academicTreasuryEvent, tariff.getProduct());
+                    // ANIL 2024-09-26 (#qub....)
+                    //
+                    // Before this date, the algorithm was closing the debit entries, which is not 
+                    // acceptable for some schools.
+
                     revertExemptionAmountsFromAcademicTreasuryToDiscountExemptionsMapForAllInstallments(tariff);
 
                     DebitEntry.findActive(academicTreasuryEvent, product)

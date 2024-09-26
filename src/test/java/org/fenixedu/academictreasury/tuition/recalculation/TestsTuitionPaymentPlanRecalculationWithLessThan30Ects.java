@@ -24,7 +24,6 @@ import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
 import org.fenixedu.academictreasury.dto.tariff.AcademicTariffBean;
 import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
 import org.fenixedu.academictreasury.services.tuition.RegistrationTuitionService;
-import org.fenixedu.academictreasury.tuition.TuitionPaymentPlanTestsUtilities;
 import org.fenixedu.academictreasury.util.AcademicTreasuryBootstrapper;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.FinantialEntity;
@@ -183,10 +182,12 @@ public class TestsTuitionPaymentPlanRecalculationWithLessThan30Ects {
         assertEquals(academicTreasuryEvent.getAmountWithVatToPay(), new BigDecimal("800.00"));
 
         assertEquals(DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).map(DebitEntry::getAmountWithVat)
-                .reduce(BigDecimal.ZERO, BigDecimal::add), new BigDecimal("300.00"));
-
-        assertEquals(DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).map(DebitEntry::getAvailableNetAmountForCredit)
                 .reduce(BigDecimal.ZERO, BigDecimal::add), new BigDecimal("200.00"));
+
+        assertEquals(
+                DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct)
+                        .map(DebitEntry::getAvailableNetAmountForCredit).reduce(BigDecimal.ZERO, BigDecimal::add),
+                new BigDecimal("200.00"));
 
         assertEquals(DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count(), 1);
     }
