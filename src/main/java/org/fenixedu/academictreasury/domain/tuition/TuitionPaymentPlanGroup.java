@@ -125,10 +125,8 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
 
     @Atomic
     public void edit(String code, LocalizedString name, boolean forRegistration, boolean forStandalone,
-            boolean forExtracurricular, Product currentProduct,
-            boolean bypassInstallmentNameIfSingleInstallmentApplied, 
-            boolean useCustomDebitEntryDescriptionFormat,
-            LocalizedString installmentDebitEntryDescriptionFormat,
+            boolean forExtracurricular, Product currentProduct, boolean bypassInstallmentNameIfSingleInstallmentApplied,
+            boolean useCustomDebitEntryDescriptionFormat, LocalizedString installmentDebitEntryDescriptionFormat,
             LocalizedString oneInstallmentDebitEntryDescriptionFormat) {
 
         super.setCode(code);
@@ -285,7 +283,8 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
             Class<? extends TuitionPaymentPlanCalculator> allowedTuitionPaymentPlanCalculators) {
         Set<Class<? extends TuitionPaymentPlanCalculator>> classes = getAllowedTuitionPaymentPlanCalculators();
         classes.remove(allowedTuitionPaymentPlanCalculators);
-        setAllowedTuitionPaymentPlanCalculatorsSerialized(classes.stream().map(t -> t.getName()).collect(Collectors.joining(",")));
+        setAllowedTuitionPaymentPlanCalculatorsSerialized(
+                classes.stream().map(t -> t.getName()).collect(Collectors.joining(",")));
     }
 
     public Set<Class<? extends TuitionTariffCustomCalculator>> getAllowedCalculatedAmountCalculators() {
@@ -318,7 +317,7 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
         classes.remove(allowedCalculatedAmountCalculators);
         setAllowedCalculatedAmountCalculatorsSerialized(classes.stream().map(t -> t.getName()).collect(Collectors.joining(",")));
     }
-    
+
     public LocalizedString buildDebitEntryDescription(TuitionInstallmentTariff installmentTariff, Registration registration,
             ExecutionYear executionYear) {
         if (getUseCustomDebitEntryDescriptionFormat()) {
@@ -344,12 +343,25 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
 
         LocalizedString result = treasuryServices.availableLocales().stream().map(locale -> {
             Map<String, String> valueMap = new HashMap<String, String>();
-            String degreeName = degreeCurricularPlan.getDegree().getPresentationName(executionYear, locale);
+
+            // ANIL 2024-09-25 (#qubIT-Fenix-5846) 
+            //
+            // There is a mismatch between the names of the degree built in debit entry 
+            // importer and created by tuition payment plan
+            //
+            // Now it is used in production, the solution is to have a dynamic property
+            // to control the degree designation
+
+            String degreePresentationName = degreeCurricularPlan.getDegree().getPresentationName(executionYear, locale);
+            String degreeName = degreeCurricularPlan.getDegree().getNameI18N(executionYear).getContent(locale);
 
             valueMap.put("productName", StringUtils.isNotEmpty(productName.getContent(locale)) ? productName
                     .getContent(locale) : productName.getContent());
             valueMap.put("degreeCode", degreeCode);
+
+            valueMap.put("degreePresentationName", degreePresentationName);
             valueMap.put("degreeName", degreeName);
+
             valueMap.put("executionYearName", executionYearQualifiedName);
 
             return new LocalizedString(locale, StrSubstitutor.replace(formatToUse.getContent(locale), valueMap));
