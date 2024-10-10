@@ -68,6 +68,7 @@ import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.InvoiceEntry;
 import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
+import org.fenixedu.treasury.domain.treasurydebtprocess.TreasuryDebtProcessMainService;
 import org.fenixedu.treasury.dto.AdhocCustomerBean;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
@@ -119,6 +120,16 @@ public class PersonCustomer extends PersonCustomer_Base {
         // create debt accounts for all active finantial instituions
         for (final FinantialInstitution finantialInstitution : FinantialInstitution.findAll().collect(Collectors.toSet())) {
             DebtAccount.create(finantialInstitution, this);
+        }
+
+        // ANIL 2024-10-10 (qubIT-Fenix-5910)
+        //
+        // Apply pluggable validation of customer creation in order to 
+        // apply specific requirements over fiscal numbers attribution
+        if (TreasuryDebtProcessMainService.isCustomerFiscalNumberInvalid(this)) {
+            List<LocalizedString> reasonsList = TreasuryDebtProcessMainService.getCustomerFiscalNumberInvalidReason(this);
+            throw new IllegalArgumentException(
+                    String.join(",", reasonsList.stream().map(l -> l.getContent()).collect(Collectors.toList())));
         }
     }
 

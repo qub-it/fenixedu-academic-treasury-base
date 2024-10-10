@@ -1,3 +1,5 @@
+- Refactor: Apply pluggable validation in creation of customers [#qubIT-Fenix-5910]
+
 11.17.8 (30-09-2024)
 - Improvement: Add key to registration tuition debt concatenation, to have the degree simple name [#qubIT-Fenix-5846]
 - Bug Fix: In calculation for tuition debts using the new registration tuition service, avoid closing debit notes to decrement amounts by product [#qubIT-Fenix-5854]
