@@ -185,7 +185,7 @@ public class BasicAcademicTreasuryUtils {
     public static Registration findOrCreateRegistration() {
         RegistrationStateType.findByCode(RegistrationStateType.REGISTERED_CODE).ifPresentOrElse(t -> {
         }, () -> {
-            RegistrationStateType.create(RegistrationStateType.REGISTERED_CODE, ls("Registered"), true, null);
+            RegistrationStateType.create(RegistrationStateType.REGISTERED_CODE, ls("Registered"), true);
         });
 
         if (findOrCreateStudent().getRegistrationsFor(findOrCreateDegree()).isEmpty()) {
