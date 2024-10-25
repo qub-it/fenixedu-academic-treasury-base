@@ -343,8 +343,7 @@ public class AggregateDebtsStrategy implements IAcademicDebtGenerationRuleStrate
         }
 
         DocumentNumberSeries defaultDocumentNumberSeries =
-                DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(),
-                        debitEntries.iterator().next().getDebtAccount().getFinantialInstitution()).get();
+                DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(), rule.getFinantialEntity());
         FinantialEntity finantialEntity = rule.getFinantialEntity();
 
         if (finantialEntity == null && !debitEntries.isEmpty()) {

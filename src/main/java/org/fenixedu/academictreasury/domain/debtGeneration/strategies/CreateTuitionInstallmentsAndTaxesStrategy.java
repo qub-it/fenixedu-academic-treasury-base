@@ -202,7 +202,7 @@ public class CreateTuitionInstallmentsAndTaxesStrategy implements IAcademicDebtG
         }
 
         if (rule.getEntriesAggregationInDebitNoteType() == AcademicDebtEntriesAggregationInDebitNoteType.AGGREGATE_IN_UNIQUE_DEBIT_NOTE) {
-            Map<DebtAccount, DebitNote> debitNotesMap = grabPreparingOrCreateDebitNotes(debitEntries);
+            Map<DebtAccount, DebitNote> debitNotesMap = grabPreparingOrCreateDebitNotes(rule, debitEntries);
 
             for (final DebitEntry debitEntry : debitEntries) {
 
@@ -232,9 +232,8 @@ public class CreateTuitionInstallmentsAndTaxesStrategy implements IAcademicDebtG
                     DebtAccount debtAccountOwnerOfDebitNote = debitEntry.getPayorDebtAccount() != null ? debitEntry
                             .getPayorDebtAccount() : debitEntry.getDebtAccount();
 
-                    DocumentNumberSeries documentNumberSeries =
-                            DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(),
-                                    debtAccountOwnerOfDebitNote.getFinantialInstitution()).get();
+                    DocumentNumberSeries documentNumberSeries = DocumentNumberSeries
+                            .findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(), rule.getFinantialEntity());
 
                     DebitNote debitNote = DebitNote.create(debitEntry.getFinantialEntity(), debitEntry.getDebtAccount(), null,
                             documentNumberSeries, new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
@@ -407,7 +406,8 @@ public class CreateTuitionInstallmentsAndTaxesStrategy implements IAcademicDebtG
         return rule.isWithAtLeastOneForceCreationEntry();
     }
 
-    private Map<DebtAccount, DebitNote> grabPreparingOrCreateDebitNotes(final Set<DebitEntry> debitEntries) {
+    private Map<DebtAccount, DebitNote> grabPreparingOrCreateDebitNotes(AcademicDebtGenerationRule rule,
+            final Set<DebitEntry> debitEntries) {
         Map<DebtAccount, DebitNote> result = new HashMap<>();
 
         for (final DebitEntry debitEntry : debitEntries) {
@@ -421,9 +421,8 @@ public class CreateTuitionInstallmentsAndTaxesStrategy implements IAcademicDebtG
                         debitEntry.getPayorDebtAccount() != null ? debitEntry.getPayorDebtAccount() : debitEntry.getDebtAccount();
 
                 if (result.get(debtAccountOwnerOfDebitNote) == null) {
-                    DocumentNumberSeries documentNumberSeries =
-                            DocumentNumberSeries.findUniqueDefault(FinantialDocumentType.findForDebitNote(),
-                                    debtAccountOwnerOfDebitNote.getFinantialInstitution()).get();
+                    DocumentNumberSeries documentNumberSeries = DocumentNumberSeries
+                            .findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(), rule.getFinantialEntity());
 
                     DebitNote debitNote = DebitNote.create(debitEntry.getFinantialEntity(), debitEntry.getDebtAccount(), null,
                             documentNumberSeries, new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);

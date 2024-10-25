@@ -1,3 +1,5 @@
+- New feature: Finantial document series by finantial entity [#qubIT-Fenix-5456]
+
 11.18.1 (14-10-2024)
 - Refactor: Replace usages of deprecated RegistrationStateTypeEnum [#qubIT-Fenix-2585]
 
