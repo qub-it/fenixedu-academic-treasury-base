@@ -1,3 +1,5 @@
+- Improvement: Improves DebtAccountReportEntryBean by adding active registrations field [#qubIT-Fenix-6052]
+
 12.0.2 (19-11-2024)
 - Improvement: Add unique degree and execution year to existing report [#qubIT-Fenix-6110]
 
