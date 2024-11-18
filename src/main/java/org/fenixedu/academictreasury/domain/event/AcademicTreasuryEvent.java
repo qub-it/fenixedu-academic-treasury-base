@@ -44,6 +44,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -1902,11 +1903,35 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
 
         BigDecimal registrationTuitionAmount = getAmountWithVatToPay().subtract(getInterestsAmountToPay());
 
+        Predicate<TreasuryEvent> considerTreasuryEvents = t -> {
+            if (!(t instanceof AcademicTreasuryEvent)) {
+                return true;
+            }
+
+            AcademicTreasuryEvent ate = (AcademicTreasuryEvent) t;
+            if (ate.isForRegistrationTuition()) {
+                return false;
+            }
+
+            // ANIL (2024-11-18) (#qubIT-Fenix-6109)
+            //
+            // Exclude standalone and extracurricular tuitions
+            if (ate.isForStandaloneTuition()) {
+                return false;
+            }
+
+            if (ate.isForExtracurricularTuition()) {
+                return false;
+            }
+
+            return true;
+        };
+
         BigDecimal otherTuitionAmount = TreasuryBridgeAPIFactory.implementation().getAllAcademicTreasuryEventsList(getPerson()) //
                 .stream() //
                 .map(TreasuryEvent.class::cast) //
                 .filter(t -> t != this) //
-                .filter(t -> !(t instanceof AcademicTreasuryEvent) || !((AcademicTreasuryEvent) t).isForRegistrationTuition()) //
+                .filter(considerTreasuryEvents) //
                 .filter(t -> t.isEventAccountedAsTuition()) //
                 .filter(t -> getExecutionYear().getQualifiedName().equals(t.getExecutionYearName())) //
                 .filter(t -> getDegreeCode().equals(t.getDegreeCode())) //
