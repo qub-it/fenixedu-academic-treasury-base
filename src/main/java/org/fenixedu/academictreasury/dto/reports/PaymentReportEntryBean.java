@@ -40,8 +40,14 @@ import static org.fenixedu.academictreasury.dto.reports.DebtReportEntryBean.pers
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
+import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.reports.DebtReportRequest;
@@ -50,6 +56,7 @@ import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Customer;
 import org.fenixedu.treasury.domain.document.Invoice;
+import org.fenixedu.treasury.domain.document.InvoiceEntry;
 import org.fenixedu.treasury.domain.document.PaymentEntry;
 import org.fenixedu.treasury.domain.document.SettlementEntry;
 import org.fenixedu.treasury.domain.document.SettlementNote;
@@ -285,6 +292,52 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
             e.printStackTrace();
             errorsLog.addError(paymentEntry, e);
         }
+    }
+
+    public Set<Degree> getAssociatedDegreesSet() {
+        Function<? super SettlementEntry, ? extends Degree> mapper = se -> {
+            InvoiceEntry invoiceEntry = se.getInvoiceEntry();
+
+            if (invoiceEntry.getTreasuryEvent() == null) {
+                return null;
+            }
+
+            String degreeCode = invoiceEntry.getTreasuryEvent().getDegreeCode();
+
+            if (StringUtils.isEmpty(degreeCode)) {
+                return null;
+            }
+
+            Degree degree = Degree.find(degreeCode);
+
+            return degree;
+        };
+
+        return this.paymentEntry.getSettlementNote().getSettlemetEntriesSet().stream().map(mapper)
+                .filter(degree -> degree != null).collect(Collectors.toSet());
+    }
+
+    public Set<ExecutionYear> getAssociatedExecutionYearsSet() {
+        Function<? super SettlementEntry, ? extends ExecutionYear> mapper = se -> {
+            InvoiceEntry invoiceEntry = se.getInvoiceEntry();
+
+            if (invoiceEntry.getTreasuryEvent() == null) {
+                return null;
+            }
+
+            String executionYearName = invoiceEntry.getTreasuryEvent().getExecutionYearName();
+
+            if (StringUtils.isEmpty(executionYearName)) {
+                return null;
+            }
+
+            ExecutionYear executionYear = ExecutionYear.readExecutionYearByName(executionYearName);
+
+            return executionYear;
+        };
+
+        return this.paymentEntry.getSettlementNote().getSettlemetEntriesSet().stream().map(mapper)
+                .filter(degree -> degree != null).collect(Collectors.toSet());
     }
 
     private String valueOrEmpty(final LocalDate value) {
