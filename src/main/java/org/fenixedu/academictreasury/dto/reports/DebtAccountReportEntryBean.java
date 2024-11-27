@@ -39,8 +39,12 @@ import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValu
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.poi.ss.usermodel.Row;
+import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.reports.DebtReportRequest;
 import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
@@ -105,6 +109,8 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
     private BigDecimal dueInDebt;
 
     private String decimalSeparator;
+
+    private Set<Registration> activeRegistrations;
 
     public DebtAccountReportEntryBean(final DebtAccount debtAccount, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
@@ -171,6 +177,12 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             this.totalInDebt = debtAccount.getTotalInDebt();
             this.dueInDebt = debtAccount.getDueInDebt();
 
+            this.activeRegistrations = new HashSet<Registration>();
+            Student student = personCustomer.getAssociatedPerson().getStudent();
+            if (student != null) {
+                student.getActiveRegistrationStream().forEach(registration -> activeRegistrations.add(registration));
+            }
+
             this.completed = true;
         } catch (final Exception e) {
             e.printStackTrace();
@@ -210,7 +222,8 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             createCellWithValue(row, i++, this.totalInDebt.toString());
 
             if (DebtReportRequest.COMMA.equals(this.decimalSeparator)) {
-                createCellWithValue(row, i++, this.totalInDebt.toString().replace(DebtReportRequest.DOT, DebtReportRequest.COMMA));
+                createCellWithValue(row, i++,
+                        this.totalInDebt.toString().replace(DebtReportRequest.DOT, DebtReportRequest.COMMA));
             } else {
                 createCellWithValue(row, i++, this.totalInDebt.toString());
             }
@@ -431,6 +444,14 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
 
     public void setPersonCustomer(PersonCustomer personCustomer) {
         this.personCustomer = personCustomer;
+    }
+
+    public Set<Registration> getActiveRegistrations() {
+        return activeRegistrations;
+    }
+
+    public void setActiveRegistrations(Set<Registration> activeRegistrations) {
+        this.activeRegistrations = activeRegistrations;
     }
 
 }
