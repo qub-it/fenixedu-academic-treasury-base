@@ -1,3 +1,5 @@
+- Bug Fix: Avoid NPE when reading debts accounts for report [#qubIT-Fenix-6052]
+
 12.0.3 (27-11-2024)
 - Improvement: Improves DebtAccountReportEntryBean by adding active registrations field [#qubIT-Fenix-6052]
 
