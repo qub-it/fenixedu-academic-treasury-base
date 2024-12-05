@@ -41,6 +41,7 @@ import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.acade
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academic.domain.student.Registration;
@@ -178,9 +179,13 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             this.dueInDebt = debtAccount.getDueInDebt();
 
             this.activeRegistrations = new HashSet<Registration>();
-            Student student = personCustomer.getAssociatedPerson().getStudent();
-            if (student != null) {
-                student.getActiveRegistrationStream().forEach(registration -> activeRegistrations.add(registration));
+
+            if (this.debtAccount.getCustomer().isPersonCustomer()) {
+                Student student = this.personCustomer.getAssociatedPerson().getStudent();
+
+                if (student != null) {
+                    this.activeRegistrations = student.getActiveRegistrationStream().collect(Collectors.toSet());
+                }
             }
 
             this.completed = true;
