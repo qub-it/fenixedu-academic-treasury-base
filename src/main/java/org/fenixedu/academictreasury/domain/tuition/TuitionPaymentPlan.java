@@ -273,7 +273,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
     public String getConditionsDescription() {
         if (isCustomized()) {
             return AcademicTreasuryConstants.academicTreasuryBundle("label.TuitionPaymentPlan.customized") + " ["
-                    + getCustomizedName().getContent() + "] ";
+                    + getCustomizedName().getContent() + "]";
         }
 
         if (isDefaultPaymentPlan()) {

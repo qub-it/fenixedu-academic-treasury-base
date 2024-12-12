@@ -28,6 +28,7 @@ import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.tuition.ITuitionRegistrationServiceParameters;
+import org.fenixedu.academictreasury.domain.tuition.TuitionAllocation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
@@ -971,17 +972,30 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
         var finantialEntity = AcademicTreasuryPlataformDependentServicesFactory.implementation()
                 .finantialEntityOfDegree(registration.getDegree(), executionYear.getBeginLocalDate());
 
+        // Construct a map based on statutes and exemptions mapping
         Set<StatuteType> statutesOfStudent = AcademicTreasuryPlataformDependentServicesFactory.implementation()
                 .statutesTypesValidOnAnyExecutionSemesterFor(registration, executionYear);
 
-        return StatuteExemptionByIntervalMapEntry.find(finantialEntity, executionYear)
-                .filter(s -> statutesOfStudent.contains(s.getStatuteType()))
+        TreeMap<TreasuryExemptionType, TreasuryExemptionMoneyBox> exemptionMapByStatutes = StatuteExemptionByIntervalMapEntry
+                .find(finantialEntity, executionYear).filter(s -> statutesOfStudent.contains(s.getStatuteType()))
                 .collect(Collectors.toMap(s -> s.getTreasuryExemptionType(), s -> {
                     BigDecimal val =
                             s.getTreasuryExemptionType().calculateDefaultNetAmountToExempt(tuitionInstallmentAmountToPay);
                     return new TreasuryExemptionMoneyBox(val, val);
                 }, TreasuryExemptionMoneyBox::mergeByChoosingTheGreaterMaximumAmount,
                         () -> new TreeMap<>(TREASURY_EVENT_COMPARATOR)));
+
+        // Construct a map based in tuition allocation
+        if (this.tuitionOptions.tuitionAllocation != null) {
+            this.tuitionOptions.tuitionAllocation.getTreasuryExemptionTypesSet().stream().forEach(s -> {
+                BigDecimal val = s.calculateDefaultNetAmountToExempt(tuitionInstallmentAmountToPay);
+                var box = new TreasuryExemptionMoneyBox(val, val);
+
+                exemptionMapByStatutes.merge(s, box, TreasuryExemptionMoneyBox::mergeByChoosingTheGreaterMaximumAmount);
+            });
+        }
+
+        return exemptionMapByStatutes;
     }
 
     private BigDecimal getAndDecrementFromDiscountMap(
@@ -1146,6 +1160,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
         TuitionPaymentPlan tuitionPaymentPlan = null;
         boolean forceCreationIfNotEnrolled = false;
         boolean applyTuitionServiceExtensions = true;
+        TuitionAllocation tuitionAllocation;
 
         TuitionOptions() {
             RegistrationTuitionService.this.tuitionOptions = this;
@@ -1164,6 +1179,11 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
         public TuitionOptions forceCreationIfNotEnrolled(boolean value) {
             this.forceCreationIfNotEnrolled = value;
+            return this;
+        }
+
+        public TuitionOptions applyTuitionAllocation(TuitionAllocation tuitionAllocation) {
+            this.tuitionAllocation = tuitionAllocation;
             return this;
         }
 

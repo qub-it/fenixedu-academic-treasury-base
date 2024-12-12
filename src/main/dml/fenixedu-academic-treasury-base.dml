@@ -1970,3 +1970,103 @@ class tuition.exemptions.StatuteExemptionByIntervalMapEntry {
 			multiplicity *;
 		}
 	}
+
+
+class tuition.TuitionDebtPostingType {
+	LocalizedString name;
+}
+
+	relation TuitionDebtPostingTypeDomainRoot {
+		.pt.ist.fenixframework.DomainRoot playsRole domainRoot {
+			multiplicity 1..1;
+		}
+		
+		tuition.TuitionDebtPostingType playsRole tuitionDebtPostingTypes {
+			multiplicity *;
+		}
+	}
+	
+	relation TuitionDebtPostingTypeFinantialEntity {
+		.org.fenixedu.treasury.domain.FinantialEntity playsRole finantialEntity {
+			multiplicity 1..1;
+		}
+		
+		tuition.TuitionDebtPostingType playsRole tuitionDebtPostingTypes {
+			multiplicity *;
+		}
+	}
+	
+class tuition.TuitionAllocation {
+	DateTime creationDate;
+	String responsible;
+}
+
+	relation TuitionAllocationDomainRoot {
+		.pt.ist.fenixframework.DomainRoot playsRole domainRoot {
+			multiplicity 1..1;
+		}
+		
+		tuition.TuitionAllocation playsRole tuitionAllocations {
+			multiplicity *;
+		}
+	}
+	
+	relation TuitionAllocationTuitionPaymentPlanType {
+		tuition.TuitionPaymentPlanGroup playsRole tuitionPaymentPlanGroup {
+			multiplicity 1..1;
+		}
+		
+		tuition.TuitionAllocation playsRole tuitionAllocations {
+			multiplicity *;
+		}
+	}
+
+	relation TuitionAllocationTuitionDebtPostingType {
+		tuition.TuitionDebtPostingType playsRole tuitionDebtPostingType {
+			multiplicity 1..1;
+		}
+		
+		tuition.TuitionAllocation playsRole tuitionAllocations {
+			multiplicity *;
+		}
+	}
+
+	relation TuitionAllocationRegistration {
+		.org.fenixedu.academic.domain.student.Registration playsRole registration {
+			multiplicity 1..1;
+		}
+		
+		tuition.TuitionAllocation playsRole tuitionAllocations {
+			multiplicity *;
+		}
+	}
+	
+	relation TuitionAllocationExecutionInterval {
+		.org.fenixedu.academic.domain.ExecutionInterval playsRole executionInterval {
+			multiplicity 1..1;
+		}
+		
+		tuition.TuitionAllocation playsRole tuitionAllocations {
+			multiplicity *;
+		}
+	}
+	
+	relation TuitionAllocationTuitionPaymentPlan {
+		tuition.TuitionPaymentPlan playsRole tuitionPaymentPlan {
+			multiplicity 1..1;
+		}		
+		
+		tuition.TuitionAllocation playsRole tuitionAllocations {
+			multiplicity *;
+		}
+	}
+	
+	relation TuitionAllocationTreasuryExemptionType {
+		.org.fenixedu.treasury.domain.exemption.TreasuryExemptionType playsRole treasuryExemptionTypes {
+			multiplicity *;
+		}
+		
+		tuition.TuitionAllocation playsRole tuitionAllocations {
+			multiplicity *;
+		}
+	}
