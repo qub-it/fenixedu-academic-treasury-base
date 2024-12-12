@@ -22,13 +22,12 @@ public class TuitionAllocation extends TuitionAllocation_Base {
         setResponsible(TreasuryPlataformDependentServicesFactory.implementation().getLoggedUsername());
     }
 
-    public TuitionAllocation(TuitionPaymentPlanGroup tuitionPaymentPlanGroup, FinantialEntity finantialEntity,
-            Registration registration, ExecutionInterval executionInterval, TuitionDebtPostingType tuitionDebtPostingType,
+    public TuitionAllocation(TuitionPaymentPlanGroup tuitionPaymentPlanGroup, Registration registration,
+            ExecutionInterval executionInterval, TuitionDebtPostingType tuitionDebtPostingType,
             TuitionPaymentPlan tuitionPaymentPlan, Set<TreasuryExemptionType> treasuryExemptionTypesSet) {
         this();
 
         setTuitionPaymentPlanGroup(tuitionPaymentPlanGroup);
-        setFinantialEntity(finantialEntity);
         setRegistration(registration);
         setExecutionInterval(executionInterval);
         setTuitionDebtPostingType(tuitionDebtPostingType);
@@ -67,10 +66,6 @@ public class TuitionAllocation extends TuitionAllocation_Base {
             throw new RuntimeException("error.TuitionAllocation.tuitionDebtPostingType.required");
         }
 
-        if (getTuitionDebtPostingType().getFinantialEntity() != getFinantialEntity()) {
-            throw new RuntimeException("error.TuitionAllocation.tuitionDebtPostingType.and.finantialEntity.differs");
-        }
-
         if (getRegistration().getTuitionAllocationsSet().stream().filter(e -> e != this)
                 .filter(e -> e.getTuitionPaymentPlanGroup() == getTuitionPaymentPlanGroup())
                 .filter(e -> e.getTuitionDebtPostingType() == getTuitionDebtPostingType())
@@ -81,7 +76,6 @@ public class TuitionAllocation extends TuitionAllocation_Base {
 
     public void delete() {
         super.setDomainRoot(null);
-        super.setFinantialEntity(null);
         super.setExecutionInterval(null);
         super.setRegistration(null);
         super.setTuitionDebtPostingType(null);
@@ -93,12 +87,24 @@ public class TuitionAllocation extends TuitionAllocation_Base {
         super.deleteDomainObject();
     }
 
-    public static TuitionAllocation create(TuitionPaymentPlanGroup tuitionPaymentPlanGroup, FinantialEntity finantialEntity,
-            Registration registration, ExecutionInterval executionInterval, TuitionDebtPostingType tuitionDebtPostingType,
+    public FinantialEntity getFinantialEntity() {
+        return getTuitionDebtPostingType().getFinantialEntity();
+    }
+
+    public void edit(TuitionPaymentPlan tuitionPaymentPlan, Set<TreasuryExemptionType> treasuryExemptionTypesSet) {
+        setTuitionPaymentPlan(tuitionPaymentPlan);
+        getTreasuryExemptionTypesSet().clear();
+        getTreasuryExemptionTypesSet().addAll(treasuryExemptionTypesSet);
+
+        checkRules();
+    }
+
+    public static TuitionAllocation create(TuitionPaymentPlanGroup tuitionPaymentPlanGroup, Registration registration,
+            ExecutionInterval executionInterval, TuitionDebtPostingType tuitionDebtPostingType,
             TuitionPaymentPlan tuitionPaymentPlan, Set<TreasuryExemptionType> treasuryExemptionTypesSet) {
 
-        return new TuitionAllocation(tuitionPaymentPlanGroup, finantialEntity, registration, executionInterval,
-                tuitionDebtPostingType, tuitionPaymentPlan, treasuryExemptionTypesSet);
+        return new TuitionAllocation(tuitionPaymentPlanGroup, registration, executionInterval, tuitionDebtPostingType,
+                tuitionPaymentPlan, treasuryExemptionTypesSet);
 
     }
 

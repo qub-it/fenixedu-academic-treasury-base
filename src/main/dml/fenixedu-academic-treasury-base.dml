@@ -2070,13 +2070,3 @@ class tuition.TuitionAllocation {
 			multiplicity *;
 		}
 	}
-	
-	relation TuitionAllocationFinantialEntity {
-		.org.fenixedu.treasury.domain.FinantialEntity playsRole finantialEntity {
-			multiplicity 1..1;
-		}
-	
-		tuition.TuitionAllocation playsRole tuitionAllocations {
-			multiplicity *;
-		}
-	}
