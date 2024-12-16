@@ -529,6 +529,22 @@ public class PersonCustomer extends PersonCustomer_Base {
             return null;
         }
 
+        // ANIL 2024-12-14 (#qubIT-Fenix-6386)
+        // 
+        // When creating debts the logic is to
+        // get the fiscal address country and fiscal number
+        // and find an active person customer
+        // which should be equal to Person#getPersonCustomer
+
+        // For now maintain the logic to be consistent
+        // and validate if the customer found
+        // is active and equal to Person#getPersonCustomer
+
+        if (!activeCustomer.get().isActive()) {
+            throw new AcademicTreasuryDomainException("error.PersonCustomer.getActiveCustomer.customer.found.but.not.active",
+                    addressCountryCode(person), fiscalNumber(person));
+        }
+
         return activeCustomer.get();
     }
 
@@ -929,6 +945,20 @@ public class PersonCustomer extends PersonCustomer_Base {
                 && !Strings.isNullOrEmpty(pc.getFiscalNumber()) && pc.getFiscalNumber().equals(fiscalNumber));
     }
 
+    // TODO ANIL 2024-12-16 (#qubIT-Fenix-6386)
+    //
+    // The SORT_BY_PERSON_MERGE have the following problems:
+    //
+    //
+    // 1. If the customer is from person merge and it is active. But if there is another
+    // inactive customer with the same VAT information, but it is not from person merge,
+    // this method will return the inactive customer with higher precedence, which will
+    // not be considered as active
+    //
+    // 2. If there are two customers from person merge, they will be sorted by external id.
+    // But there might be another person merge, which might introduce another person customer
+    // with the same VAT number, which might have high precedence, because has a lower
+    // external id
     private static final Comparator<PersonCustomer> SORT_BY_PERSON_MERGE = (o1, o2) -> {
         if (!o1.isFromPersonMerge() && o2.isFromPersonMerge()) {
             return -1;

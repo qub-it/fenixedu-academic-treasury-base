@@ -1,3 +1,5 @@
+- Bug Fix: When retrieving the PersonCustomer#getActiveCustomer(), validate that the customer found it is active. If it is not, throw exception [#qubIT-Fenix-6386]
+
 12.1.0 (12-12-2024)
 - Bug Fix: Avoid NPE when reading debts accounts for report [#qubIT-Fenix-6052]
 - New Feature: Tuition Payment Plan Allocations [#qubIT-Fenix-6235]
