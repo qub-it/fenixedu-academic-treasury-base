@@ -1,3 +1,4 @@
+12.1.1 (16-12-2024)
 - Bug Fix: When retrieving the PersonCustomer#getActiveCustomer(), validate that the customer found it is active. If it is not, throw exception [#qubIT-Fenix-6386]
 
 12.1.0 (12-12-2024)
