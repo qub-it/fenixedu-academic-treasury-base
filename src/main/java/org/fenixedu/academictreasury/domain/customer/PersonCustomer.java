@@ -945,10 +945,9 @@ public class PersonCustomer extends PersonCustomer_Base {
                 && !Strings.isNullOrEmpty(pc.getFiscalNumber()) && pc.getFiscalNumber().equals(fiscalNumber));
     }
 
-    // TODO ANIL 2024-12-16 (#qubIT-Fenix-6386)
+    // ANIL 2024-12-16 (#qubIT-Fenix-6386)
     //
     // The SORT_BY_PERSON_MERGE have the following problems:
-    //
     //
     // 1. If the customer is from person merge and it is active. But if there is another
     // inactive customer with the same VAT information, but it is not from person merge,
@@ -959,7 +958,26 @@ public class PersonCustomer extends PersonCustomer_Base {
     // But there might be another person merge, which might introduce another person customer
     // with the same VAT number, which might have high precedence, because has a lower
     // external id
-    private static final Comparator<PersonCustomer> SORT_BY_PERSON_MERGE = (o1, o2) -> {
+    //
+    // To resolve this issues, consider the active customer with highest precendence
+    //
+    // Also improve and shorten the comparator expression
+    public static final Comparator<PersonCustomer> IMPROVED_SORT_BY_PERSON_MERGE = Comparator.comparing(PersonCustomer::isActive)
+            .reversed().thenComparing(PersonCustomer::isFromPersonMerge).thenComparing(PersonCustomer::getExternalId);
+
+    // ANIL 2024-12-16 (#qubIT-Fenix-6386)
+    //
+    // This is just to make comparisions
+    // Delete when no longer is needed
+
+    @Deprecated
+    public static final Comparator<PersonCustomer> OLD_AND_DEPRECATED_SORT_BY_PERSON_MERGE = (o1, o2) -> {
+        if (o1.isActive() && !o2.isActive()) {
+            return -1;
+        } else if (!o1.isActive() && o2.isActive()) {
+            return 1;
+        }
+
         if (!o1.isFromPersonMerge() && o2.isFromPersonMerge()) {
             return -1;
         } else if (o1.isFromPersonMerge() && !o2.isFromPersonMerge()) {
@@ -971,7 +989,7 @@ public class PersonCustomer extends PersonCustomer_Base {
 
     public static Optional<? extends PersonCustomer> findUnique(final Person person, final String fiscalCountryCode,
             final String fiscalNumber) {
-        return find(person, fiscalCountryCode, fiscalNumber).sorted(SORT_BY_PERSON_MERGE).findFirst();
+        return find(person, fiscalCountryCode, fiscalNumber).sorted(IMPROVED_SORT_BY_PERSON_MERGE).findFirst();
     }
 
     public static PersonCustomer createWithCurrentFiscalInformation(final Person person) {
