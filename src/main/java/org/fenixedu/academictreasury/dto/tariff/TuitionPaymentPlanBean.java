@@ -67,6 +67,7 @@ import org.fenixedu.academictreasury.domain.tuition.TuitionConditionRule;
 import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
+import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanRecalculation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCalculatedAmountType;
 import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCustomCalculator;
 import org.fenixedu.academictreasury.domain.tuition.calculators.TuitionPaymentPlanCalculator;
@@ -137,6 +138,8 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     private List<TreasuryTupleDataSourceBean> tuitionInstallmentProductDataSource = null;
 
     public List<AcademicTariffBean> tuitionInstallmentBeans = Lists.newArrayList();
+
+    public List<TuitionPaymentPlanRecalculation> tuitionPaymentPlanRecalculationList;
 
     // @formatter:off
     /*--------------
@@ -209,6 +212,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         this.conditionRules = new HashSet<>();
         this.degreeCurricularPlans = new HashSet<>();
         this.importerMap = new HashMap<Class<? extends TuitionConditionRule>, String>();
+        this.tuitionPaymentPlanRecalculationList = new ArrayList<>();
 
         updateData();
         resetInstallmentFields();
@@ -232,6 +236,12 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         fillWithInstallments(tuitionPaymentPlan);
 
         this.tuitionPaymentPlanCalculatorList.addAll(tuitionPaymentPlan.getTuitionPaymentPlanCalculatorSet());
+        this.tuitionPaymentPlanRecalculationList.addAll(sortPaymentPlanRecalculations(tuitionPaymentPlan));
+    }
+
+    private List<TuitionPaymentPlanRecalculation> sortPaymentPlanRecalculations(TuitionPaymentPlan tuitionPaymentPlan) {
+        return tuitionPaymentPlan.getTuitionPaymentPlanRecalculationsSet().stream()
+                .sorted(TuitionPaymentPlanRecalculation.SORT_BY_PRODUCT).collect(Collectors.toList());
     }
 
     private void fillWithInstallments(final TuitionPaymentPlan tuitionPaymentPlan) {
@@ -1254,6 +1264,15 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         });
 
         return result;
+    }
+
+    public List<TuitionPaymentPlanRecalculation> getTuitionPaymentPlanRecalculationList() {
+        return tuitionPaymentPlanRecalculationList;
+    }
+
+    public void setTuitionPaymentPlanRecalculationList(
+            List<TuitionPaymentPlanRecalculation> tuitionPaymentPlanRecalculationList) {
+        this.tuitionPaymentPlanRecalculationList = tuitionPaymentPlanRecalculationList;
     }
 
 }

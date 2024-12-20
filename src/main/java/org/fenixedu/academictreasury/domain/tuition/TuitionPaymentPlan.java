@@ -145,6 +145,10 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
         createInstallments(tuitionPaymentPlanBean);
 
+        tuitionPaymentPlanBean.getTuitionPaymentPlanRecalculationList().forEach(r -> {
+            TuitionPaymentPlanRecalculation.create(r.getProduct(), r.getRecalculationDueDate()).setTuitionPaymentPlan(this);
+        });
+
         checkRules();
     }
 
@@ -620,6 +624,10 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         }
 
         setDomainRoot(null);
+
+        while (!getTuitionPaymentPlanRecalculationsSet().isEmpty()) {
+            getTuitionPaymentPlanRecalculationsSet().iterator().next().delete();
+        }
 
         while (!getTuitionInstallmentTariffsSet().isEmpty()) {
             getTuitionInstallmentTariffsSet().iterator().next().delete();
