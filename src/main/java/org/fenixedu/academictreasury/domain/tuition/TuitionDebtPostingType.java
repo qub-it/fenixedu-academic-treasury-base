@@ -13,6 +13,13 @@ public class TuitionDebtPostingType extends TuitionDebtPostingType_Base {
         setDomainRoot(FenixFramework.getDomainRoot());
     }
 
+    public void delete() {
+        setDomainRoot(null);
+        setFinantialEntity(null);
+        
+        super.deleteDomainObject();
+    }
+
     public static Stream<TuitionDebtPostingType> findAll() {
         return FenixFramework.getDomainRoot().getTuitionDebtPostingTypesSet().stream();
     }

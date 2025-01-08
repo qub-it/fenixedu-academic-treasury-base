@@ -654,6 +654,40 @@ class tuition.TuitionConditionRule {
 			}
 		}
 
+class tuition.TuitionPaymentPlanRecalculation {
+	LocalDate recalculationDueDate (REQUIRED);
+}
+
+	relation TuitionPaymentPlanRecalculationDomainRoot {
+		.pt.ist.fenixframework.DomainRoot playsRole domainRoot {
+			multiplicity 1..1;
+		}
+		
+		tuition.TuitionPaymentPlanRecalculation playsRole TuitionPaymentPlanRecalculations {
+			multiplicity *;
+		}
+	}
+	
+	relation TuitionPaymentPlanRecalculationTuitionPaymentPlan {
+		tuition.TuitionPaymentPlan playsRole tuitionPaymentPlan {
+			multiplicity 0..1;
+		}
+
+		tuition.TuitionPaymentPlanRecalculation playsRole TuitionPaymentPlanRecalculations {
+			multiplicity *;
+		}
+	}
+	
+	relation TuitionPaymentPlanRecalculationProduct {
+		.org.fenixedu.treasury.domain.Product playsRole product {
+			multiplicity 1..1;
+		}
+
+		tuition.TuitionPaymentPlanRecalculation playsRole TuitionPaymentPlanRecalculations {
+			multiplicity *;
+		}
+	}
+	
 /*----------------------
  * AcademicTreasuryEvent
  *---------------------- */

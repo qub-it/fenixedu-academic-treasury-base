@@ -1094,6 +1094,19 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
             this.tuitionOptions.tuitionPaymentPlan = TuitionPaymentPlan.inferTuitionPaymentPlanForRegistration(
                     this.registrationOptions.registration, this.registrationOptions.executionYear);
         }
+
+        // Load recalculations from tuition payment plan
+        if (!this.isForCalculationsOfOriginalAmounts && this.tuitionOptions.tuitionPaymentPlan != null) {
+            this.tuitionOptions.tuitionPaymentPlan.getTuitionPaymentPlanRecalculationsSet().stream().forEach(r -> {
+                if (this.installmentRecalculationOptions.recalculateInstallments == null) {
+                    this.installmentRecalculationOptions.recalculateInstallments = new HashMap<>();
+                }
+
+                this.installmentRecalculationOptions.recalculateInstallments.putIfAbsent(r.getProduct(),
+                        r.getRecalculationDueDate());
+            });
+        }
+
     }
 
     // SERVICE METHODS

@@ -1,3 +1,6 @@
+- Improvement: Configure recalculation of tuition installments in tuition payment plan [#qubIT-Fenix-6235]
+- Improvement: Support recalculation from tuition payment plan in manual tuition creation [#qubIT-Fenix-6235]
+
 12.1.1 (16-12-2024)
 - Bug Fix: When retrieving the PersonCustomer#getActiveCustomer(), validate that the customer found it is active. If it is not, throw exception [#qubIT-Fenix-6386]
 
