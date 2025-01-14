@@ -1,4 +1,5 @@
 - Bug Fix: In debt and payment reports, exclude personal emails which the property currentPartyContact is not null [#qubIT-Fenix-6541]
+- Bug Fix: In PersonCustomer#findUnique(), fix the sort comparator to consider active customers as highest precedence than from person merge [#qubIT-Fenix-6386]
 
 12.2.0 (08-01-2025)
 - Improvement: Configure recalculation of tuition installments in tuition payment plan [#qubIT-Fenix-6235]
