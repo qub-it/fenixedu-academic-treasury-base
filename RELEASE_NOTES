@@ -1,3 +1,5 @@
+- Bug Fix: In debt and payment reports, exclude personal emails which the property currentPartyContact is not null [#qubIT-Fenix-6541]
+
 12.2.0 (08-01-2025)
 - Improvement: Configure recalculation of tuition installments in tuition payment plan [#qubIT-Fenix-6235]
 - Improvement: Support recalculation from tuition payment plan in manual tuition creation [#qubIT-Fenix-6235]
