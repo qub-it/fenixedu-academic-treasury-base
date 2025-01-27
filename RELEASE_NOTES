@@ -1,3 +1,5 @@
+- Bug Fix: Fix debts grabbing and setting finantial document, in debts aggregation strategy, run with debts generation rules [#qubIT-Fenix-6562]
+
 12.2.1 (14-01-2025)
 - Bug Fix: In debt and payment reports, exclude personal emails which the property currentPartyContact is not null [#qubIT-Fenix-6541]
 - Bug Fix: In PersonCustomer#findUnique(), fix the sort comparator to consider active customers as highest precedence than from person merge [#qubIT-Fenix-6386]
