@@ -1,3 +1,5 @@
+- Refactor: Remove unused and deprecated classes and methods of ITreasuryBridgeAPI [#qubIT-Fenix-6565]
+
 12.2.2 (27-01-2025)
 - Bug Fix: Fix debts grabbing and setting finantial document, in debts aggregation strategy, run with debts generation rules [#qubIT-Fenix-6562]
 

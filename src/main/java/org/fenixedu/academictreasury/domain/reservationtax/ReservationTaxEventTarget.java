@@ -18,7 +18,6 @@ import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
-import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
 import org.fenixedu.academictreasury.domain.academictreasurytarget.AcademicTreasuryTargetCreateDebtBuilder;
 import org.fenixedu.academictreasury.domain.academictreasurytarget.AcademicTreasuryTargetCreateDebtBuilder.DebtBuilderWithAmountAndDueDate;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
@@ -93,9 +92,7 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
     }
 
     public void annulDebts(String reason) {
-        var api = TreasuryBridgeAPIFactory.implementation();
-
-        IAcademicTreasuryEvent academicTreasuryEvent = api.getAcademicTreasuryEventForTarget(this);
+        IAcademicTreasuryEvent academicTreasuryEvent = getReservationTaxAcademicTreasuryEvent();
         if (academicTreasuryEvent != null) {
             academicTreasuryEvent.annulDebts(reason);
         }
@@ -229,9 +226,7 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
     }
 
     public IAcademicTreasuryEvent getReservationTaxAcademicTreasuryEvent() {
-        var api = TreasuryBridgeAPIFactory.implementation();
-
-        return api.getAcademicTreasuryEventForTarget(this);
+        return AcademicTreasuryEvent.findUniqueForTarget(getAcademicTreasuryTargetPerson(), this).orElse(null);
     }
 
     public BigDecimal getAmountWithVatToPay() {
