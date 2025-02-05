@@ -1,3 +1,4 @@
+12.3.1 (05-02-2025)
 - Refactor: Move FenixEduAcademicTreasuryPlatformDependentServices#finantialEntityOfDegree to AcademicTreasuryConstants [#qubIT-Fenix-6593]
 
 12.3.0 (31-01-2025)
