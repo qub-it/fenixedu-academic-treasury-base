@@ -142,7 +142,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             var treasuryEvent =
                     AcademicTreasuryEvent.findUniqueForTarget(target.getAcademicTreasuryTargetPerson(), target).orElse(null);
             if (treasuryEvent == null) {
-                treasuryEvent = AcademicTreasuryEvent.createForAcademicTreasuryEventTarget(product, target);
+                treasuryEvent = AcademicTreasuryEvent.createForAcademicTreasuryEventTarget(finantialEntity, product, target);
             }
 
             var debitNote =
@@ -263,7 +263,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
                     AcademicTreasuryEvent.findUniqueForTarget(target.getAcademicTreasuryTargetPerson(), target).orElse(null);
 
             if (treasuryEvent == null) {
-                treasuryEvent = AcademicTreasuryEvent.createForAcademicTreasuryEventTarget(product, target);
+                treasuryEvent = AcademicTreasuryEvent.createForAcademicTreasuryEventTarget(finantialEntity, product, target);
             }
 
             if (treasuryEvent.isCharged()) {

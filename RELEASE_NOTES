@@ -1,3 +1,5 @@
+- Bug Fix: When creating academic treasury events for targets, get the FinantialEntity from the builder, instead of inferring with the degree [#qubIT-Fenix-6602]
+
 12.3.1 (05-02-2025)
 - Refactor: Move FenixEduAcademicTreasuryPlatformDependentServices#finantialEntityOfDegree to AcademicTreasuryConstants [#qubIT-Fenix-6593]
 
