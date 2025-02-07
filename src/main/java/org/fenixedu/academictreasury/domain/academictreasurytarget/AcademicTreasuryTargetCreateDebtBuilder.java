@@ -34,7 +34,6 @@ import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.tariff.AcademicTariff;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.Vat;
@@ -129,7 +128,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             var vat = Vat.findActiveUnique(product.getVatType(), finantialInstitution, new DateTime()).get();
             var person = target.getAcademicTreasuryTargetPerson();
 
-            var personCustomer = AcademicTreasuryPlataformDependentServicesFactory.implementation().personCustomer(person);
+            var personCustomer = person.getPersonCustomer();
             if (personCustomer == null) {
                 personCustomer = PersonCustomer.createWithCurrentFiscalInformation(person);
             }
@@ -251,7 +250,7 @@ public class AcademicTreasuryTargetCreateDebtBuilder {
             var now = new DateTime();
             var person = target.getAcademicTreasuryTargetPerson();
 
-            var personCustomer = AcademicTreasuryPlataformDependentServicesFactory.implementation().personCustomer(person);
+            var personCustomer = person.getPersonCustomer();
             if (personCustomer == null) {
                 personCustomer = PersonCustomer.createWithCurrentFiscalInformation(person);
             }
