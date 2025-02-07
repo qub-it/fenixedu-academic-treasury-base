@@ -1,37 +1,27 @@
 /**
- * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/>
- * All rights reserved.
+ * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/> All rights reserved.
  *
- * Redistribution and use in source and binary forms, without modification, are permitted
- * provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, without modification, are permitted provided that the following conditions
+ * are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this list of
- * conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list
- * of conditions and the following disclaimer in the documentation and/or other materials
- * provided with the distribution.
- * * Neither the name of Quorum Born IT nor the names of its contributors may be used to
- * endorse or promote products derived from this software without specific prior written
- * permission.
- * * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade
- * de Lisboa (Departamento de Informática), hereby referred to as the Beneficiary, is the
- * sole demonstrated end-user and ultimately the only beneficiary of the redistributed binary
- * form and/or source code.
- * * The Beneficiary is entrusted with either the binary form, the source code, or both, and
- * by accepting it, accepts the terms of this License.
- * * Redistribution of any binary form and/or source code is only allowed in the scope of the
- * Universidade de Lisboa FenixEdu(™)’s implementation projects.
- * * This license and conditions of redistribution of source code/binary can only be reviewed
- * by the Steering Comittee of FenixEdu(™) <http://www.fenixedu.org/>.
+ * * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ * disclaimer in the documentation and/or other materials provided with the distribution. * Neither the name of Quorum Born IT nor
+ * the names of its contributors may be used to endorse or promote products derived from this software without specific prior
+ * written permission. * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade de Lisboa
+ * (Departamento de Informática), hereby referred to as the Beneficiary, is the sole demonstrated end-user and ultimately the only
+ * beneficiary of the redistributed binary form and/or source code. * The Beneficiary is entrusted with either the binary form,
+ * the source code, or both, and by accepting it, accepts the terms of this License. * Redistribution of any binary form and/or
+ * source code is only allowed in the scope of the Universidade de Lisboa FenixEdu(™)’s implementation projects. * This license
+ * and conditions of redistribution of source code/binary can only be reviewed by the Steering Comittee of FenixEdu(™)
+ * <http://www.fenixedu.org/>.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL “Quorum Born IT” BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL “Quorum Born IT” BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.fenixedu.academictreasury.domain.integration.tuitioninfo;
 
@@ -49,8 +39,6 @@ import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
-import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Product;
@@ -171,11 +159,10 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
     private void checkColision(final ERPTuitionInfoTypeAcademicEntry academicEntry) {
         final ExecutionYear executionYear = academicEntry.getErpTuitionInfoType().getExecutionYear();
 
-        final Set<ERPTuitionInfoTypeAcademicEntry> allAcademicEntries =
-                ERPTuitionInfoType.findForExecutionYear(executionYear)
-                        .filter(t -> !Sets.intersection(academicEntry.getErpTuitionInfoType().getTuitionProductsSet(), t.getTuitionProductsSet()).isEmpty())
-                        .flatMap(t -> t.getErpTuitionInfoTypeAcademicEntriesSet().stream())
-                        .collect(Collectors.toSet());
+        final Set<ERPTuitionInfoTypeAcademicEntry> allAcademicEntries = ERPTuitionInfoType.findForExecutionYear(executionYear)
+                .filter(t -> !Sets.intersection(academicEntry.getErpTuitionInfoType().getTuitionProductsSet(),
+                        t.getTuitionProductsSet()).isEmpty()).flatMap(t -> t.getErpTuitionInfoTypeAcademicEntriesSet().stream())
+                .collect(Collectors.toSet());
 
         if (academicEntry.isDefinedForDegreeType()) {
             // Ensure degree type is not repeated
@@ -202,11 +189,11 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
                     continue;
                 }
 
-                
-                if(otherEntry.isDefinedForDegree() || otherEntry.isDefinedForDegreeCurricularPlan()) {
+                if (otherEntry.isDefinedForDegree() || otherEntry.isDefinedForDegreeCurricularPlan()) {
 
                     if (academicEntry.getDegree() == otherEntry.getDegree()) {
-                        throw new AcademicTreasuryDomainException("error.ERPTuitionInfoTypeAcademicEntry.entry.duplicated.for.degree",
+                        throw new AcademicTreasuryDomainException(
+                                "error.ERPTuitionInfoTypeAcademicEntry.entry.duplicated.for.degree",
                                 otherEntry.getDegree().getPresentationName());
                     }
 
@@ -215,8 +202,7 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
                 if (otherEntry.isDefinedForDegreeType() && academicEntry.getDegreeType() == otherEntry.getDegreeType()) {
                     throw new AcademicTreasuryDomainException(
                             "error.ERPTuitionInfoTypeAcademicEntry.entry.degreeType.of.degree.defined",
-                            academicEntry.getDegree().getPresentationName(),
-                            otherEntry.getDegreeType().getName().getContent());
+                            academicEntry.getDegree().getPresentationName(), otherEntry.getDegreeType().getName().getContent());
                 }
             }
 
@@ -236,8 +222,7 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
                 if (otherEntry.isDefinedForDegree() && academicEntry.getDegree() == otherEntry.getDegree()) {
                     throw new AcademicTreasuryDomainException(
                             "error.ERPTuitionInfoTypeAcademicEntry.entry.degree.of.degreeCurricularPlan.defined",
-                            academicEntry.getDegreeCurricularPlan().getName(),
-                            otherEntry.getDegree().getPresentationName());
+                            academicEntry.getDegreeCurricularPlan().getName(), otherEntry.getDegree().getPresentationName());
                 }
 
                 if (otherEntry.isDefinedForDegreeType() && academicEntry.getDegreeType() == otherEntry.getDegreeType()) {
@@ -305,8 +290,8 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
             return false;
         }
 
-        if (isDefinedForDegreeCurricularPlan()
-                && getDegreeCurricularPlan() == registration.getStudentCurricularPlan(executionYear).getDegreeCurricularPlan()) {
+        if (isDefinedForDegreeCurricularPlan() && getDegreeCurricularPlan() == registration.getStudentCurricularPlan(
+                executionYear).getDegreeCurricularPlan()) {
             return true;
         } else if (isDefinedForDegree() && getDegree() == registration.getDegree()) {
             return true;
@@ -328,14 +313,14 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
 
         if (!getErpTuitionInfoType().getTuitionProductsSet().containsAll(debtProducts)) {
 
-            if(!Sets.intersection(getErpTuitionInfoType().getTuitionProductsSet(), debtProducts).isEmpty()) {
+            if (!Sets.intersection(getErpTuitionInfoType().getTuitionProductsSet(), debtProducts).isEmpty()) {
                 // There are some products which match, throw an error to analyse
-                throw new AcademicTreasuryDomainException("error.ERPTuitionInfo.event.define.some.of.the.products.of.type.but.not.all",
-                        event.getPerson().getStudent().getNumber().toString(),
-                        event.getPerson().getStudent().getName(),
+                throw new AcademicTreasuryDomainException(
+                        "error.ERPTuitionInfo.event.define.some.of.the.products.of.type.but.not.all",
+                        event.getPerson().getStudent().getNumber().toString(), event.getPerson().getStudent().getName(),
                         getErpTuitionInfoType().getErpTuitionInfoProduct().getName());
             }
-            
+
             return false;
         }
 
@@ -356,7 +341,7 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
         if (isDefinedForDegreeType()) {
             LocalizedString result = new LocalizedString();
             for (Locale locale : treasuryServices().availableLocales()) {
-                result = result.with(locale, academicTreasuryServices().localizedNameOfDegreeType(getDegreeType(), locale));
+                result = result.with(locale, getDegreeType().getName().getContent(locale));
             }
             return result;
         }
@@ -373,8 +358,9 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
         if (isDefinedForDegreeCurricularPlan()) {
             LocalizedString result = new LocalizedString();
             for (Locale locale : AcademicTreasuryConstants.supportedLocales()) {
-                result = result.with(locale, String.format("[%s] %s - %s", getDegree().getCode(),
-                        getDegree().getPresentationName(), getDegreeCurricularPlan().getName()));
+                result = result.with(locale,
+                        String.format("[%s] %s - %s", getDegree().getCode(), getDegree().getPresentationName(),
+                                getDegreeCurricularPlan().getName()));
 
             }
             return result;
@@ -387,10 +373,6 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
         }
 
         throw new RuntimeException("error");
-    }
-
-    private IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
-        return AcademicTreasuryPlataformDependentServicesFactory.implementation();
     }
 
     private ITreasuryPlatformDependentServices treasuryServices() {

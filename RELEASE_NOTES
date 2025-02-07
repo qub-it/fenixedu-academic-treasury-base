@@ -1,5 +1,6 @@
 - Refactor: Remove usage of IAcademicTreasuryPlatformDependentServices in PersonCustomer class [#qubIT-Fenix-6593]
 - Refactor: Remove usage of IAcademicTreasuryPlatformDependentServices in AcademicTreasuryTargetCreateDebtBuilder [#qubIT-Fenix-6593]
+- Refactor: Remove usage of IAcademicTreasuryPlatformDependentServices in academic treasury generation rules [#qubIT-Fenix-6593]
 
 12.4.0 (07-02-2025)
 - Refactor: Move some IAcademicTreasuryPlatformDependentServices to AcademicTreasuryConstants [#qubIT-Fenix-6593]

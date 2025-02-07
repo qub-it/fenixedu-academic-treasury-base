@@ -43,8 +43,6 @@ import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.services.AcademicTaxServices;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
-import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
@@ -276,9 +274,7 @@ public class AggregateDebtsStrategy implements IAcademicDebtGenerationRuleStrate
 
     private DebitEntry grabDebitEntryForAcademicTax(final AcademicDebtGenerationRule rule, final Registration registration,
             final AcademicDebtGenerationRuleEntry entry) {
-        IAcademicTreasuryPlatformDependentServices implementation =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        PersonCustomer personCustomer = implementation.personCustomer(registration.getPerson());
+        PersonCustomer personCustomer = registration.getPerson().getPersonCustomer();
         if (personCustomer == null) {
             return null;
         }
@@ -309,9 +305,7 @@ public class AggregateDebtsStrategy implements IAcademicDebtGenerationRuleStrate
 
     private DebitEntry grabDebitEntryForTuition(final AcademicDebtGenerationRule rule, final Registration registration,
             final AcademicDebtGenerationRuleEntry entry) {
-        IAcademicTreasuryPlatformDependentServices implementation =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        PersonCustomer personCustomer = implementation.personCustomer(registration.getPerson());
+        PersonCustomer personCustomer = registration.getPerson().getPersonCustomer();
         if (personCustomer == null) {
             return null;
         }

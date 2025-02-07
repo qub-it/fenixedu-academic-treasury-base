@@ -1,40 +1,29 @@
 /**
- * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/>
- * All rights reserved.
+ * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/> All rights reserved.
  *
- * Redistribution and use in source and binary forms, without modification, are permitted
- * provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, without modification, are permitted provided that the following conditions
+ * are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this list of
- * conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list
- * of conditions and the following disclaimer in the documentation and/or other materials
- * provided with the distribution.
- * * Neither the name of Quorum Born IT nor the names of its contributors may be used to
- * endorse or promote products derived from this software without specific prior written
- * permission.
- * * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade
- * de Lisboa (Departamento de Informática), hereby referred to as the Beneficiary, is the
- * sole demonstrated end-user and ultimately the only beneficiary of the redistributed binary
- * form and/or source code.
- * * The Beneficiary is entrusted with either the binary form, the source code, or both, and
- * by accepting it, accepts the terms of this License.
- * * Redistribution of any binary form and/or source code is only allowed in the scope of the
- * Universidade de Lisboa FenixEdu(™)’s implementation projects.
- * * This license and conditions of redistribution of source code/binary can only be reviewed
- * by the Steering Comittee of FenixEdu(™) <http://www.fenixedu.org/>.
+ * * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ * disclaimer in the documentation and/or other materials provided with the distribution. * Neither the name of Quorum Born IT nor
+ * the names of its contributors may be used to endorse or promote products derived from this software without specific prior
+ * written permission. * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade de Lisboa
+ * (Departamento de Informática), hereby referred to as the Beneficiary, is the sole demonstrated end-user and ultimately the only
+ * beneficiary of the redistributed binary form and/or source code. * The Beneficiary is entrusted with either the binary form,
+ * the source code, or both, and by accepting it, accepts the terms of this License. * Redistribution of any binary form and/or
+ * source code is only allowed in the scope of the Universidade de Lisboa FenixEdu(™)’s implementation projects. * This license
+ * and conditions of redistribution of source code/binary can only be reviewed by the Steering Comittee of FenixEdu(™)
+ * <http://www.fenixedu.org/>.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL “Quorum Born IT” BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL “Quorum Born IT” BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.fenixedu.academictreasury.domain.integration.tuitioninfo;
-
 
 import static java.lang.String.format;
 
@@ -51,8 +40,6 @@ import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
-import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.dto.ITreasuryBean;
 import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
@@ -60,169 +47,176 @@ import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
 import com.google.common.collect.Lists;
 
 public class ERPTuitionInfoTypeBean implements ITreasuryBean, Serializable {
-    
+
     public static final String DEGREE_TYPE_OPTION = "DEGREE_TYPE_OPTION";
     public static final String DEGREES_OPTION = "DEGREES_OPTION";
     public static final String DEGREE_CURRICULAR_PLANS_OPTION = "DEGREE_CURRICULAR_PLANS_OPTIONS";
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private ExecutionYear executionYear;
-    
+
     private ERPTuitionInfoProduct erpTuitionInfoProduct;
-    
+
     private List<Product> tuitionProducts = Lists.newArrayList();
     private List<DegreeType> degreeTypes = Lists.newArrayList();
     private List<Degree> degrees = Lists.newArrayList();
     private List<DegreeCurricularPlan> degreeCurricularPlans = Lists.newArrayList();
-    
+
     private List<TreasuryTupleDataSourceBean> tuitionPaymentPlanGroupDataSource = Lists.newArrayList();
     private List<TreasuryTupleDataSourceBean> erpTuitionInfoProductDataSource = Lists.newArrayList();
     private List<TreasuryTupleDataSourceBean> productDataSource = Lists.newArrayList();
     private List<TreasuryTupleDataSourceBean> degreeTypeDataSource = Lists.newArrayList();
     private List<TreasuryTupleDataSourceBean> degreeDataSource = Lists.newArrayList();
     private List<TreasuryTupleDataSourceBean> degreeCurricularPlanDataSource = Lists.newArrayList();
-    
+
     private DegreeType selectedDegreeType;
     private List<Degree> selectedDegrees = Lists.newArrayList();
     private List<DegreeCurricularPlan> selectedDegreeCurricularPlans = Lists.newArrayList();
-    
+
     private Product selectedTuitionProduct;
-    
+
     private String degreeInfoSelectOption;
-    
+
     private TuitionPaymentPlanGroup tuitionPaymentPlanGroup;
 
     private ERPTuitionInfoType erpTuitionInfoType;
-    
+
     public ERPTuitionInfoTypeBean(final ExecutionYear executionYear) {
         this.executionYear = executionYear;
         this.degreeInfoSelectOption = DEGREE_TYPE_OPTION;
     }
-    
+
     public ERPTuitionInfoTypeBean(final ERPTuitionInfoType erpTuitionInfoType) {
         this.erpTuitionInfoType = erpTuitionInfoType;
-        
+
         this.erpTuitionInfoProduct = erpTuitionInfoType.getErpTuitionInfoProduct();
-        
+
         this.executionYear = erpTuitionInfoType.getExecutionYear();
 
         this.tuitionProducts.addAll(erpTuitionInfoType.getTuitionProductsSet());
-        this.degreeTypes.addAll(erpTuitionInfoType.getErpTuitionInfoTypeAcademicEntriesSet().stream().filter(e -> e.isDefinedForDegreeType()).map(e -> e.getDegreeType()).collect(Collectors.toSet()));
-        this.degrees.addAll(erpTuitionInfoType.getErpTuitionInfoTypeAcademicEntriesSet().stream().filter(e -> e.isDefinedForDegree()).map(e -> e.getDegree()).collect(Collectors.toSet()));
-        this.degreeCurricularPlans.addAll(erpTuitionInfoType.getErpTuitionInfoTypeAcademicEntriesSet().stream().filter(e -> e.isDefinedForDegreeCurricularPlan()).map(e -> e.getDegreeCurricularPlan()).collect(Collectors.toSet()));
-        
-        if(erpTuitionInfoType.getErpTuitionInfoTypeAcademicEntriesSet().iterator().next().isForRegistration()) {
+        this.degreeTypes.addAll(
+                erpTuitionInfoType.getErpTuitionInfoTypeAcademicEntriesSet().stream().filter(e -> e.isDefinedForDegreeType())
+                        .map(e -> e.getDegreeType()).collect(Collectors.toSet()));
+        this.degrees.addAll(
+                erpTuitionInfoType.getErpTuitionInfoTypeAcademicEntriesSet().stream().filter(e -> e.isDefinedForDegree())
+                        .map(e -> e.getDegree()).collect(Collectors.toSet()));
+        this.degreeCurricularPlans.addAll(erpTuitionInfoType.getErpTuitionInfoTypeAcademicEntriesSet().stream()
+                .filter(e -> e.isDefinedForDegreeCurricularPlan()).map(e -> e.getDegreeCurricularPlan())
+                .collect(Collectors.toSet()));
+
+        if (erpTuitionInfoType.getErpTuitionInfoTypeAcademicEntriesSet().iterator().next().isForRegistration()) {
             this.tuitionPaymentPlanGroup = TuitionPaymentPlanGroup.findUniqueDefaultGroupForRegistration().get();
-        } else if(erpTuitionInfoType.getErpTuitionInfoTypeAcademicEntriesSet().iterator().next().isForStandalone()) {
+        } else if (erpTuitionInfoType.getErpTuitionInfoTypeAcademicEntriesSet().iterator().next().isForStandalone()) {
             this.tuitionPaymentPlanGroup = TuitionPaymentPlanGroup.findUniqueDefaultGroupForStandalone().get();
-        } else if(erpTuitionInfoType.getErpTuitionInfoTypeAcademicEntriesSet().iterator().next().isForExtracurricular()) {
+        } else if (erpTuitionInfoType.getErpTuitionInfoTypeAcademicEntriesSet().iterator().next().isForExtracurricular()) {
             this.tuitionPaymentPlanGroup = TuitionPaymentPlanGroup.findUniqueDefaultGroupForExtracurricular().get();
         }
-        
+
         update();
     }
-    
+
     public void addTuitionProduct() {
-        if(this.selectedTuitionProduct == null) {
+        if (this.selectedTuitionProduct == null) {
             return;
         }
-        
-        if(!this.tuitionProducts.contains(this.selectedTuitionProduct) ) {
+
+        if (!this.tuitionProducts.contains(this.selectedTuitionProduct)) {
             this.tuitionProducts.add(this.selectedTuitionProduct);
         }
-        
+
         this.selectedTuitionProduct = null;
     }
-    
+
     public void removeTuitionProduct(final Product product) {
         this.tuitionProducts.remove(product);
     }
-    
+
     public void removeDegreeType(final DegreeType degreeType) {
         this.degreeTypes.remove(degreeType);
     }
-    
+
     public void removeDegree(final Degree degree) {
         this.degrees.remove(degree);
     }
-    
+
     public void removeDegreeCurricularPlan(final DegreeCurricularPlan degreeCurricularPlan) {
         this.degreeCurricularPlans.remove(degreeCurricularPlan);
     }
-    
+
     public void addDegreeType() {
-        
-        if(this.selectedDegreeType == null) {
+
+        if (this.selectedDegreeType == null) {
             return;
         }
-        
-        if(degreeCurricularPlans.stream().map(DegreeCurricularPlan::getDegree).map(Degree::getDegreeType).anyMatch(d -> d == selectedDegreeType)) {
-            throw new AcademicTreasuryDomainException("error.ERPTuitionInfoType.degreeType.refering.in.degree.curricular.plans", 
-                    format("%s",  selectedDegreeType.getName().getContent()));
+
+        if (degreeCurricularPlans.stream().map(DegreeCurricularPlan::getDegree).map(Degree::getDegreeType)
+                .anyMatch(d -> d == selectedDegreeType)) {
+            throw new AcademicTreasuryDomainException("error.ERPTuitionInfoType.degreeType.refering.in.degree.curricular.plans",
+                    format("%s", selectedDegreeType.getName().getContent()));
         }
-        
-        if(degrees.stream().map(Degree::getDegreeType).anyMatch(d -> d == selectedDegreeType)) {
-            throw new AcademicTreasuryDomainException("error.ERPTuitionInfoType.degreeType.refering.in.degrees", 
-                    format("%s",  selectedDegreeType.getName().getContent()));
+
+        if (degrees.stream().map(Degree::getDegreeType).anyMatch(d -> d == selectedDegreeType)) {
+            throw new AcademicTreasuryDomainException("error.ERPTuitionInfoType.degreeType.refering.in.degrees",
+                    format("%s", selectedDegreeType.getName().getContent()));
         }
-        
-        if(!this.degreeTypes.contains(this.selectedDegreeType)) {
+
+        if (!this.degreeTypes.contains(this.selectedDegreeType)) {
             this.degreeTypes.add(this.selectedDegreeType);
         }
-        
+
         this.selectedDegreeType = null;
     }
 
     public void addDegrees() {
-        if(this.selectedDegrees.isEmpty()) {
+        if (this.selectedDegrees.isEmpty()) {
             return;
         }
-        
+
         for (final Degree degree : this.selectedDegrees) {
-            
-            if(degreeCurricularPlans.stream().map(DegreeCurricularPlan::getDegree).anyMatch(d -> d == degree)) {
-                throw new AcademicTreasuryDomainException("error.ERPTuitionInfoType.degree.refering.in.degree.curricular.plans", 
-                        format("%s > %s",  degree.getDegreeType().getName().getContent(), degree.getPresentationName()));
+
+            if (degreeCurricularPlans.stream().map(DegreeCurricularPlan::getDegree).anyMatch(d -> d == degree)) {
+                throw new AcademicTreasuryDomainException("error.ERPTuitionInfoType.degree.refering.in.degree.curricular.plans",
+                        format("%s > %s", degree.getDegreeType().getName().getContent(), degree.getPresentationName()));
             }
 
-            if(degrees.contains(degree)) {
+            if (degrees.contains(degree)) {
                 continue;
             }
-            
-            if(degreeTypes.contains(degree.getDegreeType())) {
+
+            if (degreeTypes.contains(degree.getDegreeType())) {
                 continue;
             }
-            
+
             this.degrees.add(degree);
-            
+
         }
-        
+
         this.selectedDegrees = Lists.newArrayList();
     }
-    
+
     public void addDegreeCurricularPlans() {
-        if(this.selectedDegreeCurricularPlans.isEmpty()) {
+        if (this.selectedDegreeCurricularPlans.isEmpty()) {
             return;
         }
-        
+
         for (final DegreeCurricularPlan dcp : this.selectedDegreeCurricularPlans) {
-            
-            if(degreeTypes.contains(dcp.getDegreeType())) {
+
+            if (degreeTypes.contains(dcp.getDegreeType())) {
                 continue;
             }
-            
-            if(degrees.contains(dcp.getDegree())) {
+
+            if (degrees.contains(dcp.getDegree())) {
                 continue;
             }
-            
-            if(degreeCurricularPlans.contains(dcp)) {
+
+            if (degreeCurricularPlans.contains(dcp)) {
                 continue;
             }
-            
+
             this.degreeCurricularPlans.add(dcp);
         }
-        
+
         this.selectedDegreeCurricularPlans = Lists.newArrayList();
     }
 
@@ -231,67 +225,63 @@ public class ERPTuitionInfoTypeBean implements ITreasuryBean, Serializable {
             final TuitionPaymentPlanGroup r = TuitionPaymentPlanGroup.findUniqueDefaultGroupForRegistration().get();
             final TuitionPaymentPlanGroup s = TuitionPaymentPlanGroup.findUniqueDefaultGroupForStandalone().get();
             final TuitionPaymentPlanGroup e = TuitionPaymentPlanGroup.findUniqueDefaultGroupForExtracurricular().get();
-            
-            this.tuitionPaymentPlanGroupDataSource = Lists.newArrayList(
-                    new TreasuryTupleDataSourceBean(r.getExternalId(), r.getName().getContent()),
-                    new TreasuryTupleDataSourceBean(s.getExternalId(), s.getName().getContent()),
-                    new TreasuryTupleDataSourceBean(e.getExternalId(), e.getName().getContent()));
+
+            this.tuitionPaymentPlanGroupDataSource =
+                    Lists.newArrayList(new TreasuryTupleDataSourceBean(r.getExternalId(), r.getName().getContent()),
+                            new TreasuryTupleDataSourceBean(s.getExternalId(), s.getName().getContent()),
+                            new TreasuryTupleDataSourceBean(e.getExternalId(), e.getName().getContent()));
         }
-        
+
         this.erpTuitionInfoProductDataSource = ERPTuitionInfoProduct.findAll()
                 .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), format("[%s] %s", l.getCode(), l.getName())))
-                .sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT)
-                .collect(Collectors.toList());
-        
-        this.productDataSource = AcademicTreasurySettings.getInstance().getTuitionProductGroup().getProductsSet().stream()
-                .filter(p -> !this.tuitionProducts.contains(p))
-                .sorted(Product.COMPARE_BY_NAME)
-                .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), format("%s [%s]", l.getName().getContent(), l.getCode()))).collect(Collectors.toList());
+                .sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT).collect(Collectors.toList());
 
-        this.degreeTypeDataSource = DegreeType.all()
-                .filter(dt -> dt.getDegreeSet().stream().flatMap(d -> d.getExecutionDegreesForExecutionYear(executionYear).stream()).count() > 0)
+        this.productDataSource = AcademicTreasurySettings.getInstance().getTuitionProductGroup().getProductsSet().stream()
+                .filter(p -> !this.tuitionProducts.contains(p)).sorted(Product.COMPARE_BY_NAME)
+                .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(),
+                        format("%s [%s]", l.getName().getContent(), l.getCode()))).collect(Collectors.toList());
+
+        this.degreeTypeDataSource = DegreeType.all().filter(dt -> dt.getDegreeSet().stream()
+                        .flatMap(d -> d.getExecutionDegreesForExecutionYear(executionYear).stream()).count() > 0)
                 .filter(d -> !degreeTypes.contains(d))
                 .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), l.getName().getContent()))
                 .sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT).collect(Collectors.toList());
-        
-        if(DEGREES_OPTION.equals(this.degreeInfoSelectOption)) {
-            if(this.selectedDegreeType != null) {
-                this.degreeDataSource = this.selectedDegreeType.getDegreeSet().stream()
-                        .filter(d -> !this.degrees.contains(d))
+
+        if (DEGREES_OPTION.equals(this.degreeInfoSelectOption)) {
+            if (this.selectedDegreeType != null) {
+                this.degreeDataSource = this.selectedDegreeType.getDegreeSet().stream().filter(d -> !this.degrees.contains(d))
                         .filter(d -> !this.degreeTypes.contains(d.getDegreeType()))
                         .filter(d -> !d.getExecutionDegreesForExecutionYear(executionYear).isEmpty())
                         .map(d -> new TreasuryTupleDataSourceBean(d.getExternalId(), degreeDescription(d)))
-                        .sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT)
-                        .collect(Collectors.toList());
+                        .sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT).collect(Collectors.toList());
             } else {
                 this.degreeDataSource = Lists.newArrayList();
             }
-            
-        } else if(DEGREE_CURRICULAR_PLANS_OPTION.equals(this.degreeInfoSelectOption)) {
-            if(this.selectedDegreeType != null) {
-                
-                this.degreeCurricularPlanDataSource = academicTreasuryServices().readAllDegreeCurricularPlansSet().stream()
-                    .filter(d -> d.getDegreeType() == this.selectedDegreeType)
-			// TODO Check code Refactor/20210624-MergeWithISCTE
-			// In Refactor/ISCTE it is called d.getExecutionDegreeByYear(executionYear
-                    .filter(d -> d.findExecutionDegree(executionYear).isPresent())
-                    .filter(d -> !this.degrees.contains(d.getDegree()))
-                    .filter(d -> !this.degreeTypes.contains(d.getDegree().getDegreeType()))
-                    .map((dcp) -> new TreasuryTupleDataSourceBean(dcp.getExternalId(), dcpDescription(dcp)))
-                    .sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT)
-                    .collect(Collectors.toList());
 
-            
+        } else if (DEGREE_CURRICULAR_PLANS_OPTION.equals(this.degreeInfoSelectOption)) {
+            if (this.selectedDegreeType != null) {
+
+                this.degreeCurricularPlanDataSource =
+                        readAllDegreeCurricularPlansSet().stream().filter(d -> d.getDegreeType() == this.selectedDegreeType)
+                                // TODO Check code Refactor/20210624-MergeWithISCTE
+                                // In Refactor/ISCTE it is called d.getExecutionDegreeByYear(executionYear
+                                .filter(d -> d.findExecutionDegree(executionYear).isPresent())
+                                .filter(d -> !this.degrees.contains(d.getDegree()))
+                                .filter(d -> !this.degreeTypes.contains(d.getDegree().getDegreeType()))
+                                .map((dcp) -> new TreasuryTupleDataSourceBean(dcp.getExternalId(), dcpDescription(dcp)))
+                                .sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT).collect(Collectors.toList());
+
             } else {
                 this.degreeCurricularPlanDataSource = Lists.newArrayList();
             }
-            
+
         }
-        
+
     }
 
-    private IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
-        return AcademicTreasuryPlataformDependentServicesFactory.implementation();
+    private Set<DegreeCurricularPlan> readAllDegreeCurricularPlansSet() {
+        return Degree.readAllMatching((dt) -> true).stream().flatMap(d -> d.getDegreeCurricularPlansSet().stream())
+                .collect(Collectors.toSet());
     }
 
     private String degreeDescription(final Degree d) {
@@ -299,30 +289,28 @@ public class ERPTuitionInfoTypeBean implements ITreasuryBean, Serializable {
     }
 
     public static String dcpDescription(final DegreeCurricularPlan dcp) {
-        return format("[%s] %s - %s",
-                dcp.getDegree().getCode(), dcp.getDegree().getPresentationName(), dcp.getName());
+        return format("[%s] %s - %s", dcp.getDegree().getCode(), dcp.getDegree().getPresentationName(), dcp.getName());
     }
-    
+
     public boolean isToUpdate() {
         return getErpTuitionInfoType() != null;
     }
-    
+
     public boolean isDegreeInformationDefined() {
         return !degreeTypes.isEmpty() || !degrees.isEmpty() || !degreeCurricularPlans.isEmpty();
     }
-    
+
     public boolean isDegreeInfoSelectOptionDegreeType() {
         return DEGREE_TYPE_OPTION.equals(this.degreeInfoSelectOption);
     }
-    
+
     public boolean isDegreeInfoSelectOptionDegrees() {
         return DEGREES_OPTION.equals(this.degreeInfoSelectOption);
     }
-    
+
     public boolean isDegreeInfoSelectOptionDegreeCurricularPlans() {
         return DEGREE_CURRICULAR_PLANS_OPTION.equals(this.degreeInfoSelectOption);
     }
-    
 
     // @formatter:off
     /* *****************
@@ -334,11 +322,11 @@ public class ERPTuitionInfoTypeBean implements ITreasuryBean, Serializable {
     public ExecutionYear getExecutionYear() {
         return executionYear;
     }
-    
+
     public void setExecutionYear(ExecutionYear executionYear) {
         this.executionYear = executionYear;
     }
-    
+
     public ERPTuitionInfoProduct getErpTuitionInfoProduct() {
         return erpTuitionInfoProduct;
     }
@@ -462,25 +450,25 @@ public class ERPTuitionInfoTypeBean implements ITreasuryBean, Serializable {
     public TuitionPaymentPlanGroup getTuitionPaymentPlanGroup() {
         return tuitionPaymentPlanGroup;
     }
-    
+
     public void setTuitionPaymentPlanGroup(TuitionPaymentPlanGroup tuitionPaymentPlanGroup) {
         this.tuitionPaymentPlanGroup = tuitionPaymentPlanGroup;
     }
-    
+
     public List<TreasuryTupleDataSourceBean> getTuitionPaymentPlanGroupDataSource() {
         return tuitionPaymentPlanGroupDataSource;
     }
-    
+
     public void setTuitionPaymentPlanGroupDataSource(List<TreasuryTupleDataSourceBean> tuitionPaymentPlanGroupDataSource) {
         this.tuitionPaymentPlanGroupDataSource = tuitionPaymentPlanGroupDataSource;
     }
-    
+
     public ERPTuitionInfoType getErpTuitionInfoType() {
         return erpTuitionInfoType;
     }
-    
+
     public void setErpTuitionInfoType(ERPTuitionInfoType erpTuitionInfoType) {
         this.erpTuitionInfoType = erpTuitionInfoType;
     }
-    
+
 }
