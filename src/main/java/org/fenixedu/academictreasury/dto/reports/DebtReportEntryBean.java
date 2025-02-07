@@ -29,16 +29,18 @@ import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValu
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
+import org.fenixedu.academic.domain.contacts.PartyContact;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.reports.DebtReportRequest;
 import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
-import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Currency;
@@ -402,10 +404,7 @@ public class DebtReportEntryBean implements SpreadsheetRow, IFinantialReportEntr
     }
 
     static EmailAddress personalEmail(final Person person) {
-        IAcademicTreasuryPlatformDependentServices implementation =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        return implementation.pendingOrValidPartyContacts(person, EmailAddress.class) //
+        return pendingOrValidPartyContacts(person, EmailAddress.class) //
                 .stream() //
                 .map(EmailAddress.class::cast) //
                 .filter(e -> Boolean.TRUE.equals(e.getActive())) //
@@ -422,8 +421,19 @@ public class DebtReportEntryBean implements SpreadsheetRow, IFinantialReportEntr
                 .orElse(null);
     }
 
-    private IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
-        return AcademicTreasuryPlataformDependentServicesFactory.implementation();
+    private static List<? extends PartyContact> pendingOrValidPartyContacts(Person person,
+            Class<? extends PartyContact> partyContactType) {
+        Comparator<? super PartyContact> comparator = (o1, o2) -> {
+            if (o1.isValid() && !o2.isValid()) {
+                return -1;
+            } else if (!o1.isValid() && o2.isValid()) {
+                return 1;
+            }
+
+            return o1.getExternalId().compareTo(o2.getExternalId());
+        };
+
+        return person.getAllPartyContacts(partyContactType).stream().sorted(comparator).collect(Collectors.toList());
     }
 
     private String entryType(final InvoiceEntry entry) {
