@@ -3,8 +3,6 @@ package org.fenixedu.academictreasury;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.organizationalStructure.Party;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
-import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 
 import com.google.common.base.Strings;
 
@@ -27,11 +25,9 @@ public class AcademicTreasuryBootstrap {
 
         @Atomic(mode = TxMode.READ)
         private void createMissingPersonCustomersForStudents() {
-            final IAcademicTreasuryPlatformDependentServices academicTreasuryServices = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-            
             int count = 0;
-            int totalCount = academicTreasuryServices.readAllPersonsSet().size();
-            for (Party party : academicTreasuryServices.readAllPersonsSet()) {
+            int totalCount = Person.readAllPersons().size();
+            for (Party party : Person.readAllPersons()) {
                 if (count % 1000 == 0) {
                     System.out.println("TreasuryAcademicBoot - Processing " + count + "/" + totalCount + " parties.");
                 }
@@ -56,7 +52,7 @@ public class AcademicTreasuryBootstrap {
                 if (Strings.isNullOrEmpty(addressFiscalCountryCode) || Strings.isNullOrEmpty(fiscalNumber)) {
                     return;
                 }
-                
+
                 try {
                     createMissingPersonCustomer(person);
                 } catch (final Exception e) {
