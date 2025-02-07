@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Enrolment;
-import org.fenixedu.academic.domain.EnrolmentEvaluation;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
@@ -40,24 +39,16 @@ import org.fenixedu.academic.domain.serviceRequests.AcademicServiceRequest;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.treasury.IAcademicServiceRequestAndAcademicTaxTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEvent;
-import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
 import org.fenixedu.academic.domain.treasury.IImprovementTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.ITreasuryBridgeAPI;
-import org.fenixedu.academictreasury.domain.academicalAct.AcademicActBlockingSuspension;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
-import org.fenixedu.academictreasury.services.AcademicTaxServices;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
-import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.PersonServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.bennu.core.signals.DomainObjectEvent;
-import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.SettlementNote;
-import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
-import org.fenixedu.treasury.domain.payments.integration.DigitalPaymentPlatform;
 import org.fenixedu.treasury.util.FiscalCodeValidation;
 import org.joda.time.LocalDate;
 
@@ -78,8 +69,7 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
     @Deprecated
     public IAcademicServiceRequestAndAcademicTaxTreasuryEvent academicTreasuryEventForAcademicServiceRequest(
             AcademicServiceRequest academicServiceRequest) {
-        return AcademicTreasuryPlataformDependentServicesFactory.implementation()
-                .academicTreasuryEventsSet(academicServiceRequest.getPerson()).stream()
+        return academicServiceRequest.getPerson().getAcademicTreasuryEventSet().stream()
                 .filter(e -> e.getAcademicServiceRequest() == academicServiceRequest).findFirst().orElse(null);
     }
 
@@ -202,31 +192,24 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
     @Override
     @Deprecated
     public void saveFiscalAddressFieldsFromPersonInActiveCustomer(final Person person) {
-        IAcademicTreasuryPlatformDependentServices implementation =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        if (implementation.personCustomer(person) == null) {
+        if (person.getPersonCustomer() == null) {
             return;
         }
 
-        implementation.personCustomer(person).saveFiscalAddressFieldsFromPersonInCustomer();
+        person.getPersonCustomer().saveFiscalAddressFieldsFromPersonInCustomer();
     }
 
     @Override
     @Deprecated
     public PhysicalAddress createSaftDefaultPhysicalAddress(final Person person) {
-        IAcademicTreasuryPlatformDependentServices implementation =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         String unknownAddress =
                 AcademicTreasuryConstants.academicTreasuryBundle("label.AcademicTreasuryBridgeImpl.unknown.address");
         PhysicalAddress result =
-                implementation.createPhysicalAddress(person, Country.readDefault(), unknownAddress, unknownAddress, "0000-000",
-                        unknownAddress);
+                AcademicTreasuryConstants.createPhysicalAddress(person, Country.readDefault(), unknownAddress, unknownAddress,
+                        "0000-000", unknownAddress);
         result.setValid();
 
         return result;
-
     }
 
 }

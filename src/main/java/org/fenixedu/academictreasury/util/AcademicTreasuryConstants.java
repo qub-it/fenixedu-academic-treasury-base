@@ -31,9 +31,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Sets;
-import org.fenixedu.academic.domain.Degree;
-import org.fenixedu.academic.domain.ExecutionInterval;
-import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.*;
+import org.fenixedu.academic.domain.contacts.PartyContactType;
+import org.fenixedu.academic.domain.contacts.PhysicalAddress;
+import org.fenixedu.academic.domain.contacts.PhysicalAddressData;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.StatuteType;
@@ -310,4 +311,21 @@ public class AcademicTreasuryConstants {
         return findStatuteTypes(registration, executionInterval).stream().filter(s -> s.getVisible()).collect(Collectors.toSet());
     }
 
+    public static PhysicalAddress createPhysicalAddress(Person person, Country countryOfResidence, String districtOfResidence,
+            String districtSubdivisionOfResidence, String areaCode, String address) {
+        PhysicalAddressData data = new PhysicalAddressData();
+
+        data.setAddress(address);
+        data.setCountryOfResidence(countryOfResidence);
+        data.setDistrictOfResidence(districtOfResidence);
+        data.setDistrictSubdivisionOfResidence(districtSubdivisionOfResidence);
+        data.setAreaCode(areaCode);
+
+        final PhysicalAddress physicalAddress =
+                PhysicalAddress.createPhysicalAddress(person, data, PartyContactType.PERSONAL, false);
+
+        physicalAddress.setValid();
+
+        return physicalAddress;
+    }
 }
