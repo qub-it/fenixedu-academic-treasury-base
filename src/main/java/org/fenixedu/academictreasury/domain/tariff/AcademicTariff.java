@@ -1,37 +1,27 @@
 /**
- * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/>
- * All rights reserved.
+ * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/> All rights reserved.
  *
- * Redistribution and use in source and binary forms, without modification, are permitted
- * provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, without modification, are permitted provided that the following conditions
+ * are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this list of
- * conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list
- * of conditions and the following disclaimer in the documentation and/or other materials
- * provided with the distribution.
- * * Neither the name of Quorum Born IT nor the names of its contributors may be used to
- * endorse or promote products derived from this software without specific prior written
- * permission.
- * * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade
- * de Lisboa (Departamento de Informática), hereby referred to as the Beneficiary, is the
- * sole demonstrated end-user and ultimately the only beneficiary of the redistributed binary
- * form and/or source code.
- * * The Beneficiary is entrusted with either the binary form, the source code, or both, and
- * by accepting it, accepts the terms of this License.
- * * Redistribution of any binary form and/or source code is only allowed in the scope of the
- * Universidade de Lisboa FenixEdu(™)’s implementation projects.
- * * This license and conditions of redistribution of source code/binary can only be reviewed
- * by the Steering Comittee of FenixEdu(™) <http://www.fenixedu.org/>.
+ * * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ * disclaimer in the documentation and/or other materials provided with the distribution. * Neither the name of Quorum Born IT nor
+ * the names of its contributors may be used to endorse or promote products derived from this software without specific prior
+ * written permission. * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade de Lisboa
+ * (Departamento de Informática), hereby referred to as the Beneficiary, is the sole demonstrated end-user and ultimately the only
+ * beneficiary of the redistributed binary form and/or source code. * The Beneficiary is entrusted with either the binary form,
+ * the source code, or both, and by accepting it, accepts the terms of this License. * Redistribution of any binary form and/or
+ * source code is only allowed in the scope of the Universidade de Lisboa FenixEdu(™)’s implementation projects. * This license
+ * and conditions of redistribution of source code/binary can only be reviewed by the Steering Comittee of FenixEdu(™)
+ * <http://www.fenixedu.org/>.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL “Quorum Born IT” BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL “Quorum Born IT” BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.fenixedu.academictreasury.domain.tariff;
 
@@ -57,8 +47,6 @@ import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent.Academic
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.serviceRequests.ITreasuryServiceRequest;
 import org.fenixedu.academictreasury.dto.tariff.AcademicTariffBean;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
-import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Currency;
@@ -224,23 +212,25 @@ public class AcademicTariff extends AcademicTariff_Base {
          */
 
         if (getCycleType() != null) {
-            if (findInInterval(getFinantialEntity(), getProduct(), getDegreeType(), getDegree(), getCycleType(), getInterval())
-                    .count() > 1) {
+            if (findInInterval(getFinantialEntity(), getProduct(), getDegreeType(), getDegree(), getCycleType(),
+                    getInterval()).count() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.overlaps.with.other",
                         getProduct().getName().getContent());
-            } ;
+            }
+            ;
         } else if (getDegree() != null) {
-            if (findInInterval(getFinantialEntity(), getProduct(), getDegreeType(), getDegree(), getInterval())
-                    .filter(t -> t.getCycleType() == null).count() > 1) {
+            if (findInInterval(getFinantialEntity(), getProduct(), getDegreeType(), getDegree(), getInterval()).filter(
+                    t -> t.getCycleType() == null).count() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.overlaps.with.other",
                         getProduct().getName().getContent());
             }
         } else if (getDegreeType() != null) {
-            if (findInInterval(getFinantialEntity(), getProduct(), getDegreeType(), getInterval())
-                    .filter(t -> t.getDegree() == null).count() > 1) {
+            if (findInInterval(getFinantialEntity(), getProduct(), getDegreeType(), getInterval()).filter(
+                    t -> t.getDegree() == null).count() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.overlaps.with.other",
                         getProduct().getName().getContent());
-            } ;
+            }
+            ;
         } else {
             if (findInInterval(getFinantialEntity(), getProduct(), getInterval()).filter(t -> t.getDegreeType() == null)
                     .count() > 1) {
@@ -325,15 +315,17 @@ public class AcademicTariff extends AcademicTariff_Base {
     public BigDecimal amountForUrgencyRate(int numberOfUnits, int numberOfPages, boolean applyLanguageRate) {
         BigDecimal amount = amountWithLanguageRate(numberOfUnits, numberOfPages, applyLanguageRate);
 
-        return amount.multiply(getUrgencyRate().setScale(20, RoundingMode.HALF_EVEN)
-                .divide(AcademicTreasuryConstants.HUNDRED_PERCENT).setScale(2, RoundingMode.HALF_EVEN));
+        return amount.multiply(
+                getUrgencyRate().setScale(20, RoundingMode.HALF_EVEN).divide(AcademicTreasuryConstants.HUNDRED_PERCENT)
+                        .setScale(2, RoundingMode.HALF_EVEN));
     }
 
     public BigDecimal amountForUrgencyRate(final int numberOfUnits, final int numberOfPages, final Locale language) {
         BigDecimal amount = amountWithLanguageRate(numberOfUnits, numberOfPages, language);
 
-        return amount.multiply(getUrgencyRate().setScale(20, RoundingMode.HALF_EVEN)
-                .divide(AcademicTreasuryConstants.HUNDRED_PERCENT).setScale(2, RoundingMode.HALF_EVEN));
+        return amount.multiply(
+                getUrgencyRate().setScale(20, RoundingMode.HALF_EVEN).divide(AcademicTreasuryConstants.HUNDRED_PERCENT)
+                        .setScale(2, RoundingMode.HALF_EVEN));
     }
 
     public BigDecimal amountForLanguageTranslationRate(final int numberOfUnits, final int numberOfPages) {
@@ -431,8 +423,6 @@ public class AcademicTariff extends AcademicTariff_Base {
     public static LocalizedString improvementDebitEntryName(final AcademicTax improvementAcademicTax,
             final EnrolmentEvaluation enrolmentEvaluation) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
         final Registration registration = enrolmentEvaluation.getEnrolment().getRegistration();
         final ExecutionYear executionYear = enrolmentEvaluation.getExecutionPeriod().getExecutionYear();
@@ -440,10 +430,11 @@ public class AcademicTariff extends AcademicTariff_Base {
         LocalizedString result = new LocalizedString();
 
         for (final Locale locale : treasuryServices.availableLocales()) {
-            String enrolmentName = academicTreasuryServices.localizedNameOfEnrolment(enrolmentEvaluation.getEnrolment(), locale);
+            String enrolmentName = enrolmentEvaluation.getEnrolment().getName().getContent(locale);
             String executionIntervalName = enrolmentEvaluation.getExecutionPeriod().getQualifiedName();
-            String academicTreasuryEventDescription = AcademicTreasuryEvent
-                    .nameForAcademicTax(improvementAcademicTax, registration, executionYear).getContent(locale);
+            String academicTreasuryEventDescription =
+                    AcademicTreasuryEvent.nameForAcademicTax(improvementAcademicTax, registration, executionYear)
+                            .getContent(locale);
 
             result = result.with(locale,
                     academicTreasuryEventDescription + format(" (%s - %s)", enrolmentName, executionIntervalName));
@@ -579,9 +570,10 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         final Map<String, String> fillPriceProperties = fillPriceProperties(academicTreasuryEvent, enrolmentEvaluation);
 
-        final DebitEntry debitEntry = DebitEntry.create(getFinantialEntity(), debtAccount, academicTreasuryEvent, vat, amount,
-                dueDate, fillPriceProperties, getProduct(), debitEntryName.getContent(TreasuryConstants.DEFAULT_LANGUAGE),
-                AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), new DateTime(), false, false, null);
+        final DebitEntry debitEntry =
+                DebitEntry.create(getFinantialEntity(), debtAccount, academicTreasuryEvent, vat, amount, dueDate,
+                        fillPriceProperties, getProduct(), debitEntryName.getContent(TreasuryConstants.DEFAULT_LANGUAGE),
+                        AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), new DateTime(), false, false, null);
 
         academicTreasuryEvent.associateEnrolmentEvaluation(debitEntry, enrolmentEvaluation);
 
@@ -607,10 +599,12 @@ public class AcademicTariff extends AcademicTariff_Base {
         final BigDecimal amountForAdditionalUnits = amountForAdditionalUnits(academicTreasuryEvent.getNumberOfUnits());
         final BigDecimal amountForPages = amountForPages(academicTreasuryEvent.getNumberOfPages());
         final BigDecimal maximumAmount = getMaximumAmount();
-        final BigDecimal amountForLanguageTranslationRate = amountForLanguageTranslationRate(
-                academicTreasuryEvent.getNumberOfUnits(), academicTreasuryEvent.getNumberOfPages());
-        final BigDecimal amountForUrgencyRate = amountForUrgencyRate(academicTreasuryEvent.getNumberOfUnits(),
-                academicTreasuryEvent.getNumberOfPages(), academicTreasuryEvent.getLanguage());
+        final BigDecimal amountForLanguageTranslationRate =
+                amountForLanguageTranslationRate(academicTreasuryEvent.getNumberOfUnits(),
+                        academicTreasuryEvent.getNumberOfPages());
+        final BigDecimal amountForUrgencyRate =
+                amountForUrgencyRate(academicTreasuryEvent.getNumberOfUnits(), academicTreasuryEvent.getNumberOfPages(),
+                        academicTreasuryEvent.getLanguage());
 
         academicTreasuryEvent.updatePricingFields(baseAmount, amountForAdditionalUnits, amountForPages, maximumAmount,
                 amountForLanguageTranslationRate, amountForUrgencyRate);
@@ -646,8 +640,9 @@ public class AcademicTariff extends AcademicTariff_Base {
         propertiesMap.put(AcademicTreasuryEventKeys.EXECUTION_YEAR.getDescriptionI18N().getContent(),
                 academicTreasuryEvent.getExecutionYear().getQualifiedName());
 
-        propertiesMap.put(AcademicTreasuryEventKeys.DEGREE.getDescriptionI18N().getContent(), academicTreasuryEvent
-                .getRegistration().getDegree().getPresentationName(academicTreasuryEvent.getExecutionYear()));
+        propertiesMap.put(AcademicTreasuryEventKeys.DEGREE.getDescriptionI18N().getContent(),
+                academicTreasuryEvent.getRegistration().getDegree()
+                        .getPresentationName(academicTreasuryEvent.getExecutionYear()));
         propertiesMap.put(AcademicTreasuryEventKeys.DEGREE_CURRICULAR_PLAN.getDescriptionI18N().getContent(),
                 academicTreasuryEvent.getRegistration().getDegreeCurricularPlanName());
 
@@ -689,18 +684,17 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.FOREIGN_LANGUAGE_RATE.getDescriptionI18N().getContent(),
                 getLanguageTranslationRate().toString());
-        propertiesMap.put(
-                AcademicTreasuryEvent.AcademicTreasuryEventKeys.CALCULATED_FOREIGN_LANGUAGE_RATE.getDescriptionI18N()
-                        .getContent(),
-                currency.getValueFor(amountForLanguageTranslationRate(academicTreasuryEvent.getNumberOfUnits(),
-                        academicTreasuryEvent.getNumberOfPages())));
+        propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.CALCULATED_FOREIGN_LANGUAGE_RATE.getDescriptionI18N()
+                .getContent(), currency.getValueFor(amountForLanguageTranslationRate(academicTreasuryEvent.getNumberOfUnits(),
+                academicTreasuryEvent.getNumberOfPages())));
 
         propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.URGENT_PERCENTAGE.getDescriptionI18N().getContent(),
                 getUrgencyRate().toString());
         propertiesMap.put(
                 AcademicTreasuryEvent.AcademicTreasuryEventKeys.CALCULATED_URGENT_AMOUNT.getDescriptionI18N().getContent(),
-                currency.getValueFor(amountForUrgencyRate(academicTreasuryEvent.getNumberOfUnits(),
-                        academicTreasuryEvent.getNumberOfPages(), academicTreasuryEvent.getLanguage())));
+                currency.getValueFor(
+                        amountForUrgencyRate(academicTreasuryEvent.getNumberOfUnits(), academicTreasuryEvent.getNumberOfPages(),
+                                academicTreasuryEvent.getLanguage())));
 
         propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.FINAL_AMOUNT.getDescriptionI18N().getContent(),
                 currency.getValueFor(amountToPay(academicTreasuryEvent)));
@@ -713,9 +707,6 @@ public class AcademicTariff extends AcademicTariff_Base {
 
     private Map<String, String> fillPriceProperties(final AcademicTreasuryEvent academicTreasuryEvent,
             final EnrolmentEvaluation improvementEnrolmentEvaluation) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         final Map<String, String> propertiesMap = Maps.newHashMap();
 
         propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.BASE_AMOUNT.getDescriptionI18N().getContent(),
@@ -725,7 +716,7 @@ public class AcademicTariff extends AcademicTariff_Base {
                 amountToPay(academicTreasuryEvent).toString());
 
         propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.ENROLMENT.getDescriptionI18N().getContent(),
-                academicTreasuryServices.localizedNameOfEnrolment(improvementEnrolmentEvaluation.getEnrolment()));
+                improvementEnrolmentEvaluation.getEnrolment().getName().getContent());
 
         propertiesMap.put(
                 AcademicTreasuryEvent.AcademicTreasuryEventKeys.DEGREE_CURRICULAR_PLAN.getDescriptionI18N().getContent(),
@@ -767,11 +758,11 @@ public class AcademicTariff extends AcademicTariff_Base {
     }
 
     // @formatter: off
+
     /************
      * SERVICES *
      ************/
     // @formatter: on
-
     @Atomic
     public static AcademicTariff create(final FinantialEntity finantialEntity, final Product product,
             final AcademicTariffBean bean) {
@@ -868,28 +859,28 @@ public class AcademicTariff extends AcademicTariff_Base {
     public static Stream<? extends AcademicTariff> findInInterval(FinantialEntity finantialEntity, Product product,
             DegreeType degreeType, Interval interval) {
         return //
-        AcademicTariff.find(finantialEntity, product) //
-                .filter(i -> degreeType == i.getDegreeType()) //
-                .filter(t -> t.isActive(interval));
+                AcademicTariff.find(finantialEntity, product) //
+                        .filter(i -> degreeType == i.getDegreeType()) //
+                        .filter(t -> t.isActive(interval));
     }
 
     public static Stream<? extends AcademicTariff> findInInterval(FinantialEntity finantialEntity, Product product,
             DegreeType degreeType, Degree degree, Interval interval) {
         return //
-        AcademicTariff.find(finantialEntity, product) //
-                .filter(i -> degreeType == i.getDegreeType()) //
-                .filter(t -> t.getDegree() == degree) //
-                .filter(t -> t.isActive(interval));
+                AcademicTariff.find(finantialEntity, product) //
+                        .filter(i -> degreeType == i.getDegreeType()) //
+                        .filter(t -> t.getDegree() == degree) //
+                        .filter(t -> t.isActive(interval));
     }
 
     public static Stream<? extends AcademicTariff> findInInterval(FinantialEntity finantialEntity, Product product,
             DegreeType degreeType, Degree degree, CycleType cycleType, Interval interval) {
         return //
-        AcademicTariff.find(finantialEntity, product) //
-                .filter(i -> degreeType == i.getDegreeType()) //
-                .filter(t -> t.getDegree() == degree) //
-                .filter(t -> t.getCycleType() == cycleType) //
-                .filter(t -> t.isActive(interval));
+                AcademicTariff.find(finantialEntity, product) //
+                        .filter(i -> degreeType == i.getDegreeType()) //
+                        .filter(t -> t.getDegree() == degree) //
+                        .filter(t -> t.getCycleType() == cycleType) //
+                        .filter(t -> t.isActive(interval));
     }
 
     public static AcademicTariff findMatch(FinantialEntity finantialEntity, Product product, DateTime when) {
@@ -951,8 +942,9 @@ public class AcademicTariff extends AcademicTariff_Base {
         {
             // With the most specific conditions tariff was not found. Fallback to degree
 
-            Set<? extends AcademicTariff> activeTariffs = findActive(finantialEntity, product, degreeType, degree, when)
-                    .filter(e -> e.getCycleType() == null).collect(Collectors.<AcademicTariff> toSet());
+            Set<? extends AcademicTariff> activeTariffs =
+                    findActive(finantialEntity, product, degreeType, degree, when).filter(e -> e.getCycleType() == null)
+                            .collect(Collectors.<AcademicTariff> toSet());
 
             if (activeTariffs.size() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.findActive.more.than.one");
@@ -975,8 +967,8 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         {
             Set<? extends AcademicTariff> activeTariffs =
-                    findActive(finantialEntity, product, degreeType, degree, cycleType, when)
-                            .collect(Collectors.<AcademicTariff> toSet());
+                    findActive(finantialEntity, product, degreeType, degree, cycleType, when).collect(
+                            Collectors.<AcademicTariff> toSet());
 
             if (activeTariffs.size() > 1) {
                 throw new AcademicTreasuryDomainException("error.AcademicTariff.findActive.more.than.one");
