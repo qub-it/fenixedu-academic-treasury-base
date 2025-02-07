@@ -45,8 +45,6 @@ import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
-import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Customer;
 import org.fenixedu.treasury.domain.CustomerType;
@@ -90,8 +88,7 @@ public class PersonCustomer extends PersonCustomer_Base {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.person.customer.duplicated");
         }
 
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        if (services.personCustomer(person) != null) {
+        if (person.getPersonCustomer() != null) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.person.already.has.person.customer");
         }
 
@@ -127,7 +124,6 @@ public class PersonCustomer extends PersonCustomer_Base {
     public void checkRules() {
         super.checkRules();
 
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
         /* Person Customer can be associated to Person with only one of two relations
          */
 
@@ -147,16 +143,16 @@ public class PersonCustomer extends PersonCustomer_Base {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.may.only.be.related.to.person.with.one.relation");
         }
 
-        if (isActive() && services.fiscalAddress(getPerson()) == null) {
+        if (isActive() && getPerson().getFiscalAddress() == null) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.person.fiscalAddress.required");
         }
 
-        if (isActive() && services.fiscalAddress(getPerson()).getCountryOfResidence() == null) {
+        if (isActive() && getPerson().getFiscalAddress().getCountryOfResidence() == null) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.person.countryOfResidence.required");
         }
 
-        if (isActive() && !TreasuryConstants.isSameCountryCode(
-                services.fiscalAddress(getPerson()).getCountryOfResidence().getCode(), getAddressCountryCode())) {
+        if (isActive() && !TreasuryConstants.isSameCountryCode(getPerson().getFiscalAddress().getCountryOfResidence().getCode(),
+                getAddressCountryCode())) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.countryOfResidence.is.not.equal.of.customer");
         }
 
@@ -213,10 +209,7 @@ public class PersonCustomer extends PersonCustomer_Base {
     }
 
     public static String fiscalNumber(final Person person) {
-        final IAcademicTreasuryPlatformDependentServices services =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        return services.fiscalNumber(person);
+        return person.getSocialSecurityNumber();
     }
 
     @Override
@@ -241,20 +234,17 @@ public class PersonCustomer extends PersonCustomer_Base {
 
     @Override
     public String getPhoneNumber() {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
         Person person = getAssociatedPerson();
 
-        if (!Strings.isNullOrEmpty(services.defaultPhoneNumber(person))) {
-            return services.defaultPhoneNumber(person);
+        if (!Strings.isNullOrEmpty(person.getDefaultPhoneNumber())) {
+            return person.getDefaultPhoneNumber();
         }
 
-        return services.defaultMobilePhoneNumber(person);
+        return person.getDefaultMobilePhoneNumber();
     }
 
     public String getMobileNumber() {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        return services.defaultMobilePhoneNumber(getAssociatedPerson());
+        return getAssociatedPerson().getDefaultMobilePhoneNumber();
     }
 
     @Override
@@ -273,17 +263,30 @@ public class PersonCustomer extends PersonCustomer_Base {
 
     @Deprecated
     public static PhysicalAddress physicalAddress(final Person person) {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         if (person.getDefaultPhysicalAddress() != null) {
             return person.getDefaultPhysicalAddress();
         }
 
-        if (services.pendingOrValidPhysicalAddresses(person).size() == 1) {
-            return services.pendingOrValidPhysicalAddresses(person).get(0);
+        if (pendingOrValidPhysicalAddresses(person).size() == 1) {
+            return pendingOrValidPhysicalAddresses(person).get(0);
         }
 
         return null;
+    }
+
+    private static List<PhysicalAddress> pendingOrValidPhysicalAddresses(Person person) {
+        Comparator<? super PhysicalAddress> comparator = (o1, o2) -> {
+            if (o1.isValid() && !o2.isValid()) {
+                return -1;
+            } else if (!o1.isValid() && o2.isValid()) {
+                return 1;
+            }
+
+            return 10 * PhysicalAddress.COMPARATOR_BY_ADDRESS.compare(o1, o2) + o1.getExternalId().compareTo(o2.getExternalId());
+        };
+
+        return person.getAllPartyContacts(PhysicalAddress.class).stream().map(PhysicalAddress.class::cast)
+                .filter(pc -> pc.isValid()).sorted(comparator).collect(Collectors.toList());
     }
 
     public PhysicalAddress getFiscalAddress() {
@@ -291,9 +294,7 @@ public class PersonCustomer extends PersonCustomer_Base {
     }
 
     public static PhysicalAddress fiscalAddress(final Person person) {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        return services.fiscalAddress(person);
+        return person.getFiscalAddress();
     }
 
     @Override
@@ -389,8 +390,7 @@ public class PersonCustomer extends PersonCustomer_Base {
     }
 
     public static String addressCountryCode(final Person person) {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        PhysicalAddress fiscalAddress = services.fiscalAddress(person);
+        PhysicalAddress fiscalAddress = person.getFiscalAddress();
 
         return addressCountryCode(fiscalAddress);
     }
@@ -406,29 +406,7 @@ public class PersonCustomer extends PersonCustomer_Base {
 
         return physicalAddress.getCountryOfResidence().getCode();
     }
-
-    /*
-    @Deprecated
-    public static String countryCode(final Person person) {
-        final IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
     
-        return services.fiscalCountry(person);
-    }
-    
-    @Deprecated
-    public static String countryCode(final PersonBean personBean) {
-        if (personBean == null) {
-            return null;
-        }
-    
-        if (personBean.getFiscalCountry() == null) {
-            return null;
-        }
-    
-        return personBean.getFiscalCountry().getCode();
-    }
-    */
-
     public static String addressUiFiscalPresentationValue(PhysicalAddress pa) {
         final List<String> compounds = new ArrayList<>();
 
@@ -452,9 +430,7 @@ public class PersonCustomer extends PersonCustomer_Base {
     }
 
     public static boolean isValidFiscalNumber(final Person person) {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        return services.fiscalAddress(person) != null && FiscalCodeValidation.isValidFiscalNumber(addressCountryCode(person),
+        return person.getFiscalAddress() != null && FiscalCodeValidation.isValidFiscalNumber(addressCountryCode(person),
                 fiscalNumber(person));
     }
 
@@ -604,19 +580,17 @@ public class PersonCustomer extends PersonCustomer_Base {
 
     @Override
     public BigDecimal getGlobalBalance() {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         BigDecimal globalBalance = BigDecimal.ZERO;
 
         final Person person = isActive() ? getPerson() : getPersonForInactivePersonCustomer();
 
-        if (services.personCustomer(person) != null) {
-            for (final DebtAccount debtAccount : services.personCustomer(person).getDebtAccountsSet()) {
+        if (person.getPersonCustomer() != null) {
+            for (final DebtAccount debtAccount : person.getPersonCustomer().getDebtAccountsSet()) {
                 globalBalance = globalBalance.add(debtAccount.getTotalInDebt());
             }
         }
 
-        for (final PersonCustomer personCustomer : services.inactivePersonCustomers(person)) {
+        for (final PersonCustomer personCustomer : person.getInactivePersonCustomersSet()) {
             for (final DebtAccount debtAccount : personCustomer.getDebtAccountsSet()) {
                 globalBalance = globalBalance.add(debtAccount.getTotalInDebt());
             }
@@ -627,19 +601,17 @@ public class PersonCustomer extends PersonCustomer_Base {
 
     @Override
     public BigDecimal getGlobalDueInDebt() {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         BigDecimal globalDueInDebt = BigDecimal.ZERO;
 
         final Person person = isActive() ? getPerson() : getPersonForInactivePersonCustomer();
 
-        if (services.personCustomer(person) != null) {
-            for (final DebtAccount debtAccount : services.personCustomer(person).getDebtAccountsSet()) {
+        if (person.getPersonCustomer() != null) {
+            for (final DebtAccount debtAccount : person.getPersonCustomer().getDebtAccountsSet()) {
                 globalDueInDebt = globalDueInDebt.add(debtAccount.getDueInDebt());
             }
         }
 
-        for (final PersonCustomer personCustomer : services.inactivePersonCustomers(person)) {
+        for (final PersonCustomer personCustomer : person.getInactivePersonCustomersSet()) {
             for (final DebtAccount debtAccount : personCustomer.getDebtAccountsSet()) {
                 globalDueInDebt = globalDueInDebt.add(debtAccount.getDueInDebt());
             }
@@ -654,8 +626,6 @@ public class PersonCustomer extends PersonCustomer_Base {
     }
 
     public void mergeWithPerson(final Person personToDelete) {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         if (getPerson() == personToDelete) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.merging.not.happening");
         }
@@ -664,8 +634,8 @@ public class PersonCustomer extends PersonCustomer_Base {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.merged.already.with.person");
         }
 
-        if (services.personCustomer(personToDelete) != null) {
-            final PersonCustomer personCustomer = services.personCustomer(personToDelete);
+        if (personToDelete.getPersonCustomer() != null) {
+            final PersonCustomer personCustomer = personToDelete.getPersonCustomer();
             personCustomer.saveFiscalAddressFieldsFromPersonInCustomer();
             personCustomer.setPersonForInactivePersonCustomer(getPerson());
             personCustomer.setPerson(null);
@@ -673,14 +643,14 @@ public class PersonCustomer extends PersonCustomer_Base {
             personCustomer.checkRules();
         }
 
-        for (final PersonCustomer personCustomer : services.inactivePersonCustomers(personToDelete)) {
+        for (final PersonCustomer personCustomer : personToDelete.getInactivePersonCustomersSet()) {
             personCustomer.setPersonForInactivePersonCustomer(getPerson());
             personCustomer.setFromPersonMerge(true);
             personCustomer.checkRules();
         }
 
         final Person thisPerson = getAssociatedPerson();
-        for (final AcademicTreasuryEvent e : Sets.newHashSet(services.academicTreasuryEventsSet(personToDelete))) {
+        for (final AcademicTreasuryEvent e : Sets.newHashSet(personToDelete.getAcademicTreasuryEventSet())) {
             e.mergeToTargetPerson(thisPerson);
         }
 
@@ -689,8 +659,6 @@ public class PersonCustomer extends PersonCustomer_Base {
 
     @Atomic
     public void changeFiscalNumber(AdhocCustomerBean bean, PhysicalAddress fiscalAddress) {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         if (!Strings.isNullOrEmpty(getErpCustomerId())) {
             throw new TreasuryDomainException("warning.Customer.changeFiscalNumber.maybe.integrated.in.erp");
         }
@@ -753,11 +721,11 @@ public class PersonCustomer extends PersonCustomer_Base {
 
             setAddressCountryCode(addressCountryCode);
             setFiscalNumber(fiscalNumber);
-            if (services.fiscalAddress(getPerson()) != null) {
-                services.setFiscalAddress(services.fiscalAddress(getPerson()), false);
+            if (getPerson().getFiscalAddress() != null) {
+                getPerson().getFiscalAddress().setFiscalAddress(false);
             }
 
-            services.editSocialSecurityNumber(getPerson(), fiscalNumber, fiscalAddress);
+            getPerson().editSocialSecurityNumber(fiscalNumber, fiscalAddress);
         } else {
             // Check if this customer has customer with same fiscal information
             if (customerOptional.isPresent()) {
@@ -799,7 +767,6 @@ public class PersonCustomer extends PersonCustomer_Base {
 
     @Override
     public String uiRedirectToActiveCustomer(final String url) {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
         if (isActive() || !isUiOtherRelatedCustomerActive()) {
             return url + "/" + getExternalId();
         }
@@ -843,8 +810,7 @@ public class PersonCustomer extends PersonCustomer_Base {
 
     @Override
     public String getIban() {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        return services.iban(getAssociatedPerson());
+        return getAssociatedPerson().getIban();
     }
 
     public void saveFiscalAddressFieldsFromPersonInCustomer() {
@@ -911,17 +877,16 @@ public class PersonCustomer extends PersonCustomer_Base {
     }
 
     public static Stream<? extends PersonCustomer> find(final Person person) {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
         final Set<PersonCustomer> result = Sets.newHashSet();
 
         if (person != null) {
 
-            PersonCustomer personCustomer = services.personCustomer(person);
+            PersonCustomer personCustomer = person.getPersonCustomer();
             if (personCustomer != null) {
                 result.add(personCustomer);
             }
 
-            result.addAll(services.inactivePersonCustomers(person));
+            result.addAll(person.getInactivePersonCustomersSet());
         }
 
         return result.stream();
@@ -978,13 +943,11 @@ public class PersonCustomer extends PersonCustomer_Base {
     }
 
     public static PersonCustomer createWithCurrentFiscalInformation(final Person person) {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        if (services.fiscalAddress(person) == null) {
+        if (person.getFiscalAddress() == null) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.fiscalAddress.required");
         }
 
-        if (services.fiscalAddress(person).getCountryOfResidence() == null) {
+        if (person.getFiscalAddress().getCountryOfResidence() == null) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.fiscalAddress.countryOfResidence.required");
         }
 
@@ -992,19 +955,17 @@ public class PersonCustomer extends PersonCustomer_Base {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.fiscalNumber.required");
         }
 
-        final Country countryOfResidence = services.fiscalAddress(person).getCountryOfResidence();
+        final Country countryOfResidence = person.getFiscalAddress().getCountryOfResidence();
 
         return create(person, countryOfResidence.getCode(), person.getSocialSecurityNumber());
     }
 
     public static PersonCustomer activePersonCustomer(Person person) {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        return services.personCustomer(person);
+        return person.getPersonCustomer();
     }
 
     public static Set<PersonCustomer> inactivePersonCustomers(Person person) {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        return services.inactivePersonCustomers(person);
+        return person.getInactivePersonCustomersSet();
     }
 
     @Atomic
@@ -1013,9 +974,7 @@ public class PersonCustomer extends PersonCustomer_Base {
     }
 
     public static boolean switchCustomer(final Person person, final String fiscalAddressCountryCode, final String fiscalNumber) {
-        IAcademicTreasuryPlatformDependentServices services = AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        final PersonCustomer currentPersonCustomer = services.personCustomer(person);
+        final PersonCustomer currentPersonCustomer = person.getPersonCustomer();
         Optional<? extends PersonCustomer> newCustomer =
                 PersonCustomer.findUnique(person, fiscalAddressCountryCode, fiscalNumber);
 
