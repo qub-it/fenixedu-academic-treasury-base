@@ -27,14 +27,16 @@ package org.fenixedu.academictreasury.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Sets;
 import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.ExecutionInterval;
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.organizationalStructure.Unit;
+import org.fenixedu.academic.domain.student.Registration;
+import org.fenixedu.academic.domain.student.StatuteType;
 import org.fenixedu.academictreasury.domain.serviceRequests.ITreasuryServiceRequest;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
@@ -250,4 +252,62 @@ public class AcademicTreasuryConstants {
 
         return null;
     }
+
+    public static Set<Degree> readDegrees(FinantialEntity finantialEntity) {
+        if (finantialEntity.getUnit() != null) {
+            return finantialEntity.getUnit().getAllSubUnits().stream() //
+                    .filter(u -> u.isDegreeUnit()) //
+                    .filter(u -> u.getDegree() != null) //
+                    .map(u -> u.getDegree()) //
+                    .collect(Collectors.toSet()); //
+        }
+
+        return Collections.emptySet();
+    }
+
+    public static Set<StatuteType> statutesTypesValidOnAnyExecutionSemesterFor(Registration registration,
+            ExecutionInterval executionInterval) {
+        return Sets.newHashSet(findStatuteTypes(registration, executionInterval));
+    }
+
+    static public Collection<StatuteType> findStatuteTypes(final Registration registration,
+            final ExecutionInterval executionInterval) {
+
+        if (executionInterval instanceof ExecutionYear) {
+            return findStatuteTypesByYear(registration, (ExecutionYear) executionInterval);
+        }
+
+        return findStatuteTypesByChildInterval(registration, executionInterval);
+    }
+
+    static private Collection<StatuteType> findStatuteTypesByYear(final Registration registration,
+            final ExecutionYear executionYear) {
+
+        final Set<StatuteType> result = Sets.newHashSet();
+        for (final ExecutionInterval executionInterval : executionYear.getExecutionPeriodsSet()) {
+            result.addAll(findStatuteTypesByChildInterval(registration, executionInterval));
+        }
+
+        return result;
+    }
+
+    static private Collection<StatuteType> findStatuteTypesByChildInterval(final Registration registration,
+            final ExecutionInterval executionInterval) {
+
+        return registration.getStudent().getStudentStatutesSet().stream().filter(s -> s.isValidInExecutionInterval(
+                        executionInterval) && (s.getRegistration() == null || s.getRegistration() == registration)).map(s -> s.getType())
+                .collect(Collectors.toSet());
+    }
+
+    static public String getVisibleStatuteTypesDescription(final Registration registration,
+            final ExecutionInterval executionInterval) {
+        return findVisibleStatuteTypes(registration, executionInterval).stream().map(s -> s.getName().getContent()).distinct()
+                .collect(Collectors.joining(", "));
+    }
+
+    static public Collection<StatuteType> findVisibleStatuteTypes(final Registration registration,
+            final ExecutionInterval executionInterval) {
+        return findStatuteTypes(registration, executionInterval).stream().filter(s -> s.getVisible()).collect(Collectors.toSet());
+    }
+
 }

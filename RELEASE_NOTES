@@ -1,3 +1,5 @@
+- Refactor: Move some IAcademicTreasuryPlatformDependentServices to AcademicTreasuryConstants [#qubIT-Fenix-6593]
+
 12.3.2 (06-02-2025)
 - Bug Fix: When creating academic treasury events for targets, get the FinantialEntity from the builder, instead of inferring with the degree [#qubIT-Fenix-6602]
 
