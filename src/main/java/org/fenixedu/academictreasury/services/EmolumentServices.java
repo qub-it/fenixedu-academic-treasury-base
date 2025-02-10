@@ -1,37 +1,27 @@
 /**
- * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/>
- * All rights reserved.
+ * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/> All rights reserved.
  *
- * Redistribution and use in source and binary forms, without modification, are permitted
- * provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, without modification, are permitted provided that the following conditions
+ * are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this list of
- * conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list
- * of conditions and the following disclaimer in the documentation and/or other materials
- * provided with the distribution.
- * * Neither the name of Quorum Born IT nor the names of its contributors may be used to
- * endorse or promote products derived from this software without specific prior written
- * permission.
- * * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade
- * de Lisboa (Departamento de Informática), hereby referred to as the Beneficiary, is the
- * sole demonstrated end-user and ultimately the only beneficiary of the redistributed binary
- * form and/or source code.
- * * The Beneficiary is entrusted with either the binary form, the source code, or both, and
- * by accepting it, accepts the terms of this License.
- * * Redistribution of any binary form and/or source code is only allowed in the scope of the
- * Universidade de Lisboa FenixEdu(™)’s implementation projects.
- * * This license and conditions of redistribution of source code/binary can only be reviewed
- * by the Steering Comittee of FenixEdu(™) <http://www.fenixedu.org/>.
+ * * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ * disclaimer in the documentation and/or other materials provided with the distribution. * Neither the name of Quorum Born IT nor
+ * the names of its contributors may be used to endorse or promote products derived from this software without specific prior
+ * written permission. * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade de Lisboa
+ * (Departamento de Informática), hereby referred to as the Beneficiary, is the sole demonstrated end-user and ultimately the only
+ * beneficiary of the redistributed binary form and/or source code. * The Beneficiary is entrusted with either the binary form,
+ * the source code, or both, and by accepting it, accepts the terms of this License. * Redistribution of any binary form and/or
+ * source code is only allowed in the scope of the Universidade de Lisboa FenixEdu(™)’s implementation projects. * This license
+ * and conditions of redistribution of source code/binary can only be reviewed by the Steering Comittee of FenixEdu(™)
+ * <http://www.fenixedu.org/>.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL “Quorum Born IT” BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL “Quorum Born IT” BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.fenixedu.academictreasury.services;
 
@@ -59,6 +49,7 @@ import org.fenixedu.academictreasury.domain.serviceRequests.ITreasuryServiceRequ
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.domain.tariff.AcademicTariff;
 import org.fenixedu.academictreasury.dto.academictax.AcademicDebitEntryBean;
+import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.FinantialEntity;
@@ -101,7 +92,8 @@ public class EmolumentServices {
         // ITreasuryServiceRequest have always a registration which has a degree
         if (!(academicServiceRequest instanceof ITreasuryServiceRequest)) {
             return false;
-        } ;
+        }
+        ;
 
         ITreasuryServiceRequest iTreasuryServiceRequest = (ITreasuryServiceRequest) academicServiceRequest;
 
@@ -125,11 +117,9 @@ public class EmolumentServices {
             return false;
         }
 
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
         final LocalDate when = possibleDebtDateOnAcademicService(iTreasuryServiceRequest);
         final FinantialEntity finantialEntity =
-                academicTreasuryServices.finantialEntityOfDegree(iTreasuryServiceRequest.getRegistration().getDegree(), when);
+                AcademicTreasuryConstants.getFinantialEntityOfDegree(iTreasuryServiceRequest.getRegistration().getDegree(), when);
 
         return createAcademicServiceRequestEmolument(finantialEntity, iTreasuryServiceRequest, when);
     }
@@ -140,11 +130,8 @@ public class EmolumentServices {
 
     public static AcademicTariff findTariffForAcademicServiceRequestForDefaultFinantialEntity(
             final ITreasuryServiceRequest iTreasuryServiceRequest, final LocalDate when) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         final FinantialEntity finantialEntity =
-                academicTreasuryServices.finantialEntityOfDegree(iTreasuryServiceRequest.getRegistration().getDegree(), when);
+                AcademicTreasuryConstants.getFinantialEntityOfDegree(iTreasuryServiceRequest.getRegistration().getDegree(), when);
         return findTariffForAcademicServiceRequest(finantialEntity, iTreasuryServiceRequest, when);
     }
 
@@ -163,11 +150,9 @@ public class EmolumentServices {
 
     public static AcademicDebitEntryBean calculateForAcademicServiceRequestForDefaultFinantialEntity(
             final ITreasuryServiceRequest iTreasuryServiceRequest, final LocalDate debtDate) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         final FinantialEntity finantialEntity =
-                academicTreasuryServices.finantialEntityOfDegree(iTreasuryServiceRequest.getRegistration().getDegree(), debtDate);
+                AcademicTreasuryConstants.getFinantialEntityOfDegree(iTreasuryServiceRequest.getRegistration().getDegree(),
+                        debtDate);
 
         return calculateForAcademicServiceRequest(finantialEntity, iTreasuryServiceRequest, debtDate);
     }
@@ -238,11 +223,9 @@ public class EmolumentServices {
     @Atomic
     public static boolean createAcademicServiceRequestEmolumentForDefaultFinantialEntity(
             final ITreasuryServiceRequest iTreasuryServiceRequest, final LocalDate when) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
 
         final FinantialEntity finantialEntity =
-                academicTreasuryServices.finantialEntityOfDegree(iTreasuryServiceRequest.getRegistration().getDegree(), when);
+                AcademicTreasuryConstants.getFinantialEntityOfDegree(iTreasuryServiceRequest.getRegistration().getDegree(), when);
 
         return createAcademicServiceRequestEmolument(finantialEntity, iTreasuryServiceRequest, when);
     }
@@ -339,8 +322,9 @@ public class EmolumentServices {
 
         DocumentNumberSeries defaultDocumentNumberSeries =
                 DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(), finantialEntity);
-        final DebitNote debitNote = DebitNote.create(academicTariff.getFinantialEntity(), personDebtAccount, null,
-                defaultDocumentNumberSeries, new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
+        final DebitNote debitNote =
+                DebitNote.create(academicTariff.getFinantialEntity(), personDebtAccount, null, defaultDocumentNumberSeries,
+                        new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
 
         debitNote.addDebitNoteEntries(Collections.singletonList(debitEntry));
 
@@ -401,8 +385,8 @@ public class EmolumentServices {
 
         final DebitNote debitNote = (DebitNote) debitEntry.getFinantialDocument();
         if (!debitEntry.isProcessedInDebitNote()) {
-            debitEntry
-                    .annulDebitEntry(academicTreasuryBundle("label.EmolumentServices.removeDebitEntryForAcademicService.reason"));
+            debitEntry.annulDebitEntry(
+                    academicTreasuryBundle("label.EmolumentServices.removeDebitEntryForAcademicService.reason"));
             debitEntry.delete();
 
             return true;
@@ -442,8 +426,7 @@ public class EmolumentServices {
 
     public static boolean createCustomAcademicDebtForDefaultFinantialEntity(Product product, Registration registration,
             ExecutionYear executionYear, int numberOfUnits, int numberOfPages, boolean urgentRequest, LocalDate when) {
-        FinantialEntity finantialEntity = AcademicTreasuryPlataformDependentServicesFactory.implementation()
-                .finantialEntityOfDegree(registration.getDegree(), when);
+        FinantialEntity finantialEntity = AcademicTreasuryConstants.getFinantialEntityOfDegree(registration.getDegree(), when);
 
         return createCustomAcademicDebt(finantialEntity, product, registration, executionYear, numberOfUnits, numberOfPages,
                 urgentRequest, when);
@@ -468,8 +451,9 @@ public class EmolumentServices {
 
         final DebtAccount debtAccount = DebtAccount.findUnique(finantialEntity.getFinantialInstitution(), personCustomer).get();
 
-        final AcademicTreasuryEvent academicTreasuryEvent = AcademicTreasuryEvent.createForCustomAcademicDebt(product,
-                registration, executionYear, numberOfUnits, numberOfPages, urgentRequest, when, null);
+        final AcademicTreasuryEvent academicTreasuryEvent =
+                AcademicTreasuryEvent.createForCustomAcademicDebt(product, registration, executionYear, numberOfUnits,
+                        numberOfPages, urgentRequest, when, null);
 
         final AcademicTariff academicTariff =
                 AcademicTariff.findMatch(finantialEntity, product, registration.getDegree(), when.toDateTimeAtStartOfDay());

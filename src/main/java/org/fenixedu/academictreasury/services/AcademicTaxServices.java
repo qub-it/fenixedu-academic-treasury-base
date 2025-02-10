@@ -1,37 +1,27 @@
 /**
- * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/>
- * All rights reserved.
+ * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/> All rights reserved.
  *
- * Redistribution and use in source and binary forms, without modification, are permitted
- * provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, without modification, are permitted provided that the following conditions
+ * are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this list of
- * conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list
- * of conditions and the following disclaimer in the documentation and/or other materials
- * provided with the distribution.
- * * Neither the name of Quorum Born IT nor the names of its contributors may be used to
- * endorse or promote products derived from this software without specific prior written
- * permission.
- * * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade
- * de Lisboa (Departamento de Informática), hereby referred to as the Beneficiary, is the
- * sole demonstrated end-user and ultimately the only beneficiary of the redistributed binary
- * form and/or source code.
- * * The Beneficiary is entrusted with either the binary form, the source code, or both, and
- * by accepting it, accepts the terms of this License.
- * * Redistribution of any binary form and/or source code is only allowed in the scope of the
- * Universidade de Lisboa FenixEdu(™)’s implementation projects.
- * * This license and conditions of redistribution of source code/binary can only be reviewed
- * by the Steering Comittee of FenixEdu(™) <http://www.fenixedu.org/>.
+ * * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ * disclaimer in the documentation and/or other materials provided with the distribution. * Neither the name of Quorum Born IT nor
+ * the names of its contributors may be used to endorse or promote products derived from this software without specific prior
+ * written permission. * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade de Lisboa
+ * (Departamento de Informática), hereby referred to as the Beneficiary, is the sole demonstrated end-user and ultimately the only
+ * beneficiary of the redistributed binary form and/or source code. * The Beneficiary is entrusted with either the binary form,
+ * the source code, or both, and by accepting it, accepts the terms of this License. * Redistribution of any binary form and/or
+ * source code is only allowed in the scope of the Universidade de Lisboa FenixEdu(™)’s implementation projects. * This license
+ * and conditions of redistribution of source code/binary can only be reviewed by the Steering Comittee of FenixEdu(™)
+ * <http://www.fenixedu.org/>.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL “Quorum Born IT” BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL “Quorum Born IT” BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.fenixedu.academictreasury.services;
 
@@ -89,10 +79,8 @@ public class AcademicTaxServices {
 
     public static AcademicTariff findAcademicTariff(final AcademicTax academicTax, final Registration registration,
             final LocalDate debtDate) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
         final FinantialEntity finantialEntity =
-                academicTreasuryServices.finantialEntityOfDegree(registration.getDegree(), debtDate);
+                AcademicTreasuryConstants.getFinantialEntityOfDegree(registration.getDegree(), debtDate);
 
         return AcademicTariff.findMatch(finantialEntity, academicTax.getProduct(), registration.getDegree(),
                 debtDate.toDateTimeAtStartOfDay());
@@ -101,11 +89,8 @@ public class AcademicTaxServices {
     public static AcademicDebitEntryBean calculateAcademicTaxForDefaultFinantialEntity(final Registration registration,
             final ExecutionYear executionYear, final AcademicTax academicTax, final LocalDate debtDate,
             final boolean forceCreation) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         final FinantialEntity finantialEntity =
-                academicTreasuryServices.finantialEntityOfDegree(registration.getDegree(), debtDate);
+                AcademicTreasuryConstants.getFinantialEntityOfDegree(registration.getDegree(), debtDate);
 
         return calculateAcademicTax(finantialEntity, registration, executionYear, academicTax, debtDate, forceCreation);
     }
@@ -123,8 +108,9 @@ public class AcademicTaxServices {
                     "error.AcademicTaxServices.calculateAcademicTax.not.appliable.for.registration.and.execution.year");
         }
 
-        final AcademicTariff academicTariff = AcademicTariff.findMatch(finantialEntity, academicTax.getProduct(),
-                registration.getDegree(), debtDate.toDateTimeAtStartOfDay());
+        final AcademicTariff academicTariff =
+                AcademicTariff.findMatch(finantialEntity, academicTax.getProduct(), registration.getDegree(),
+                        debtDate.toDateTimeAtStartOfDay());
 
         if (academicTariff == null) {
             throw new AcademicTreasuryDomainException("error.AcademicTaxServices.calculateAcademicTax.tariff.not.found",
@@ -153,20 +139,15 @@ public class AcademicTaxServices {
     @Atomic
     public static boolean createAcademicTaxForEnrolmentDateAndDefaultFinantialEntity(final Registration registration,
             final ExecutionYear executionYear, final AcademicTax academicTax, final boolean forceCreation) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
         final LocalDate enrolmentDate = possibleEnrolmentDate(registration, executionYear);
 
         final FinantialEntity finantialEntity =
-                academicTreasuryServices.finantialEntityOfDegree(registration.getDegree(), enrolmentDate);
+                AcademicTreasuryConstants.getFinantialEntityOfDegree(registration.getDegree(), enrolmentDate);
         return createAcademicTax(finantialEntity, registration, executionYear, academicTax, enrolmentDate, forceCreation);
     }
 
     private static LocalDate possibleEnrolmentDate(Registration registration, ExecutionYear executionYear) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        final RegistrationDataByExecutionYear data =
-                academicTreasuryServices.findRegistrationDataByExecutionYear(registration, executionYear);
+        final RegistrationDataByExecutionYear data = findRegistrationDataByExecutionYear(registration, executionYear);
 
         if (data != null && data.getEnrolmentDate() != null) {
             return data.getEnrolmentDate();
@@ -175,13 +156,17 @@ public class AcademicTaxServices {
         return new LocalDate();
     }
 
+    private static RegistrationDataByExecutionYear findRegistrationDataByExecutionYear(Registration registration,
+            ExecutionYear executionYear) {
+        return registration.getRegistrationDataByExecutionYearSet().stream().filter(rd -> rd.getExecutionYear() == executionYear)
+                .findAny().orElse(null);
+    }
+
     @Atomic
     public static boolean createAcademicTaxForDefaultFinantialEntity(final Registration registration,
             final ExecutionYear executionYear, final AcademicTax academicTax, final LocalDate when, final boolean forceCreation) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        final FinantialEntity finantialEntity = academicTreasuryServices.finantialEntityOfDegree(registration.getDegree(), when);
+        final FinantialEntity finantialEntity =
+                AcademicTreasuryConstants.getFinantialEntityOfDegree(registration.getDegree(), when);
         return createAcademicTax(finantialEntity, registration, executionYear, academicTax, when, forceCreation);
     }
 
@@ -196,8 +181,9 @@ public class AcademicTaxServices {
             return false;
         }
 
-        final AcademicTariff academicTariff = AcademicTariff.findMatch(finantialEntity, academicTax.getProduct(),
-                registration.getDegree(), when.toDateTimeAtStartOfDay());
+        final AcademicTariff academicTariff =
+                AcademicTariff.findMatch(finantialEntity, academicTax.getProduct(), registration.getDegree(),
+                        when.toDateTimeAtStartOfDay());
 
         if (academicTariff == null) {
             return false;
@@ -255,9 +241,9 @@ public class AcademicTaxServices {
 
     public static boolean isAppliableOnRegistration(final AcademicTax academicTax, final Registration registration,
             final ExecutionYear executionYear) {
-        return (isRegistrationFirstYear(registration, executionYear) && academicTax.isAppliedOnRegistrationFirstYear())
-                || (isRegistrationSubsequentYear(registration, executionYear)
-                        && academicTax.isAppliedOnRegistrationSubsequentYears());
+        return (isRegistrationFirstYear(registration,
+                executionYear) && academicTax.isAppliedOnRegistrationFirstYear()) || (isRegistrationSubsequentYear(registration,
+                executionYear) && academicTax.isAppliedOnRegistrationSubsequentYears());
     }
 
     /* ***********
@@ -272,11 +258,8 @@ public class AcademicTaxServices {
 
     public static AcademicTariff findAcademicTariffForDefaultFinantialEntity(final EnrolmentEvaluation enrolmentEvaluation,
             final LocalDate debtDate) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        final FinantialEntity finantialEntity = academicTreasuryServices
-                .finantialEntityOfDegree(enrolmentEvaluation.getEnrolment().getRegistration().getDegree(), debtDate);
+        final FinantialEntity finantialEntity = AcademicTreasuryConstants.getFinantialEntityOfDegree(
+                enrolmentEvaluation.getEnrolment().getRegistration().getDegree(), debtDate);
 
         return findAcademicTariff(finantialEntity, enrolmentEvaluation, debtDate);
     }
@@ -305,11 +288,8 @@ public class AcademicTaxServices {
 
     public static AcademicDebitEntryBean calculateImprovementTaxForDefaultEntity(final EnrolmentEvaluation enrolmentEvaluation,
             final LocalDate debtDate) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        final FinantialEntity finantialEntity = academicTreasuryServices
-                .finantialEntityOfDegree(enrolmentEvaluation.getEnrolment().getRegistration().getDegree(), debtDate);
+        final FinantialEntity finantialEntity = AcademicTreasuryConstants.getFinantialEntityOfDegree(
+                enrolmentEvaluation.getEnrolment().getRegistration().getDegree(), debtDate);
 
         return calculateImprovementTax(finantialEntity, enrolmentEvaluation, debtDate);
 
@@ -337,8 +317,9 @@ public class AcademicTaxServices {
             return null;
         }
 
-        final AcademicTariff academicTariff = AcademicTariff.findMatch(finantialEntity, improvementAcademicTax.getProduct(),
-                registration.getDegree(), debtDate.toDateTimeAtStartOfDay());
+        final AcademicTariff academicTariff =
+                AcademicTariff.findMatch(finantialEntity, improvementAcademicTax.getProduct(), registration.getDegree(),
+                        debtDate.toDateTimeAtStartOfDay());
 
         if (academicTariff == null) {
             return null;
@@ -356,10 +337,8 @@ public class AcademicTaxServices {
     @Atomic
     public static boolean createImprovementTaxForDefaultFinantialEntity(final EnrolmentEvaluation enrolmentEvaluation,
             final LocalDate when) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
         final FinantialEntity finantialEntity =
-                academicTreasuryServices.finantialEntityOfDegree(enrolmentEvaluation.getRegistration().getDegree(), when);
+                AcademicTreasuryConstants.getFinantialEntityOfDegree(enrolmentEvaluation.getRegistration().getDegree(), when);
 
         return createImprovementTax(finantialEntity, enrolmentEvaluation, when);
     }
@@ -387,8 +366,9 @@ public class AcademicTaxServices {
             return false;
         }
 
-        final AcademicTariff academicTariff = AcademicTariff.findMatch(finantialEntity, improvementAcademicTax.getProduct(),
-                registration.getDegree(), when.toDateTimeAtStartOfDay());
+        final AcademicTariff academicTariff =
+                AcademicTariff.findMatch(finantialEntity, improvementAcademicTax.getProduct(), registration.getDegree(),
+                        when.toDateTimeAtStartOfDay());
 
         if (academicTariff == null) {
             throw new AcademicTreasuryDomainException("error.AcademicTaxDebtCreation.tariff.not.found");
@@ -433,8 +413,9 @@ public class AcademicTaxServices {
         if (debitEntry != null) {
             DocumentNumberSeries defaultDocumentNumberSeries =
                     DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(), finantialEntity);
-            final DebitNote debitNote = DebitNote.create(academicTariff.getFinantialEntity(), debtAccount, null,
-                    defaultDocumentNumberSeries, new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
+            final DebitNote debitNote =
+                    DebitNote.create(academicTariff.getFinantialEntity(), debtAccount, null, defaultDocumentNumberSeries,
+                            new DateTime(), new LocalDate(), null, Collections.emptyMap(), null, null);
 
             debitNote.addDebitNoteEntries(Lists.newArrayList(debitEntry));
 

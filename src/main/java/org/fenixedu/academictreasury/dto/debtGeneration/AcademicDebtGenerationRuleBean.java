@@ -1,37 +1,27 @@
 /**
- * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/>
- * All rights reserved.
+ * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/> All rights reserved.
  *
- * Redistribution and use in source and binary forms, without modification, are permitted
- * provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, without modification, are permitted provided that the following conditions
+ * are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this list of
- * conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list
- * of conditions and the following disclaimer in the documentation and/or other materials
- * provided with the distribution.
- * * Neither the name of Quorum Born IT nor the names of its contributors may be used to
- * endorse or promote products derived from this software without specific prior written
- * permission.
- * * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade
- * de Lisboa (Departamento de Informática), hereby referred to as the Beneficiary, is the
- * sole demonstrated end-user and ultimately the only beneficiary of the redistributed binary
- * form and/or source code.
- * * The Beneficiary is entrusted with either the binary form, the source code, or both, and
- * by accepting it, accepts the terms of this License.
- * * Redistribution of any binary form and/or source code is only allowed in the scope of the
- * Universidade de Lisboa FenixEdu(™)’s implementation projects.
- * * This license and conditions of redistribution of source code/binary can only be reviewed
- * by the Steering Comittee of FenixEdu(™) <http://www.fenixedu.org/>.
+ * * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ * disclaimer in the documentation and/or other materials provided with the distribution. * Neither the name of Quorum Born IT nor
+ * the names of its contributors may be used to endorse or promote products derived from this software without specific prior
+ * written permission. * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade de Lisboa
+ * (Departamento de Informática), hereby referred to as the Beneficiary, is the sole demonstrated end-user and ultimately the only
+ * beneficiary of the redistributed binary form and/or source code. * The Beneficiary is entrusted with either the binary form,
+ * the source code, or both, and by accepting it, accepts the terms of this License. * Redistribution of any binary form and/or
+ * source code is only allowed in the scope of the Universidade de Lisboa FenixEdu(™)’s implementation projects. * This license
+ * and conditions of redistribution of source code/binary can only be reviewed by the Steering Comittee of FenixEdu(™)
+ * <http://www.fenixedu.org/>.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL “Quorum Born IT” BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL “Quorum Born IT” BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.fenixedu.academictreasury.dto.debtGeneration;
 
@@ -54,8 +44,6 @@ import org.fenixedu.academictreasury.domain.debtGeneration.DebtGenerationRuleRes
 import org.fenixedu.academictreasury.domain.debtGeneration.IAcademicDebtGenerationRuleStrategy;
 import org.fenixedu.academictreasury.domain.emoluments.AcademicTax;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
-import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
@@ -178,17 +166,13 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
             availableProducts.add(TreasurySettings.getInstance().getInterestProduct());
         }
 
-        IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         this.productDataSource = availableProducts.stream().sorted(Product.COMPARE_BY_NAME)
                 .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(),
-                        String.format("%s [%s]", l.getName().getContent(), l.getCode())))
-                .collect(Collectors.toList());
+                        String.format("%s [%s]", l.getName().getContent(), l.getCode()))).collect(Collectors.toList());
 
-        this.degreeTypeDataSource = DegreeType.all().map(
-                l -> new TreasuryTupleDataSourceBean(l.getExternalId(), academicTreasuryServices.localizedNameOfDegreeType(l)))
-                .sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT).collect(Collectors.toList());
+        this.degreeTypeDataSource =
+                DegreeType.all().map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), l.getName().getContent()))
+                        .sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT).collect(Collectors.toList());
 
         this.academicTaxDueDateAlignmentTypeDataSource = Lists.newArrayList(AcademicTaxDueDateAlignmentType.values()).stream()
                 .map(l -> new TreasuryTupleDataSourceBean(l.name(), l.getDescriptionI18N().getContent()))
@@ -260,8 +244,7 @@ public class AcademicDebtGenerationRuleBean implements Serializable, ITreasuryBe
 
         final List<TreasuryTupleDataSourceBean> result =
                 ExecutionDegree.getAllByExecutionYearAndDegreeType(getExecutionYear(), getDegreeType()).stream()
-                        .filter(e -> AcademicTreasuryPlataformDependentServicesFactory.implementation()
-                                .readDegrees(this.finantialEntity).contains(e.getDegree())) //
+                        .filter(e -> AcademicTreasuryConstants.readDegrees(this.finantialEntity).contains(e.getDegree())) //
                         .map(e -> e.getDegreeCurricularPlan()) //
                         .map((dcp) -> new TreasuryTupleDataSourceBean(dcp.getExternalId(),
                                 "[" + dcp.getDegree().getCode() + "] " + dcp.getPresentationName(getExecutionYear()))) //

@@ -1,37 +1,27 @@
 /**
- * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/>
- * All rights reserved.
+ * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/> All rights reserved.
  *
- * Redistribution and use in source and binary forms, without modification, are permitted
- * provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, without modification, are permitted provided that the following conditions
+ * are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this list of
- * conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list
- * of conditions and the following disclaimer in the documentation and/or other materials
- * provided with the distribution.
- * * Neither the name of Quorum Born IT nor the names of its contributors may be used to
- * endorse or promote products derived from this software without specific prior written
- * permission.
- * * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade
- * de Lisboa (Departamento de Informática), hereby referred to as the Beneficiary, is the
- * sole demonstrated end-user and ultimately the only beneficiary of the redistributed binary
- * form and/or source code.
- * * The Beneficiary is entrusted with either the binary form, the source code, or both, and
- * by accepting it, accepts the terms of this License.
- * * Redistribution of any binary form and/or source code is only allowed in the scope of the
- * Universidade de Lisboa FenixEdu(™)’s implementation projects.
- * * This license and conditions of redistribution of source code/binary can only be reviewed
- * by the Steering Comittee of FenixEdu(™) <http://www.fenixedu.org/>.
+ * * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ * disclaimer in the documentation and/or other materials provided with the distribution. * Neither the name of Quorum Born IT nor
+ * the names of its contributors may be used to endorse or promote products derived from this software without specific prior
+ * written permission. * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade de Lisboa
+ * (Departamento de Informática), hereby referred to as the Beneficiary, is the sole demonstrated end-user and ultimately the only
+ * beneficiary of the redistributed binary form and/or source code. * The Beneficiary is entrusted with either the binary form,
+ * the source code, or both, and by accepting it, accepts the terms of this License. * Redistribution of any binary form and/or
+ * source code is only allowed in the scope of the Universidade de Lisboa FenixEdu(™)’s implementation projects. * This license
+ * and conditions of redistribution of source code/binary can only be reviewed by the Steering Comittee of FenixEdu(™)
+ * <http://www.fenixedu.org/>.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL “Quorum Born IT” BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL “Quorum Born IT” BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.fenixedu.academictreasury.services;
 
@@ -87,10 +77,7 @@ import pt.ist.fenixframework.Atomic;
 public class TuitionServices {
 
     public static Comparator<Enrolment> ENROLMENT_COMPARATOR_BY_NAME_AND_ID = (o1, o2) -> {
-        IAcademicTreasuryPlatformDependentServices implementation =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        int c = implementation.localizedNameOfEnrolment(o1).compareTo(implementation.localizedNameOfEnrolment(o2));
+        int c = o1.getName().getContent().compareTo(o2.getName().getContent());
         return c != 0 ? c : DomainObjectUtil.COMPARATOR_BY_ID.compare(o1, o2);
     };
 
@@ -99,15 +86,13 @@ public class TuitionServices {
     public static void registerTuitionServiceExtension(final ITuitionServiceExtension extension) {
         TUITION_SERVICE_EXTENSIONS.add(extension);
     }
-    
+
     public static List<ITuitionServiceExtension> TUITION_SERVICE_EXTENSIONS() {
         return Collections.unmodifiableList(TUITION_SERVICE_EXTENSIONS);
     }
 
     public static boolean isToPayRegistrationTuition(final Registration registration, final ExecutionYear executionYear) {
-        final IAcademicTreasuryPlatformDependentServices academicServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-        return Boolean.TRUE.equals(academicServices.registrationProtocol(registration).getPayGratuity());
+        return Boolean.TRUE.equals(registration.getRegistrationProtocol().getPayGratuity());
     }
 
     public static AcademicTreasuryEvent findAcademicTreasuryEventTuitionForRegistration(final Registration registration,
@@ -145,8 +130,9 @@ public class TuitionServices {
             Set<Product> restrictCreationToInstallments, boolean forceEvenTreasuryEventIsCharged) {
         var inferedTuitionPaymentPlan = TuitionPaymentPlan.inferTuitionPaymentPlanForRegistration(registration, executionYear);
 
-        return createTuitionForRegistration(registration, executionYear, debtDate, forceCreationIfNotEnrolled, inferedTuitionPaymentPlan,
-                applyTuitionServiceExtensions, restrictCreationToInstallments, forceEvenTreasuryEventIsCharged);
+        return createTuitionForRegistration(registration, executionYear, debtDate, forceCreationIfNotEnrolled,
+                inferedTuitionPaymentPlan, applyTuitionServiceExtensions, restrictCreationToInstallments,
+                forceEvenTreasuryEventIsCharged);
     }
 
     public static boolean createTuitionForRegistration(final Registration registration, final ExecutionYear executionYear,
@@ -175,8 +161,8 @@ public class TuitionServices {
             return false;
         }
 
-        if (!forceCreationIfNotEnrolled && tuitionPaymentPlan.isStudentMustBeEnrolled()
-                && normalEnrolmentsIncludingAnnuled(registration, executionYear).isEmpty()) {
+        if (!forceCreationIfNotEnrolled && tuitionPaymentPlan.isStudentMustBeEnrolled() && normalEnrolmentsIncludingAnnuled(
+                registration, executionYear).isEmpty()) {
             return false;
         }
 
@@ -259,10 +245,12 @@ public class TuitionServices {
             return Lists.newArrayList();
         }
 
-        final BigDecimal enrolledEctsUnits = AcademicTreasuryEvent
-                .getEnrolledEctsUnits(tuitionPaymentPlan.getTuitionPaymentPlanGroup(), registration, executionYear);
-        final BigDecimal enrolledCoursesCount = AcademicTreasuryEvent
-                .getEnrolledCoursesCount(tuitionPaymentPlan.getTuitionPaymentPlanGroup(), registration, executionYear);
+        final BigDecimal enrolledEctsUnits =
+                AcademicTreasuryEvent.getEnrolledEctsUnits(tuitionPaymentPlan.getTuitionPaymentPlanGroup(), registration,
+                        executionYear);
+        final BigDecimal enrolledCoursesCount =
+                AcademicTreasuryEvent.getEnrolledCoursesCount(tuitionPaymentPlan.getTuitionPaymentPlanGroup(), registration,
+                        executionYear);
 
         return buildInstallmentDebitEntryBeans(registration, tuitionPaymentPlan, debtDate, enrolledEctsUnits,
                 enrolledCoursesCount);
@@ -283,8 +271,9 @@ public class TuitionServices {
                     }
                 });
 
-        DiscountTuitionInstallmentsHelper discountMapHelper = new DiscountTuitionInstallmentsHelper(registration,
-                tuitionPaymentPlan, debtDate, enrolledEctsUnits, enrolledCoursesCount, calculatorsMap);
+        DiscountTuitionInstallmentsHelper discountMapHelper =
+                new DiscountTuitionInstallmentsHelper(registration, tuitionPaymentPlan, debtDate, enrolledEctsUnits,
+                        enrolledCoursesCount, calculatorsMap);
 
         final List<TuitionDebitEntryBean> entries = Lists.newArrayList();
         for (final TuitionInstallmentTariff tuitionInstallmentTariff : tuitionPaymentPlan.getTuitionInstallmentTariffsSet()
@@ -380,8 +369,9 @@ public class TuitionServices {
                 continue;
             }
 
-            final TuitionPaymentPlan tuitionPaymentPlan = TuitionPaymentPlan
-                    .inferTuitionPaymentPlanForStandaloneEnrolment(registration, executionYear, standaloneEnrolment);
+            final TuitionPaymentPlan tuitionPaymentPlan =
+                    TuitionPaymentPlan.inferTuitionPaymentPlanForStandaloneEnrolment(registration, executionYear,
+                            standaloneEnrolment);
 
             created |= createTuitionForStandalone(standaloneEnrolment, tuitionPaymentPlan, when, forceCreation);
         }
@@ -507,8 +497,9 @@ public class TuitionServices {
                 DebtAccount.create(tuitionPaymentPlan.getFinantialEntity().getFinantialInstitution(), personCustomer);
             }
 
-            final DebtAccount debtAccount = DebtAccount
-                    .findUnique(tuitionPaymentPlan.getFinantialEntity().getFinantialInstitution(), personCustomer).get();
+            final DebtAccount debtAccount =
+                    DebtAccount.findUnique(tuitionPaymentPlan.getFinantialEntity().getFinantialInstitution(), personCustomer)
+                            .get();
 
             if (!AcademicTreasuryEvent.findUniqueForStandaloneTuition(registration, executionYear).isPresent()) {
                 AcademicTreasuryEvent.createForStandaloneTuition(tuitionPaymentPlan.getProduct(), registration, executionYear);
@@ -523,8 +514,9 @@ public class TuitionServices {
             tuitionPaymentPlan.getTuitionInstallmentTariffsSet().stream().map(tariff -> tariff.getTuitionTariffCustomCalculator())
                     .collect(Collectors.toSet()).forEach(clazz -> {
                         if (clazz != null) {
-                            TuitionTariffCustomCalculator newInstanceFor = TuitionTariffCustomCalculator.getNewInstanceFor(clazz,
-                                    registration, tuitionPaymentPlanToCalculator, enrolment);
+                            TuitionTariffCustomCalculator newInstanceFor =
+                                    TuitionTariffCustomCalculator.getNewInstanceFor(clazz, registration, tuitionPaymentPlanToCalculator,
+                                            enrolment);
                             calculatorsMap.put(clazz, newInstanceFor);
                         }
                     });
@@ -537,8 +529,8 @@ public class TuitionServices {
             final BigDecimal amount = tuitionInstallmentTariff.amountToPay(academicTreasuryEvent, enrolment, calculatorsMap);
             final Currency currency = tuitionInstallmentTariff.getFinantialEntity().getFinantialInstitution().getCurrency();
 
-            entries.add(
-                    new TuitionDebitEntryBean(installmentOrder, tuitionInstallmentTariff, installmentName, dueDate, vat.getTaxRate(), amount, currency));
+            entries.add(new TuitionDebitEntryBean(installmentOrder, tuitionInstallmentTariff, installmentName, dueDate,
+                    vat.getTaxRate(), amount, currency));
         }
 
         return entries.stream().sorted((o1, o2) -> o1.getInstallmentOrder() - o2.getInstallmentOrder())
@@ -654,8 +646,9 @@ public class TuitionServices {
                 continue;
             }
 
-            final TuitionPaymentPlan tuitionPaymentPlan = TuitionPaymentPlan
-                    .inferTuitionPaymentPlanForExtracurricularEnrolment(registration, executionYear, extracurricularEnrolment);
+            final TuitionPaymentPlan tuitionPaymentPlan =
+                    TuitionPaymentPlan.inferTuitionPaymentPlanForExtracurricularEnrolment(registration, executionYear,
+                            extracurricularEnrolment);
 
             created |= createTuitionForExtracurricular(extracurricularEnrolment, tuitionPaymentPlan, when, forceCreation);
         }
@@ -770,8 +763,9 @@ public class TuitionServices {
         final List<TuitionDebitEntryBean> entries = Lists.newArrayList();
         for (final Enrolment enrolment : enrolments) {
             if (tuitionPaymentPlan == null) {
-                tuitionPaymentPlan = TuitionPaymentPlan.inferTuitionPaymentPlanForExtracurricularEnrolment(registration,
-                        executionYear, enrolment);
+                tuitionPaymentPlan =
+                        TuitionPaymentPlan.inferTuitionPaymentPlanForExtracurricularEnrolment(registration, executionYear,
+                                enrolment);
             }
 
             if (tuitionPaymentPlan == null) {
@@ -797,8 +791,9 @@ public class TuitionServices {
             tuitionPaymentPlan.getTuitionInstallmentTariffsSet().stream().map(tariff -> tariff.getTuitionTariffCustomCalculator())
                     .collect(Collectors.toSet()).forEach(clazz -> {
                         if (clazz != null) {
-                            TuitionTariffCustomCalculator newInstanceFor = TuitionTariffCustomCalculator.getNewInstanceFor(clazz,
-                                    registration, tuitionPaymentPlanToCalculator, enrolment);
+                            TuitionTariffCustomCalculator newInstanceFor =
+                                    TuitionTariffCustomCalculator.getNewInstanceFor(clazz, registration, tuitionPaymentPlanToCalculator,
+                                            enrolment);
                             calculatorsMap.put(clazz, newInstanceFor);
                         }
                     });
@@ -812,8 +807,8 @@ public class TuitionServices {
             final BigDecimal amount = tuitionInstallmentTariff.amountToPay(academicTreasuryEvent, enrolment, calculatorsMap);
             final Currency currency = tuitionInstallmentTariff.getFinantialEntity().getFinantialInstitution().getCurrency();
 
-            entries.add(
-                    new TuitionDebitEntryBean(installmentOrder, tuitionInstallmentTariff, installmentName, dueDate, vat.getTaxRate(), amount, currency));
+            entries.add(new TuitionDebitEntryBean(installmentOrder, tuitionInstallmentTariff, installmentName, dueDate,
+                    vat.getTaxRate(), amount, currency));
         }
 
         return entries.stream().sorted((o1, o2) -> o1.getInstallmentOrder() - o2.getInstallmentOrder())
@@ -857,10 +852,8 @@ public class TuitionServices {
 
     public static LocalDate enrolmentDate(final Registration registration, final ExecutionYear executionYear,
             final boolean isToForceCreation) {
-        for (final RegistrationDataByExecutionYear registrationDataByExecutionYear : registration
-                .getRegistrationDataByExecutionYearSet()) {
-            if (registrationDataByExecutionYear.getExecutionYear() == executionYear
-                    && registrationDataByExecutionYear.getEnrolmentDate() != null) {
+        for (final RegistrationDataByExecutionYear registrationDataByExecutionYear : registration.getRegistrationDataByExecutionYearSet()) {
+            if (registrationDataByExecutionYear.getExecutionYear() == executionYear && registrationDataByExecutionYear.getEnrolmentDate() != null) {
                 return registrationDataByExecutionYear.getEnrolmentDate();
             }
         }
@@ -869,10 +862,10 @@ public class TuitionServices {
             // Search the enrolment dates for most recent years in which the student was enrolled
 
             int i = 0;
-            for (ExecutionYear it = executionYear.getPreviousExecutionYear(); it != null; it =
-                    it.getPreviousExecutionYear(), i++) {
-                if (registrationDataByExecutionYear(registration, it) != null
-                        && registrationDataByExecutionYear(registration, it).getEnrolmentDate() != null) {
+            for (ExecutionYear it = executionYear.getPreviousExecutionYear(); it != null;
+                 it = it.getPreviousExecutionYear(), i++) {
+                if (registrationDataByExecutionYear(registration, it) != null && registrationDataByExecutionYear(registration,
+                        it).getEnrolmentDate() != null) {
                     return registrationDataByExecutionYear(registration, it).getEnrolmentDate().plusYears(i);
                 }
             }
@@ -894,10 +887,12 @@ public class TuitionServices {
         }
 
         final LocalDate stateDate = lastRegistrationState.getStateDate().toLocalDate();
-        final LocalDate dateOnBeginExecutionYearCivilDate = new LocalDate(
-                executionYear.getAcademicInterval().getStart().getYear(), stateDate.getMonthOfYear(), stateDate.getDayOfMonth());
-        final LocalDate dateOnEndExecutionYearCivilDate = new LocalDate(executionYear.getAcademicInterval().getEnd().getYear(),
-                stateDate.getMonthOfYear(), stateDate.getDayOfMonth());
+        final LocalDate dateOnBeginExecutionYearCivilDate =
+                new LocalDate(executionYear.getAcademicInterval().getStart().getYear(), stateDate.getMonthOfYear(),
+                        stateDate.getDayOfMonth());
+        final LocalDate dateOnEndExecutionYearCivilDate =
+                new LocalDate(executionYear.getAcademicInterval().getEnd().getYear(), stateDate.getMonthOfYear(),
+                        stateDate.getDayOfMonth());
 
         if (executionYear.containsDate(dateOnBeginExecutionYearCivilDate.toDateTimeAtStartOfDay())) {
             return dateOnBeginExecutionYearCivilDate;
