@@ -68,8 +68,6 @@ import org.fenixedu.academictreasury.domain.tariff.AcademicTariff;
 import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
-import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
@@ -160,8 +158,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         }
 
         Degree degree = iTreasuryServiceRequest.getRegistration().getDegree();
-        FinantialEntity finantialEntity =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation().finantialEntityOfDegree(degree, eventDate);
+        FinantialEntity finantialEntity = AcademicTreasuryConstants.getFinantialEntityOfDegree(degree, eventDate);
 
         if (finantialEntity == null && FinantialEntity.findAll().count() == 1) {
             finantialEntity = FinantialEntity.findAll().iterator().next();
@@ -220,11 +217,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
 
     private void initForTuition(final TuitionPaymentPlanGroup tuitionPaymentPlanGroup, final Product product,
             final Registration registration, final ExecutionYear executionYear) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        final RegistrationDataByExecutionYear data =
-                academicTreasuryServices.findRegistrationDataByExecutionYear(registration, executionYear);
+        final RegistrationDataByExecutionYear data = findRegistrationDataByExecutionYear(registration, executionYear);
 
         LocalDate eventDate = null;
         if (data != null && data.getEnrolmentDate() != null) {
@@ -238,8 +231,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         }
 
         Degree degree = registration.getDegree();
-        FinantialEntity finantialEntity =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation().finantialEntityOfDegree(degree, eventDate);
+        FinantialEntity finantialEntity = AcademicTreasuryConstants.getFinantialEntityOfDegree(degree, eventDate);
 
         if (finantialEntity == null && FinantialEntity.findAll().count() == 1) {
             finantialEntity = FinantialEntity.findAll().iterator().next();
@@ -254,6 +246,12 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         setPropertiesJsonMap(org.fenixedu.treasury.util.TreasuryConstants.propertiesMapToJson(fillPropertiesMap()));
 
         checkRules();
+    }
+
+    private RegistrationDataByExecutionYear findRegistrationDataByExecutionYear(Registration registration,
+            ExecutionYear executionYear) {
+        return registration.getRegistrationDataByExecutionYearSet().stream().filter(rd -> rd.getExecutionYear() == executionYear)
+                .findAny().orElse(null);
     }
 
     private LocalizedString nameForTuition(final Product product, final Registration registration,
@@ -273,11 +271,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
 
     private void initForAcademicTax(final AcademicTax academicTax, final Registration registration,
             final ExecutionYear executionYear) {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        final RegistrationDataByExecutionYear data =
-                academicTreasuryServices.findRegistrationDataByExecutionYear(registration, executionYear);
+        final RegistrationDataByExecutionYear data = findRegistrationDataByExecutionYear(registration, executionYear);
 
         LocalDate eventDate = null;
         if (data != null && data.getEnrolmentDate() != null) {
@@ -291,8 +285,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         }
 
         Degree degree = registration.getDegree();
-        FinantialEntity finantialEntity =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation().finantialEntityOfDegree(degree, eventDate);
+        FinantialEntity finantialEntity = AcademicTreasuryConstants.getFinantialEntityOfDegree(degree, eventDate);
 
         if (finantialEntity == null && FinantialEntity.findAll().count() == 1) {
             finantialEntity = FinantialEntity.findAll().iterator().next();
@@ -347,8 +340,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
                     eventDate = new LocalDate();
                 }
 
-                finantialEntity = AcademicTreasuryPlataformDependentServicesFactory.implementation()
-                        .finantialEntityOfDegree(target.getAcademicTreasuryTargetDegree(), eventDate);
+                finantialEntity =
+                        AcademicTreasuryConstants.getFinantialEntityOfDegree(target.getAcademicTreasuryTargetDegree(), eventDate);
             }
         }
 
@@ -380,8 +373,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
             eventDate = new LocalDate();
         }
 
-        FinantialEntity finantialEntity = AcademicTreasuryPlataformDependentServicesFactory.implementation()
-                .finantialEntityOfDegree(registration.getDegree(), eventDate);
+        FinantialEntity finantialEntity =
+                AcademicTreasuryConstants.getFinantialEntityOfDegree(registration.getDegree(), eventDate);
 
         if (finantialEntity == null && FinantialEntity.findAll().count() == 1) {
             finantialEntity = FinantialEntity.findAll().iterator().next();
@@ -598,19 +591,16 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
     }
 
     public LocalDate getRequestDate() {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         if (isForAcademicServiceRequest()) {
             return getITreasuryServiceRequest().getRequestDate().toLocalDate();
         } else if (isForAcademicTax() && !isForImprovementTax()) {
             final RegistrationDataByExecutionYear registrationDataByExecutionYear =
-                    academicTreasuryServices.findRegistrationDataByExecutionYear(getRegistration(), getExecutionYear());
+                    findRegistrationDataByExecutionYear(getRegistration(), getExecutionYear());
 
             return registrationDataByExecutionYear != null ? registrationDataByExecutionYear.getEnrolmentDate() : new LocalDate();
         } else if (isForImprovementTax()) {
             final RegistrationDataByExecutionYear registrationDataByExecutionYear =
-                    academicTreasuryServices.findRegistrationDataByExecutionYear(getRegistration(), getExecutionYear());
+                    findRegistrationDataByExecutionYear(getRegistration(), getExecutionYear());
 
             return registrationDataByExecutionYear != null ? registrationDataByExecutionYear.getEnrolmentDate() : new LocalDate();
         }
@@ -663,15 +653,12 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
 
     @Override
     public LocalDate getTreasuryEventDate() {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         if (isForAcademicServiceRequest()) {
             return getITreasuryServiceRequest().getRequestDate().toLocalDate();
         } else if (isForImprovementTax() || isForAcademicTax() || isForRegistrationTuition() || isForExtracurricularTuition() || isForStandaloneTuition()) {
 
             final RegistrationDataByExecutionYear data =
-                    academicTreasuryServices.findRegistrationDataByExecutionYear(getRegistration(), getExecutionYear());
+                    findRegistrationDataByExecutionYear(getRegistration(), getExecutionYear());
 
             if (data != null && data.getEnrolmentDate() != null) {
                 return data.getEnrolmentDate();
@@ -717,7 +704,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         }
 
         debitEntry.setCurricularCourse(enrolment.getCurricularCourse());
-        debitEntry.setExecutionSemester(academicTreasuryServices().executionSemester(enrolment));
+        debitEntry.setExecutionSemester(enrolment.getExecutionInterval());
     }
 
     public void associateEnrolmentEvaluation(final DebitEntry debitEntry, final EnrolmentEvaluation enrolmentEvaluation) {
@@ -730,10 +717,10 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         }
 
         debitEntry.setCurricularCourse(enrolmentEvaluation.getEnrolment().getCurricularCourse());
-        debitEntry.setExecutionSemester(academicTreasuryServices().executionSemester(enrolmentEvaluation.getEnrolment()));
+        debitEntry.setExecutionSemester(enrolmentEvaluation.getEnrolment().getExecutionInterval());
 
-        if (academicTreasuryServices().executionSemester(enrolmentEvaluation) != null) {
-            debitEntry.setExecutionSemester(academicTreasuryServices().executionSemester(enrolmentEvaluation));
+        if (enrolmentEvaluation.getExecutionInterval() != null) {
+            debitEntry.setExecutionSemester(enrolmentEvaluation.getExecutionInterval());
         }
 
         debitEntry.setEvaluationSeason(enrolmentEvaluation.getEvaluationSeason());
@@ -1017,7 +1004,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
     }
 
     public static Stream<? extends AcademicTreasuryEvent> find(Person person) {
-        return academicTreasuryServices().academicTreasuryEventsSet(person).stream();
+        return person.getAcademicTreasuryEventSet().stream();
     }
 
     public static Stream<? extends AcademicTreasuryEvent> find(ExecutionYear executionYear) {
@@ -1439,10 +1426,6 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         super.setMaximumAmount(maximumAmount);
         super.setAmountForLanguageTranslationRate(amountForLanguageTranslationRate);
         super.setAmountForUrgencyRate(amountForUrgencyRate);
-    }
-
-    private static IAcademicTreasuryPlatformDependentServices academicTreasuryServices() {
-        return AcademicTreasuryPlataformDependentServicesFactory.implementation();
     }
 
     /* ----------------------
@@ -1868,8 +1851,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
     public FinantialEntity getAssociatedFinantialEntity() {
         if (getDegree() != null) {
             Degree degree = getDegree();
-            FinantialEntity finantialEntityOfDegree = AcademicTreasuryPlataformDependentServicesFactory.implementation()
-                    .finantialEntityOfDegree(degree, getTreasuryEventDate());
+            FinantialEntity finantialEntityOfDegree =
+                    AcademicTreasuryConstants.getFinantialEntityOfDegree(degree, getTreasuryEventDate());
 
             return finantialEntityOfDegree;
         }
