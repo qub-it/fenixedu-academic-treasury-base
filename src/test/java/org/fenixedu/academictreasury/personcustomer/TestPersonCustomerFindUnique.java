@@ -11,12 +11,12 @@ import java.util.stream.Collectors;
 
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
+import org.fenixedu.academic.domain.contacts.PhysicalAddressData;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academictreasury.base.FenixFrameworkRunner;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
-import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryBootstrapper;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.CustomerType;
@@ -93,8 +93,9 @@ public class TestPersonCustomerFindUnique {
     @Test
     public void testChangeCustomerFromPersonMerge() {
         Person person = Student.readStudentByNumber(1).getPerson();
-        PhysicalAddress physicalAddress = person.getPhysicalAddresses().stream()
-                .filter(a -> "PT".equals(PersonCustomer.addressCountryCode(a))).findFirst().get();
+        PhysicalAddress physicalAddress =
+                person.getPhysicalAddresses().stream().filter(a -> "PT".equals(PersonCustomer.addressCountryCode(a))).findFirst()
+                        .get();
 
         person.editSocialSecurityNumber("507113810", physicalAddress);
 
@@ -106,8 +107,9 @@ public class TestPersonCustomerFindUnique {
     @Test
     public void testIsNotFromPersonMerge() {
         Person person = Student.readStudentByNumber(1).getPerson();
-        PhysicalAddress physicalAddress = person.getPhysicalAddresses().stream()
-                .filter(a -> "PT".equals(PersonCustomer.addressCountryCode(a))).findFirst().get();
+        PhysicalAddress physicalAddress =
+                person.getPhysicalAddresses().stream().filter(a -> "PT".equals(PersonCustomer.addressCountryCode(a))).findFirst()
+                        .get();
 
         person.editSocialSecurityNumber("504024850", physicalAddress);
 
@@ -125,8 +127,9 @@ public class TestPersonCustomerFindUnique {
     @Test
     public void testChangeNIF() {
         Person person = Student.readStudentByNumber(1).getPerson();
-        PhysicalAddress physicalAddress = person.getPhysicalAddresses().stream()
-                .filter(a -> "PT".equals(PersonCustomer.addressCountryCode(a))).findFirst().get();
+        PhysicalAddress physicalAddress =
+                person.getPhysicalAddresses().stream().filter(a -> "PT".equals(PersonCustomer.addressCountryCode(a))).findFirst()
+                        .get();
 
         person.editSocialSecurityNumber("503021202", physicalAddress);
 
@@ -180,15 +183,31 @@ public class TestPersonCustomerFindUnique {
     }
 
     private static PhysicalAddress createDefaultPhysicalAddress(final Person person) {
-        IAcademicTreasuryPlatformDependentServices implementation =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        PhysicalAddress result = implementation.createPhysicalAddress(person, Country.readByTwoLetterCode("PT"), "unknownAddress",
-                "unknownAddress", "0000-000", "unknownAddress");
+        PhysicalAddress result =
+                createPhysicalAddress(person, Country.readByTwoLetterCode("PT"), "unknownAddress", "unknownAddress", "0000-000",
+                        "unknownAddress");
         result.setValid();
 
         return result;
 
+    }
+
+    private static PhysicalAddress createPhysicalAddress(Person person, Country countryOfResidence, String districtOfResidence,
+            String districtSubdivisionOfResidence, String areaCode, String address) {
+        PhysicalAddressData data = new PhysicalAddressData();
+
+        data.setAddress(address);
+        data.setCountryOfResidence(countryOfResidence);
+        data.setDistrictOfResidence(districtOfResidence);
+        data.setDistrictSubdivisionOfResidence(districtSubdivisionOfResidence);
+        data.setAreaCode(areaCode);
+
+        final PhysicalAddress physicalAddress =
+                PhysicalAddress.createPhysicalAddress(person, data, PartyContactType.PERSONAL, false);
+
+        physicalAddress.setValid();
+
+        return physicalAddress;
     }
 
 }
