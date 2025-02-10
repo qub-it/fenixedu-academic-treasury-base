@@ -1,37 +1,27 @@
 /**
- * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/>
- * All rights reserved.
+ * Copyright (c) 2015, Quorum Born IT <http://www.qub-it.com/> All rights reserved.
  *
- * Redistribution and use in source and binary forms, without modification, are permitted
- * provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, without modification, are permitted provided that the following conditions
+ * are met:
  *
- * * Redistributions of source code must retain the above copyright notice, this list of
- * conditions and the following disclaimer.
- * * Redistributions in binary form must reproduce the above copyright notice, this list
- * of conditions and the following disclaimer in the documentation and/or other materials
- * provided with the distribution.
- * * Neither the name of Quorum Born IT nor the names of its contributors may be used to
- * endorse or promote products derived from this software without specific prior written
- * permission.
- * * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade
- * de Lisboa (Departamento de Informática), hereby referred to as the Beneficiary, is the
- * sole demonstrated end-user and ultimately the only beneficiary of the redistributed binary
- * form and/or source code.
- * * The Beneficiary is entrusted with either the binary form, the source code, or both, and
- * by accepting it, accepts the terms of this License.
- * * Redistribution of any binary form and/or source code is only allowed in the scope of the
- * Universidade de Lisboa FenixEdu(™)’s implementation projects.
- * * This license and conditions of redistribution of source code/binary can only be reviewed
- * by the Steering Comittee of FenixEdu(™) <http://www.fenixedu.org/>.
+ * * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+ * * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
+ * disclaimer in the documentation and/or other materials provided with the distribution. * Neither the name of Quorum Born IT nor
+ * the names of its contributors may be used to endorse or promote products derived from this software without specific prior
+ * written permission. * Universidade de Lisboa and its respective subsidiary Serviços Centrais da Universidade de Lisboa
+ * (Departamento de Informática), hereby referred to as the Beneficiary, is the sole demonstrated end-user and ultimately the only
+ * beneficiary of the redistributed binary form and/or source code. * The Beneficiary is entrusted with either the binary form,
+ * the source code, or both, and by accepting it, accepts the terms of this License. * Redistribution of any binary form and/or
+ * source code is only allowed in the scope of the Universidade de Lisboa FenixEdu(™)’s implementation projects. * This license
+ * and conditions of redistribution of source code/binary can only be reviewed by the Steering Comittee of FenixEdu(™)
+ * <http://www.fenixedu.org/>.
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
- * OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
- * AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL “Quorum Born IT” BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+ * BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL “Quorum Born IT” BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package org.fenixedu.academictreasury.dto.tariff;
 
@@ -49,10 +39,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
 
-import org.fenixedu.academic.domain.CurricularYear;
-import org.fenixedu.academic.domain.DegreeCurricularPlan;
-import org.fenixedu.academic.domain.ExecutionInterval;
-import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.*;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.exceptions.DomainException;
@@ -79,8 +66,6 @@ import org.fenixedu.academictreasury.domain.tuition.conditionRule.RegistrationPr
 import org.fenixedu.academictreasury.domain.tuition.conditionRule.RegistrationRegimeTypeConditionRule;
 import org.fenixedu.academictreasury.domain.tuition.conditionRule.StatuteTypeConditionRule;
 import org.fenixedu.academictreasury.domain.tuition.conditionRule.WithLaboratorialClassesConditionRule;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
-import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
@@ -322,8 +307,9 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
             return;
         }
 
-        int executionYearInterval = this.executionYear.getAcademicInterval().getStart().getYear()
-                - this.copiedExecutionYear.getAcademicInterval().getStart().getYear();
+        int executionYearInterval =
+                this.executionYear.getAcademicInterval().getStart().getYear() - this.copiedExecutionYear.getAcademicInterval()
+                        .getStart().getYear();
 
         for (final AcademicTariffBean academicTariffBean : this.tuitionInstallmentBeans) {
             academicTariffBean.setBeginDate(academicTariffBean.getBeginDate().plusYears(executionYearInterval));
@@ -363,30 +349,24 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
             errorMessages.add("error.TuitionPaymentPlan.fixedAmount.required");
         }
 
-        if (this.tuitionCalculationType != null && (this.tuitionCalculationType.isEcts() || this.tuitionCalculationType.isUnits())
-                && this.ectsCalculationType == null) {
+        if (this.tuitionCalculationType != null && (this.tuitionCalculationType.isEcts() || this.tuitionCalculationType.isUnits()) && this.ectsCalculationType == null) {
             errorMessages.add("error.TuitionPaymentPlan.ectsCalculationType.required");
         }
 
-        if (this.tuitionCalculationType != null && (this.tuitionCalculationType.isEcts() || this.tuitionCalculationType.isUnits())
-                && this.ectsCalculationType != null && this.ectsCalculationType.isFixedAmount() && this.fixedAmount == null) {
+        if (this.tuitionCalculationType != null && (this.tuitionCalculationType.isEcts() || this.tuitionCalculationType.isUnits()) && this.ectsCalculationType != null && this.ectsCalculationType.isFixedAmount() && this.fixedAmount == null) {
             errorMessages.add("error.TuitionPaymentPlan.fixedAmount.required");
         }
 
-        if (this.tuitionCalculationType != null && (this.tuitionCalculationType.isEcts() || this.tuitionCalculationType.isUnits())
-                && this.ectsCalculationType != null && this.ectsCalculationType.isDependentOnDefaultPaymentPlan()
-                && this.factor == null) {
+        if (this.tuitionCalculationType != null && (this.tuitionCalculationType.isEcts() || this.tuitionCalculationType.isUnits()) && this.ectsCalculationType != null && this.ectsCalculationType.isDependentOnDefaultPaymentPlan() && this.factor == null) {
             errorMessages.add("error.TuitionPaymentPlan.factor.required");
         }
 
-        if (this.tuitionCalculationType != null && (this.tuitionCalculationType.isEcts() || this.tuitionCalculationType.isUnits())
-                && this.ectsCalculationType != null && this.ectsCalculationType.isDependentOnDefaultPaymentPlan()
-                && this.totalEctsOrUnits == null) {
+        if (this.tuitionCalculationType != null && (this.tuitionCalculationType.isEcts() || this.tuitionCalculationType.isUnits()) && this.ectsCalculationType != null && this.ectsCalculationType.isDependentOnDefaultPaymentPlan() && this.totalEctsOrUnits == null) {
             errorMessages.add("error.TuitionPaymentPlan.totalEctsOrUnits.required");
         }
 
-        if (this.applyMaximumAmount
-                && (this.maximumAmount == null || !AcademicTreasuryConstants.isPositive(this.maximumAmount))) {
+        if (this.applyMaximumAmount && (this.maximumAmount == null || !AcademicTreasuryConstants.isPositive(
+                this.maximumAmount))) {
             errorMessages.add("error.TuitionPaymentPlan.maximumAmount.required");
         }
 
@@ -406,8 +386,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
             errorMessages.add("error.TuitionPaymentPlan.interestType.required");
         }
 
-        if (this.applyInterests && this.interestRateType != null && this.interestRateType.isInterestFixedAmountRequired()
-                && this.interestFixedAmount == null) {
+        if (this.applyInterests && this.interestRateType != null && this.interestRateType.isInterestFixedAmountRequired() && this.interestFixedAmount == null) {
             errorMessages.add("error.TuitionPaymentPlan.interestFixedAmount.required");
         }
 
@@ -416,9 +395,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
             errorMessages.add("error.TuitionPaymentPlan.installment.already.with.product");
         }
 
-        if (getTuitionPaymentPlanGroup().isForRegistration()
-                && (getTuitionCalculationType().isEcts() || getTuitionCalculationType().isUnits())
-                && getEctsCalculationType().isDefaultPaymentPlanCourseFunctionCostIndexed()) {
+        if (getTuitionPaymentPlanGroup().isForRegistration() && (getTuitionCalculationType().isEcts() || getTuitionCalculationType().isUnits()) && getEctsCalculationType().isDefaultPaymentPlanCourseFunctionCostIndexed()) {
             errorMessages.add(
                     "error.TuitionInstallmentTariff.defaultPaymentPlanCourseFunctionCostIndexed.not.supported.for.registrationTuition");
         }
@@ -596,8 +573,9 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     public void addOrReplaceConditionRules(TuitionConditionRule tuitionConditionRule) {
-        TuitionConditionRule rule = conditionRules.stream()
-                .filter(c -> c.getClass().isAssignableFrom(tuitionConditionRule.getClass())).findFirst().orElse(null);
+        TuitionConditionRule rule =
+                conditionRules.stream().filter(c -> c.getClass().isAssignableFrom(tuitionConditionRule.getClass())).findFirst()
+                        .orElse(null);
         if (rule != null) {
             conditionRules.remove(rule);
         }
@@ -606,8 +584,9 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     public void addConditionRules(TuitionConditionRule tuitionConditionRule) {
-        TuitionConditionRule rule = conditionRules.stream()
-                .filter(c -> c.getClass().isAssignableFrom(tuitionConditionRule.getClass())).findFirst().orElse(null);
+        TuitionConditionRule rule =
+                conditionRules.stream().filter(c -> c.getClass().isAssignableFrom(tuitionConditionRule.getClass())).findFirst()
+                        .orElse(null);
         if (rule != null) {
             throw new DomainException(TreasuryPlataformDependentServicesFactory.implementation()
                     .bundle(AcademicTreasuryConstants.BUNDLE, "error.TuitionPaymentPlan.conditionRule.duplicated"));
@@ -981,12 +960,9 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     };
 
     private List<TreasuryTupleDataSourceBean> degreeTypeDataSource() {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        final List<TreasuryTupleDataSourceBean> result =
-                Lists.newArrayList(DegreeType.all().map((dt) -> new TreasuryTupleDataSourceBean(dt.getExternalId(),
-                        academicTreasuryServices.localizedNameOfDegreeType(dt))).collect(Collectors.toList()));
+        final List<TreasuryTupleDataSourceBean> result = Lists.newArrayList(
+                DegreeType.all().map((dt) -> new TreasuryTupleDataSourceBean(dt.getExternalId(), dt.getName().getContent()))
+                        .collect(Collectors.toList()));
 
         result.add(AcademicTreasuryConstants.SELECT_OPTION);
 
@@ -994,9 +970,6 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     private List<TreasuryTupleDataSourceBean> degreeCurricularPlanDataSource() {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
         if (getExecutionYear() == null) {
             return Collections.<TreasuryTupleDataSourceBean> emptyList();
         }
@@ -1008,14 +981,12 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         final List<TreasuryTupleDataSourceBean> result = Lists.newArrayList();
 
         if (isShowAllDcps()) {
-            result.addAll(academicTreasuryServices.readAllDegreeCurricularPlansSet().stream()
-                    .filter(dcp -> dcp.getDegreeType() == getDegreeType())
+            result.addAll(readAllDegreeCurricularPlansSet().stream().filter(dcp -> dcp.getDegreeType() == getDegreeType())
                     .map((dcp) -> new TreasuryTupleDataSourceBean(dcp.getExternalId(),
                             "[" + dcp.getDegree().getCode() + "] " + dcp.getPresentationName(getExecutionYear())))
                     .collect(Collectors.toList()));
         } else {
-            result.addAll(academicTreasuryServices
-                    .readDegreeCurricularPlansWithExecutionDegree(getExecutionYear(), getDegreeType()).stream()
+            result.addAll(readDegreeCurricularPlansWithExecutionDegree(getExecutionYear(), getDegreeType()).stream()
                     .map((dcp) -> new TreasuryTupleDataSourceBean(dcp.getExternalId(),
                             "[" + dcp.getDegree().getCode() + "] " + dcp.getPresentationName(getExecutionYear())))
                     .collect(Collectors.toList()));
@@ -1024,10 +995,18 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         return result.stream().sorted(COMPARE_BY_ID_AND_TEXT).collect(Collectors.toList());
     }
 
-    private List<TreasuryTupleDataSourceBean> semesterDataSource() {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+    public Set<DegreeCurricularPlan> readDegreeCurricularPlansWithExecutionDegree(final ExecutionYear executionYear,
+            final DegreeType degreeType) {
+        return ExecutionDegree.getAllByExecutionYearAndDegreeType(executionYear, degreeType).stream()
+                .map(e -> e.getDegreeCurricularPlan()).collect(Collectors.toSet());
+    }
 
+    private Set<DegreeCurricularPlan> readAllDegreeCurricularPlansSet() {
+        return Degree.readAllMatching((dt) -> true).stream().flatMap(d -> d.getDegreeCurricularPlansSet().stream())
+                .collect(Collectors.toSet());
+    }
+
+    private List<TreasuryTupleDataSourceBean> semesterDataSource() {
         if (getExecutionYear() == null) {
             return Lists.newArrayList();
         }
@@ -1042,10 +1021,7 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     private List<TreasuryTupleDataSourceBean> curricularYearDataSource() {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        final List<TreasuryTupleDataSourceBean> result = academicTreasuryServices.readAllCurricularYearsSet().stream()
+        final List<TreasuryTupleDataSourceBean> result = readAllCurricularYearsSet().stream()
                 .map((cy) -> new TreasuryTupleDataSourceBean(cy.getExternalId(), cy.getYear().toString()))
                 .collect(Collectors.toList());
 
@@ -1054,11 +1030,22 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         return result.stream().sorted(COMPARE_BY_ID_AND_TEXT).collect(Collectors.toList());
     }
 
-    private List<TreasuryTupleDataSourceBean> ingressionDataSource() {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+    private Set<CurricularYear> readAllCurricularYearsSet() {
+        final Set<CurricularYear> result = new HashSet<>();
 
-        final List<TreasuryTupleDataSourceBean> result = academicTreasuryServices.readAllIngressionTypesSet().stream()
+        for (int i = 1; i <= 10; i++) {
+            if (CurricularYear.readByYear(i) == null) {
+                return result;
+            }
+
+            result.add(CurricularYear.readByYear(i));
+        }
+
+        return result;
+    }
+
+    private List<TreasuryTupleDataSourceBean> ingressionDataSource() {
+        final List<TreasuryTupleDataSourceBean> result = readAllIngressionTypesSet().stream()
                 .map((i) -> new TreasuryTupleDataSourceBean(i.getExternalId(), i.getDescription().getContent()))
                 .collect(Collectors.toList());
 
@@ -1067,11 +1054,16 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         return result.stream().sorted(COMPARE_BY_ID_AND_TEXT).collect(Collectors.toList());
     }
 
-    private List<TreasuryTupleDataSourceBean> registrationProtocolDataSource() {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
+    private Set<IngressionType> readAllIngressionTypesSet() {
+        return IngressionType.findAllByPredicate((i) -> true).collect(Collectors.toSet());
+    }
 
-        final List<TreasuryTupleDataSourceBean> result = academicTreasuryServices.readAllRegistrationProtocol().stream()
+    private Set<RegistrationProtocol> readAllRegistrationProtocol() {
+        return RegistrationProtocol.findByPredicate((p) -> true).collect(Collectors.toSet());
+    }
+
+    private List<TreasuryTupleDataSourceBean> registrationProtocolDataSource() {
+        final List<TreasuryTupleDataSourceBean> result = readAllRegistrationProtocol().stream()
                 .map((rp) -> new TreasuryTupleDataSourceBean(rp.getExternalId(), rp.getDescription().getContent()))
                 .collect(Collectors.toList());
 
@@ -1101,9 +1093,10 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     public static List<TreasuryTupleDataSourceBean> ectsCalculationTypeDataSource() {
-        List<TreasuryTupleDataSourceBean> result = ((List<EctsCalculationType>) Arrays.asList(EctsCalculationType.values()))
-                .stream().map((ct) -> new TreasuryTupleDataSourceBean(ct.name(), ct.getDescriptionI18N().getContent()))
-                .collect(Collectors.toList());
+        List<TreasuryTupleDataSourceBean> result =
+                ((List<EctsCalculationType>) Arrays.asList(EctsCalculationType.values())).stream()
+                        .map((ct) -> new TreasuryTupleDataSourceBean(ct.name(), ct.getDescriptionI18N().getContent()))
+                        .collect(Collectors.toList());
 
         result.add(AcademicTreasuryConstants.SELECT_OPTION);
 
@@ -1111,9 +1104,10 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     public static List<TreasuryTupleDataSourceBean> tuitionCalculationTypeDataSource() {
-        List<TreasuryTupleDataSourceBean> result = ((List<TuitionCalculationType>) Arrays.asList(TuitionCalculationType.values()))
-                .stream().map((ct) -> new TreasuryTupleDataSourceBean(ct.name(), ct.getDescriptionI18N().getContent()))
-                .collect(Collectors.toList());
+        List<TreasuryTupleDataSourceBean> result =
+                ((List<TuitionCalculationType>) Arrays.asList(TuitionCalculationType.values())).stream()
+                        .map((ct) -> new TreasuryTupleDataSourceBean(ct.name(), ct.getDescriptionI18N().getContent()))
+                        .collect(Collectors.toList());
 
         result.add(AcademicTreasuryConstants.SELECT_OPTION);
 
@@ -1142,16 +1136,21 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     private List<TreasuryTupleDataSourceBean> statuteTypeDataSource() {
-        final IAcademicTreasuryPlatformDependentServices academicTreasuryServices =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        final List<TreasuryTupleDataSourceBean> result = academicTreasuryServices.readAllStatuteTypesSet().stream().map(
-                l -> new TreasuryTupleDataSourceBean(l.getExternalId(), academicTreasuryServices.localizedNameOfStatuteType(l)))
+        final List<TreasuryTupleDataSourceBean> result = readAllStatuteTypesSet().stream()
+                .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), l.getName().getContent()))
                 .collect(Collectors.toList());
 
         result.add(AcademicTreasuryConstants.SELECT_OPTION);
 
         return result.stream().sorted(COMPARE_BY_ID_AND_TEXT).collect(Collectors.toList());
+    }
+
+    private Set<StatuteType> readAllStatuteTypesSet() {
+        return StatuteType.readAll((s) -> true).collect(Collectors.toSet());
+    }
+
+    private Set<StatuteType> readAllStatuteTypesSet(boolean active) {
+        return readAllStatuteTypesSet().stream().filter(s -> s.getActive() == active).collect(Collectors.toSet());
     }
 
     private List<TreasuryTupleDataSourceBean> payorDebtAccountDataSource() {
@@ -1173,9 +1172,11 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
     }
 
     private List<TreasuryTupleDataSourceBean> executionYearDataSource() {
-        final List<TreasuryTupleDataSourceBean> result = ExecutionYear.readNotClosedExecutionYears().stream()
-                .sorted(ExecutionYear.REVERSE_COMPARATOR_BY_YEAR).collect(Collectors.toList()).stream()
-                .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), l.getQualifiedName())).collect(Collectors.toList());
+        final List<TreasuryTupleDataSourceBean> result =
+                ExecutionYear.readNotClosedExecutionYears().stream().sorted(ExecutionYear.REVERSE_COMPARATOR_BY_YEAR)
+                        .collect(Collectors.toList()).stream()
+                        .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(), l.getQualifiedName()))
+                        .collect(Collectors.toList());
 
         result.add(0, AcademicTreasuryConstants.SELECT_OPTION);
 

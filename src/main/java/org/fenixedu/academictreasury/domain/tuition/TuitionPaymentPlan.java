@@ -49,8 +49,6 @@ import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.domain.tuition.calculators.TuitionPaymentPlanCalculator;
 import org.fenixedu.academictreasury.dto.tariff.AcademicTariffBean;
 import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
-import org.fenixedu.academictreasury.services.IAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.academictreasury.util.LocalizedStringUtil;
 import org.fenixedu.commons.i18n.LocalizedString;
@@ -836,11 +834,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
     }
 
     public static Set<Integer> semestersWithEnrolments(final Registration registration, final ExecutionYear executionYear) {
-        IAcademicTreasuryPlatformDependentServices implementation =
-                AcademicTreasuryPlataformDependentServicesFactory.implementation();
-
-        return registration.getEnrolments(executionYear).stream()
-                .map(e -> implementation.executionIntervalChildOrder(e.getExecutionPeriod())).collect(Collectors.toSet());
+        return registration.getEnrolments(executionYear).stream().map(e -> e.getExecutionPeriod().getChildOrder())
+                .collect(Collectors.toSet());
     }
 
     @Atomic
