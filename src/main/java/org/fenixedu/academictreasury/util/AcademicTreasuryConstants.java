@@ -221,15 +221,18 @@ public class AcademicTreasuryConstants {
      *
      */
     public static FinantialEntity getFinantialEntityOfDegree(Degree degree, LocalDate when) {
-        // Look at the organizational structure
-        Unit degreeUnit = degree.getUnit();
+        return getFinantialEntityOfUnit(degree.getUnit(), when);
+    }
 
-        if (degreeUnit == null) {
+    public static FinantialEntity getFinantialEntityOfUnit(Unit unit, LocalDate when) {
+        // Look at the organizational structure
+
+        if (unit == null) {
             return null;
         }
 
         List<FinantialEntity> candidateFinantialEntities =
-                degreeUnit.getAllParentUnits().stream().map(parent -> parent.getFinantialEntity()).filter(Objects::nonNull)
+                unit.getAllParentUnits().stream().map(parent -> parent.getFinantialEntity()).filter(Objects::nonNull)
                         .sorted(FinantialEntity.COMPARE_BY_NAME).collect(Collectors.toList());
 
         if (candidateFinantialEntities.size() == 1) {

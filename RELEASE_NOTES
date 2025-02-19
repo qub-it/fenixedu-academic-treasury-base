@@ -1,3 +1,5 @@
+- Refactor: Service method to find financial entity for unit [#qubIT-Fenix-6627]
+
 12.5.0 (10-02-2025)
 - Refactor: Remove usage of IAcademicTreasuryPlatformDependentServices [#qubIT-Fenix-6593]
 
