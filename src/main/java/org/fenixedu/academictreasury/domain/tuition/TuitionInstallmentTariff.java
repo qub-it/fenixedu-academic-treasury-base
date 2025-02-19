@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.Enrolment;
@@ -744,16 +745,29 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
 
         fillPriceProperties.put("RECALCULATED_AMOUNT", recalculatedAmount.toString());
 
-        String recalculationLabel = AcademicTreasuryConstants.academicTreasuryBundle(AcademicTreasuryConstants.DEFAULT_LANGUAGE,
-                "label.RegistrationTuitionService.recalculation.installmentName.prefix");
         String installmentName =
                 installmentName(academicTreasuryEvent.getRegistration()).getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE);
 
+        String installmentDebitEntryName = installmentName;
+
+        TuitionPaymentPlanGroup group = getTuitionPaymentPlan().getTuitionPaymentPlanGroup();
+        if (group.getTuitionRecalculationDebitEntryPrefix() != null && StringUtils.isNotEmpty(
+                group.getTuitionRecalculationDebitEntryPrefix().getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE))) {
+            installmentDebitEntryName = group.getTuitionRecalculationDebitEntryPrefix()
+                    .getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE) + " " + installmentDebitEntryName;
+        }
+
+        if (group.getTuitionRecalculationDebitEntrySuffix() != null && StringUtils.isNotEmpty(group.getTuitionRecalculationDebitEntrySuffix()
+                .getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE))) {
+            installmentDebitEntryName = installmentDebitEntryName + " " + group.getTuitionRecalculationDebitEntrySuffix()
+                    .getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE);
+        }
+
         DebitEntry debitEntry =
                 DebitEntry.create(getTuitionPaymentPlan().getFinantialEntity(), debtAccount, academicTreasuryEvent, vat(when),
-                        recalculatedAmount, recalculationDueDate, fillPriceProperties, getProduct(),
-                        recalculationLabel + " " + installmentName, AcademicTreasuryConstants.DEFAULT_QUANTITY,
-                        this.getInterestRate(), when.toDateTimeAtStartOfDay(), false, false, null);
+                        recalculatedAmount, recalculationDueDate, fillPriceProperties, getProduct(), installmentDebitEntryName.trim(),
+                        AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay(), false,
+                        false, null);
 
         if (isAcademicalActBlockingOff()) {
             debitEntry.markAcademicalActBlockingSuspension();

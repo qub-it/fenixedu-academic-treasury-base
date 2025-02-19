@@ -221,6 +221,8 @@ class tuition.TuitionPaymentPlanGroup {
 	LocalizedString installmentDebitEntryDescriptionFormat;
 	LocalizedString oneInstallmentDebitEntryDescriptionFormat;
 	Boolean applyDomainObjectCalculators;
+	LocalizedString tuitionRecalculationDebitEntryPrefix;
+	LocalizedString tuitionRecalculationDebitEntrySuffix;
 }
 
 	relation TuitionPaymentPlanGroupBennu {

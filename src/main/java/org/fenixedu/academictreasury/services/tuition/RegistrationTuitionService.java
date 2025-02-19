@@ -393,14 +393,14 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                             exemptionsToApplyMap);
                 }
 
-                throw new IllegalStateException("reculation: do not know how to handle this case???");
+                throw new IllegalStateException("recalculation: do not know how to handle this case???");
             } else if (!isTuitionInstallmentCharged(product)) {
                 return createUnchargedInstallmentDebitEntry(debtDate, debtAccount, academicTreasuryEvent, tariff,
                         _discountExemptionsMapForOnlyThisInstallment);
             } else if (isTuitionInstallmentCharged(product)) {
                 return false;
             } else {
-                throw new IllegalStateException("reculation: do not know how to handle this case???");
+                throw new IllegalStateException("recalculation: do not know how to handle this case???");
             }
         };
 
@@ -851,9 +851,19 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
                 LocalDate recalculationDueDate = this.installmentRecalculationOptions.recalculateInstallments.get(product);
 
-                LocalizedString recalculationInstallmentName = AcademicTreasuryConstants.academicTreasuryBundleI18N(
-                                "label.RegistrationTuitionService.recalculation.installmentName.prefix").append(" ")
-                        .append(installmentName);
+                LocalizedString recalculationInstallmentName = installmentName;
+                if (tuitionPaymentPlan.getTuitionPaymentPlanGroup().getTuitionRecalculationDebitEntryPrefix() != null) {
+                    recalculationInstallmentName =
+                            tuitionPaymentPlan.getTuitionPaymentPlanGroup().getTuitionRecalculationDebitEntryPrefix()
+                                    .append(recalculationInstallmentName, " ");
+                }
+
+                if (tuitionPaymentPlan.getTuitionPaymentPlanGroup().getTuitionRecalculationDebitEntrySuffix() != null) {
+                    recalculationInstallmentName = recalculationInstallmentName.append(
+                            tuitionPaymentPlan.getTuitionPaymentPlanGroup().getTuitionRecalculationDebitEntrySuffix(), " ");
+                }
+
+                recalculationInstallmentName = trim(recalculationInstallmentName);
 
                 return Collections.singletonList(
                         new TuitionDebitEntryBean(installmentOrder, tariff, recalculationInstallmentName, recalculationDueDate,
@@ -866,9 +876,20 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
                 // Create debit entry with the positive difference
                 LocalDate recalculationDueDate = this.installmentRecalculationOptions.recalculateInstallments.get(product);
-                LocalizedString recalculationInstallmentName = AcademicTreasuryConstants.academicTreasuryBundleI18N(
-                                "label.RegistrationTuitionService.recalculation.installmentName.prefix").append(" ")
-                        .append(installmentName);
+
+                LocalizedString recalculationInstallmentName = installmentName;
+                if (tuitionPaymentPlan.getTuitionPaymentPlanGroup().getTuitionRecalculationDebitEntryPrefix() != null) {
+                    recalculationInstallmentName =
+                            tuitionPaymentPlan.getTuitionPaymentPlanGroup().getTuitionRecalculationDebitEntryPrefix()
+                                    .append(recalculationInstallmentName, " ");
+                }
+
+                if (tuitionPaymentPlan.getTuitionPaymentPlanGroup().getTuitionRecalculationDebitEntrySuffix() != null) {
+                    recalculationInstallmentName = recalculationInstallmentName.append(
+                            tuitionPaymentPlan.getTuitionPaymentPlanGroup().getTuitionRecalculationDebitEntrySuffix(), " ");
+                }
+
+                recalculationInstallmentName = trim(recalculationInstallmentName);
 
                 // We need how to take the difference exemption. We take from the
                 // mapForOnlyThisInstallment or the mapForAllInstallments exemption map? And how much to take
@@ -968,6 +989,12 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
         } else {
             return Collections.emptyList();
         }
+    }
+
+    private LocalizedString trim(LocalizedString value) {
+        return value.getLocales().stream()
+                .map(l -> new LocalizedString(l, value.getContent(l) != null ? value.getContent(l).trim() : null))
+                .reduce(new LocalizedString(), LocalizedString::append);
     }
 
     private TreeMap<TreasuryExemptionType, TreasuryExemptionMoneyBox> buildDiscountExemptionsMapForOnlyThisInstallment(

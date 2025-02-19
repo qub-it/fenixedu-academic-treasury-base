@@ -1,3 +1,5 @@
+- Improvement: Configuration for prefix and suffix of recalculation of tuition installment debit entry description [#qubIT-Fenix-6649]
+
 12.6.0 (19-02-2025)
 - Refactor: Service method to find financial entity for unit [#qubIT-Fenix-6627]
 
