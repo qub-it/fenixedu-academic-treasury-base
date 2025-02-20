@@ -689,7 +689,18 @@ class tuition.TuitionPaymentPlanRecalculation {
 			multiplicity *;
 		}
 	}
-	
+
+relation TuitionProductDegreeType {
+
+	.org.fenixedu.treasury.domain.Product playsRole possibleTuitionProductsForDegreeType {
+		multiplicity *;
+	}
+
+	.org.fenixedu.academic.domain.degree.DegreeType playsRole possibleDegreeTypesForTuition {
+		multiplicity *;
+	}
+}
+
 /*----------------------
  * AcademicTreasuryEvent
  *---------------------- */
