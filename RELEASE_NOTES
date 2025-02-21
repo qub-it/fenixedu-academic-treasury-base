@@ -1,3 +1,5 @@
+- Bug Fix: In deleting a curricular course, dissociate all debit entries [#qubIT-Fenix-6657]
+
 12.7.1 (20-02-2025)
 - Refactor: Transfer relation between tuition products and degree types to this module [#qubIT-Fenix-6648]
 
