@@ -42,6 +42,7 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.emoluments.AcademicTax;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
+import org.fenixedu.academictreasury.domain.tuition.TuitionAllocation;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
 import org.fenixedu.academictreasury.services.TuitionServices;
@@ -87,6 +88,8 @@ public class TuitionDebtCreationBean implements Serializable, ITreasuryBean {
     private Map<Product, LocalDate> recalculationInstallmentProductsMap = new HashMap<>();
 
     private Boolean applyDefaultEnrolmentCredits;
+
+    private TuitionAllocation tuitionAllocation;
 
     public TuitionDebtCreationBean(final DebtAccount debtAccount, final TuitionPaymentPlanGroup tuitionPaymentPlanGroup) {
         this.debtAccount = debtAccount;
@@ -461,5 +464,13 @@ public class TuitionDebtCreationBean implements Serializable, ITreasuryBean {
 
     public void setApplyDefaultEnrolmentCredits(Boolean applyDefaultEnrolmentCredits) {
         this.applyDefaultEnrolmentCredits = applyDefaultEnrolmentCredits;
+    }
+
+    public TuitionAllocation getTuitionAllocation() {
+        return tuitionAllocation;
+    }
+
+    public void setTuitionAllocation(TuitionAllocation tuitionAllocation) {
+        this.tuitionAllocation = tuitionAllocation;
     }
 }

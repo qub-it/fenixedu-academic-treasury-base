@@ -32,6 +32,10 @@ public class TuitionPaymentPlanRecalculation extends TuitionPaymentPlanRecalcula
 
     }
 
+    public TuitionPaymentPlanRecalculation createCopy() {
+        return create(getProduct(), getRecalculationDueDate());
+    }
+
     public void delete() {
         setDomainRoot(null);
         setProduct(null);

@@ -39,6 +39,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
 
+import com.qubit.terra.framework.services.ServiceProvider;
 import org.fenixedu.academic.domain.*;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.degree.DegreeType;
@@ -81,6 +82,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import pt.ist.fenixframework.Atomic;
+import pt.ist.fenixframework.FenixFramework;
+import pt.ist.fenixframework.TransactionManager;
 
 public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
 
@@ -318,6 +321,9 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
                 academicTariffBean.setFixedDueDate(academicTariffBean.getFixedDueDate().plusYears(executionYearInterval));
             }
         }
+
+        FenixFramework.atomic(() -> getTuitionPaymentPlanRecalculationList().forEach(
+                r -> r.setRecalculationDueDate(r.getRecalculationDueDate().plusYears(executionYearInterval))));
     }
 
     private boolean isTuitionPaymentPlanCreationFromCopy() {
@@ -1263,6 +1269,11 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
         result.tuitionInstallmentBeans.stream().filter(b -> b.getTuitionPaymentPlanCalculator() != null).forEach(b -> {
             b.setTuitionPaymentPlanCalculator(map.get(b.getTuitionPaymentPlanCalculator()));
         });
+
+        result.tuitionPaymentPlanRecalculationList.clear();
+        result.tuitionPaymentPlanRecalculationList.addAll(
+                tuitionPaymentPlan.getTuitionPaymentPlanRecalculationsSet().stream().map(r -> r.createCopy())
+                        .sorted(TuitionPaymentPlanRecalculation.SORT_BY_PRODUCT).collect(Collectors.toList()));
 
         return result;
     }

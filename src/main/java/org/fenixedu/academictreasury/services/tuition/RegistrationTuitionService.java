@@ -278,11 +278,11 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                                 });
 
                                 // 4. Annul the debit entry
-                                d.annulOnlyThisDebitEntryAndInterestsInBusinessContext(TreasuryConstants.treasuryBundle(
-                                        "label.RegistrationTuitionService.tuitionRecalculationReason"));
+                                d.annulOnlyThisDebitEntryAndInterestsInBusinessContext(AcademicTreasuryConstants.academicTreasuryBundle(
+                                        "label.RegistrationTuitionService.tuitionRecalculationReason"), false);
 
                             } else if (d.getFinantialDocument().isClosed()) {
-                                String reason = TreasuryConstants.treasuryBundle(
+                                String reason = AcademicTreasuryConstants.academicTreasuryBundle(
                                         "label.RegistrationTuitionService.tuitionRecalculationReason");
                                 Map<TreasuryExemption, BigDecimal> creditExemptionsMap =
                                         d.calculateDefaultNetExemptedAmountsToCreditMap(netAmountToCredit);
@@ -377,7 +377,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                     DebitEntry.findActive(academicTreasuryEvent, product).forEach(
                             d -> d.annulOnlyThisDebitEntryAndInterestsInBusinessContext(
                                     AcademicTreasuryConstants.academicTreasuryBundle(
-                                            "label.RegistrationTuitionService.tuitionRecalculationReason")));
+                                            "label.RegistrationTuitionService.tuitionRecalculationReason"), false));
 
                     Map<TreasuryExemptionType, BigDecimal> exemptionsToApplyMap = new HashMap<>();
                     BigDecimal tuitionInstallmentAmountToPay = originalBean.getAmount().add(originalBean.getExemptedAmount());
@@ -673,6 +673,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
         var executionYear = this.registrationOptions.executionYear;
         var debtDate = this.registrationOptions.debtDate;
         var tuitionPaymentPlan = this.tuitionOptions.tuitionPaymentPlan;
+        var tuitionAllocation = this.tuitionOptions.tuitionAllocation;
 
         var serviceBuilder = startServiceInvocation(registration, executionYear, debtDate);
 
@@ -681,6 +682,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
         serviceBuilder.applyDefaultEnrolmentCredits(this.registrationOptions.applyDefaultEnrolmentCredits);
 
         var tuitionPaymentPlanBuilder = serviceBuilder.withTuitionPaymentPlan(tuitionPaymentPlan);
+        tuitionPaymentPlanBuilder.applyTuitionAllocation(tuitionAllocation);
 
         if (this.installmentOptions.installments != null) {
             var products = new HashSet<>(this.installmentOptions.installments);
