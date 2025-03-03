@@ -32,6 +32,11 @@ public class TuitionPaymentPlanRecalculation extends TuitionPaymentPlanRecalcula
 
     }
 
+    // ANIL 2025-03-03 (#qubIT-Fenix-6664)
+    public TuitionPaymentPlanRecalculation createCopy() {
+        return create(getProduct(), getRecalculationDueDate());
+    }
+
     public void delete() {
         setDomainRoot(null);
         setProduct(null);
