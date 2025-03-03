@@ -1,3 +1,4 @@
+12.7.3 (03-03-2025)
 - Bug Fix: When using the registration tuition service to calculate the original tuition amounts per installment, initialize the tuition allocation [#qubIT-Fenix-6662]
 - Refactor: Unit tests for registration tuition serive, using tuition allocation [#qubIT-Fenix-6662]
 - Bug Fix: When recalculation tuition installments, do not annul interest entries [#qubIT-Fenix-6662]
