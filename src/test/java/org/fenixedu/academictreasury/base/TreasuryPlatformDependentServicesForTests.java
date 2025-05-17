@@ -200,6 +200,11 @@ public class TreasuryPlatformDependentServicesForTests implements ITreasuryPlatf
     }
 
     @Override
+    public LocalizedString getDynamicApplicationMessage(String key) {
+        throw new RuntimeException("not implemented");
+    }
+
+    @Override
     public <T> String versioningCreatorUsername(T obj) {
         // TODO Auto-generated method stub
         return null;
