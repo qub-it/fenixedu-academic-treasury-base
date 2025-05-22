@@ -37,10 +37,11 @@ package org.fenixedu.academictreasury.dto.academictax;
 
 import java.math.BigDecimal;
 
+import org.fenixedu.academictreasury.dto.calculation.DebitEntryCalculationBean;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.LocalDate;
 
-public class AcademicDebitEntryBean {
+public class AcademicDebitEntryBean implements DebitEntryCalculationBean {
 
     private LocalizedString description;
     private LocalDate dueDate;
@@ -58,10 +59,12 @@ public class AcademicDebitEntryBean {
         this.amount = amount;
     }
 
+    @Override
     public LocalizedString getDescription() {
         return description;
     }
 
+    @Override
     public LocalDate getDueDate() {
         return dueDate;
     }
@@ -72,6 +75,16 @@ public class AcademicDebitEntryBean {
 
     public BigDecimal getAmount() {
         return amount;
+    }
+
+    @Override
+    public BigDecimal getAmountWithVat() {
+        return getAmount();
+    }
+
+    @Override
+    public BigDecimal getNetExemptedAmount() {
+        return BigDecimal.ZERO;
     }
 
 }
