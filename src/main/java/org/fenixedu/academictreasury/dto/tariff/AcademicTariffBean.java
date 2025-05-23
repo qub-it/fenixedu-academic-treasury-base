@@ -37,11 +37,14 @@ package org.fenixedu.academictreasury.dto.tariff;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
+import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academictreasury.domain.tariff.AcademicTariff;
 import org.fenixedu.academictreasury.domain.tuition.EctsCalculationType;
 import org.fenixedu.academictreasury.domain.tuition.TuitionCalculationType;
@@ -81,6 +84,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
     private BigDecimal rate;
 
     /* AcademicTariff */
+    private Set<Unit> units;
     private DegreeType degreeType;
     private Degree degree;
     private CycleType cycleType;
@@ -149,6 +153,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         setInterestFixedAmount(BigDecimal.ZERO);
         setRate(BigDecimal.ZERO);
 
+        setUnits(new HashSet<>());
         setDegreeType(null);
         setDegree(null);
         setCycleType(null);
@@ -191,6 +196,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
                 academicTariff.isApplyInterests() ? academicTariff.getInterestRate().getInterestFixedAmount() : null);
         setRate(academicTariff.isApplyInterests() ? academicTariff.getInterestRate().getRate() : null);
 
+        setUnits(new HashSet<>(academicTariff.getUnitsSet()));
         setDegreeType(academicTariff.getDegreeType());
         setDegree(academicTariff.getDegree());
         setCycleType(academicTariff.getCycleType());
@@ -395,6 +401,14 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
     public void setApplyInFirstWorkday(boolean applyInFirstWorkday) {
         this.applyInFirstWorkday = applyInFirstWorkday;
+    }
+
+    public Set<Unit> getUnits() {
+        return units;
+    }
+
+    public void setUnits(Set<Unit> units) {
+        this.units = units;
     }
 
     public DegreeType getDegreeType() {

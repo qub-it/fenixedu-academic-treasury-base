@@ -135,6 +135,16 @@ class tariff.AcademicTariff extends .org.fenixedu.treasury.domain.tariff.Tariff 
 		}
 	}
 
+	relation AcademicTariffUnits {
+	    .org.fenixedu.academic.domain.organizationalStructure.Unit playsRole units {
+	        multiplicity *;
+	    }
+
+		tariff.AcademicTariff playsRole academicTariffs {
+			multiplicity *;
+		}
+	}
+
 /*------------------------------------
  * ServiceRequestEmolumentMapEntry
  *------------------------------------*/
