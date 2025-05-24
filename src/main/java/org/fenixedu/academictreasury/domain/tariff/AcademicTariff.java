@@ -108,7 +108,7 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         getUnitsSet().addAll(bean.getUnits());
         setDegreeType(bean.getDegreeType());
-        setDegree(bean.getDegree());
+        getAssociatedDegreesSet().addAll(bean.getAssociatedDegrees());
         setCycleType(bean.getCycleType());
 
         checkRules();
@@ -142,11 +142,16 @@ public class AcademicTariff extends AcademicTariff_Base {
     public void checkRules() {
         super.checkRules();
 
-        if (getCycleType() != null && getDegree() == null) {
+        if (getCycleType() != null && getAssociatedDegreesSet().isEmpty()) {
             throw new AcademicTreasuryDomainException("error.AcademicTariff.degree.required");
         }
 
-        if (getDegree() != null && getDegreeType() != getDegree().getDegreeType()) {
+        if (getCycleType() != null && getAssociatedDegreesSet().size() > 1) {
+            throw new AcademicTreasuryDomainException("error.AcademicTariff.cycleType.requires.single.associatedDegree");
+        }
+
+        if (!getAssociatedDegreesSet().isEmpty() && getAssociatedDegreesSet().stream()
+                .anyMatch(d -> getDegreeType() != d.getDegreeType())) {
             throw new AcademicTreasuryDomainException("error.AcademicTariff.degreeType.required");
         }
 
@@ -217,7 +222,7 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         if (getCycleType() != null) {
             checkDuplicatesOfCycleType();
-        } else if (getDegree() != null) {
+        } else if (!getAssociatedDegreesSet().isEmpty()) {
             checkDuplicatesOfDegree();
         } else if (getDegreeType() != null && !getUnitsSet().isEmpty()) {
             checkDuplicatesOfDegreeTypeAndUnit();
@@ -245,7 +250,7 @@ public class AcademicTariff extends AcademicTariff_Base {
     private void checkDuplicatesOfDegreeTypeAndUnit() {
         Predicate<Unit> predicate =
                 u -> findInInterval(getFinantialEntity(), getProduct(), getDegreeType(), u, false, getInterval()).filter(
-                                t -> t.getDegree() == null) //
+                                t -> t.getAssociatedDegreesSet().isEmpty()) //
                         .count() > 1;
 
         getUnitsSet().forEach(unit -> {
@@ -272,7 +277,7 @@ public class AcademicTariff extends AcademicTariff_Base {
     private void checkDuplicatesOfDegreeType() {
         Boolean isDuplicate = findInInterval(getFinantialEntity(), getProduct(), getDegreeType(), getInterval()) //
                 .filter(t -> t.getUnitsSet().isEmpty()) //
-                .filter(t -> t.getDegree() == null).count() > 1;
+                .filter(t -> t.getAssociatedDegreesSet().isEmpty()).count() > 1;
 
         if (isDuplicate) {
             throw new AcademicTreasuryDomainException("error.AcademicTariff.overlaps.with.other",
@@ -281,19 +286,22 @@ public class AcademicTariff extends AcademicTariff_Base {
     }
 
     private void checkDuplicatesOfDegree() {
-        boolean isDuplicate =
-                findInInterval(getFinantialEntity(), getProduct(), getDegreeType(), getDegree(), getInterval()).filter(
+        Predicate<Degree> isDuplicatePredicate =
+                degree -> findInInterval(getFinantialEntity(), getProduct(), getDegreeType(), degree, getInterval()).filter(
                         t -> t.getCycleType() == null).count() > 1;
 
-        if (isDuplicate) {
-            throw new AcademicTreasuryDomainException("error.AcademicTariff.overlaps.with.other",
-                    getProduct().getName().getContent());
-        }
+        getAssociatedDegreesSet().forEach(d -> {
+            if (isDuplicatePredicate.test(d)) {
+                throw new AcademicTreasuryDomainException("error.AcademicTariff.overlaps.with.other",
+                        getProduct().getName().getContent());
+            }
+        });
     }
 
     private void checkDuplicatesOfCycleType() {
-        boolean isDuplicate = findInInterval(getFinantialEntity(), getProduct(), getDegreeType(), getDegree(), getCycleType(),
-                getInterval()).count() > 1;
+        boolean isDuplicate =
+                findInInterval(getFinantialEntity(), getProduct(), getDegreeType(), getAssociatedDegreesSet().iterator().next(),
+                        getCycleType(), getInterval()).count() > 1;
 
         if (isDuplicate) {
             throw new AcademicTreasuryDomainException("error.AcademicTariff.overlaps.with.other",
@@ -333,7 +341,9 @@ public class AcademicTariff extends AcademicTariff_Base {
     @Atomic
     public void delete() {
         setDegreeType(null);
-        setDegree(null);
+        // setDegree(null);
+        getAssociatedDegreesSet().clear();
+        getUnitsSet().clear();
 
         super.delete();
     }
@@ -643,7 +653,7 @@ public class AcademicTariff extends AcademicTariff_Base {
 
     @Override
     public boolean isBroadTariffForFinantialEntity() {
-        return getDegreeType() == null && getDegree() == null && getCycleType() == null;
+        return getUnitsSet().isEmpty() && getDegreeType() == null && getAssociatedDegreesSet().isEmpty() && getCycleType() == null;
     }
 
     private void updatePriceValuesInEvent(final AcademicTreasuryEvent academicTreasuryEvent,
@@ -877,9 +887,8 @@ public class AcademicTariff extends AcademicTariff_Base {
             throw new RuntimeException("unit is null. wrong find call");
         }
 
-        Predicate<AcademicTariff> unitPredicate =
-                tariff -> !tariff.getUnitsSet().isEmpty() && (tariff.getUnitsSet().contains(unit) || (isSubUnit && unit.isSubUnitOf(
-                        tariff.getUnitsSet())));
+        Predicate<AcademicTariff> unitPredicate = tariff -> !tariff.getUnitsSet().isEmpty() && (tariff.getUnitsSet()
+                .contains(unit) || (isSubUnit && unit.isSubUnitOf(tariff.getUnitsSet())));
 
         return find(finantialEntity, product) //
                 .filter(i -> i.getDegreeType() == degreeType) //
@@ -892,7 +901,7 @@ public class AcademicTariff extends AcademicTariff_Base {
             throw new RuntimeException("degree is null. wrong find call");
         }
 
-        return find(finantialEntity, product, degreeType).filter(t -> t.getDegree() == degree);
+        return find(finantialEntity, product, degreeType).filter(t -> t.getAssociatedDegreesSet().contains(degree));
     }
 
     // FFUL still distinguish the cycle in one case. So this method is not deprecated
@@ -985,7 +994,7 @@ public class AcademicTariff extends AcademicTariff_Base {
         return //
                 AcademicTariff.find(finantialEntity, product) //
                         .filter(i -> degreeType == i.getDegreeType()) //
-                        .filter(t -> t.getDegree() == degree) //
+                        .filter(t -> t.getAssociatedDegreesSet().contains(degree)) //
                         .filter(t -> t.isActive(interval));
     }
 
@@ -994,7 +1003,7 @@ public class AcademicTariff extends AcademicTariff_Base {
         return //
                 AcademicTariff.find(finantialEntity, product) //
                         .filter(i -> degreeType == i.getDegreeType()) //
-                        .filter(t -> t.getDegree() == degree) //
+                        .filter(t -> t.getAssociatedDegreesSet().contains(degree)) //
                         .filter(t -> t.getCycleType() == cycleType) //
                         .filter(t -> t.isActive(interval));
     }
@@ -1012,7 +1021,7 @@ public class AcademicTariff extends AcademicTariff_Base {
         final Set<? extends AcademicTariff> activeTariffs = findActive(finantialEntity, product, when) //
                 .filter(e -> e.getUnitsSet().isEmpty()) //
                 .filter(e -> e.getDegreeType() == null) //
-                .filter(e -> e.getDegree() == null) //
+                .filter(e -> e.getAssociatedDegreesSet().isEmpty()) //
                 .filter(e -> e.getCycleType() == null) //
                 .collect(Collectors.<AcademicTariff> toSet());
 
@@ -1037,7 +1046,7 @@ public class AcademicTariff extends AcademicTariff_Base {
             // Fallback to degreeType
             Set<? extends AcademicTariff> activeTariffs = findActive(finantialEntity, product, degreeType, when) //
                     .filter(e -> e.getUnitsSet().isEmpty()) //
-                    .filter(e -> e.getDegree() == null) //
+                    .filter(e -> e.getAssociatedDegreesSet().isEmpty()) //
                     .filter(e -> e.getCycleType() == null) //
                     .collect(Collectors.<AcademicTariff> toSet());
 
@@ -1056,11 +1065,12 @@ public class AcademicTariff extends AcademicTariff_Base {
             throw new RuntimeException("unit is null. wrong findMatch call");
         }
 
-        Function<Boolean, Set<? extends AcademicTariff>> func = isSubUnit -> findActive(finantialEntity, product, unit, isSubUnit, when) //
-                .filter(e -> e.getDegreeType() == null) //
-                .filter(e -> e.getDegree() == null) //
-                .filter(e -> e.getCycleType() == null) //
-                .collect(Collectors.<AcademicTariff> toSet());
+        Function<Boolean, Set<? extends AcademicTariff>> func =
+                isSubUnit -> findActive(finantialEntity, product, unit, isSubUnit, when) //
+                        .filter(e -> e.getDegreeType() == null) //
+                        .filter(e -> e.getAssociatedDegreesSet().isEmpty()) //
+                        .filter(e -> e.getCycleType() == null) //
+                        .collect(Collectors.<AcademicTariff> toSet());
 
         {
             // Fallback to degreeType
@@ -1097,10 +1107,11 @@ public class AcademicTariff extends AcademicTariff_Base {
             throw new RuntimeException("unit is null. wrong findMatch call");
         }
 
-        Function<Boolean, Set<? extends AcademicTariff>> func = isSubUnit -> findActive(finantialEntity, product, degreeType, unit, false, when) //
-                .filter(e -> e.getDegree() == null) //
-                .filter(e -> e.getCycleType() == null) //
-                .collect(Collectors.<AcademicTariff> toSet());
+        Function<Boolean, Set<? extends AcademicTariff>> func =
+                isSubUnit -> findActive(finantialEntity, product, degreeType, unit, false, when) //
+                        .filter(e -> e.getAssociatedDegreesSet().isEmpty()) //
+                        .filter(e -> e.getCycleType() == null) //
+                        .collect(Collectors.<AcademicTariff> toSet());
 
         {
             Set<? extends AcademicTariff> activeTariffs = func.apply(false);
@@ -1125,7 +1136,7 @@ public class AcademicTariff extends AcademicTariff_Base {
         // Try to find by degreeType but not go up to financial entity
         Set<? extends AcademicTariff> activeTariffsByDegreeType = findActive(finantialEntity, product, degreeType, when) //
                 .filter(e -> e.getUnitsSet().isEmpty()) //
-                .filter(e -> e.getDegree() == null) //
+                .filter(e -> e.getAssociatedDegreesSet().isEmpty()) //
                 .filter(e -> e.getCycleType() == null) //
                 .collect(Collectors.<AcademicTariff> toSet());
 

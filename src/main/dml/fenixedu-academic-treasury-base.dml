@@ -123,7 +123,7 @@ class tariff.AcademicTariff extends .org.fenixedu.treasury.domain.tariff.Tariff 
 			multiplicity *;
 		}
 	}
-	
+
 	relation AcademicTariffDegree {
 		
 		.org.fenixedu.academic.domain.Degree playsRole degree {
@@ -131,6 +131,16 @@ class tariff.AcademicTariff extends .org.fenixedu.treasury.domain.tariff.Tariff 
 		}
 		
 		tariff.AcademicTariff playsRole academicTariffs {
+			multiplicity *;
+		}
+	}
+
+	relation AcademicTariffAssociatedDegrees {
+		.org.fenixedu.academic.domain.Degree playsRole associatedDegrees {
+			multiplicity *;
+		}
+
+		tariff.AcademicTariff playsRole associatedAcademicTariffs {
 			multiplicity *;
 		}
 	}

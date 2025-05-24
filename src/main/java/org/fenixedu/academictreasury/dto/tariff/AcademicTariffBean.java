@@ -86,7 +86,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
     /* AcademicTariff */
     private Set<Unit> units;
     private DegreeType degreeType;
-    private Degree degree;
+    private Set<Degree> associatedDegrees;
     private CycleType cycleType;
 
     private BigDecimal baseAmount;
@@ -155,7 +155,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
         setUnits(new HashSet<>());
         setDegreeType(null);
-        setDegree(null);
+        setAssociatedDegrees(new HashSet<>());
         setCycleType(null);
 
         setBaseAmount(BigDecimal.ZERO);
@@ -198,7 +198,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
         setUnits(new HashSet<>(academicTariff.getUnitsSet()));
         setDegreeType(academicTariff.getDegreeType());
-        setDegree(academicTariff.getDegree());
+        setAssociatedDegrees(academicTariff.getAssociatedDegreesSet());
         setCycleType(academicTariff.getCycleType());
         setBaseAmount(academicTariff.getBaseAmount());
         setUnitsForBase(academicTariff.getUnitsForBase());
@@ -285,12 +285,12 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
             setInterestFixedAmount(BigDecimal.ZERO);
         }
 
-        if (getDegree() == null) {
+        if (getAssociatedDegrees().isEmpty()) {
             setCycleType(null);
         }
 
         if (getDegreeType() == null) {
-            setDegree(null);
+            setAssociatedDegrees(new HashSet<>());
         }
 
         if (!isApplyUnitsAmount()) {
@@ -339,6 +339,16 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
     public boolean isApplyBaseAmount() {
         return AcademicTreasuryConstants.isPositive(getBaseAmount());
+    }
+
+    private Degree degree;
+
+    public Degree getDegree() {
+        return degree;
+    }
+
+    public void setDegree(Degree degree) {
+        this.degree = degree;
     }
 
     // @formatter:off
@@ -419,12 +429,22 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         this.degreeType = degreeType;
     }
 
-    public Degree getDegree() {
-        return degree;
+    public Set<Degree> getAssociatedDegrees() {
+        Set<Degree> result = new HashSet<>();
+
+        if (this.associatedDegrees != null) {
+            result.addAll(this.associatedDegrees);
+        }
+
+        if (this.degree != null) {
+            result.add(this.degree);
+        }
+
+        return result;
     }
 
-    public void setDegree(Degree degree) {
-        this.degree = degree;
+    public void setAssociatedDegrees(Set<Degree> associatedDegrees) {
+        this.associatedDegrees = associatedDegrees;
     }
 
     public CycleType getCycleType() {
