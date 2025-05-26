@@ -547,6 +547,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
             return 0;
         } else if (isForImprovementTax()) {
             return 0;
+        } else if (isTuitionEvent()) {
+            return 0;
         } else if (isForCustomAcademicDebt()) {
             return getCustomAcademicDebtNumberOfUnits();
         }
@@ -565,6 +567,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
             return 0;
         } else if (isForImprovementTax()) {
             return 0;
+        } else if (isTuitionEvent()) {
+            return 0;
         } else if (isForCustomAcademicDebt()) {
             return getCustomAcademicDebtNumberOfPages();
         }
@@ -582,6 +586,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         } else if (isForAcademicTax()) {
             return false;
         } else if (isForImprovementTax()) {
+            return false;
+        } else if (isTuitionEvent()) {
             return false;
         } else if (isForCustomAcademicDebt()) {
             return isCustomAcademicDebtUrgent();
@@ -618,6 +624,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         } else if (isForAcademicTax()) {
             return null;
         } else if (isForImprovementTax()) {
+            return null;
+        } else if (isTuitionEvent()) {
             return null;
         } else if (isForCustomAcademicDebt()) {
             return null;
@@ -1486,6 +1494,11 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
     @Override
     public LocalDate getDueDate() {
         return DebitEntry.findActive(this).sorted(DebitEntry.COMPARE_BY_DUE_DATE).map(l -> l.getDueDate()).findFirst()
+                .orElse(null);
+    }
+
+    public LocalDate getDueDate(Product product) {
+        return DebitEntry.findActive(this, product).sorted(DebitEntry.COMPARE_BY_DUE_DATE).map(l -> l.getDueDate()).findFirst()
                 .orElse(null);
     }
 

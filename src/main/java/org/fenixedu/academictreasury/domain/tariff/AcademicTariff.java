@@ -49,6 +49,7 @@ import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent.AcademicTreasuryEventKeys;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.serviceRequests.ITreasuryServiceRequest;
+import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
 import org.fenixedu.academictreasury.dto.tariff.AcademicTariffBean;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
@@ -648,6 +649,35 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         academicTreasuryEvent.associateEnrolmentEvaluation(debitEntry, enrolmentEvaluation);
 
+        return debitEntry;
+    }
+
+    public DebitEntry createDebitEntryForTuition(TuitionPaymentPlanGroup tuitionPaymentPlanGroup, DebtAccount debtAccount,
+            AcademicTreasuryEvent academicTreasuryEvent, LocalDate when) {
+
+        final LocalDate dueDate = dueDate(when);
+
+        if (DueDateCalculationType.FIXED_DATE == getDueDateCalculationType() && dueDate.isBefore(when)) {
+            when = dueDate;
+        }
+
+        final LocalizedString debitEntryName =
+                tuitionPaymentPlanGroup.buildDebitEntryDescription(getProduct(), academicTreasuryEvent.getRegistration(),
+                        academicTreasuryEvent.getExecutionYear());
+        final Vat vat = vat(when);
+        final BigDecimal amount = amountToPay(academicTreasuryEvent);
+
+        if (!TreasuryConstants.isPositive(amount)) {
+            throw new AcademicTreasuryDomainException(
+                    "error.AcademicTariff.createDebitEntryForCustomAcademicDebt.amount.to.pay.not.positive");
+        }
+
+        Map<String, String> fillPriceProperties = fillPriceCommonProperties(debtAccount, academicTreasuryEvent, when);
+
+        final DebitEntry debitEntry =
+                DebitEntry.create(getFinantialEntity(), debtAccount, academicTreasuryEvent, vat, amount, dueDate,
+                        fillPriceProperties, getProduct(), debitEntryName.getContent(TreasuryConstants.DEFAULT_LANGUAGE),
+                        AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), new DateTime(), false, false, null);
         return debitEntry;
     }
 

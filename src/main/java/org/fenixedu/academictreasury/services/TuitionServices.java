@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import net.bytebuddy.asm.Advice;
 import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.EnrolmentEvaluation;
@@ -44,6 +45,7 @@ import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
+import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationDataByExecutionYear;
 import org.fenixedu.academic.domain.student.registrationStates.RegistrationState;
@@ -52,14 +54,18 @@ import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
+import org.fenixedu.academictreasury.domain.tariff.AcademicTariff;
 import org.fenixedu.academictreasury.domain.tuition.DiscountTuitionInstallmentsHelper;
 import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
 import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCustomCalculator;
+import org.fenixedu.academictreasury.dto.academictax.AcademicDebitEntryBean;
 import org.fenixedu.academictreasury.dto.tuition.TuitionDebitEntryBean;
+import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Currency;
+import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.Vat;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
@@ -133,6 +139,71 @@ public class TuitionServices {
         return createTuitionForRegistration(registration, executionYear, debtDate, forceCreationIfNotEnrolled,
                 inferedTuitionPaymentPlan, applyTuitionServiceExtensions, restrictCreationToInstallments,
                 forceEvenTreasuryEventIsCharged);
+    }
+
+    public static boolean createRegistrationTuitionInstallmentDebitEntryWithAcademicTariff(Registration registration,
+            ExecutionYear executionYear, Product tuitionInstallmentProduct, LocalDate debtDate) {
+        TuitionPaymentPlanGroup tuitionPaymentPlanGroup = TuitionPaymentPlanGroup.findUniqueDefaultGroupForRegistration().get();
+        DegreeType degreeType = registration.getDegreeType();
+
+        if (!degreeType.getPossibleTuitionProductsForDegreeTypeSet().contains(tuitionInstallmentProduct)) {
+            throw new IllegalArgumentException(
+                    "error.TuitionServices.calculateRegistrationTuitionInstallmentEntryWithAcademicTariff.invalid.registration.tuition.product");
+        }
+
+        FinantialEntity finantialEntity =
+                AcademicTreasuryConstants.getFinantialEntityOfDegree(registration.getDegree(), debtDate);
+
+        AcademicTariff academicTariff =
+                AcademicTariff.findMatch(finantialEntity, tuitionInstallmentProduct, registration.getDegree(),
+                        debtDate.toDateTimeAtStartOfDay());
+
+        if (academicTariff == null) {
+            throw new AcademicTreasuryDomainException("error.AcademicTaxServices.calculateAcademicTax.tariff.not.found",
+                    debtDate.toString(TreasuryConstants.DATE_FORMAT));
+        }
+
+        final Person person = registration.getPerson();
+        final String addressFiscalCountryCode = PersonCustomer.addressCountryCode(person);
+        final String fiscalNumber = PersonCustomer.fiscalNumber(person);
+
+        AcademicTreasuryEvent academicTreasuryEvent =
+                AcademicTreasuryEvent.findUniqueForRegistrationTuition(registration, executionYear)
+                        .map(AcademicTreasuryEvent.class::cast).orElseGet(() -> {
+                            if (Strings.isNullOrEmpty(addressFiscalCountryCode) || Strings.isNullOrEmpty(fiscalNumber)) {
+                                throw new AcademicTreasuryDomainException("error.PersonCustomer.fiscalInformation.required");
+                            }
+
+                            // Read person customer
+                            if (!PersonCustomer.findUnique(person, addressFiscalCountryCode, fiscalNumber).isPresent()) {
+                                PersonCustomer.create(person, addressFiscalCountryCode, fiscalNumber);
+                            }
+
+                            final PersonCustomer personCustomer =
+                                    PersonCustomer.findUnique(person, addressFiscalCountryCode, fiscalNumber).get();
+                            if (!personCustomer.isActive()) {
+                                throw new AcademicTreasuryDomainException("error.PersonCustomer.not.active", addressFiscalCountryCode,
+                                        fiscalNumber);
+                            }
+
+                            if (!DebtAccount.findUnique(finantialEntity.getFinantialInstitution(), personCustomer).isPresent()) {
+                                DebtAccount.create(finantialEntity.getFinantialInstitution(), personCustomer);
+                            }
+
+                            return AcademicTreasuryEvent.createForRegistrationTuition(tuitionPaymentPlanGroup.getCurrentProduct(),
+                                    registration, executionYear);
+                        });
+
+        if (academicTreasuryEvent.isChargedWithDebitEntry(tuitionInstallmentProduct)) {
+            return false;
+        }
+
+        final PersonCustomer personCustomer = PersonCustomer.findUnique(person, addressFiscalCountryCode, fiscalNumber).get();
+        final DebtAccount debtAccount = DebtAccount.findUnique(finantialEntity.getFinantialInstitution(), personCustomer).get();
+
+        academicTariff.createDebitEntryForTuition(tuitionPaymentPlanGroup, debtAccount, academicTreasuryEvent, debtDate);
+
+        return true;
     }
 
     public static boolean createTuitionForRegistration(final Registration registration, final ExecutionYear executionYear,
@@ -254,6 +325,41 @@ public class TuitionServices {
 
         return buildInstallmentDebitEntryBeans(registration, tuitionPaymentPlan, debtDate, enrolledEctsUnits,
                 enrolledCoursesCount);
+    }
+
+    public static AcademicDebitEntryBean calculateRegistrationTuitionInstallmentEntryWithAcademicTariff(Registration registration,
+            ExecutionYear executionYear, Product tuitionInstallmentProduct, LocalDate debtDate) {
+        // Validate that the tuitionInstallmentProduct are part of the list of tuition products associated
+        // with the registration degree type
+
+        DegreeType degreeType = registration.getDegreeType();
+
+        if (!degreeType.getPossibleTuitionProductsForDegreeTypeSet().contains(tuitionInstallmentProduct)) {
+            throw new IllegalArgumentException(
+                    "error.TuitionServices.calculateRegistrationTuitionInstallmentEntryWithAcademicTariff.invalid.registration.tuition.product");
+        }
+
+        FinantialEntity finantialEntity =
+                AcademicTreasuryConstants.getFinantialEntityOfDegree(registration.getDegree(), debtDate);
+
+        AcademicTariff academicTariff =
+                AcademicTariff.findMatch(finantialEntity, tuitionInstallmentProduct, registration.getDegree(),
+                        debtDate.toDateTimeAtStartOfDay());
+
+        if (academicTariff == null) {
+            throw new AcademicTreasuryDomainException("error.AcademicTaxServices.calculateAcademicTax.tariff.not.found",
+                    debtDate.toString(TreasuryConstants.DATE_FORMAT));
+        }
+
+        TuitionPaymentPlanGroup tuitionPaymentPlanGroup = TuitionPaymentPlanGroup.findUniqueDefaultGroupForRegistration().get();
+
+        LocalizedString debitEntryName =
+                tuitionPaymentPlanGroup.buildDebitEntryDescription(tuitionInstallmentProduct, registration, executionYear);
+        LocalDate dueDate = academicTariff.dueDate(debtDate);
+        Vat vat = academicTariff.vat(debtDate);
+        BigDecimal amount = academicTariff.amountToPay(0, 0, AcademicTreasuryConstants.DEFAULT_LANGUAGE, false);
+
+        return new AcademicDebitEntryBean(debitEntryName, dueDate, vat.getTaxRate(), amount);
     }
 
     public static List<TuitionDebitEntryBean> buildInstallmentDebitEntryBeans(Registration registration,
