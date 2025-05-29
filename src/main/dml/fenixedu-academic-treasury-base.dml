@@ -1128,7 +1128,10 @@ class settings.AcademicTreasurySettings {
 	boolean closeServiceRequestEmolumentsWithDebitNote;
 	boolean runAcademicDebtGenerationRuleOnNormalEnrolment;
 	String academicTreasuryAccountUrlImpl;
-	Boolean debtGenerationRulesPeriodicExecutionActive;	
+	Boolean debtGenerationRulesPeriodicExecutionActive;
+
+	boolean useCustomAcademicDebtFormat;
+	LocalizedStringAT customAcademicDebtFormat;
 }
 
 	relation AcademicTreasurySettingsBennu {

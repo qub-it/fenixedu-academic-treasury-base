@@ -1,4 +1,5 @@
 - Refactor: Implement missing treasury service method [#qubIT-Fenix-5465]
+- Improvement: Customize and uniform the tuition installments and academic debts debit entry description format [#qubIT-Fenix-6941]
 
 12.7.3 (03-03-2025)
 - Bug Fix: When using the registration tuition service to calculate the original tuition amounts per installment, initialize the tuition allocation [#qubIT-Fenix-6662]

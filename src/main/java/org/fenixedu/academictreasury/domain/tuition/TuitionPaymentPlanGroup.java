@@ -320,23 +320,39 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
 
     public LocalizedString buildDebitEntryDescription(TuitionInstallmentTariff installmentTariff, Registration registration,
             ExecutionYear executionYear) {
+        // ANIL 2025-05-28 (#qubIT-Fenix-6941)
+        //
+        // Changed to allow to be used when creating debit entries manually
+        // in the debt account
+
+        TuitionPaymentPlan tuitionPaymentPlan = installmentTariff.getTuitionPaymentPlan();
+        boolean applySingleInstallmentName = tuitionPaymentPlan.getTuitionInstallmentTariffsSet()
+                .size() == 1 && isBypassInstallmentNameIfSingleInstallmentApplied();
+
+        int installmentOrder = installmentTariff.getInstallmentOrder();
+
         if (getUseCustomDebitEntryDescriptionFormat()) {
-            return formatInstallmentName(installmentTariff, registration, executionYear);
+            return formatInstallmentName(installmentTariff.getProduct(), registration, executionYear, applySingleInstallmentName);
         } else {
-            return defaultInstallmentName(installmentTariff, registration, executionYear);
+            return defaultInstallmentName(registration, executionYear, applySingleInstallmentName, installmentOrder);
         }
     }
 
-    private LocalizedString formatInstallmentName(TuitionInstallmentTariff installmentTariff, Registration registration,
-            ExecutionYear executionYear) {
-        LocalizedString formatToUse = installmentFormatToUse(installmentTariff);
+    public LocalizedString buildDebitEntryDescription(Product product, Registration registration, ExecutionYear executionYear) {
+        return formatInstallmentName(product, registration, executionYear, false);
+    }
+
+    private LocalizedString formatInstallmentName(Product product, Registration registration, ExecutionYear executionYear,
+            boolean applySingleInstallmentName) {
+        LocalizedString formatToUse =
+                applySingleInstallmentName ? getOneInstallmentDebitEntryDescriptionFormat() : getInstallmentDebitEntryDescriptionFormat();
 
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
 
         DegreeCurricularPlan degreeCurricularPlan =
                 registration.getStudentCurricularPlan(executionYear).getDegreeCurricularPlan();
 
-        LocalizedString productName = installmentTariff.getProduct().getName();
+        LocalizedString productName = product.getName();
         String degreeCode = registration.getDegree().getCode();
 
         String executionYearQualifiedName = executionYear.getQualifiedName();
@@ -344,9 +360,9 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
         LocalizedString result = treasuryServices.availableLocales().stream().map(locale -> {
             Map<String, String> valueMap = new HashMap<String, String>();
 
-            // ANIL 2024-09-25 (#qubIT-Fenix-5846) 
+            // ANIL 2024-09-25 (#qubIT-Fenix-5846)
             //
-            // There is a mismatch between the names of the degree built in debit entry 
+            // There is a mismatch between the names of the degree built in debit entry
             // importer and created by tuition payment plan
             //
             // Now it is used in production, the solution is to have a dynamic property
@@ -355,8 +371,8 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
             String degreePresentationName = degreeCurricularPlan.getDegree().getPresentationName(executionYear, locale);
             String degreeName = degreeCurricularPlan.getDegree().getNameI18N(executionYear).getContent(locale);
 
-            valueMap.put("productName", StringUtils.isNotEmpty(productName.getContent(locale)) ? productName
-                    .getContent(locale) : productName.getContent());
+            valueMap.put("productName", StringUtils.isNotEmpty(productName.getContent(locale)) ? productName.getContent(
+                    locale) : productName.getContent());
             valueMap.put("degreeCode", degreeCode);
 
             valueMap.put("degreePresentationName", degreePresentationName);
@@ -370,26 +386,14 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
         return result;
     }
 
-    private LocalizedString installmentFormatToUse(TuitionInstallmentTariff installmentTariff) {
-        LocalizedString formatToUse = getInstallmentDebitEntryDescriptionFormat();
-
-        if (getBypassInstallmentNameIfSingleInstallmentApplied()
-                && installmentTariff.getTuitionPaymentPlan().getTuitionInstallmentTariffsSet().size() == 1) {
-            formatToUse = getOneInstallmentDebitEntryDescriptionFormat();
-        }
-        return formatToUse;
-    }
-
-    private LocalizedString defaultInstallmentName(TuitionInstallmentTariff installmentTariff, Registration registration,
-            ExecutionYear executionYear) {
-        TuitionPaymentPlan tuitionPaymentPlan = installmentTariff.getTuitionPaymentPlan();
+    private LocalizedString defaultInstallmentName(Registration registration, ExecutionYear executionYear,
+            boolean applySingleInstallmentName, int installmentOrder) {
 
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
         String label = "label.TuitionInstallmentTariff.debitEntry.name.";
 
         if (isForRegistration()) {
-            if (tuitionPaymentPlan.getTuitionInstallmentTariffsSet().size() == 1
-                    && isBypassInstallmentNameIfSingleInstallmentApplied()) {
+            if (applySingleInstallmentName) {
                 label += "registration.one.installment";
             } else {
                 label += "registration";
@@ -404,10 +408,10 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
 
         LocalizedString result = new LocalizedString();
         for (final Locale locale : treasuryServices.availableLocales()) {
-            final String installmentName = AcademicTreasuryConstants.academicTreasuryBundle(locale, label,
-                    String.valueOf(installmentTariff.getInstallmentOrder()),
-                    degreeCurricularPlan.getDegree().getPresentationName(executionYear, locale),
-                    executionYear.getQualifiedName());
+            final String installmentName =
+                    AcademicTreasuryConstants.academicTreasuryBundle(locale, label, String.valueOf(installmentOrder),
+                            degreeCurricularPlan.getDegree().getPresentationName(executionYear, locale),
+                            executionYear.getQualifiedName());
 
             result = result.with(locale, installmentName);
         }
