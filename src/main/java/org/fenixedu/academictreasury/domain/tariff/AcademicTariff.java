@@ -417,7 +417,13 @@ public class AcademicTariff extends AcademicTariff_Base {
             throw new RuntimeException("wrong call");
         }
 
-        return academicTreasuryEvent.getDescription();
+        // ANIL 2025-05-28 (#qubIT-Fenix-6941)
+        //
+        // Compute again the academic tax instead of returning AcademicTreasuryEvent#description
+        // property
+
+        return AcademicTreasuryEvent.nameForAcademicTax(academicTreasuryEvent.getAcademicTax(),
+                academicTreasuryEvent.getRegistration(), academicTreasuryEvent.getExecutionYear());
     }
 
     public static LocalizedString improvementDebitEntryName(final AcademicTax improvementAcademicTax,

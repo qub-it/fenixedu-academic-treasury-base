@@ -28,12 +28,7 @@ package org.fenixedu.academictreasury.domain.event;
 import static java.lang.String.format;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -304,6 +299,51 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
 
     public static LocalizedString nameForAcademicTax(final AcademicTax academicTax, final Registration registration,
             final ExecutionYear executionYear) {
+        // ANIL 2025-05-28 (#qubIT-Fenix-6941)
+        if (AcademicTreasurySettings.getInstance().getUseCustomAcademicDebtFormat()) {
+            return buildCustomNameForAcademicTax(academicTax, registration, executionYear);
+        } else {
+            return defaultNameForAcademicTax(academicTax, registration, executionYear);
+        }
+    }
+
+    private static LocalizedString buildCustomNameForAcademicTax(AcademicTax academicTax, Registration registration,
+            ExecutionYear executionYear) {
+        if(!academicTax.isAppliedOnRegistration()) {
+            throw new RuntimeException("error.AcademicTreasuryEvent.buildCustomNameForAcademicTax.isAppliedOnRegistration.not.supported");
+        }
+
+        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
+
+        LocalizedString result = new LocalizedString();
+        for (final Locale locale : treasuryServices.availableLocales()) {
+            Map<String, String> valueMap = new HashMap<String, String>();
+
+            String degreePresentationName = registration.getDegree().getPresentationName(executionYear, locale);
+            String degreeName = registration.getDegree().getNameI18N(executionYear).getContent(locale);
+
+            Product product = academicTax.getProduct();
+            LocalizedString productName = product.getName();
+
+            valueMap.put("productName", StringUtils.isNotEmpty(productName.getContent(locale)) ? productName.getContent(
+                    locale) : productName.getContent());
+            valueMap.put("degreeCode", registration.getDegree().getCode());
+
+            valueMap.put("degreePresentationName", degreePresentationName);
+            valueMap.put("degreeName", degreeName);
+
+            valueMap.put("executionYearName", executionYear.getQualifiedName());
+
+            LocalizedString formatToUse = AcademicTreasurySettings.getInstance().getCustomAcademicDebtFormat();
+            String name = StrSubstitutor.replace(formatToUse.getContent(locale), valueMap);
+            result = result.with(locale, name);
+        }
+
+        return result;
+    }
+
+    private static LocalizedString defaultNameForAcademicTax(AcademicTax academicTax, Registration registration,
+            ExecutionYear executionYear) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
 
         LocalizedString result = new LocalizedString();
@@ -397,6 +437,47 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
 
     public static LocalizedString nameForCustomAcademicDebt(final Product product, final Registration registration,
             final ExecutionYear executionYear) {
+        // ANIL 2025-05-28 (#qubIT-Fenix-6941)
+        if (AcademicTreasurySettings.getInstance().getUseCustomAcademicDebtFormat()) {
+            return buildCustomNameForCustomAcademicDebt(product, registration, executionYear);
+        } else {
+            return defaultNameForCustomAcademicDebt(product, registration, executionYear);
+        }
+    }
+
+    private static LocalizedString buildCustomNameForCustomAcademicDebt(Product product, Registration registration,
+            ExecutionYear executionYear) {
+        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
+
+        LocalizedString result = new LocalizedString();
+        for (final Locale locale : treasuryServices.availableLocales()) {
+            Map<String, String> valueMap = new HashMap<String, String>();
+
+            String degreePresentationName = registration.getDegree().getPresentationName(executionYear, locale);
+            String degreeName = registration.getDegree().getNameI18N(executionYear).getContent(locale);
+
+            LocalizedString productName = product.getName();
+
+            valueMap.put("productName", StringUtils.isNotEmpty(productName.getContent(locale)) ? productName.getContent(
+                    locale) : productName.getContent());
+            valueMap.put("degreeCode", registration.getDegree().getCode());
+
+            valueMap.put("degreePresentationName", degreePresentationName);
+            valueMap.put("degreeName", degreeName);
+
+            valueMap.put("executionYearName", executionYear.getQualifiedName());
+
+            LocalizedString formatToUse = AcademicTreasurySettings.getInstance().getCustomAcademicDebtFormat();
+            String name = StrSubstitutor.replace(formatToUse.getContent(locale), valueMap);
+
+            result = result.with(locale, name);
+        }
+
+        return result;
+    }
+
+    private static LocalizedString defaultNameForCustomAcademicDebt(Product product, Registration registration,
+            ExecutionYear executionYear) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
 
         LocalizedString result = new LocalizedString();
