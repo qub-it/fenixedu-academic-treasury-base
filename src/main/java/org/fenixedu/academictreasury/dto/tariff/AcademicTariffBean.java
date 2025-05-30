@@ -37,11 +37,14 @@ package org.fenixedu.academictreasury.dto.tariff;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.degreeStructure.CycleType;
+import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academictreasury.domain.tariff.AcademicTariff;
 import org.fenixedu.academictreasury.domain.tuition.EctsCalculationType;
 import org.fenixedu.academictreasury.domain.tuition.TuitionCalculationType;
@@ -81,8 +84,9 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
     private BigDecimal rate;
 
     /* AcademicTariff */
+    private Set<Unit> units;
     private DegreeType degreeType;
-    private Degree degree;
+    private Set<Degree> associatedDegrees;
     private CycleType cycleType;
 
     private BigDecimal baseAmount;
@@ -149,8 +153,9 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         setInterestFixedAmount(BigDecimal.ZERO);
         setRate(BigDecimal.ZERO);
 
+        setUnits(new HashSet<>());
         setDegreeType(null);
-        setDegree(null);
+        setAssociatedDegrees(new HashSet<>());
         setCycleType(null);
 
         setBaseAmount(BigDecimal.ZERO);
@@ -191,8 +196,9 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
                 academicTariff.isApplyInterests() ? academicTariff.getInterestRate().getInterestFixedAmount() : null);
         setRate(academicTariff.isApplyInterests() ? academicTariff.getInterestRate().getRate() : null);
 
+        setUnits(new HashSet<>(academicTariff.getUnitsSet()));
         setDegreeType(academicTariff.getDegreeType());
-        setDegree(academicTariff.getDegree());
+        setAssociatedDegrees(academicTariff.getAssociatedDegreesSet());
         setCycleType(academicTariff.getCycleType());
         setBaseAmount(academicTariff.getBaseAmount());
         setUnitsForBase(academicTariff.getUnitsForBase());
@@ -279,12 +285,12 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
             setInterestFixedAmount(BigDecimal.ZERO);
         }
 
-        if (getDegree() == null) {
+        if (getAssociatedDegrees().isEmpty()) {
             setCycleType(null);
         }
 
         if (getDegreeType() == null) {
-            setDegree(null);
+            setAssociatedDegrees(new HashSet<>());
         }
 
         if (!isApplyUnitsAmount()) {
@@ -333,6 +339,16 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
     public boolean isApplyBaseAmount() {
         return AcademicTreasuryConstants.isPositive(getBaseAmount());
+    }
+
+    private Degree degree;
+
+    public Degree getDegree() {
+        return degree;
+    }
+
+    public void setDegree(Degree degree) {
+        this.degree = degree;
     }
 
     // @formatter:off
@@ -397,6 +413,14 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         this.applyInFirstWorkday = applyInFirstWorkday;
     }
 
+    public Set<Unit> getUnits() {
+        return units;
+    }
+
+    public void setUnits(Set<Unit> units) {
+        this.units = units;
+    }
+
     public DegreeType getDegreeType() {
         return degreeType;
     }
@@ -405,12 +429,22 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         this.degreeType = degreeType;
     }
 
-    public Degree getDegree() {
-        return degree;
+    public Set<Degree> getAssociatedDegrees() {
+        Set<Degree> result = new HashSet<>();
+
+        if (this.associatedDegrees != null) {
+            result.addAll(this.associatedDegrees);
+        }
+
+        if (this.degree != null) {
+            result.add(this.degree);
+        }
+
+        return result;
     }
 
-    public void setDegree(Degree degree) {
-        this.degree = degree;
+    public void setAssociatedDegrees(Set<Degree> associatedDegrees) {
+        this.associatedDegrees = associatedDegrees;
     }
 
     public CycleType getCycleType() {

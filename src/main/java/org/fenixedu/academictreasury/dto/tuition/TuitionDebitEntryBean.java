@@ -39,12 +39,13 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
+import org.fenixedu.academictreasury.dto.calculation.DebitEntryCalculationBean;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Currency;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemptionType;
 import org.joda.time.LocalDate;
 
-public class TuitionDebitEntryBean {
+public class TuitionDebitEntryBean implements DebitEntryCalculationBean {
 
     private int installmentOrder;
     private TuitionInstallmentTariff tuitionInstallmentTariff;
@@ -95,6 +96,7 @@ public class TuitionDebitEntryBean {
         this.tuitionInstallmentTariff = tuitionInstallmentTariff;
     }
 
+    @Override
     public LocalizedString getDescription() {
         return description;
     }
@@ -103,6 +105,7 @@ public class TuitionDebitEntryBean {
         this.description = description;
     }
 
+    @Override
     public LocalDate getDueDate() {
         return dueDate;
     }
@@ -157,6 +160,16 @@ public class TuitionDebitEntryBean {
 
     public void setNetAmountAlreadyCreated(BigDecimal netAmountAlreadyCreated) {
         this.netAmountAlreadyCreated = netAmountAlreadyCreated;
+    }
+
+    @Override
+    public BigDecimal getAmountWithVat() {
+        return getAmount();
+    }
+
+    @Override
+    public BigDecimal getNetExemptedAmount() {
+        return getExemptedAmount();
     }
 
 }
