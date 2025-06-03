@@ -342,7 +342,7 @@ public class AcademicTariff extends AcademicTariff_Base {
     @Atomic
     public void delete() {
         setDegreeType(null);
-        // setDegree(null);
+        setDegree(null);
         getAssociatedDegreesSet().clear();
         getUnitsSet().clear();
 

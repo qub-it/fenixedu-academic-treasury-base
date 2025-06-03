@@ -1,3 +1,5 @@
+- Bug Fix: Dissociate the degree when deleting an academic tariff [#qubIT-Fenix-6753]
+
 12.9.0 (30-05-2025)
 - Improvement: Associate academic tariffs with units and more than one degree [#qubIT-Fenix-6753]
 - Improvement: Create registration tuition debt by academic tariff [#qubIT-Fenix-6753]
