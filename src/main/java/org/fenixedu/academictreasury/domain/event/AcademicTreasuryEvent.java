@@ -309,8 +309,9 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
 
     private static LocalizedString buildCustomNameForAcademicTax(AcademicTax academicTax, Registration registration,
             ExecutionYear executionYear) {
-        if(!academicTax.isAppliedOnRegistration()) {
-            throw new RuntimeException("error.AcademicTreasuryEvent.buildCustomNameForAcademicTax.isAppliedOnRegistration.not.supported");
+        if (!academicTax.isAppliedOnRegistration()) {
+            throw new RuntimeException(
+                    "error.AcademicTreasuryEvent.buildCustomNameForAcademicTax.isAppliedOnRegistration.not.supported");
         }
 
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
@@ -1277,8 +1278,12 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
     public static Stream<? extends AcademicTreasuryEvent> findForCustomAcademicDebt(final Product product,
             final Registration registration, final ExecutionYear executionYear) {
 
-        return find(registration.getPerson()).filter(e -> e.getExecutionYear() == executionYear)
-                .filter(e -> e.isCustomAcademicDebt()).filter(e -> e.getProduct() == product);
+        // ANIL 2025-06-26 (#qubIT-Fenix-7151) - The registration must be filtered
+        return find(registration.getPerson()) //
+                .filter(e -> e.getExecutionYear() == executionYear) //
+                .filter(e -> e.isCustomAcademicDebt()) //
+                .filter(e -> e.getRegistration() == registration) //
+                .filter(e -> e.getProduct() == product);
     }
 
     // @formatter:off
