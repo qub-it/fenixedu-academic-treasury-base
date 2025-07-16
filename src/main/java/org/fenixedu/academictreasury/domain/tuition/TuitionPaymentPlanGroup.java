@@ -339,7 +339,11 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
     }
 
     public LocalizedString buildDebitEntryDescription(Product product, Registration registration, ExecutionYear executionYear) {
-        return formatInstallmentName(product, registration, executionYear, false);
+        if (getUseCustomDebitEntryDescriptionFormat()) {
+            return formatInstallmentName(product, registration, executionYear, false);
+        } else {
+            return defaultInstallmentName(registration, executionYear, false, product.getTuitionInstallmentOrder());
+        }
     }
 
     private LocalizedString formatInstallmentName(Product product, Registration registration, ExecutionYear executionYear,
@@ -408,12 +412,20 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
 
         LocalizedString result = new LocalizedString();
         for (final Locale locale : treasuryServices.availableLocales()) {
-            final String installmentName =
-                    AcademicTreasuryConstants.academicTreasuryBundle(locale, label, String.valueOf(installmentOrder),
-                            degreeCurricularPlan.getDegree().getPresentationName(executionYear, locale),
-                            executionYear.getQualifiedName());
+            if (isForRegistration()) {
+                final String installmentName =
+                        AcademicTreasuryConstants.academicTreasuryBundle(locale, label, String.valueOf(installmentOrder),
+                                degreeCurricularPlan.getDegree().getPresentationName(executionYear, locale),
+                                executionYear.getQualifiedName());
 
-            result = result.with(locale, installmentName);
+                result = result.with(locale, installmentName);
+            } else if (isForStandalone() || isForExtracurricular()) {
+                final String installmentName = AcademicTreasuryConstants.academicTreasuryBundle(locale, label,
+                        degreeCurricularPlan.getDegree().getPresentationName(executionYear, locale),
+                        executionYear.getQualifiedName());
+
+                result = result.with(locale, installmentName);
+            }
         }
 
         return result;

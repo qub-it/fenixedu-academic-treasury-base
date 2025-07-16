@@ -1,3 +1,5 @@
+- Bug Fix: Use the default tuition debit entry description format in creating debts manually [#qubIT-Fenix-7244]
+
 12.9.2 (26-06-2025)
 - Bug Fix: Added the missing registration filter in finding custom academic treasury events [#qubIT-Fenix-7151]
 
