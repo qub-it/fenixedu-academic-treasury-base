@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.Row;
+import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.PartyContact;
@@ -251,6 +253,9 @@ public class DebtReportEntryBean implements SpreadsheetRow, IFinantialReportEntr
 
     private String finantialEntityCode;
     private LocalizedString finantialEntityName;
+
+    private Degree degreeDomainObject;
+    private ExecutionYear executionYearDomainObject;
 
     public DebtReportEntryBean(final InvoiceEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
@@ -1237,6 +1242,23 @@ public class DebtReportEntryBean implements SpreadsheetRow, IFinantialReportEntr
 
     public void setFinantialEntityName(LocalizedString finantialEntityName) {
         this.finantialEntityName = finantialEntityName;
+    }
+
+
+    public Degree getDegreeDomainObject() {
+        return this.degreeDomainObject;
+    }
+
+    public void setDegreeDomainObject(Degree degree) {
+        this.degreeDomainObject = degree;
+    }
+
+    public ExecutionYear getExecutionYearDomainObject() {
+        return this.executionYearDomainObject;
+    }
+
+    public void setExecutionYearDomainObject(ExecutionYear executionYear) {
+        this.executionYearDomainObject = executionYear;
     }
 
 }

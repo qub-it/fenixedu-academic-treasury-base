@@ -2,6 +2,7 @@ package org.fenixedu.academictreasury.dto.reports;
 
 import java.util.Comparator;
 
+import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.student.Registration;
@@ -110,7 +111,9 @@ public interface IFinantialReportEntryCommonMethods {
                             academicTreasuryEvent.getRegistration().getDegree().getDegreeType().getName().getContent());
                     this.setDegreeCode(academicTreasuryEvent.getRegistration().getDegree().getCode());
                     this.setDegreeName(academicTreasuryEvent.getRegistration().getDegree().getPresentationName());
+                    this.setDegreeDomainObject(academicTreasuryEvent.getRegistration().getDegree());
                     this.setExecutionYear(academicTreasuryEvent.getExecutionYear().getQualifiedName());
+                    this.setExecutionYearDomainObject(academicTreasuryEvent.getExecutionYear());
 
                     if (debitEntry != null) {
                         this.setTuitionPaymentPlan(
@@ -126,10 +129,12 @@ public interface IFinantialReportEntryCommonMethods {
                         this.setDegreeType(debitEntry.getCurricularCourse().getDegree().getDegreeType().getName().getContent());
                         this.setDegreeCode(debitEntry.getCurricularCourse().getDegree().getCode());
                         this.setDegreeName(debitEntry.getCurricularCourse().getDegree().getPresentationName());
+                        this.setDegreeDomainObject(debitEntry.getCurricularCourse().getDegree());
                     }
 
                     if (debitEntry != null && debitEntry.getExecutionSemester() != null) {
                         this.setExecutionYear(debitEntry.getExecutionSemester().getExecutionYear().getQualifiedName());
+                        this.setExecutionYearDomainObject(debitEntry.getExecutionSemester().getExecutionYear());
                         this.setExecutionSemester(debitEntry.getExecutionSemester().getQualifiedName());
                     }
 
@@ -151,11 +156,13 @@ public interface IFinantialReportEntryCommonMethods {
                         this.setDegreeType(debitEntry.getCurricularCourse().getDegree().getDegreeType().getName().getContent());
                         this.setDegreeCode(debitEntry.getCurricularCourse().getDegree().getCode());
                         this.setDegreeName(debitEntry.getCurricularCourse().getDegree().getPresentationName());
+                        this.setDegreeDomainObject(debitEntry.getCurricularCourse().getDegree());
                     }
 
                     if (debitEntry != null && debitEntry.getExecutionSemester() != null) {
                         this.setExecutionYear(debitEntry.getExecutionSemester().getExecutionYear().getQualifiedName());
                         this.setExecutionSemester(debitEntry.getExecutionSemester().getQualifiedName());
+                        this.setExecutionYearDomainObject(debitEntry.getExecutionSemester().getExecutionYear());
                     }
 
                     if (academicTreasuryEvent.getRegistration() != null && academicTreasuryEvent.getExecutionYear() != null) {
@@ -170,7 +177,9 @@ public interface IFinantialReportEntryCommonMethods {
                             academicTreasuryEvent.getRegistration().getDegree().getDegreeType().getName().getContent());
                     this.setDegreeCode(academicTreasuryEvent.getRegistration().getDegree().getCode());
                     this.setDegreeName(academicTreasuryEvent.getRegistration().getDegree().getPresentationName());
+                    this.setDegreeDomainObject(academicTreasuryEvent.getRegistration().getDegree());
                     this.setExecutionYear(academicTreasuryEvent.getExecutionYear().getQualifiedName());
+                    this.setExecutionYearDomainObject(academicTreasuryEvent.getExecutionYear());
 
                     fillStudentConditionsInformation(academicTreasuryEvent.getRegistration(),
                             academicTreasuryEvent.getExecutionYear());
@@ -184,9 +193,11 @@ public interface IFinantialReportEntryCommonMethods {
                     this.setDegreeType(registration.getDegree().getDegreeType().getName().getContent());
                     this.setDegreeCode(registration.getDegree().getCode());
                     this.setDegreeName(registration.getDegree().getPresentationName());
+                    this.setDegreeDomainObject(registration.getDegree());
 
                     if (iTreasuryServiceRequest.hasExecutionYear()) {
                         this.setExecutionYear(iTreasuryServiceRequest.getExecutionYear().getQualifiedName());
+                        this.setExecutionYearDomainObject(iTreasuryServiceRequest.getExecutionYear());
                         fillStudentConditionsInformation(iTreasuryServiceRequest.getRegistration(),
                                 iTreasuryServiceRequest.getExecutionYear());
                     }
@@ -202,10 +213,12 @@ public interface IFinantialReportEntryCommonMethods {
                         this.setDegreeCode(treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree().getCode());
                         this.setDegreeName(
                                 treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree().getPresentationName());
+                        this.setDegreeDomainObject(treasuryEventTarget.getAcademicTreasuryTargetRegistration().getDegree());
                     }
 
                     if (treasuryEventTarget.getAcademicTreasuryTargetExecutionYear() != null) {
                         this.setExecutionYear(treasuryEventTarget.getAcademicTreasuryTargetExecutionYear().getQualifiedName());
+                        this.setExecutionYearDomainObject(treasuryEventTarget.getAcademicTreasuryTargetExecutionYear());
                     }
 
                     if (treasuryEventTarget.getAcademicTreasuryTargetExecutionSemester() != null) {
@@ -219,7 +232,9 @@ public interface IFinantialReportEntryCommonMethods {
                     this.setDegreeType(registration.getDegree().getDegreeType().getName().getContent());
                     this.setDegreeCode(registration.getDegree().getCode());
                     this.setDegreeName(registration.getDegree().getPresentationName());
+                    this.setDegreeDomainObject(registration.getDegree());
                     this.setExecutionYear(academicTreasuryEvent.getExecutionYear().getQualifiedName());
+                    this.setExecutionYearDomainObject(academicTreasuryEvent.getExecutionYear());
 
                     fillStudentConditionsInformation(registration, academicTreasuryEvent.getExecutionYear());
                 }
@@ -342,4 +357,11 @@ public interface IFinantialReportEntryCommonMethods {
 
     public void setTuitionPaymentPlanConditions(String tuitionPaymentPlanConditions);
 
+    public abstract Degree getDegreeDomainObject();
+
+    public abstract void setDegreeDomainObject(Degree degree);
+
+    public abstract ExecutionYear getExecutionYearDomainObject();
+
+    public abstract void setExecutionYearDomainObject(ExecutionYear executionYear);
 }
