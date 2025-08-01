@@ -42,6 +42,7 @@
 		<dependency>
 			<groupId>org.fenixedu</groupId>
 			<artifactId>fenixedu-treasury-base</artifactId>
+			<version>14.2.5</version>
 		</dependency>
 	</dependencies>
 
