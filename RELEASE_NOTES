@@ -1,3 +1,5 @@
+- Improvement: Allow correction of fiscal numbers of customers, which countries are other than of finantial institution [#qubIT-Fenix-7300]
+
 12.9.4 (22-07-2025)
 - Refactor: Declare execution year and degree in beans used for treasury reporting [#qubIT-Fenix-7272]
 

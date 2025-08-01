@@ -257,6 +257,9 @@ public class DebtReportEntryBean implements SpreadsheetRow, IFinantialReportEntr
     private Degree degreeDomainObject;
     private ExecutionYear executionYearDomainObject;
 
+    private String emptyColumnOne;
+    private String emptyColumnTwo;
+
     public DebtReportEntryBean(final InvoiceEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
 
@@ -1261,4 +1264,19 @@ public class DebtReportEntryBean implements SpreadsheetRow, IFinantialReportEntr
         this.executionYearDomainObject = executionYear;
     }
 
+    public String getEmptyColumnOne() {
+        return emptyColumnOne;
+    }
+
+    public void setEmptyColumnOne(String emptyColumnOne) {
+        this.emptyColumnOne = emptyColumnOne;
+    }
+
+    public String getEmptyColumnTwo() {
+        return emptyColumnTwo;
+    }
+
+    public void setEmptyColumnTwo(String emptyColumnTwo) {
+        this.emptyColumnTwo = emptyColumnTwo;
+    }
 }
