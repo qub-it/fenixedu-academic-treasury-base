@@ -39,6 +39,9 @@ import java.util.stream.Stream;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.contacts.EmailAddress;
+import org.fenixedu.academic.domain.contacts.PartyContact;
+import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
@@ -233,6 +236,18 @@ public class PersonCustomer extends PersonCustomer_Base {
     }
 
     @Override
+    public String getPersonalEmail() {
+        return getAssociatedPerson().getPartyContactsSet().stream() //
+                .filter(PartyContact::isEmailAddress) //
+                .map(EmailAddress.class::cast) //
+                .filter(PartyContact::isActiveAndValid) //
+                .filter(e -> !StringUtils.isBlank(e.getValue())) //
+                .filter(e -> e.getType() == PartyContactType.PERSONAL) //
+                .sorted(EmailAddress.COMPARATOR_BY_EMAIL) //
+                .findFirst().map(EmailAddress::getValue).orElse(null);
+    }
+
+    @Override
     public String getPhoneNumber() {
         Person person = getAssociatedPerson();
 
@@ -406,7 +421,7 @@ public class PersonCustomer extends PersonCustomer_Base {
 
         return physicalAddress.getCountryOfResidence().getCode();
     }
-    
+
     public static String addressUiFiscalPresentationValue(PhysicalAddress pa) {
         final List<String> compounds = new ArrayList<>();
 

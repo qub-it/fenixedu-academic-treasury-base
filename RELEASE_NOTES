@@ -1,3 +1,5 @@
+- Refactor: Implement method to retrieve personal email from person customer [#qubIT-Fenix-7385]
+
 12.9.5 (01-08-2025)
 - Improvement: Allow correction of fiscal numbers of customers, which countries are other than of finantial institution [#qubIT-Fenix-7300]
 
