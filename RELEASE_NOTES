@@ -1,3 +1,5 @@
+- Refactor: Implement treasury service method to check if dynamic message is defined [#qubIT-Fenix-7405]
+
 12.9.6 (04-08-2025)
 - Refactor: Implement method to retrieve personal email from person customer [#qubIT-Fenix-7385]
 

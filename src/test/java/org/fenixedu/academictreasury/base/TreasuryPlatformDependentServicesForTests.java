@@ -200,6 +200,11 @@ public class TreasuryPlatformDependentServicesForTests implements ITreasuryPlatf
     }
 
     @Override
+    public boolean isDynamicApplicationMessageDefined(String key) {
+        throw new RuntimeException("not implemented");
+    }
+
+    @Override
     public LocalizedString getDynamicApplicationMessage(String key) {
         throw new RuntimeException("not implemented");
     }
