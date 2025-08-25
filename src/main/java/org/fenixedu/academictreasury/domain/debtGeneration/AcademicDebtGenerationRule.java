@@ -127,7 +127,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
 
         setOrderNumber(-1);
         final Optional<AcademicDebtGenerationRule> max =
-                find(getAcademicDebtGenerationRuleType(), getExecutionYear()).max(COMPARE_BY_ORDER_NUMBER);
+                find(getAcademicDebtGenerationRuleType(), getFinantialEntity(), getExecutionYear()).max(COMPARE_BY_ORDER_NUMBER);
 
         setOrderNumber(max.isPresent() ? max.get().getOrderNumber() + 1 : 1);
 
@@ -173,7 +173,7 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
 
         setOrderNumber(-1);
         final Optional<AcademicDebtGenerationRule> max =
-                find(getAcademicDebtGenerationRuleType(), getExecutionYear()).max(COMPARE_BY_ORDER_NUMBER);
+                find(getAcademicDebtGenerationRuleType(), getFinantialEntity(), getExecutionYear()).max(COMPARE_BY_ORDER_NUMBER);
 
         setOrderNumber(max.isPresent() ? max.get().getOrderNumber() + 1 : 1);
 
@@ -215,8 +215,8 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
                     "error.AcademicDebtGenerationRule.aggregateAllOrNothing.requires.aggregateOnDebitNote");
         }
 
-        if (getAcademicDebtGenerationRuleType().strategyImplementation().isEntriesRequired()
-                && getAcademicDebtGenerationRuleEntriesSet().isEmpty()) {
+        if (getAcademicDebtGenerationRuleType().strategyImplementation()
+                .isEntriesRequired() && getAcademicDebtGenerationRuleEntriesSet().isEmpty()) {
             throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.entries.required");
         }
 
@@ -243,9 +243,9 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     }
 
     public List<AcademicDebtGenerationRuleEntry> getOrderedAcademicDebtGenerationRuleEntries() {
-        return getAcademicDebtGenerationRuleEntriesSet().stream().sorted((e1, e2) -> Integer
-                .compare(e1.getProduct().getTuitionInstallmentOrder(), e2.getProduct().getTuitionInstallmentOrder()))
-                .collect(Collectors.toList());
+        return getAcademicDebtGenerationRuleEntriesSet().stream()
+                .sorted((e1, e2) -> Integer.compare(e1.getProduct().getTuitionInstallmentOrder(),
+                        e2.getProduct().getTuitionInstallmentOrder())).collect(Collectors.toList());
     }
 
     public boolean isActive() {
@@ -316,15 +316,14 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
 
     @Deprecated
     @Override
-    /* Remove this when this restrictions has been migrated to AcademicDebtRuleRestriction */
-    public DebtGenerationRuleRestriction getDebtGenerationRuleRestriction() {
+    /* Remove this when this restrictions has been migrated to AcademicDebtRuleRestriction */ public DebtGenerationRuleRestriction getDebtGenerationRuleRestriction() {
         return super.getDebtGenerationRuleRestriction();
     }
 
     @Deprecated
     @Override
-    /* Remove this when this restrictions has been migrated to AcademicDebtRuleRestriction */
-    public void setDebtGenerationRuleRestriction(DebtGenerationRuleRestriction debtGenerationRuleRestriction) {
+    /* Remove this when this restrictions has been migrated to AcademicDebtRuleRestriction */ public void setDebtGenerationRuleRestriction(
+            DebtGenerationRuleRestriction debtGenerationRuleRestriction) {
         super.setDebtGenerationRuleRestriction(debtGenerationRuleRestriction);
     }
 
@@ -383,8 +382,9 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     }
 
     private AcademicDebtGenerationRule findPrevious() {
-        List<AcademicDebtGenerationRule> list = find(getAcademicDebtGenerationRuleType(), getExecutionYear())
-                .sorted(COMPARE_BY_ORDER_NUMBER).collect(Collectors.toList());
+        List<AcademicDebtGenerationRule> list =
+                find(getAcademicDebtGenerationRuleType(), getFinantialEntity(), getExecutionYear()).sorted(
+                        COMPARE_BY_ORDER_NUMBER).collect(Collectors.toList());
 
         AcademicDebtGenerationRule result = null;
         for (final AcademicDebtGenerationRule r : list) {
@@ -407,8 +407,9 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     }
 
     private AcademicDebtGenerationRule findNext() {
-        List<AcademicDebtGenerationRule> list = find(getAcademicDebtGenerationRuleType(), getExecutionYear())
-                .sorted(COMPARE_BY_ORDER_NUMBER).collect(Collectors.toList());
+        List<AcademicDebtGenerationRule> list =
+                find(getAcademicDebtGenerationRuleType(), getFinantialEntity(), getExecutionYear()).sorted(
+                        COMPARE_BY_ORDER_NUMBER).collect(Collectors.toList());
 
         AcademicDebtGenerationRule result = null;
         for (final AcademicDebtGenerationRule r : list) {
@@ -431,11 +432,13 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     }
 
     public boolean isFirst() {
-        return find(this.getAcademicDebtGenerationRuleType(), this.getExecutionYear()).min(COMPARE_BY_ORDER_NUMBER).get() == this;
+        return find(this.getAcademicDebtGenerationRuleType(), getFinantialEntity(), this.getExecutionYear()).min(
+                COMPARE_BY_ORDER_NUMBER).get() == this;
     }
 
     public boolean isLast() {
-        return find(this.getAcademicDebtGenerationRuleType(), this.getExecutionYear()).max(COMPARE_BY_ORDER_NUMBER).get() == this;
+        return find(this.getAcademicDebtGenerationRuleType(), getFinantialEntity(), this.getExecutionYear()).max(
+                COMPARE_BY_ORDER_NUMBER).get() == this;
     }
 
     public boolean isCopyFromOtherExistingAcademicDebtGenerationRule() {
@@ -521,27 +524,28 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     }
 
     public boolean isRuleToApply(Registration registration) {
-        if (getDebtGenerationRuleRestriction() != null
-                && !getDebtGenerationRuleRestriction().strategyImplementation().isToApply(this, registration)) {
+        if (getDebtGenerationRuleRestriction() != null && !getDebtGenerationRuleRestriction().strategyImplementation()
+                .isToApply(this, registration)) {
             return false;
         }
 
-        return getAcademicDebtGenerationRuleRestrictionsSet().isEmpty()
-                || getAcademicDebtGenerationRuleRestrictionsSet().stream().allMatch(r -> r.test(registration));
+        return getAcademicDebtGenerationRuleRestrictionsSet().isEmpty() || getAcademicDebtGenerationRuleRestrictionsSet().stream()
+                .allMatch(r -> r.test(registration));
     }
 
     // @formatter: off
+
     /************
      * SERVICES *
      ************/
     // @formatter: on
-
     public static Stream<AcademicDebtGenerationRule> findAll() {
         return FenixFramework.getDomainRoot().getAcademicDebtGenerationRuleSet().stream();
     }
 
-    public static Stream<AcademicDebtGenerationRule> find(AcademicDebtGenerationRuleType type, ExecutionYear executionYear) {
-        return findAll().filter(r -> r.getExecutionYear() == executionYear)
+    public static Stream<AcademicDebtGenerationRule> find(AcademicDebtGenerationRuleType type, FinantialEntity finantialEntity,
+            ExecutionYear executionYear) {
+        return findAll().filter(r -> r.getExecutionYear() == executionYear).filter(r -> r.getFinantialEntity() == finantialEntity)
                 .filter(r -> r.getAcademicDebtGenerationRuleType() == type);
     }
 
@@ -556,8 +560,8 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
     @Atomic
     public static AcademicDebtGenerationRule create(final AcademicDebtGenerationRuleBean bean) {
         if (bean.isAppliedMinimumAmountForPaymentCode()) {
-            if (bean.getMinimumAmountForPaymentCode() == null
-                    || !TreasuryConstants.isPositive(bean.getMinimumAmountForPaymentCode())) {
+            if (bean.getMinimumAmountForPaymentCode() == null || !TreasuryConstants.isPositive(
+                    bean.getMinimumAmountForPaymentCode())) {
                 throw new AcademicTreasuryDomainException(
                         "error.AcademicDebtGenerationRule.create.appliedMinimumAmountForPaymentCode.but.minimumAmountForPaymentCode.not.valid");
             }
