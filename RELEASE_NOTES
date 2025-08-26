@@ -1,3 +1,4 @@
+12.9.8 (26-08-2025)
 - Refactor: Transform static method into instance method to copy academic debt rule between periods [#qubIT-Fenix-7423]
 - Bug Fix: Copy the start and end dates of academic debt rule execution [#qubIT-Fenix-7423]
 
