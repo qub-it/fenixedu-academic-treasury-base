@@ -1,3 +1,4 @@
+12.9.7 (26-08-2025)
 - Refactor: Implement treasury service method to check if dynamic message is defined [#qubIT-Fenix-7405]
 - Bug Fix: Correct order between academic debt rules between the same type, financial entity and execution year [#qubIT-Fenix-5440]
 
