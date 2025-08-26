@@ -1,3 +1,6 @@
+- Refactor: Transform static method into instance method to copy academic debt rule between periods [#qubIT-Fenix-7423]
+- Bug Fix: Copy the start and end dates of academic debt rule execution [#qubIT-Fenix-7423]
+
 12.9.7 (26-08-2025)
 - Refactor: Implement treasury service method to check if dynamic message is defined [#qubIT-Fenix-7405]
 - Bug Fix: Correct order between academic debt rules between the same type, financial entity and execution year [#qubIT-Fenix-5440]

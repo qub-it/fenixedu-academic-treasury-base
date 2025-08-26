@@ -187,6 +187,20 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
             setMinimumAmountForPaymentCode(null);
         }
 
+        if (ruleToCopy.getStartExecutionDate() != null) {
+            int deltaYear =
+                    executionYear.getBeginLocalDate().getYear() - ruleToCopy.getExecutionYear().getBeginLocalDate().getYear();
+
+            setStartExecutionDate(ruleToCopy.getStartExecutionDate().plusYears(deltaYear));
+        }
+
+        if (ruleToCopy.getEndExecutionDate() != null) {
+            int deltaYear =
+                    executionYear.getBeginLocalDate().getYear() - ruleToCopy.getExecutionYear().getBeginLocalDate().getYear();
+
+            setEndExecutionDate(ruleToCopy.getEndExecutionDate().plusYears(deltaYear));
+        }
+
         setCopyFromAcademicDebtGenerationRule(ruleToCopy);
 
         checkRules();
@@ -533,6 +547,15 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
                 .allMatch(r -> r.test(registration));
     }
 
+    // ANIL 2025-08-26 (#qubIT-Fenix-7423)
+    public AcademicDebtGenerationRule copyToExecutionYear(ExecutionYear executionYear) {
+        if (executionYear == getExecutionYear()) {
+            throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.copy.same.executionYear");
+        }
+
+        return new AcademicDebtGenerationRule(this, executionYear);
+    }
+
     // @formatter: off
 
     /************
@@ -568,15 +591,6 @@ public class AcademicDebtGenerationRule extends AcademicDebtGenerationRule_Base 
         }
 
         return new AcademicDebtGenerationRule(bean);
-    }
-
-    @Atomic
-    public static AcademicDebtGenerationRule copy(final AcademicDebtGenerationRule rule, ExecutionYear executionYear) {
-        if (executionYear == rule.getExecutionYear()) {
-            throw new AcademicTreasuryDomainException("error.AcademicDebtGenerationRule.copy.same.executionYear");
-        }
-
-        return new AcademicDebtGenerationRule(rule, executionYear);
     }
 
     public static List<AcademicDebtGenerationProcessingResult> runAllActive(final boolean runOnlyWithBackgroundExecution) {
