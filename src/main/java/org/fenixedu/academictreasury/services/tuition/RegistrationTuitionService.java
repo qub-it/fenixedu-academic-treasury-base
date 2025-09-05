@@ -1,5 +1,6 @@
 package org.fenixedu.academictreasury.services.tuition;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Comparator;
@@ -77,7 +78,10 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
     RegistrationTuitionService _originalAmountsCalculator;
 
+    // algorithm
     public boolean executeTuitionPaymentPlanCreation() {
+        String reason =
+                AcademicTreasuryConstants.academicTreasuryBundle("label.RegistrationTuitionService.tuitionRecalculationReason");
 
         Registration registration = this.registrationOptions.registration;
         ExecutionYear executionYear = this.registrationOptions.executionYear;
@@ -215,155 +219,22 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                     return false;
                 }
 
-                // This is the case where we only need to create a credit
-                if (TreasuryConstants.isNegative(differenceNetAmount) && TreasuryConstants.isZero(
-                        differenceInNetExemptedAmount) && isExemptionsMapAreEqual(tariff, academicTreasuryEvent, originalBean)) {
+                boolean isExemptionsMapAreEqual = isExemptionsMapAreEqual(tariff, academicTreasuryEvent, originalBean);
+                boolean isThereIsOnlyRemovalsOrDecrementsInExemptions =
+                        isThereIsOnlyRemovalsOrDecrementsInExemptions(tariff, academicTreasuryEvent, originalBean);
+                boolean isThereAreOnlyNewEntriesOrIncrementsInExemptions =
+                        isThereAreOnlyNewEntriesOrIncrementsInExemptions(tariff, academicTreasuryEvent, originalBean);
 
-                    // ANIL 2024-09-26 (#qubIT-Fenix-5854)
-                    //
-                    // Before this date, the algorithm was closing the debit entries, which is not 
-                    // acceptable for some schools. Now do not close and let the algorithm decide
-                    // if it has to simply annul or create a credit entry if it is already closed
-
-                    BigDecimal remainingAmountToCredit = differenceNetAmount.negate();
-                    List<DebitEntry> debitEntriesToCreditList = DebitEntry.findActive(academicTreasuryEvent, product)
-                            .sorted(DebitEntry.COMPARE_BY_EXTERNAL_ID.reversed()).collect(Collectors.toList());
-
-                    for (DebitEntry d : debitEntriesToCreditList) {
-                        BigDecimal netAmountToCredit = remainingAmountToCredit.min(d.getAvailableNetAmountForCredit());
-                        remainingAmountToCredit = netAmountToCredit.subtract(netAmountToCredit);
-
-                        if (TreasuryConstants.isPositive(netAmountToCredit)) {
-                            // ANIL 2024-09-26 (#qubIT-Fenix-5854)
-                            //
-                            // Distinguish between debit entry in preparing state or closed
-
-                            if (d.getFinantialDocument() == null || d.getFinantialDocument().isPreparing()) {
-                                // When it is preparing, we proceed with the following
-                                //
-                                // 1. Remove the debit entry from the debit note, if it is associated
-                                DebitNote debitNote = d.getDebitNote();
-
-                                if (d.getDebitNote() != null) {
-                                    d.removeFromDocument();
-                                }
-
-                                // 2. Calculate the exempted amounts to credit
-
-                                Map<TreasuryExemption, BigDecimal> creditExemptionsMap =
-                                        d.calculateDefaultNetExemptedAmountsToCreditMap(netAmountToCredit);
-
-                                // 3. Create the debitEntry with the amount equals to the following formula
-                                // netAmount + netExemptedAmount - netAmountToCredit
-
-                                BigDecimal newNetAmount =
-                                        d.getNetAmount().add(d.getNetExemptedAmount()).subtract(netAmountToCredit);
-
-                                DebitEntry newDebitEntry =
-                                        DebitEntry.create(d.getFinantialEntity(), d.getDebtAccount(), d.getTreasuryEvent(),
-                                                d.getVat(), //
-                                                newNetAmount, d.getDueDate(), d.getPropertiesMap(), d.getProduct(), //
-                                                d.getDescription(), BigDecimal.ONE, d.getInterestRate(), d.getEntryDateTime(), //
-                                                d.isAcademicalActBlockingSuspension(), d.isBlockAcademicActsOnDebt(), debitNote);
-
-                                d.getTreasuryExemptionsSet().forEach(exemption -> {
-                                    BigDecimal newExemptionAmount = exemption.getNetExemptedAmount();
-
-                                    if (creditExemptionsMap.containsKey(exemption)) {
-                                        newExemptionAmount = newExemptionAmount.subtract(creditExemptionsMap.get(exemption));
-                                    }
-
-                                    TreasuryExemption.create(exemption.getTreasuryExemptionType(), exemption.getReason(),
-                                            newExemptionAmount, newDebitEntry);
-                                });
-
-                                // 4. Annul the debit entry
-
-                                // ANIL 2025-03-03 (#qubIT-Fenix-6662)
-                                //
-                                // Interest entries cannot be annulled
-                                d.annulOnlyThisDebitEntryAndInterestsInBusinessContext(AcademicTreasuryConstants.academicTreasuryBundle(
-                                        "label.RegistrationTuitionService.tuitionRecalculationReason"), false);
-
-                            } else if (d.getFinantialDocument().isClosed()) {
-                                String reason = AcademicTreasuryConstants.academicTreasuryBundle(
-                                        "label.RegistrationTuitionService.tuitionRecalculationReason");
-                                Map<TreasuryExemption, BigDecimal> creditExemptionsMap =
-                                        d.calculateDefaultNetExemptedAmountsToCreditMap(netAmountToCredit);
-                                d.creditDebitEntry(netAmountToCredit, reason, false, creditExemptionsMap);
-
-                                if (isToBeAnnuledInTreasuryEvent(d)) {
-                                    // The net amount of debit entry is zero, which means can be annuled in academic treasury event
-                                    d.annulOnEvent();
-                                }
-
-                            } else {
-                                throw new IllegalStateException("how to handle this case?");
-                            }
-
-                        }
-                    }
-
-                    return true;
-                }
-
-                if (!TreasuryConstants.isNegative(differenceNetAmount) && !TreasuryConstants.isNegative(
-                        differenceInNetExemptedAmount) && isThereAreOnlyNewEntriesOrIncrementsInExemptions(tariff,
-                        academicTreasuryEvent, originalBean)) {
-                    // This combination of difference amounts, allow us to create a new recalculation debit entry
-                    LocalDate recalculationDueDate = this.installmentRecalculationOptions.recalculateInstallments.get(product);
-
-                    // Now it is time to discount from both discount exemption maps, 
-                    // for this installment and from all installments
-                    Map<TreasuryExemptionType, BigDecimal> exemptionsToApplyMap = new HashMap<>();
-
-                    // We need how to take the difference exemption. We take from the
-                    // mapForOnlyThisInstallment or the mapForAllInstallments exemption map? And how much to take
-                    // from one and the other?
-
-                    // 1. Know how much it will take from the mapForOnlyThisInstallment, we need to make a simulation
-                    BigDecimal simulationOfTotalExemptedAmountForOnlyThisInstallment =
-                            getAndDecrementFromDiscountMap(buildDiscountExemptionsMapForOnlyThisInstallment(tariff),
-                                    originalBean.getExemptedAmount(), new HashMap<>());
-
-                    // 2. Know how much was taken from the mapForOnlyThisInstallment in the already exempted amount
-                    BigDecimal simulationOfAlreadyExemptedAmountForOnlyThisInstallment = getAndDecrementFromDiscountMap(
-                            buildDiscountExemptionsMapForOnlyThisInstallmentByAmount(
-                                    getNetAmountAlreadyDebited(product).add(getNetAmountAlreadyExempted(product))),
-                            getNetAmountAlreadyExempted(product), new HashMap<>());
-
-                    BigDecimal netExemptedAmountToTakeFromExemptionsMapForAllInstallments = differenceInNetExemptedAmount;
-                    if (TreasuryConstants.isGreaterOrEqualThan(simulationOfTotalExemptedAmountForOnlyThisInstallment,
-                            simulationOfAlreadyExemptedAmountForOnlyThisInstallment)) {
-                        // 3. With the difference exempted amount, get the exemptions to apply for the debit entry
-
-                        getAndDecrementFromDiscountMap(_discountExemptionsMapForOnlyThisInstallment,
-                                simulationOfAlreadyExemptedAmountForOnlyThisInstallment, new HashMap<>());
-
-                        BigDecimal totalExemptedAmountFromExemptionsMapForOnlyThisInstallment =
-                                getAndDecrementFromDiscountMap(_discountExemptionsMapForOnlyThisInstallment,
-                                        simulationOfTotalExemptedAmountForOnlyThisInstallment.subtract(
-                                                simulationOfAlreadyExemptedAmountForOnlyThisInstallment), exemptionsToApplyMap);
-
-                        netExemptedAmountToTakeFromExemptionsMapForAllInstallments =
-                                netExemptedAmountToTakeFromExemptionsMapForAllInstallments.subtract(
-                                        totalExemptedAmountFromExemptionsMapForOnlyThisInstallment);
-                    } else {
-                        // Nothing to do, we only need to take the difference and decrement
-                        // with mapForAllInstallments
-                    }
-
-                    // 5. Now discount from the acrossAllInstallments exemption map
-                    getAndDecrementFromDiscountMap(this._discountExemptionsMapForAllInstallments,
-                            netExemptedAmountToTakeFromExemptionsMapForAllInstallments, exemptionsToApplyMap);
-
-                    BigDecimal debitEntryNetAmount = differenceNetAmount.add(differenceInNetExemptedAmount);
-
-                    return createRecalculationAdditionalDebitEntryForRegistrationAndExempt(debtDate, debtAccount,
-                            academicTreasuryEvent, tariff, exemptionsToApplyMap, debitEntryNetAmount, recalculationDueDate);
-                }
-
-                if (TreasuryConstants.isNegative(differenceInNetExemptedAmount) || (TreasuryConstants.isNegative(
+                if (!TreasuryConstants.isPositive(
+                        differenceNetAmount) && (isExemptionsMapAreEqual || isThereIsOnlyRemovalsOrDecrementsInExemptions)) {
+                    return runLogicToDecrementOnlyNetAmountOrExemptions(tariff, academicTreasuryEvent, originalBean, product,
+                            differenceNetAmount, reason);
+                } else if (!TreasuryConstants.isNegative(
+                        differenceNetAmount) && isThereAreOnlyNewEntriesOrIncrementsInExemptions) {
+                    return runLogicToIncrementOnlyNetAmountOrExemptions(tariff, product, originalBean,
+                            differenceInNetExemptedAmount, _discountExemptionsMapForOnlyThisInstallment, differenceNetAmount,
+                            debtDate, debtAccount, academicTreasuryEvent);
+                } else if (TreasuryConstants.isNegative(differenceInNetExemptedAmount) || (TreasuryConstants.isNegative(
                         differenceNetAmount) && !TreasuryConstants.isZero(
                         differenceInNetExemptedAmount)) || isThereAreRemovalOrDecrementsInExemptions(tariff,
                         academicTreasuryEvent, originalBean)) {
@@ -381,10 +252,8 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                     // ANIL 2025-03-03 (#qubIT-Fenix-6662)
                     //
                     // Interest entries cannot be annulled
-                    DebitEntry.findActive(academicTreasuryEvent, product).forEach(
-                            d -> d.annulOnlyThisDebitEntryAndInterestsInBusinessContext(
-                                    AcademicTreasuryConstants.academicTreasuryBundle(
-                                            "label.RegistrationTuitionService.tuitionRecalculationReason"), false));
+                    DebitEntry.findActive(academicTreasuryEvent, product)
+                            .forEach(d -> d.annulOnlyThisDebitEntryAndInterestsInBusinessContext(reason, false));
 
                     Map<TreasuryExemptionType, BigDecimal> exemptionsToApplyMap = new HashMap<>();
                     BigDecimal tuitionInstallmentAmountToPay = originalBean.getAmount().add(originalBean.getExemptedAmount());
@@ -422,7 +291,208 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                 .reduce(Boolean.FALSE, Boolean::logicalOr);
     }
 
-    private boolean isToBeAnnuledInTreasuryEvent(DebitEntry debitEntry) {
+    private Boolean runLogicToIncrementOnlyNetAmountOrExemptions(final TuitionInstallmentTariff tariff, final Product product,
+            final TuitionDebitEntryBean originalBean, final BigDecimal differenceInNetExemptedAmount,
+            final TreeMap<TreasuryExemptionType, TreasuryExemptionMoneyBox> _discountExemptionsMapForOnlyThisInstallment,
+            final BigDecimal differenceNetAmount, LocalDate debtDate, DebtAccount debtAccount,
+            final AcademicTreasuryEvent academicTreasuryEvent) {
+        // This combination of difference amounts, allow us to create a new recalculation debit entry
+        LocalDate recalculationDueDate = this.installmentRecalculationOptions.recalculateInstallments.get(product);
+
+        // Now it is time to discount from both discount exemption maps,
+        // for this installment and from all installments
+        Map<TreasuryExemptionType, BigDecimal> exemptionsToApplyMap = new HashMap<>();
+
+        // We need how to take the difference exemption. We take from the
+        // mapForOnlyThisInstallment or the mapForAllInstallments exemption map? And how much to take
+        // from one and the other?
+
+        // 1. Know how much it will take from the mapForOnlyThisInstallment, we need to make a simulation
+        BigDecimal simulationOfTotalExemptedAmountForOnlyThisInstallment =
+                getAndDecrementFromDiscountMap(buildDiscountExemptionsMapForOnlyThisInstallment(tariff),
+                        originalBean.getExemptedAmount(), new HashMap<>());
+
+        // 2. Know how much was taken from the mapForOnlyThisInstallment in the already exempted amount
+        BigDecimal simulationOfAlreadyExemptedAmountForOnlyThisInstallment = getAndDecrementFromDiscountMap(
+                buildDiscountExemptionsMapForOnlyThisInstallmentByAmount(
+                        getNetAmountAlreadyDebited(product).add(getNetAmountAlreadyExempted(product))),
+                getNetAmountAlreadyExempted(product), new HashMap<>());
+
+        BigDecimal netExemptedAmountToTakeFromExemptionsMapForAllInstallments = differenceInNetExemptedAmount;
+        if (TreasuryConstants.isGreaterOrEqualThan(simulationOfTotalExemptedAmountForOnlyThisInstallment,
+                simulationOfAlreadyExemptedAmountForOnlyThisInstallment)) {
+            // 3. With the difference exempted amount, get the exemptions to apply for the debit entry
+
+            getAndDecrementFromDiscountMap(_discountExemptionsMapForOnlyThisInstallment,
+                    simulationOfAlreadyExemptedAmountForOnlyThisInstallment, new HashMap<>());
+
+            BigDecimal totalExemptedAmountFromExemptionsMapForOnlyThisInstallment =
+                    getAndDecrementFromDiscountMap(_discountExemptionsMapForOnlyThisInstallment,
+                            simulationOfTotalExemptedAmountForOnlyThisInstallment.subtract(
+                                    simulationOfAlreadyExemptedAmountForOnlyThisInstallment), exemptionsToApplyMap);
+
+            netExemptedAmountToTakeFromExemptionsMapForAllInstallments =
+                    netExemptedAmountToTakeFromExemptionsMapForAllInstallments.subtract(
+                            totalExemptedAmountFromExemptionsMapForOnlyThisInstallment);
+        } else {
+            // Nothing to do, we only need to take the difference and decrement
+            // with mapForAllInstallments
+        }
+
+        // 5. Now discount from the acrossAllInstallments exemption map
+        getAndDecrementFromDiscountMap(this._discountExemptionsMapForAllInstallments,
+                netExemptedAmountToTakeFromExemptionsMapForAllInstallments, exemptionsToApplyMap);
+
+        BigDecimal debitEntryNetAmount = differenceNetAmount.add(differenceInNetExemptedAmount);
+
+        return createRecalculationAdditionalDebitEntryForRegistrationAndExempt(debtDate, debtAccount, academicTreasuryEvent,
+                tariff, exemptionsToApplyMap, debitEntryNetAmount, recalculationDueDate);
+    }
+
+    private Boolean runLogicToDecrementOnlyNetAmountOrExemptions(TuitionInstallmentTariff tariff,
+            AcademicTreasuryEvent academicTreasuryEvent, TuitionDebitEntryBean originalBean, Product product,
+            BigDecimal differenceNetAmount, String reason) {
+        Map<TreasuryExemptionType, BigDecimal> exemptionDecrementAmountsByTypeMap =
+                getTreasuryExemptionDecrementsByTypeMap(tariff, academicTreasuryEvent, originalBean);
+
+        List<DebitEntry> debitEntriesToCreditList =
+                DebitEntry.findActive(academicTreasuryEvent, product).sorted(DebitEntry.COMPARE_BY_EXTERNAL_ID.reversed())
+                        .collect(Collectors.toList());
+
+        BigDecimal remainingAmountToCredit = differenceNetAmount.negate();
+        for (DebitEntry d : debitEntriesToCreditList) {
+            if (!TreasuryConstants.isPositive(remainingAmountToCredit) && !TreasuryConstants.isPositive(
+                    exemptionDecrementAmountsByTypeMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add))) {
+                // Nothing more to decrement
+                return true;
+            }
+
+            BigDecimal netAmountToCredit = remainingAmountToCredit.min(d.getAvailableNetAmountForCredit());
+            Map<TreasuryExemptionType, BigDecimal> netExemptedAmountToCreditByTypeMap = new HashMap<>();
+
+            for (TreasuryExemptionType t : exemptionDecrementAmountsByTypeMap.keySet()) {
+                BigDecimal netExemptedAmountToCredit =
+                        exemptionDecrementAmountsByTypeMap.get(t).min(d.getAvailableNetExemptedAmountForCredit(t));
+
+                if (TreasuryConstants.isPositive(netExemptedAmountToCredit)) {
+                    netExemptedAmountToCreditByTypeMap.put(t, netExemptedAmountToCredit);
+                }
+            }
+
+            remainingAmountToCredit = netAmountToCredit.subtract(netAmountToCredit);
+            netExemptedAmountToCreditByTypeMap.keySet().forEach(t -> exemptionDecrementAmountsByTypeMap.put(t,
+                    exemptionDecrementAmountsByTypeMap.get(t).subtract(netExemptedAmountToCreditByTypeMap.get(t))));
+
+            // Distinguish between debit entry in preparing state or closed
+            if (d.getFinantialDocument() == null || d.getFinantialDocument().isPreparing()) {
+                // When it is preparing, we proceed with the following
+                //
+                // 1. Remove the debit entry from the debit note, if it is associated
+                DebitNote debitNote = d.getDebitNote();
+
+                if (d.getDebitNote() != null) {
+                    d.removeFromDocument();
+                }
+
+                // 2. Calculate the exempted amounts to credit
+
+                Map<TreasuryExemption, BigDecimal> creditExemptionsMap =
+                        d.calculateNetExemptedAmountsToCreditMapBasedInExplicitAmounts(netExemptedAmountToCreditByTypeMap, true);
+
+                // 3. Create the debitEntry with the amount equals to the following formula
+                // netAmount + netExemptedAmount - netAmountToCredit - exemptedNetAmountToCredit
+
+                BigDecimal newNetAmount = d.getNetAmount().add(d.getNetExemptedAmount()).subtract(netAmountToCredit)
+                        .subtract(netExemptedAmountToCreditByTypeMap.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add));
+
+                DebitEntry newDebitEntry =
+                        DebitEntry.create(d.getFinantialEntity(), d.getDebtAccount(), d.getTreasuryEvent(), d.getVat(), //
+                                newNetAmount, d.getDueDate(), d.getPropertiesMap(), d.getProduct(), //
+                                d.getDescription(), BigDecimal.ONE, d.getInterestRate(), d.getEntryDateTime(), //
+                                d.isAcademicalActBlockingSuspension(), d.isBlockAcademicActsOnDebt(), debitNote);
+
+                d.getTreasuryExemptionsSet().forEach(exemption -> {
+                    BigDecimal newExemptionAmount = exemption.getNetExemptedAmount();
+
+                    if (creditExemptionsMap.containsKey(exemption)) {
+                        newExemptionAmount = newExemptionAmount.subtract(creditExemptionsMap.get(exemption));
+                        if (this._discountExemptionsMapForAllInstallments.containsKey(exemption.getTreasuryExemptionType())) {
+                            this._discountExemptionsMapForAllInstallments.get(exemption.getTreasuryExemptionType())
+                                    .addToAvailableNetAmountForExemption(creditExemptionsMap.get(exemption));
+                        }
+                    }
+
+                    TreasuryExemption.create(exemption.getTreasuryExemptionType(), exemption.getReason(), newExemptionAmount,
+                            newDebitEntry);
+
+                    // Revert to the discount map for all installments, until it reach the maximum amount
+                });
+
+                // 4. Annul the debit entry, interest entries cannot be annulled
+                d.annulOnlyThisDebitEntryAndInterestsInBusinessContext(reason, false);
+
+            } else if (d.getFinantialDocument().isClosed()) {
+                Map<TreasuryExemption, BigDecimal> creditExemptionsMap =
+                        d.calculateNetExemptedAmountsToCreditMapBasedInExplicitAmounts(netExemptedAmountToCreditByTypeMap, true);
+
+                d.creditDebitEntry(netAmountToCredit, reason, false, creditExemptionsMap);
+
+                if (isToBeAnnulledInTreasuryEvent(d)) {
+                    // The net amount of debit entry is zero and the net exempted amount is zero,
+                    // which means can be annulled in academic treasury event
+                    d.annulOnEvent();
+                }
+
+            } else {
+                throw new IllegalStateException("how to handle this case?");
+            }
+        }
+
+        return true;
+    }
+
+    private Map<TreasuryExemptionType, BigDecimal> getTreasuryExemptionDecrementsByTypeMap(TuitionInstallmentTariff tariff,
+            AcademicTreasuryEvent academicTreasuryEvent, TuitionDebitEntryBean originalBean) {
+        final Map<TreasuryExemptionType, BigDecimal> alreadyCreatedMap =
+                academicTreasuryEvent.getNetExemptedAmountsMap(tariff.getProduct());
+        final Map<TreasuryExemptionType, BigDecimal> newExemptionsMap = originalBean.getExemptionsMap();
+
+        Map<TreasuryExemptionType, BigDecimal> result = new HashMap<>();
+        for (TreasuryExemptionType t : alreadyCreatedMap.keySet()) {
+            if (newExemptionsMap.containsKey(t) && TreasuryConstants.isLessThan(newExemptionsMap.get(t),
+                    alreadyCreatedMap.get(t))) {
+                result.put(t, alreadyCreatedMap.get(t).subtract(newExemptionsMap.get(t)));
+            } else if (!newExemptionsMap.containsKey(t)) {
+                result.put(t, alreadyCreatedMap.get(t));
+            }
+        }
+
+        return result;
+    }
+
+    private boolean isThereIsOnlyRemovalsOrDecrementsInExemptions(TuitionInstallmentTariff tariff,
+            AcademicTreasuryEvent academicTreasuryEvent, TuitionDebitEntryBean originalBean) {
+        final Map<TreasuryExemptionType, BigDecimal> alreadyCreatedMap =
+                academicTreasuryEvent.getNetExemptedAmountsMap(tariff.getProduct());
+        final Map<TreasuryExemptionType, BigDecimal> newExemptionsMap = originalBean.getExemptionsMap();
+
+        Set<TreasuryExemptionType> allTypes =
+                Stream.concat(alreadyCreatedMap.keySet().stream(), newExemptionsMap.keySet().stream())
+                        .collect(Collectors.toSet());
+
+        Predicate<TreasuryExemptionType> typeMatchInValue =
+                t -> newExemptionsMap.containsKey(t) && alreadyCreatedMap.containsKey(t) && TreasuryConstants.isEqual(
+                        newExemptionsMap.get(t), alreadyCreatedMap.get(t));
+
+        Set<TreasuryExemptionType> differingTypesSet =
+                allTypes.stream().filter(typeMatchInValue.negate()).collect(Collectors.toSet());
+
+        return !differingTypesSet.isEmpty() && differingTypesSet.stream().allMatch(
+                t -> alreadyCreatedMap.containsKey(t) && (!newExemptionsMap.containsKey(t) || TreasuryConstants.isLessThan(
+                        newExemptionsMap.get(t), alreadyCreatedMap.get(t))));
+    }
+
+    private boolean isToBeAnnulledInTreasuryEvent(DebitEntry debitEntry) {
         BigDecimal netExemptedAmount = debitEntry.getNetExemptedAmount();
         BigDecimal creditedNetExemptedAmount =
                 debitEntry.getCreditEntriesSet().stream().filter(c -> !c.isAnnulled()).map(c -> c.getNetExemptedAmount())
@@ -434,9 +504,9 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
     private boolean isThereAreRemovalOrDecrementsInExemptions(TuitionInstallmentTariff tariff,
             AcademicTreasuryEvent academicTreasuryEvent, TuitionDebitEntryBean newTuitionDebitEntryBean) {
-        Map<TreasuryExemptionType, BigDecimal> alreadyCreatedMap =
+        final Map<TreasuryExemptionType, BigDecimal> alreadyCreatedMap =
                 academicTreasuryEvent.getNetExemptedAmountsMap(tariff.getProduct());
-        Map<TreasuryExemptionType, BigDecimal> newTuitionDebitEntryBeanExemptionsMap =
+        final Map<TreasuryExemptionType, BigDecimal> newTuitionDebitEntryBeanExemptionsMap =
                 newTuitionDebitEntryBean.getExemptionsMap();
 
         Predicate<Map.Entry<TreasuryExemptionType, BigDecimal>> predicate =
@@ -453,25 +523,25 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
     }
 
     private boolean isThereAreOnlyNewEntriesOrIncrementsInExemptions(TuitionInstallmentTariff tariff,
-            AcademicTreasuryEvent academicTreasuryEvent, TuitionDebitEntryBean newTuitionDebitEntryBean) {
-        Map<TreasuryExemptionType, BigDecimal> alreadyCreatedMap =
+            AcademicTreasuryEvent academicTreasuryEvent, TuitionDebitEntryBean originalBean) {
+        final Map<TreasuryExemptionType, BigDecimal> alreadyCreatedMap =
                 academicTreasuryEvent.getNetExemptedAmountsMap(tariff.getProduct());
-        Map<TreasuryExemptionType, BigDecimal> newTuitionDebitEntryBeanExemptionsMap =
-                newTuitionDebitEntryBean.getExemptionsMap();
+        final Map<TreasuryExemptionType, BigDecimal> newExemptionsMap = originalBean.getExemptionsMap();
 
-        if (alreadyCreatedMap.keySet().size() > newTuitionDebitEntryBeanExemptionsMap.keySet().size()) {
-            return false;
-        }
+        Set<TreasuryExemptionType> allTypes =
+                Stream.concat(alreadyCreatedMap.keySet().stream(), newExemptionsMap.keySet().stream())
+                        .collect(Collectors.toSet());
 
-        Predicate<Map.Entry<TreasuryExemptionType, BigDecimal>> predicate =
-                e -> !newTuitionDebitEntryBeanExemptionsMap.containsKey(e.getKey()) || TreasuryConstants.isLessThan(
-                        newTuitionDebitEntryBeanExemptionsMap.get(e.getKey()), e.getValue());
+        Predicate<TreasuryExemptionType> typeMatchInValue =
+                t -> newExemptionsMap.containsKey(t) && alreadyCreatedMap.containsKey(t) && TreasuryConstants.isEqual(
+                        newExemptionsMap.get(t), alreadyCreatedMap.get(t));
 
-        if (alreadyCreatedMap.entrySet().stream().anyMatch(predicate)) {
-            return false;
-        }
+        Set<TreasuryExemptionType> differingTypesSet =
+                allTypes.stream().filter(typeMatchInValue.negate()).collect(Collectors.toSet());
 
-        return true;
+        return !differingTypesSet.isEmpty() && differingTypesSet.stream().allMatch(
+                t -> newExemptionsMap.containsKey(t) && (!alreadyCreatedMap.containsKey(t) || TreasuryConstants.isGreaterThan(
+                        newExemptionsMap.get(t), alreadyCreatedMap.get(t))));
     }
 
     private boolean isExemptionsMapAreEqual(TuitionInstallmentTariff tariff, AcademicTreasuryEvent academicTreasuryEvent,
@@ -480,8 +550,8 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                 academicTreasuryEvent.getNetExemptedAmountsMap(tariff.getProduct());
         Map<TreasuryExemptionType, BigDecimal> originalExemptionsMap = newTuitionDebitEntryBean.getExemptionsMap();
 
-        if (alreadyCreatedMap.keySet().equals(originalExemptionsMap.keySet())) {
-            return true;
+        if (!alreadyCreatedMap.keySet().equals(originalExemptionsMap.keySet())) {
+            return false;
         }
 
         Predicate<Map.Entry<TreasuryExemptionType, BigDecimal>> predicate =
@@ -817,6 +887,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                 .collect(Collectors.toList());
     }
 
+    // algorithm
     private List<TuitionDebitEntryBean> buildInstallmentDebitEntryBeanWithDiscount(
             Map<TuitionInstallmentTariff, TuitionDebitEntryBean> calculatedDebitEntryBeansMap, TuitionInstallmentTariff tariff) {
         Product product = tariff.getProduct();
@@ -854,15 +925,15 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                     AcademicTreasuryEvent.findUniqueForRegistrationTuition(this.registrationOptions.registration,
                             this.registrationOptions.executionYear).get();
 
-            if (TreasuryConstants.isZero(differenceNetAmount) && TreasuryConstants.isZero(
-                    differenceInNetExemptedAmount) && isExemptionsMapAreEqual(tariff, academicTreasuryEvent, originalBean)) {
+            if (TreasuryConstants.isZero(differenceNetAmount) && isExemptionsMapAreEqual(tariff, academicTreasuryEvent,
+                    originalBean)) {
                 // Before and after is equal, nothing to do
                 return Collections.emptyList();
             }
 
-            if (TreasuryConstants.isNegative(differenceNetAmount) && TreasuryConstants.isZero(
-                    differenceInNetExemptedAmount) && isExemptionsMapAreEqual(tariff, academicTreasuryEvent, originalBean)) {
-
+            if (!TreasuryConstants.isPositive(differenceInNetExemptedAmount) && (isExemptionsMapAreEqual(tariff,
+                    academicTreasuryEvent, originalBean) || isThereIsOnlyRemovalsOrDecrementsInExemptions(tariff,
+                    academicTreasuryEvent, originalBean))) {
                 LocalDate recalculationDueDate = this.installmentRecalculationOptions.recalculateInstallments.get(product);
 
                 LocalizedString recalculationInstallmentName = installmentName;
@@ -881,7 +952,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
                 return Collections.singletonList(
                         new TuitionDebitEntryBean(installmentOrder, tariff, recalculationInstallmentName, recalculationDueDate,
-                                vat.getTaxRate(), differenceNetAmount.negate(), BigDecimal.ZERO, new HashMap<>(), currency));
+                                vat.getTaxRate(), differenceNetAmount, differenceInNetExemptedAmount, new HashMap<>(), currency));
             }
 
             if (!TreasuryConstants.isNegative(differenceNetAmount) && !TreasuryConstants.isNegative(
