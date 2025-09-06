@@ -219,10 +219,12 @@ public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
                 .recalculateInstallments(Map.of(firstInstallmentProduct, new LocalDate())) //
                 .executeTuitionPaymentPlanCreation();
 
-        assertEquals(academicTreasuryEvent.getAmountWithVatToPay(), new BigDecimal("3200.00"));
+        assertEquals(new BigDecimal("3200.00"), academicTreasuryEvent.getAmountWithVatToPay());
 
-        assertEquals(DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).map(DebitEntry::getAmountWithVat)
-                .reduce(BigDecimal.ZERO, BigDecimal::add), new BigDecimal("800.00"));
+        BigDecimal amountOfFirstInstallment =
+                DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).map(DebitEntry::getAmountWithVat)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+        assertEquals(new BigDecimal("800.00"), amountOfFirstInstallment);
 
         assertEquals(DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count(), 2);
     }
