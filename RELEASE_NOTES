@@ -1,3 +1,5 @@
+- Bug Fix: Resolve some interest debts associated with standalone, extracurricular and improvement tuition present degree information [#qubIT-Fenix-7443]
+
 12.9.8 (26-08-2025)
 - Refactor: Transform static method into instance method to copy academic debt rule between periods [#qubIT-Fenix-7423]
 - Bug Fix: Copy the start and end dates of academic debt rule execution [#qubIT-Fenix-7423]
