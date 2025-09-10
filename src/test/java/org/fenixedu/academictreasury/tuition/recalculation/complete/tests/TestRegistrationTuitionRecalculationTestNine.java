@@ -1,17 +1,6 @@
 package org.fenixedu.academictreasury.tuition.recalculation.complete.tests;
 
-import static org.junit.Assert.assertEquals;
-
-import java.lang.reflect.UndeclaredThrowableException;
-import java.math.BigDecimal;
-import java.util.Map;
-import java.util.Set;
-
-import org.fenixedu.academic.domain.Country;
-import org.fenixedu.academic.domain.DegreeCurricularPlan;
-import org.fenixedu.academic.domain.ExecutionInterval;
-import org.fenixedu.academic.domain.ExecutionYear;
-import org.fenixedu.academic.domain.StudentCurricularPlan;
+import org.fenixedu.academic.domain.*;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
@@ -29,19 +18,29 @@ import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.document.DebitEntry;
+import org.fenixedu.treasury.domain.document.DebitNote;
+import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
+import org.fenixedu.treasury.domain.document.FinantialDocumentType;
 import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
 import org.fenixedu.treasury.util.TreasuryConstants;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import pt.ist.esw.advice.pt.ist.fenixframework.AtomicInstance;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
 
+import java.lang.reflect.UndeclaredThrowableException;
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+
 @RunWith(FenixFrameworkRunner.class)
-public class TestRegistrationTuitionRecalculationTestOne {
+public class TestRegistrationTuitionRecalculationTestNine {
 
     private static Registration registration;
     private static ExecutionInterval executionInterval;
@@ -51,7 +50,7 @@ public class TestRegistrationTuitionRecalculationTestOne {
     public static void init() {
         try {
             FenixFramework.getTransactionManager().withTransaction(() -> {
-                org.fenixedu.academic.domain.EnrolmentTest.initEnrolments();
+                EnrolmentTest.initEnrolments();
 
                 org.fenixedu.academictreasury.tuition.TuitionPaymentPlanTestsUtilities.startUp();
                 AcademicTreasuryBootstrapper.bootstrap();
@@ -173,8 +172,15 @@ public class TestRegistrationTuitionRecalculationTestOne {
 
         DebitEntry firstInstallment = DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next();
 
+        DocumentNumberSeries documentNumberSeries =
+                DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(),
+                        firstInstallment.getFinantialEntity());
+        DebitNote.createDebitNoteForDebitEntry(firstInstallment, null, documentNumberSeries, new DateTime(), new LocalDate(),
+                null, null, null);
+        firstInstallment.getDebitNote().closeDocument();
+
         RegistrationTuitionService.startServiceInvocation(registration, executionYear, new LocalDate())
-                .applyEnrolledEctsUnits(new BigDecimal("30")) //
+                .applyEnrolledEctsUnits(new BigDecimal("32.5")) //
                 .applyEnrolledCoursesCount(new BigDecimal("5")) //
                 .withInferedTuitionPaymentPlan() //
                 .withAllInstallments() //
@@ -182,13 +188,15 @@ public class TestRegistrationTuitionRecalculationTestOne {
                 .recalculateInstallments(Map.of(firstInstallmentProduct, new LocalDate())) //
                 .executeTuitionPaymentPlanCreation();
 
-        assertEquals(new BigDecimal("1200.00"), academicTreasuryEvent.getAmountWithVatToPay());
-        assertEquals(4, DebitEntry.findActive(academicTreasuryEvent).count());
+        assertEquals(new BigDecimal("1300.00"), academicTreasuryEvent.getAmountWithVatToPay());
+        assertEquals(5, DebitEntry.findActive(academicTreasuryEvent).count());
 
-        assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
-        assertEquals(firstInstallment, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next());
+        assertEquals(Boolean.FALSE, firstInstallment.isAnnulled());
 
-        assertEquals(new BigDecimal("300.00"),
+        assertEquals(2, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
+        assertEquals(0, firstInstallment.getCreditEntriesSet().size());
+
+        assertEquals(new BigDecimal("325.00"),
                 DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).map(DebitEntry::getAmountWithVat)
                         .reduce(BigDecimal.ZERO, BigDecimal::add));
     }

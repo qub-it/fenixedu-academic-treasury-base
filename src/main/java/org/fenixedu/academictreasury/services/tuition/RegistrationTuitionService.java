@@ -18,10 +18,10 @@ import org.fenixedu.treasury.domain.FinantialInstitution;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.Vat;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
-import org.fenixedu.treasury.domain.document.DebitEntry;
-import org.fenixedu.treasury.domain.document.DebitNote;
+import org.fenixedu.treasury.domain.document.*;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemptionType;
+import org.fenixedu.treasury.dto.SettlementNoteBean;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.TreasuryConstants;
@@ -227,18 +227,39 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                     this._treasuryExemptionsTeller.revertExemptionAmountsFromAcademicTreasuryToDiscountExemptionsMapForAllInstallments(
                             tariff);
 
+                    Set<DebitEntry> debitEntriesToAnnul =
+                            DebitEntry.findActive(academicTreasuryEvent, product).collect(Collectors.toSet());
+
+                    // Check if there is only one payor entity to set
+                    Set<DebtAccount> payorDebtAccountsSet =
+                            debitEntriesToAnnul.stream().map(de -> de.getDebitNote() != null ? de.getPayorDebtAccount() : null)
+                                    .filter(Objects::nonNull).collect(Collectors.toSet());
+
+                    DebtAccount payorDebtAccount =
+                            payorDebtAccountsSet.size() == 1 ? payorDebtAccountsSet.iterator().next() : null;
+
+                    // Track the existing credit entries before annulation
+                    Set<CreditEntry> existingCreditEntriesSet =
+                            debitEntriesToAnnul.stream().flatMap(de -> de.getCreditEntriesSet().stream())
+                                    .filter(ce -> !ce.isAnnulled()).collect(Collectors.toSet());
+
                     // ANIL 2025-03-03 (#qubIT-Fenix-6662)
                     //
                     // Interest entries cannot be annulled
-                    DebitEntry.findActive(academicTreasuryEvent, product)
-                            .forEach(d -> d.annulOnlyThisDebitEntryAndInterestsInBusinessContext(reason, false));
+                    debitEntriesToAnnul.forEach(d -> d.annulOnlyThisDebitEntryAndInterestsInBusinessContext(reason, false));
+
+                    // Collect the new creditEntries that we can compensate with the new debitEntry
+                    Set<CreditEntry> newCreditEntriesSet =
+                            debitEntriesToAnnul.stream().flatMap(de -> de.getCreditEntriesSet().stream())
+                                    .filter(ce -> !existingCreditEntriesSet.contains(ce)).filter(ce -> !ce.isAnnulled())
+                                    .collect(Collectors.toSet());
 
                     BigDecimal tuitionInstallmentAmountToPay = originalBean.getAmount().add(originalBean.getExemptedAmount());
                     Map<TreasuryExemptionType, BigDecimal> exemptionsToApplyMap =
                             this._treasuryExemptionsTeller.retrieveUnchargedExemptionsToApplyMapForTariff(tariff,
                                     tuitionInstallmentAmountToPay);
 
-                    createDebitEntryForRegistrationAndExempt(tariff, exemptionsToApplyMap);
+                    createDebitEntryForRegistrationAndExempt(tariff, exemptionsToApplyMap, payorDebtAccount, newCreditEntriesSet);
 
                     return true;
                 }
@@ -319,17 +340,20 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                 }
             }
 
-            remainingAmountToCredit = netAmountToCredit.subtract(netAmountToCredit);
+            remainingAmountToCredit = remainingAmountToCredit.subtract(netAmountToCredit);
             netExemptedAmountToCreditByTypeMap.keySet().forEach(t -> exemptionDecrementAmountsByTypeMap.put(t,
                     exemptionDecrementAmountsByTypeMap.get(t).subtract(netExemptedAmountToCreditByTypeMap.get(t))));
 
             // Distinguish between debit entry in preparing state or closed
             if (d.getFinantialDocument() == null || d.getFinantialDocument().isPreparing()) {
+                // Save the payor entity, if there is one
+                DebtAccount payorDebtAccount = d.getDebitNote() != null ? d.getDebitNote().getPayorDebtAccount() : null;
+
                 // we are going to annul this item
                 // fill back the exemption amount for all installments
                 // til the limit
                 d.getEffectiveNetExemptionAmountsMapByType().entrySet().forEach(
-                        entry -> this._treasuryExemptionsTeller.fillBackExemptionAmountForAllInstallments(entry.getKey(),
+                        entry -> this._treasuryExemptionsTeller.fillBackExemptionAmountForAllInstallments(tariff, entry.getKey(),
                                 entry.getValue()));
 
                 // When it is preparing, we proceed with the following
@@ -354,28 +378,41 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                 BigDecimal newNetAmount = d.getNetAmount().add(d.getNetExemptedAmount()).subtract(netAmountToCredit)
                         .subtract(sumOfNetExemptedAmountToCreditByTypeMap);
 
-                DebitEntry newDebitEntry =
-                        DebitEntry.create(d.getFinantialEntity(), d.getDebtAccount(), d.getTreasuryEvent(), d.getVat(), //
-                                newNetAmount, d.getDueDate(), d.getPropertiesMap(), d.getProduct(), //
-                                d.getDescription(), BigDecimal.ONE, d.getInterestRate(), d.getEntryDateTime(), //
-                                d.isAcademicalActBlockingSuspension(), d.isBlockAcademicActsOnDebt(), debitNote);
+                if (TreasuryConstants.isPositive(newNetAmount)) {
+                    DebitEntry newDebitEntry =
+                            DebitEntry.create(d.getFinantialEntity(), d.getDebtAccount(), d.getTreasuryEvent(), d.getVat(), //
+                                    newNetAmount, d.getDueDate(), d.getPropertiesMap(), d.getProduct(), //
+                                    d.getDescription(), BigDecimal.ONE, d.getInterestRate(), d.getEntryDateTime(), //
+                                    d.isAcademicalActBlockingSuspension(), d.isBlockAcademicActsOnDebt(), debitNote);
 
-                Map<TreasuryExemptionType, BigDecimal> newTreasuryExemptionMapByType =
-                        this._treasuryExemptionsTeller.retrieveUnchargedExemptionsToApplyMapForTariff(tariff, newNetAmount);
+                    if (payorDebtAccount != null) {
+                        DocumentNumberSeries debitNoteNumberSeries =
+                                DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(),
+                                        newDebitEntry.getFinantialEntity());
+                        DebitNote.createDebitNoteForDebitEntry(newDebitEntry, payorDebtAccount, debitNoteNumberSeries,
+                                new DateTime(), new LocalDate(), null, null, null);
+                    }
 
-                newTreasuryExemptionMapByType.entrySet().forEach(entry -> {
-                    String exemptionReason = entry.getKey().getName()
-                            .getContent(TreasuryPlataformDependentServicesFactory.implementation().defaultLocale());
+                    Map<TreasuryExemptionType, BigDecimal> newTreasuryExemptionMapByType =
+                            this._treasuryExemptionsTeller.retrieveUnchargedExemptionsToApplyMapForTariff(tariff, newNetAmount);
 
-                    TreasuryExemption.create(entry.getKey(), exemptionReason, entry.getValue(), newDebitEntry);
+                    newTreasuryExemptionMapByType.entrySet().forEach(entry -> {
+                        String exemptionReason = entry.getKey().getName()
+                                .getContent(TreasuryPlataformDependentServicesFactory.implementation().defaultLocale());
 
-                });
+                        TreasuryExemption.create(entry.getKey(), exemptionReason, entry.getValue(), newDebitEntry);
+                    });
+                }
 
                 // 4. Annul the debit entry, interest entries cannot be annulled
                 d.annulOnlyThisDebitEntryAndInterestsInBusinessContext(recalculationReason, false);
             } else if (d.getFinantialDocument().isClosed()) {
                 Map<TreasuryExemption, BigDecimal> creditExemptionsMap =
                         d.calculateNetExemptedAmountsToCreditMapBasedInExplicitAmounts(netExemptedAmountToCreditByTypeMap, true);
+
+                creditExemptionsMap.entrySet().forEach(
+                        entry -> this._treasuryExemptionsTeller.fillBackExemptionAmountForAllInstallments(tariff,
+                                entry.getKey().getTreasuryExemptionType(), entry.getValue()));
 
                 d.creditDebitEntry(netAmountToCredit, recalculationReason, false, creditExemptionsMap);
 
@@ -418,7 +455,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                 this._treasuryExemptionsTeller.retrieveUnchargedExemptionsToApplyMapForTariff(tariff,
                         tuitionInstallmentAmountToPay);
 
-        createDebitEntryForRegistrationAndExempt(tariff, exemptionsToApplyMap);
+        createDebitEntryForRegistrationAndExempt(tariff, exemptionsToApplyMap, null, Set.of());
         return true;
     }
 
@@ -447,8 +484,9 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
     }
 
     private DebitEntry createDebitEntryForRegistrationAndExempt(TuitionInstallmentTariff tariff,
-            Map<TreasuryExemptionType, BigDecimal> exemptionsToApplyMap) {
-        DebitEntry installmentDebitEntry = tariff.createDebitEntryForRegistration(this);
+            Map<TreasuryExemptionType, BigDecimal> exemptionsToApplyMap, DebtAccount payorDebtAccount,
+            Set<CreditEntry> newCreditEntriesCreatedWithAnnulOfOldDebitEntriesSet) {
+        DebitEntry newDebitEntry = tariff.createDebitEntryForRegistration(this);
 
         for (Entry<TreasuryExemptionType, BigDecimal> entry : exemptionsToApplyMap.entrySet()) {
             TreasuryExemptionType treasuryExemptionType = entry.getKey();
@@ -456,10 +494,67 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
             String reason = treasuryExemptionType.getName()
                     .getContent(TreasuryPlataformDependentServicesFactory.implementation().defaultLocale());
-            TreasuryExemption.create(treasuryExemptionType, reason, amountToExempt, installmentDebitEntry);
+            TreasuryExemption.create(treasuryExemptionType, reason, amountToExempt, newDebitEntry);
         }
 
-        return installmentDebitEntry;
+        if (payorDebtAccount != null) {
+            if (newDebitEntry.getDebitNote() == null) {
+                DocumentNumberSeries debitNoteNumberSeries =
+                        DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(),
+                                newDebitEntry.getFinantialEntity());
+                DebitNote.createDebitNoteForDebitEntry(newDebitEntry, payorDebtAccount, debitNoteNumberSeries, new DateTime(),
+                        new LocalDate(), null, null, null);
+            }
+        }
+
+        Comparator<InvoiceEntry> invoiceEntryHighestAmountComparator =
+                Comparator.comparing(InvoiceEntry::getOpenAmount).reversed().thenComparing(InvoiceEntry::getExternalId);
+        TreeSet<CreditEntry> creditEntriesToCompensateSet = new TreeSet<>(invoiceEntryHighestAmountComparator);
+        creditEntriesToCompensateSet.addAll(newCreditEntriesCreatedWithAnnulOfOldDebitEntriesSet);
+
+        // Try to compensate the newDebitEntry with the new credits that were created
+        while (!creditEntriesToCompensateSet.isEmpty()) {
+            CreditEntry creditEntryToSettle = creditEntriesToCompensateSet.pollFirst();
+
+            if (!TreasuryConstants.isPositive(creditEntryToSettle.getOpenAmount())) {
+                continue;
+            }
+
+            newDebitEntry.getAllSplittedDebitEntriesSet().stream() //
+                    .filter(de -> de.getDebtAccount() == creditEntryToSettle.getDebtAccount())
+                    .filter(de -> TreasuryConstants.isPositive(de.getOpenAmount()))
+                    .filter(de -> de.getDebitNote() == null || de.getDebitNote().isPreparing())
+                    .filter(hasTheSamePayorDebtAccount(creditEntryToSettle)) //
+                    .sorted(invoiceEntryHighestAmountComparator) //
+                    .findFirst().ifPresent(de -> {
+                        BigDecimal minimumAmountToSettle = creditEntryToSettle.getOpenAmount().min(de.getOpenAmount());
+
+                        DocumentNumberSeries settleDocNumSeries =
+                                DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForSettlementNote(),
+                                        creditEntryToSettle.getFinantialEntity());
+                        SettlementNoteBean settlementNoteBean =
+                                new SettlementNoteBean(creditEntryToSettle.getDebtAccount(), false, false);
+
+                        settlementNoteBean.setFinantialEntity(creditEntryToSettle.getFinantialEntity());
+                        settlementNoteBean.setDocNumSeries(settleDocNumSeries);
+                        settlementNoteBean.getInvoiceEntryBean(creditEntryToSettle).setIncluded(true);
+                        settlementNoteBean.getInvoiceEntryBean(creditEntryToSettle).setSettledAmount(minimumAmountToSettle);
+                        settlementNoteBean.getInvoiceEntryBean(de).setIncluded(true);
+                        settlementNoteBean.getInvoiceEntryBean(de).setSettledAmount(minimumAmountToSettle);
+
+                        SettlementNote.createSettlementNote(settlementNoteBean);
+                    });
+        }
+
+        return newDebitEntry;
+    }
+
+    private Predicate<DebitEntry> hasTheSamePayorDebtAccount(CreditEntry creditEntryToSettle) {
+        return de -> {
+            DebtAccount debitEntryPayorAccount = de.getDebitNote() != null ? de.getDebitNote().getPayorDebtAccount() : null;
+
+            return creditEntryToSettle.getCreditNote().getPayorDebtAccount() == debitEntryPayorAccount;
+        };
     }
 
     public List<TuitionDebitEntryBean> executeInstallmentDebitEntryBeansCalculation() {

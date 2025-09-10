@@ -12,6 +12,7 @@ import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
 import org.fenixedu.academictreasury.domain.tuition.exemptions.StatuteExemptionByIntervalMapEntry;
 import org.fenixedu.academictreasury.dto.tuition.TuitionDebitEntryBean;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
+import org.fenixedu.treasury.domain.Currency;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.event.TreasuryEvent;
@@ -23,6 +24,7 @@ import pt.ist.fenixframework.core.AbstractDomainObject;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -462,15 +464,38 @@ class TreasuryExemptionsTeller {
         return alreadyCreatedMap.entrySet().stream().allMatch(predicate);
     }
 
-    public void fillBackExemptionAmountForAllInstallments(TreasuryExemptionType treasuryExemptionType,
-            BigDecimal exemptionAmount) {
+    public void fillBackExemptionAmountForAllInstallments(TuitionInstallmentTariff tariff,
+            TreasuryExemptionType treasuryExemptionType, BigDecimal exemptionAmount) {
+
+        Supplier<BigDecimal> exemptionAmountMinusOnlyForInstallmentCalc = () -> {
+            if (!this._alreadyCreatedExemptionsMapForOnlyThisInstallment.containsKey(tariff)) {
+                return BigDecimal.ZERO;
+            }
+
+            if (!this._alreadyCreatedExemptionsMapForOnlyThisInstallment.get(tariff).containsKey(treasuryExemptionType)) {
+                return BigDecimal.ZERO;
+            }
+
+            BigDecimal exemptionRatio = TreasuryConstants.divide(treasuryExemptionType.getDefaultExemptionPercentage(),
+                    TreasuryConstants.HUNDRED_PERCENT);
+
+            BigDecimal result = exemptionAmount.multiply(exemptionRatio);
+
+            return Currency.getValueWithScale(this._alreadyCreatedExemptionsMapForOnlyThisInstallment.get(tariff)
+                    .get(treasuryExemptionType).availableNetAmountForExemption.min(result));
+        };
+
+        BigDecimal exemptionAmountMinusOnlyForInstallment =
+                exemptionAmount.subtract(exemptionAmountMinusOnlyForInstallmentCalc.get());
+
         if (!this._alreadyCreatedExemptionsMapForAllInstallments.containsKey(treasuryExemptionType)) {
             return;
         }
 
         BigDecimal amountToAdd =
                 this._alreadyCreatedExemptionsMapForAllInstallments.get(treasuryExemptionType).availableNetAmountForExemption.min(
-                        exemptionAmount);
+                        exemptionAmountMinusOnlyForInstallment);
+
         this._discountExemptionsMapForAllInstallments.get(treasuryExemptionType).addToAvailableNetAmountForExemption(amountToAdd);
         this._alreadyCreatedExemptionsMapForAllInstallments.get(treasuryExemptionType).subtractFromCurrentNetAmount(amountToAdd);
     }
