@@ -1,3 +1,7 @@
+- Bug Fix: Fix the recalculation of registration tuition installments [#qubIT-Fenix-7442]
+- Refactor: Partition the RegistrationTuitionService into smaller classes [#qubIT-Fenix-7442]
+- Refactor: Unit tests to cover most as possible, the variations with the recalculation of registration tuition installments [#qubIT-Fenix-7442]
+
 12.9.9 (08-09-2025)
 - Bug Fix: Resolve some interest debts associated with standalone, extracurricular and improvement tuition present degree information [#qubIT-Fenix-7443]
 

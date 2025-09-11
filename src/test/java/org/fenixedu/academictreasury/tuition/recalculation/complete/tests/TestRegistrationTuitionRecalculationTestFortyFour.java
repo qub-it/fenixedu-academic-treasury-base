@@ -1,23 +1,28 @@
-package org.fenixedu.academictreasury.tuition.recalculation.tuition.allocation;
+package org.fenixedu.academictreasury.tuition.recalculation.complete.tests;
 
 import org.fenixedu.academic.domain.*;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
+import org.fenixedu.academictreasury.base.BasicAcademicTreasuryUtils;
 import org.fenixedu.academictreasury.base.FenixFrameworkRunner;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.tuition.*;
 import org.fenixedu.academictreasury.dto.tariff.AcademicTariffBean;
 import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
 import org.fenixedu.academictreasury.services.tuition.RegistrationTuitionService;
-import org.fenixedu.academictreasury.tuition.TuitionPaymentPlanTestsUtilities;
 import org.fenixedu.academictreasury.util.AcademicTreasuryBootstrapper;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.FinantialEntity;
+import org.fenixedu.treasury.domain.FinantialInstitution;
+import org.fenixedu.treasury.domain.PaymentMethod;
 import org.fenixedu.treasury.domain.Product;
-import org.fenixedu.treasury.domain.document.DebitEntry;
+import org.fenixedu.treasury.domain.document.*;
+import org.fenixedu.treasury.domain.exemption.TreasuryExemptionType;
 import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
+import org.fenixedu.treasury.dto.SettlementNoteBean;
 import org.fenixedu.treasury.util.TreasuryConstants;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,7 +40,7 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(FenixFrameworkRunner.class)
-public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
+public class TestRegistrationTuitionRecalculationTestFortyFour {
 
     private static Registration registration;
     private static ExecutionInterval executionInterval;
@@ -45,11 +50,13 @@ public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
     public static void init() {
         try {
             FenixFramework.getTransactionManager().withTransaction(() -> {
-                org.fenixedu.academic.domain.EnrolmentTest.initEnrolments();
+                EnrolmentTest.initEnrolments();
 
-                TuitionPaymentPlanTestsUtilities.startUp();
+                org.fenixedu.academictreasury.tuition.TuitionPaymentPlanTestsUtilities.startUp();
                 AcademicTreasuryBootstrapper.bootstrap();
+                BasicAcademicTreasuryUtils.createReservationTaxes();
                 createTuitionPaymentPlanWithAmountByEcts();
+                BasicAcademicTreasuryUtils.createStatuteTypeExemptionsMap();
                 createTuitionAllocationData();
 
                 return null;
@@ -57,6 +64,17 @@ public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
         } catch (Exception e) {
             throw new UndeclaredThrowableException(e);
         }
+    }
+
+    private static void createTuitionPaymentPlanWithAmountByEcts() {
+        registration = Student.readStudentByNumber(1).getRegistrationStream().findAny().orElseThrow();
+        final StudentCurricularPlan scp = registration.getLastStudentCurricularPlan();
+
+        executionInterval = ExecutionInterval.findFirstCurrentChild(scp.getDegree().getCalendar());
+        executionYear = executionInterval.getExecutionYear();
+
+        createTuitionPaymentPlan("1T", new BigDecimal("10"));
+        createTuitionPaymentPlan("2T", new BigDecimal("5"));
     }
 
     private static void createTuitionAllocationData() {
@@ -75,22 +93,14 @@ public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
                         .map(t -> t.getTuitionPaymentPlan()).filter(t -> "2T".equals(t.getCustomizedName().getContent()))
                         .findFirst().get();
 
+        TreasuryExemptionType exemptionTypeOne = TreasuryExemptionType.findByCode("TET1").findFirst().get();
+        TreasuryExemptionType exemptionTypeThree = TreasuryExemptionType.findByCode("TET3").findFirst().get();
+
         TuitionAllocation.create(tuitionPaymentPlan_1T.getTuitionPaymentPlanGroup(), registration,
-                tuitionPaymentPlan_1T.getExecutionYear(), firstMoment, tuitionPaymentPlan_1T, Set.of());
+                tuitionPaymentPlan_1T.getExecutionYear(), firstMoment, tuitionPaymentPlan_1T, Set.of(exemptionTypeOne));
 
         TuitionAllocation.create(tuitionPaymentPlan_2T.getTuitionPaymentPlanGroup(), registration,
-                tuitionPaymentPlan_2T.getExecutionYear(), secondMoment, tuitionPaymentPlan_2T, Set.of());
-    }
-
-    private static void createTuitionPaymentPlanWithAmountByEcts() {
-        registration = Student.readStudentByNumber(1).getRegistrationStream().findAny().orElseThrow();
-        final StudentCurricularPlan scp = registration.getLastStudentCurricularPlan();
-
-        executionInterval = ExecutionInterval.findFirstCurrentChild(scp.getDegree().getCalendar());
-        executionYear = executionInterval.getExecutionYear();
-
-        createTuitionPaymentPlan("1T", new BigDecimal("10"));
-        createTuitionPaymentPlan("2T", new BigDecimal("20"));
+                tuitionPaymentPlan_2T.getExecutionYear(), secondMoment, tuitionPaymentPlan_2T, Set.of(exemptionTypeThree));
     }
 
     private static TuitionPaymentPlan createTuitionPaymentPlan(String customizedPlanName, BigDecimal amountByEcts) {
@@ -177,7 +187,11 @@ public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
     }
 
     @Test
-    public void recalculationWithMoreThan30Ects() {
+    public void doRecalculation() {
+        FinantialInstitution.findAll().iterator().next().setSupportCreditTreasuryExemptions(true);
+        FinantialInstitution.findAll().iterator().next().setSplitDebitEntriesWithSettledAmount(true);
+        FinantialInstitution.findAll().iterator().next().setSplitCreditEntriesWithSettledAmount(true);
+
         createTuitionPaymentPlanWithAmountByEcts();
         ensureNecessaryAcademicDataIsAvailable();
 
@@ -207,10 +221,49 @@ public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
         AcademicTreasuryEvent academicTreasuryEvent =
                 AcademicTreasuryEvent.findUniqueForRegistrationTuition(registration, executionYear).get();
 
-        assertEquals(new BigDecimal("300.00"), academicTreasuryEvent.getAmountWithVatToPay());
+        assertEquals(new BigDecimal("263.37"), academicTreasuryEvent.getAmountWithVatToPay());
+        assertEquals(new BigDecimal("36.63"), academicTreasuryEvent.getNetExemptedAmount());
+        assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
+
+        DebitEntry firstInstallment = DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next();
+
+        DocumentNumberSeries debitNoteDocumentNumberSeries =
+                DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(),
+                        firstInstallment.getFinantialEntity());
+
+        DebitNote.createDebitNoteForDebitEntry(firstInstallment, null, debitNoteDocumentNumberSeries, new DateTime(),
+                new LocalDate(), null, null, null);
+
+        DocumentNumberSeries settleDocumentNumberSeries =
+                DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForSettlementNote(),
+                        firstInstallment.getFinantialEntity());
+
+        SettlementNoteBean settlementNoteBean = new SettlementNoteBean(firstInstallment.getDebtAccount(), false, false);
+        settlementNoteBean.setDocNumSeries(settleDocumentNumberSeries);
+        settlementNoteBean.getInvoiceEntryBean(firstInstallment).setSettledAmount(new BigDecimal("163.37"));
+        settlementNoteBean.getInvoiceEntryBean(firstInstallment).setIncluded(true);
+        settlementNoteBean.setFinantialEntity(firstInstallment.getFinantialEntity());
+
+        settlementNoteBean.getPaymentEntries()
+                .add(new SettlementNoteBean.PaymentEntryBean(new BigDecimal("163.37"), PaymentMethod.findByCode("NU"), null));
+
+        SettlementNote.createSettlementNote(settlementNoteBean);
+
+        assertEquals(new BigDecimal("163.37"), firstInstallment.getAmountWithVat());
+        assertEquals(new BigDecimal("22.72"), firstInstallment.getNetExemptedAmount());
+
+        assertEquals(2, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
+
+        DebitEntry secondFirstInstallment =
+                DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).filter(d -> d != firstInstallment)
+                        .iterator().next();
+
+        assertEquals(true, secondFirstInstallment.getDebitNote().isPreparing());
+        assertEquals(new BigDecimal("100.00"), secondFirstInstallment.getAmountWithVat());
+        assertEquals(new BigDecimal("13.91"), secondFirstInstallment.getNetExemptedAmount());
 
         RegistrationTuitionService.startServiceInvocation(registration, executionYear, new LocalDate())
-                .applyEnrolledEctsUnits(new BigDecimal("40")) //
+                .applyEnrolledEctsUnits(new BigDecimal("24")) //
                 .applyEnrolledCoursesCount(new BigDecimal("5")) //
                 .withTuitionPaymentPlan(secondAllocation.getTuitionPaymentPlan()) //
                 .applyTuitionAllocation(secondAllocation) //
@@ -219,14 +272,48 @@ public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
                 .recalculateInstallments(Map.of(firstInstallmentProduct, new LocalDate())) //
                 .executeTuitionPaymentPlanCreation();
 
-        assertEquals(new BigDecimal("3200.00"), academicTreasuryEvent.getAmountWithVatToPay());
+        assertEquals(true, secondFirstInstallment.isAnnulled());
 
-        BigDecimal amountOfFirstInstallment =
-                DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).map(DebitEntry::getAmountWithVat)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
-        assertEquals(new BigDecimal("800.00"), amountOfFirstInstallment);
+        assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
+        assertEquals(false, firstInstallment.isAnnulled());
+        assertEquals(new BigDecimal("80.40"), academicTreasuryEvent.getAmountWithVatToPay(firstInstallmentProduct));
+        assertEquals(new BigDecimal("39.60"), academicTreasuryEvent.getNetExemptedAmount(firstInstallmentProduct));
 
-        assertEquals(DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count(), 2);
+        assertEquals(2, firstInstallment.getCreditEntriesSet().size());
+
+        CreditEntry firstCreditEntry = firstInstallment.getCreditEntriesSet()
+                .stream().filter(ce -> ce.getCreditNote().isClosed())
+                .iterator().next();
+
+        assertEquals(new BigDecimal("80.40"), firstCreditEntry.getAmountWithVat());
+        assertEquals(new BigDecimal("11.18"), firstCreditEntry.getNetExemptedAmount());
+
+        CreditEntry secondCreditEntry = firstInstallment.getCreditEntriesSet()
+                .stream().filter(ce -> ce.getCreditNote().isPreparing())
+                .iterator().next();
+
+        assertEquals(1, firstCreditEntry.getSettlementEntriesSet().size());
+
+        assertEquals(new BigDecimal("82.97"), secondCreditEntry.getAmountWithVat());
+        assertEquals(new BigDecimal("11.54"), secondCreditEntry.getNetExemptedAmount());
+
+        DebitEntry thirdFirstInstallment = DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next();
+
+        assertEquals(new BigDecimal("80.40"), thirdFirstInstallment.getAmountWithVat());
+        assertEquals(new BigDecimal("39.60"), thirdFirstInstallment.getNetExemptedAmount());
+
+        Product secondInstallmentProduct = Product.findUniqueByCode("PROP_2_PREST_1_CIC").get();
+
+        assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, secondInstallmentProduct).count());
+
+        DebitEntry secondInstallment = DebitEntry.findActive(academicTreasuryEvent, secondInstallmentProduct).iterator().next();
+        assertEquals(new BigDecimal("80.40"), secondInstallment.getAmountWithVat());
+        assertEquals(new BigDecimal("39.60"), secondInstallment.getNetExemptedAmount());
+
+        assertEquals(new BigDecimal("321.60"), academicTreasuryEvent.getAmountWithVatToPay());
+        assertEquals(new BigDecimal("158.40"), academicTreasuryEvent.getNetExemptedAmount());
+
+        assertEquals(4, DebitEntry.findActive(academicTreasuryEvent).count());
     }
 
     private static FinantialEntity readFinantialEntity() {

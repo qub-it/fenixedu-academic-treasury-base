@@ -1,4 +1,4 @@
-package org.fenixedu.academictreasury.tuition.recalculation.tuition.allocation;
+package org.fenixedu.academictreasury.tuition.recalculation.complete.tests;
 
 import org.fenixedu.academic.domain.*;
 import org.fenixedu.academic.domain.student.Registration;
@@ -6,18 +6,24 @@ import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
 import org.fenixedu.academictreasury.base.FenixFrameworkRunner;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
-import org.fenixedu.academictreasury.domain.tuition.*;
+import org.fenixedu.academictreasury.domain.tuition.EctsCalculationType;
+import org.fenixedu.academictreasury.domain.tuition.TuitionCalculationType;
+import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
+import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
 import org.fenixedu.academictreasury.dto.tariff.AcademicTariffBean;
 import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
 import org.fenixedu.academictreasury.services.tuition.RegistrationTuitionService;
-import org.fenixedu.academictreasury.tuition.TuitionPaymentPlanTestsUtilities;
 import org.fenixedu.academictreasury.util.AcademicTreasuryBootstrapper;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.FinantialEntity;
+import org.fenixedu.treasury.domain.FinantialInstitution;
+import org.fenixedu.treasury.domain.PaymentMethod;
 import org.fenixedu.treasury.domain.Product;
-import org.fenixedu.treasury.domain.document.DebitEntry;
+import org.fenixedu.treasury.domain.document.*;
 import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
+import org.fenixedu.treasury.dto.SettlementNoteBean;
 import org.fenixedu.treasury.util.TreasuryConstants;
+import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,14 +34,13 @@ import pt.ist.fenixframework.FenixFramework;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.math.BigDecimal;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
 @RunWith(FenixFrameworkRunner.class)
-public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
+public class TestRegistrationTuitionRecalculationTestFifteen {
 
     private static Registration registration;
     private static ExecutionInterval executionInterval;
@@ -45,12 +50,11 @@ public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
     public static void init() {
         try {
             FenixFramework.getTransactionManager().withTransaction(() -> {
-                org.fenixedu.academic.domain.EnrolmentTest.initEnrolments();
+                EnrolmentTest.initEnrolments();
 
-                TuitionPaymentPlanTestsUtilities.startUp();
+                org.fenixedu.academictreasury.tuition.TuitionPaymentPlanTestsUtilities.startUp();
                 AcademicTreasuryBootstrapper.bootstrap();
                 createTuitionPaymentPlanWithAmountByEcts();
-                createTuitionAllocationData();
 
                 return null;
             }, new AtomicInstance(TxMode.WRITE, true));
@@ -59,48 +63,18 @@ public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
         }
     }
 
-    private static void createTuitionAllocationData() {
-        TuitionDebtPostingType firstMoment = TuitionDebtPostingType.create(FinantialEntity.findAll().iterator().next(),
-                new LocalizedString(new Locale("pt"), "1M"));
-        TuitionDebtPostingType secondMoment = TuitionDebtPostingType.create(FinantialEntity.findAll().iterator().next(),
-                new LocalizedString(new Locale("pt"), "2M"));
-
-        TuitionPaymentPlan tuitionPaymentPlan_1T =
-                registration.getLastStudentCurricularPlan().getDegreeCurricularPlan().getTuitionPaymentPlanOrdersSet().stream()
-                        .map(t -> t.getTuitionPaymentPlan()).filter(t -> "1T".equals(t.getCustomizedName().getContent()))
-                        .findFirst().get();
-
-        TuitionPaymentPlan tuitionPaymentPlan_2T =
-                registration.getLastStudentCurricularPlan().getDegreeCurricularPlan().getTuitionPaymentPlanOrdersSet().stream()
-                        .map(t -> t.getTuitionPaymentPlan()).filter(t -> "2T".equals(t.getCustomizedName().getContent()))
-                        .findFirst().get();
-
-        TuitionAllocation.create(tuitionPaymentPlan_1T.getTuitionPaymentPlanGroup(), registration,
-                tuitionPaymentPlan_1T.getExecutionYear(), firstMoment, tuitionPaymentPlan_1T, Set.of());
-
-        TuitionAllocation.create(tuitionPaymentPlan_2T.getTuitionPaymentPlanGroup(), registration,
-                tuitionPaymentPlan_2T.getExecutionYear(), secondMoment, tuitionPaymentPlan_2T, Set.of());
-    }
-
-    private static void createTuitionPaymentPlanWithAmountByEcts() {
+    private static TuitionPaymentPlan createTuitionPaymentPlanWithAmountByEcts() {
         registration = Student.readStudentByNumber(1).getRegistrationStream().findAny().orElseThrow();
         final StudentCurricularPlan scp = registration.getLastStudentCurricularPlan();
 
         executionInterval = ExecutionInterval.findFirstCurrentChild(scp.getDegree().getCalendar());
         executionYear = executionInterval.getExecutionYear();
 
-        createTuitionPaymentPlan("1T", new BigDecimal("10"));
-        createTuitionPaymentPlan("2T", new BigDecimal("20"));
-    }
-
-    private static TuitionPaymentPlan createTuitionPaymentPlan(String customizedPlanName, BigDecimal amountByEcts) {
         TuitionPaymentPlanBean bean = new TuitionPaymentPlanBean(
                 TuitionPaymentPlanGroup.findUniqueDefaultGroupForRegistration().get().getCurrentProduct(),
                 TuitionPaymentPlanGroup.findUniqueDefaultGroupForRegistration().get(), readFinantialEntity(), executionYear);
 
-        bean.setDefaultPaymentPlan(false);
-        bean.setCustomized(true);
-        bean.setName(customizedPlanName);
+        bean.setDefaultPaymentPlan(true);
 
         DegreeCurricularPlan degreeCurricularPlan = registration.getLastStudentCurricularPlan().getDegreeCurricularPlan();
         bean.addDegreeCurricularPlans(degreeCurricularPlan);
@@ -111,7 +85,7 @@ public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
             academicTariffBean.setTuitionInstallmentProduct(Product.findUniqueByCode("PROP_1_PREST_1_CIC").get());
             academicTariffBean.setTuitionCalculationType(TuitionCalculationType.ECTS);
             academicTariffBean.setEctsCalculationType(EctsCalculationType.FIXED_AMOUNT);
-            academicTariffBean.setFixedAmount(amountByEcts);
+            academicTariffBean.setFixedAmount(new BigDecimal("10"));
             academicTariffBean.setBeginDate(executionYear.getBeginLocalDate());
             academicTariffBean.setDueDateCalculationType(DueDateCalculationType.DAYS_AFTER_CREATION);
             academicTariffBean.setNumberOfDaysAfterCreationForDueDate(7);
@@ -125,7 +99,7 @@ public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
             academicTariffBean.setTuitionInstallmentProduct(Product.findUniqueByCode("PROP_2_PREST_1_CIC").get());
             academicTariffBean.setTuitionCalculationType(TuitionCalculationType.ECTS);
             academicTariffBean.setEctsCalculationType(EctsCalculationType.FIXED_AMOUNT);
-            academicTariffBean.setFixedAmount(amountByEcts);
+            academicTariffBean.setFixedAmount(new BigDecimal("10"));
             academicTariffBean.setBeginDate(executionYear.getBeginLocalDate());
             academicTariffBean.setDueDateCalculationType(DueDateCalculationType.DAYS_AFTER_CREATION);
             academicTariffBean.setNumberOfDaysAfterCreationForDueDate(30);
@@ -139,7 +113,7 @@ public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
             academicTariffBean.setTuitionInstallmentProduct(Product.findUniqueByCode("PROP_3_PREST_1_CIC").get());
             academicTariffBean.setTuitionCalculationType(TuitionCalculationType.ECTS);
             academicTariffBean.setEctsCalculationType(EctsCalculationType.FIXED_AMOUNT);
-            academicTariffBean.setFixedAmount(amountByEcts);
+            academicTariffBean.setFixedAmount(new BigDecimal("10"));
             academicTariffBean.setBeginDate(executionYear.getBeginLocalDate());
             academicTariffBean.setDueDateCalculationType(DueDateCalculationType.DAYS_AFTER_CREATION);
             academicTariffBean.setNumberOfDaysAfterCreationForDueDate(60);
@@ -153,7 +127,7 @@ public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
             academicTariffBean.setTuitionInstallmentProduct(Product.findUniqueByCode("PROP_4_PREST_1_CIC").get());
             academicTariffBean.setTuitionCalculationType(TuitionCalculationType.ECTS);
             academicTariffBean.setEctsCalculationType(EctsCalculationType.FIXED_AMOUNT);
-            academicTariffBean.setFixedAmount(amountByEcts);
+            academicTariffBean.setFixedAmount(new BigDecimal("10"));
             academicTariffBean.setBeginDate(executionYear.getBeginLocalDate());
             academicTariffBean.setDueDateCalculationType(DueDateCalculationType.DAYS_AFTER_CREATION);
             academicTariffBean.setNumberOfDaysAfterCreationForDueDate(90);
@@ -177,29 +151,18 @@ public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
     }
 
     @Test
-    public void recalculationWithMoreThan30Ects() {
+    public void doRecalculation() {
+        FinantialInstitution.findAll().iterator().next().setSplitCreditEntriesWithSettledAmount(true);
+        FinantialInstitution.findAll().iterator().next().setSplitDebitEntriesWithSettledAmount(true);
+
         createTuitionPaymentPlanWithAmountByEcts();
         ensureNecessaryAcademicDataIsAvailable();
-
-        TuitionDebtPostingType firstMoment =
-                TuitionDebtPostingType.findAll().filter(t -> "1M".equals(t.getName().getContent())).findFirst().get();
-        TuitionDebtPostingType secondMoment =
-                TuitionDebtPostingType.findAll().filter(t -> "2M".equals(t.getName().getContent())).findFirst().get();
-
-        TuitionAllocation firstAllocation =
-                TuitionAllocation.findUnique(TuitionPaymentPlanGroup.findUniqueDefaultGroupForRegistration().get(), registration,
-                        executionYear, firstMoment).get();
-
-        TuitionAllocation secondAllocation =
-                TuitionAllocation.findUnique(TuitionPaymentPlanGroup.findUniqueDefaultGroupForRegistration().get(), registration,
-                        executionYear, secondMoment).get();
 
         Product firstInstallmentProduct = Product.findUniqueByCode("PROP_1_PREST_1_CIC").get();
         RegistrationTuitionService.startServiceInvocation(registration, executionYear, new LocalDate()) //
                 .applyEnrolledEctsUnits(new BigDecimal("30")) //
                 .applyEnrolledCoursesCount(new BigDecimal("5")) //
-                .withTuitionPaymentPlan(firstAllocation.getTuitionPaymentPlan()) //
-                .applyTuitionAllocation(firstAllocation) //
+                .withInferedTuitionPaymentPlan() //
                 .restrictForInstallmentProducts(Set.of(firstInstallmentProduct)) //
                 .withoutInstallmentsRecalculation() //
                 .executeTuitionPaymentPlanCreation();
@@ -208,25 +171,64 @@ public class TestsTuitionAllocationPaymentPlanRecalculationWithMoreThan30Ects {
                 AcademicTreasuryEvent.findUniqueForRegistrationTuition(registration, executionYear).get();
 
         assertEquals(new BigDecimal("300.00"), academicTreasuryEvent.getAmountWithVatToPay());
+        assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
+
+        DebitEntry firstInstallment = DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next();
+
+        DocumentNumberSeries debitDocumentNumberSeries =
+                DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForDebitNote(),
+                        firstInstallment.getFinantialEntity());
+        DebitNote.createDebitNoteForDebitEntry(firstInstallment, null, debitDocumentNumberSeries, new DateTime(), new LocalDate(),
+                null, null, null);
+
+        DocumentNumberSeries settleDocumentNumberSeries =
+                DocumentNumberSeries.findUniqueDefaultSeries(FinantialDocumentType.findForSettlementNote(),
+                        firstInstallment.getFinantialEntity());
+
+        SettlementNoteBean settlementNoteBean = new SettlementNoteBean(firstInstallment.getDebtAccount(), false, false);
+        settlementNoteBean.setDocNumSeries(settleDocumentNumberSeries);
+        settlementNoteBean.getInvoiceEntryBean(firstInstallment).setSettledAmount(new BigDecimal("300.00"));
+        settlementNoteBean.getInvoiceEntryBean(firstInstallment).setIncluded(true);
+        settlementNoteBean.setFinantialEntity(firstInstallment.getFinantialEntity());
+
+        settlementNoteBean.getPaymentEntries()
+                .add(new SettlementNoteBean.PaymentEntryBean(new BigDecimal("300.00"), PaymentMethod.findByCode("NU"), null));
+
+        SettlementNote.createSettlementNote(settlementNoteBean);
+
+        firstInstallment.annulOnlyThisDebitEntryAndInterestsInBusinessContext("Test", false);
+
+        assertEquals(0, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
+        assertEquals(new BigDecimal("300.00"), firstInstallment.getAmountWithVat());
+        assertEquals(true, firstInstallment.getDebitNote().isClosed());
+
+        assertEquals(new BigDecimal("300.00"), firstInstallment.getCreditEntriesSet().iterator().next().getAmountWithVat());
+        assertEquals(true, firstInstallment.getCreditEntriesSet().iterator().next().getCreditNote().isPreparing());
 
         RegistrationTuitionService.startServiceInvocation(registration, executionYear, new LocalDate())
-                .applyEnrolledEctsUnits(new BigDecimal("40")) //
+                .applyEnrolledEctsUnits(new BigDecimal("27.5")) //
                 .applyEnrolledCoursesCount(new BigDecimal("5")) //
-                .withTuitionPaymentPlan(secondAllocation.getTuitionPaymentPlan()) //
-                .applyTuitionAllocation(secondAllocation) //
+                .withInferedTuitionPaymentPlan() //
                 .withAllInstallments() //
                 .forceInstallmentsEvenTreasuryEventIsCharged(true) //
                 .recalculateInstallments(Map.of(firstInstallmentProduct, new LocalDate())) //
                 .executeTuitionPaymentPlanCreation();
 
-        assertEquals(new BigDecimal("3200.00"), academicTreasuryEvent.getAmountWithVatToPay());
+        DebitEntry secondFirstInstallment = DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next();
 
-        BigDecimal amountOfFirstInstallment =
+        assertEquals(true, firstInstallment != secondFirstInstallment);
+
+        assertEquals(new BigDecimal("1100.00"), academicTreasuryEvent.getAmountWithVatToPay());
+        assertEquals(4, DebitEntry.findActive(academicTreasuryEvent).count());
+
+        assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
+
+        assertEquals(new BigDecimal("275.00"),
                 DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).map(DebitEntry::getAmountWithVat)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
-        assertEquals(new BigDecimal("800.00"), amountOfFirstInstallment);
+                        .reduce(BigDecimal.ZERO, BigDecimal::add));
 
-        assertEquals(DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count(), 2);
+        assertEquals(new BigDecimal("300.00"), firstInstallment.getCreditEntriesSet().iterator().next().getAmountWithVat());
+        assertEquals(true, firstInstallment.getCreditEntriesSet().iterator().next().getCreditNote().isPreparing());
     }
 
     private static FinantialEntity readFinantialEntity() {
