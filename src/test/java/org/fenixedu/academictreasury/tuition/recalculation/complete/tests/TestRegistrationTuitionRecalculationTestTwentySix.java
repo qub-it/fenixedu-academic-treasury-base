@@ -44,6 +44,32 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Student has reservation tax
+ *
+ * Creation of the 1st instalment 40 ECTS, €10 per ECTS
+ * 1st instalment is paid partially, small part is in preparing debit note
+ *
+ * 2.ª Moment:
+ *
+ * Creation of 4 instalments at 30 ECTS, €10 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * The first installment is annulled and recreated with another with only
+ * exempted amount. The first installment that is paid, is created a credit.
+ * The remaining three instalments are created. The second installment
+ * has exemption
+ *
+ */
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestTwentySix {
 
@@ -202,6 +228,7 @@ public class TestRegistrationTuitionRecalculationTestTwentySix {
 
         SettlementNote.createSettlementNote(settlementNoteBean);
 
+        assertEquals(1, firstInstallment.getSettlementEntriesSet().size());
         assertEquals(2, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
 
         assertEquals(new BigDecimal("40.00"), firstInstallment.getAmountWithVat());
@@ -224,6 +251,8 @@ public class TestRegistrationTuitionRecalculationTestTwentySix {
                 .executeTuitionPaymentPlanCreation();
 
         assertEquals(true, secondFirstInstallment.isAnnulled());
+        assertEquals(false, firstInstallment.isAnnulled());
+        assertEquals(false, firstInstallment.isEventAnnuled());
         assertEquals(2, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
         assertEquals(1, firstInstallment.getCreditEntriesSet().size());
 
@@ -256,6 +285,14 @@ public class TestRegistrationTuitionRecalculationTestTwentySix {
 
         assertEquals(new BigDecimal("300.00"), DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct)
                 .map(DebitEntry::getAvailableNetExemptedAmountForCredit).reduce(BigDecimal.ZERO, BigDecimal::add));
+
+        Product fourthInstallmentProduct = Product.findUniqueByCode("PROP_4_PREST_1_CIC").get();
+
+        assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, fourthInstallmentProduct).count());
+
+        DebitEntry fourthInstallment = DebitEntry.findActive(academicTreasuryEvent, fourthInstallmentProduct).iterator().next();
+        assertEquals(new BigDecimal("300.00"), fourthInstallment.getAmountWithVat());
+        assertEquals(new BigDecimal("0"), fourthInstallment.getNetExemptedAmount());
     }
 
     private static FinantialEntity readFinantialEntity() {

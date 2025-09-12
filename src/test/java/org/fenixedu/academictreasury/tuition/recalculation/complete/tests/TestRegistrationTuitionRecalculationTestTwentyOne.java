@@ -43,6 +43,31 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Student has reservation tax
+ *
+ * Creation of the 1st instalment 40 ECTS, €10 per ECTS
+ * 1st instalment unpaid, preparing debt note
+ *
+ * 2.ª Moment:
+ *
+ * Creation of 4 instalments at 40 ECTS, €10 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * The first instalment remains unchanged
+ * The remaining three instalments are created without exemptions
+ *
+ */
+
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestTwentyOne {
 
@@ -197,6 +222,8 @@ public class TestRegistrationTuitionRecalculationTestTwentyOne {
 
         SettlementNote.createSettlementNote(settlementNoteBean);
 
+        assertEquals(1, firstInstallment.getSettlementEntriesSet().size());
+
         RegistrationTuitionService.startServiceInvocation(registration, executionYear, new LocalDate())
                 .applyEnrolledEctsUnits(new BigDecimal("40")) //
                 .applyEnrolledCoursesCount(new BigDecimal("5")) //
@@ -205,6 +232,9 @@ public class TestRegistrationTuitionRecalculationTestTwentyOne {
                 .forceInstallmentsEvenTreasuryEventIsCharged(true) //
                 .recalculateInstallments(Map.of(firstInstallmentProduct, new LocalDate())) //
                 .executeTuitionPaymentPlanCreation();
+
+        assertEquals(false, firstInstallment.isAnnulled());
+        assertEquals(0, firstInstallment.getCreditEntriesSet().size());
 
         Product secondInstallmentProduct = Product.findUniqueByCode("PROP_2_PREST_1_CIC").get();
 

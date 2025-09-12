@@ -39,6 +39,28 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Creation of the 1st instalment 30 ECTS, €10 per ECTS
+ * 1st instalment unpaid but the debit note is closed
+ *
+ * 2.ª Moment:
+ *
+ * Creation of 4 instalments at 30.0 ECTS, €10 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * The first instalment remains unchanged
+ * The remaining three instalments are created
+ *
+ */
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestSeven {
 
@@ -192,6 +214,10 @@ public class TestRegistrationTuitionRecalculationTestSeven {
         assertEquals(4, DebitEntry.findActive(academicTreasuryEvent).count());
 
         assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
+        assertEquals(firstInstallment, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next());
+        assertEquals(false, firstInstallment.isAnnulled());
+        assertEquals(0, firstInstallment.getCreditEntriesSet().size());
+        assertEquals(0, firstInstallment.getSettlementEntriesSet().size());
 
         assertEquals(new BigDecimal("300.00"),
                 DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).map(DebitEntry::getAmountWithVat)

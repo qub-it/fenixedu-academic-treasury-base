@@ -39,6 +39,30 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Student has exemption T1 by each installment
+ *
+ * Creation of the 1st instalment 30 ECTS, €10 per ECTS
+ * 1st instalment is partially paid
+ *
+ * 2.ª Moment:
+ * The exemption T1 is removed and replaced by T2 100%
+ * Creation of 4 instalments at 12 ECTS, €5 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * The open first installment is annulled. The paid first installment is credited totally.
+ * The four instalments are created with total exemption
+ *
+ */
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestFortyThree {
 
@@ -248,6 +272,8 @@ public class TestRegistrationTuitionRecalculationTestFortyThree {
 
         SettlementNote.createSettlementNote(settlementNoteBean);
 
+        assertEquals(1, firstInstallment.getSettlementEntriesSet().size());
+
         assertEquals(new BigDecimal("163.37"), firstInstallment.getAmountWithVat());
         assertEquals(new BigDecimal("22.72"), firstInstallment.getNetExemptedAmount());
 
@@ -275,13 +301,22 @@ public class TestRegistrationTuitionRecalculationTestFortyThree {
 
         assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
         assertEquals(false, firstInstallment.isAnnulled());
+        assertEquals(true, firstInstallment.isEventAnnuled());
         assertEquals(new BigDecimal("0.00"), academicTreasuryEvent.getAmountWithVatToPay(firstInstallmentProduct));
         assertEquals(new BigDecimal("60.00"), academicTreasuryEvent.getNetExemptedAmount(firstInstallmentProduct));
+
+        assertEquals(true, secondFirstInstallment.isAnnulled());
+        assertEquals(true, secondFirstInstallment.isEventAnnuled());
 
         CreditEntry creditEntry = firstInstallment.getCreditEntriesSet().iterator().next();
 
         assertEquals(new BigDecimal("163.37"), creditEntry.getAmountWithVat());
         assertEquals(new BigDecimal("22.72"), creditEntry.getNetExemptedAmount());
+
+        DebitEntry thirdFirstInstallment = DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next();
+
+        assertEquals(true, thirdFirstInstallment != firstInstallment);
+        assertEquals(true, thirdFirstInstallment != secondFirstInstallment);
 
         Product secondInstallmentProduct = Product.findUniqueByCode("PROP_2_PREST_1_CIC").get();
 

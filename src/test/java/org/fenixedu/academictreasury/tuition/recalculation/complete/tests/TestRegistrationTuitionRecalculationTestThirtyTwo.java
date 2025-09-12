@@ -38,6 +38,30 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Student has exemption T1 by each installment
+ *
+ * Creation of the 1st instalment 30 ECTS, €10 per ECTS
+ * 1st instalment is paid with debit note closed
+ *
+ * 2.ª Moment:
+ *
+ * Creation of 4 instalments at 12 ECTS, €10 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * The first installment is credited
+ * The remaining three instalments with exemption
+ *
+ */
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestThirtyTwo {
 
@@ -239,6 +263,8 @@ public class TestRegistrationTuitionRecalculationTestThirtyTwo {
 
         SettlementNote.createSettlementNote(settlementNoteBean);
 
+        assertEquals(1, firstInstallment.getSettlementEntriesSet().size());
+
         assertEquals(new BigDecimal("263.37"), firstInstallment.getAmountWithVat());
         assertEquals(new BigDecimal("36.63"), firstInstallment.getNetExemptedAmount());
 
@@ -255,8 +281,11 @@ public class TestRegistrationTuitionRecalculationTestThirtyTwo {
         assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
         assertEquals(1, firstInstallment.getCreditEntriesSet().size());
         assertEquals(false, firstInstallment.isAnnulled());
+        assertEquals(false, firstInstallment.isEventAnnuled());
         assertEquals(new BigDecimal("105.35"), academicTreasuryEvent.getAmountWithVatToPay(firstInstallmentProduct));
         assertEquals(new BigDecimal("14.65"), academicTreasuryEvent.getNetExemptedAmount(firstInstallmentProduct));
+
+        assertEquals(firstInstallment, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next());
 
         CreditEntry creditEntry = firstInstallment.getCreditEntriesSet().iterator().next();
 

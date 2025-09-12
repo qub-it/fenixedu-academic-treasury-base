@@ -39,6 +39,31 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Student has exemption T1 by each installment
+ *
+ * Creation of the 1st instalment 30 ECTS, €10 per ECTS
+ * 1st instalment is partially paid
+ *
+ * 2.ª Moment:
+ * The exemption T1 is removed and replaced by T3 33%
+ * Creation of 4 instalments at 24 ECTS, €5 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * The open first installment is annulled. The paid first installment is credited totally.
+ * The four instalments are created with exemption
+ * The credit of old paid first installment is settled with new first instalment
+ *
+ */
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestFortyFour {
 
@@ -249,6 +274,8 @@ public class TestRegistrationTuitionRecalculationTestFortyFour {
 
         SettlementNote.createSettlementNote(settlementNoteBean);
 
+        assertEquals(1, firstInstallment.getSettlementEntriesSet().size());
+
         assertEquals(new BigDecimal("163.37"), firstInstallment.getAmountWithVat());
         assertEquals(new BigDecimal("22.72"), firstInstallment.getNetExemptedAmount());
 
@@ -276,6 +303,7 @@ public class TestRegistrationTuitionRecalculationTestFortyFour {
 
         assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
         assertEquals(false, firstInstallment.isAnnulled());
+        assertEquals(true, firstInstallment.isEventAnnuled());
         assertEquals(new BigDecimal("80.40"), academicTreasuryEvent.getAmountWithVatToPay(firstInstallmentProduct));
         assertEquals(new BigDecimal("39.60"), academicTreasuryEvent.getNetExemptedAmount(firstInstallmentProduct));
 
@@ -299,6 +327,8 @@ public class TestRegistrationTuitionRecalculationTestFortyFour {
 
         DebitEntry thirdFirstInstallment = DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next();
 
+        assertEquals(true, thirdFirstInstallment != firstInstallment);
+        assertEquals(true, thirdFirstInstallment != secondFirstInstallment);
         assertEquals(new BigDecimal("80.40"), thirdFirstInstallment.getAmountWithVat());
         assertEquals(new BigDecimal("39.60"), thirdFirstInstallment.getNetExemptedAmount());
 

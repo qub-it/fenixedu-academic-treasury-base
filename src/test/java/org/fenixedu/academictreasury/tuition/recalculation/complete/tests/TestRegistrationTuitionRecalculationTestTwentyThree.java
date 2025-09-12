@@ -41,6 +41,30 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Student has reservation tax
+ *
+ * Creation of the 1st instalment 40 ECTS, €10 per ECTS
+ * 1st instalment unpaid, preparing debt note
+ *
+ * 2.ª Moment:
+ *
+ * Creation of 4 instalments at 42.5 ECTS, €10 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * The first instalment is maintained and an additional debit entry is created
+ * The remaining three instalments are created without exemption
+ *
+ */
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestTwentyThree {
 
@@ -197,6 +221,8 @@ public class TestRegistrationTuitionRecalculationTestTwentyThree {
 
         SettlementNote.createSettlementNote(settlementNoteBean);
 
+        assertEquals(1, firstInstallment.getSettlementEntriesSet().size());
+
         RegistrationTuitionService.startServiceInvocation(registration, executionYear, new LocalDate())
                 .applyEnrolledEctsUnits(new BigDecimal("42.5")) //
                 .applyEnrolledCoursesCount(new BigDecimal("5")) //
@@ -211,7 +237,6 @@ public class TestRegistrationTuitionRecalculationTestTwentyThree {
         assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, secondInstallmentProduct).count());
 
         DebitEntry secondInstallment = DebitEntry.findActive(academicTreasuryEvent, secondInstallmentProduct).iterator().next();
-
         assertEquals(new BigDecimal("425.00"), secondInstallment.getAmountWithVat());
         assertEquals(new BigDecimal("0"), secondInstallment.getNetExemptedAmount());
 
@@ -220,7 +245,8 @@ public class TestRegistrationTuitionRecalculationTestTwentyThree {
         assertEquals(5, DebitEntry.findActive(academicTreasuryEvent).count());
 
         assertEquals(2, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
-        assertEquals(firstInstallment, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next());
+        assertEquals(false, firstInstallment.isAnnulled());
+        assertEquals(false, firstInstallment.isEventAnnuled());
 
         assertEquals(new BigDecimal("75.00"),
                 DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).map(DebitEntry::getAmountWithVat)

@@ -40,6 +40,28 @@ import pt.ist.esw.advice.pt.ist.fenixframework.AtomicInstance;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Creation of the 1st instalment 30 ECTS, €10 per ECTS
+ * 1st instalment unpaid, preparing debt note
+ *
+ * 2.ª Moment:
+ *
+ * Creation of 4 instalments at 30 ECTS, €10 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * The first instalment remains unchanged
+ * The remaining three instalments are created
+ *
+ */
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestOne {
 
@@ -187,6 +209,8 @@ public class TestRegistrationTuitionRecalculationTestOne {
 
         assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
         assertEquals(firstInstallment, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next());
+        assertEquals(false, firstInstallment.isAnnulled());
+        assertEquals(0, firstInstallment.getCreditEntriesSet().size());
 
         assertEquals(new BigDecimal("300.00"),
                 DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).map(DebitEntry::getAmountWithVat)

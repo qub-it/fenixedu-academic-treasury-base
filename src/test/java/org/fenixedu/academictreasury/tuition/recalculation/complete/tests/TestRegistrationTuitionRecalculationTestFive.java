@@ -37,6 +37,28 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Creation of the 1st instalment 30 ECTS, €10 per ECTS
+ * 1st instalment paid and debit note is closed
+ *
+ * 2.ª Moment:
+ *
+ * Creation of 4 instalments at 27.5 ECTS, €10 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * On first instalment is it is created a credit with the difference
+ * The remaining three instalments are created
+ *
+ */
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestFive {
 
@@ -184,6 +206,8 @@ public class TestRegistrationTuitionRecalculationTestFive {
 
         SettlementNote.createSettlementNote(settlementNoteBean);
 
+        assertEquals(1, firstInstallment.getSettlementEntriesSet().size());
+
         RegistrationTuitionService.startServiceInvocation(registration, executionYear, new LocalDate())
                 .applyEnrolledEctsUnits(new BigDecimal("27.5")) //
                 .applyEnrolledCoursesCount(new BigDecimal("5")) //
@@ -198,6 +222,7 @@ public class TestRegistrationTuitionRecalculationTestFive {
 
         assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
         assertEquals(firstInstallment, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next());
+        assertEquals(false, firstInstallment.isAnnulled());
         assertEquals(1, firstInstallment.getCreditEntriesSet().size());
 
         CreditEntry creditEntry = firstInstallment.getCreditEntriesSet().iterator().next();
@@ -207,6 +232,7 @@ public class TestRegistrationTuitionRecalculationTestFive {
                         .reduce(BigDecimal.ZERO, BigDecimal::add));
 
         assertEquals(new BigDecimal("25.00"), creditEntry.getAmountWithVat());
+        assertEquals(new BigDecimal("275.00"), academicTreasuryEvent.getAmountWithVatToPay(firstInstallmentProduct));
     }
 
     private static FinantialEntity readFinantialEntity() {

@@ -41,6 +41,33 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Student has exemption T1 by each installment and reservation tax
+ *
+ * Creation of the 1st instalment 30 ECTS, €10 per ECTS
+ * 1st instalment is paid partially
+ *
+ * 2.ª Moment:
+ *
+ * Removal of T1 and replaced with exemption T3 33%
+ *
+ * Creation of 4 instalments at 40 ECTS, €5 per ECTS
+ * Recalculation of the 1st installment
+ *
+ * Result:
+ *
+ * The first installment is annulled, credited and replaced
+ * The remaining three instalments are created with exemption
+ *
+ * The credited first installment is settled with the new first installment
+ */
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestFortyNine {
 
@@ -285,12 +312,16 @@ public class TestRegistrationTuitionRecalculationTestFortyNine {
 
         assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
         assertEquals(false, firstInstallment.isAnnulled());
+        assertEquals(true, firstInstallment.isEventAnnuled());
         assertEquals(1, firstInstallment.getCreditEntriesSet().size());
         assertEquals(true, secondFirstInstallment.isAnnulled());
+        assertEquals(true, secondFirstInstallment.isEventAnnuled());
 
         DebitEntry thirdFirstInstallment =
                 DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next();
 
+        assertEquals(true, thirdFirstInstallment != firstInstallment);
+        assertEquals(true, thirdFirstInstallment != secondFirstInstallment);
         assertEquals(new BigDecimal("0.00"), thirdFirstInstallment.getAmountWithVat());
         assertEquals(new BigDecimal("200.00"), thirdFirstInstallment.getNetExemptedAmount());
         assertEquals(0, thirdFirstInstallment.getSettlementEntriesSet().size());

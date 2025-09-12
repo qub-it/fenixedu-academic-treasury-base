@@ -36,6 +36,30 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Student has exemption T1 by each installment
+ *
+ * Creation of the 1st instalment 30 ECTS, €10 per ECTS
+ * 1st instalment is open
+ *
+ * 2.ª Moment:
+ *
+ * Creation of 4 instalments at 24 ECTS, €10 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * The first installment is annulled and replaced by another with lesser value
+ * The remaining three instalments with exemption
+ *
+ */
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestThirty {
 
@@ -88,7 +112,6 @@ public class TestRegistrationTuitionRecalculationTestThirty {
                 registration.getLastStudentCurricularPlan().getDegreeCurricularPlan().getTuitionPaymentPlanOrdersSet().stream()
                         .map(t -> t.getTuitionPaymentPlan()).filter(t -> "2T".equals(t.getCustomizedName().getContent()))
                         .findFirst().get();
-
 
         TreasuryExemptionType exemptionType = TreasuryExemptionType.findByCode("TET1").findFirst().get();
 
@@ -237,6 +260,15 @@ public class TestRegistrationTuitionRecalculationTestThirty {
                 .executeTuitionPaymentPlanCreation();
 
         assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
+        assertEquals(true, firstInstallment.isAnnulled());
+        assertEquals(true, firstInstallment.isEventAnnuled());
+
+        DebitEntry secondFirstInstallment =
+                DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next();
+
+        assertEquals(true, firstInstallment != secondFirstInstallment);
+        assertEquals(new BigDecimal("210.70"), secondFirstInstallment.getAmountWithVat());
+        assertEquals(new BigDecimal("29.30"), secondFirstInstallment.getNetExemptedAmount());
 
         Product secondInstallmentProduct = Product.findUniqueByCode("PROP_2_PREST_1_CIC").get();
 

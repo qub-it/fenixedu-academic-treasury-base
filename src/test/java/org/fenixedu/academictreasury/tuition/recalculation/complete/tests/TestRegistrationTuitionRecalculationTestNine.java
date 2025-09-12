@@ -191,10 +191,21 @@ public class TestRegistrationTuitionRecalculationTestNine {
         assertEquals(new BigDecimal("1300.00"), academicTreasuryEvent.getAmountWithVatToPay());
         assertEquals(5, DebitEntry.findActive(academicTreasuryEvent).count());
 
-        assertEquals(Boolean.FALSE, firstInstallment.isAnnulled());
+        assertEquals(false, firstInstallment.isAnnulled());
 
         assertEquals(2, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
         assertEquals(0, firstInstallment.getCreditEntriesSet().size());
+        assertEquals(0, firstInstallment.getSettlementEntriesSet().size());
+
+        assertEquals(new BigDecimal("325.00"),
+                DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).map(DebitEntry::getAmountWithVat)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add));
+
+        DebitEntry secondFirstInstallment =
+                DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).filter(de -> de != firstInstallment)
+                        .iterator().next();
+
+        assertEquals(new BigDecimal("25.00"), secondFirstInstallment.getAmountWithVat());
 
         assertEquals(new BigDecimal("325.00"),
                 DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).map(DebitEntry::getAmountWithVat)

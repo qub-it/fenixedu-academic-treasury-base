@@ -39,6 +39,30 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Creation of the 1st instalment 30 ECTS, €10 per ECTS
+ * 1st instalment is half paid, one debit entry is closed in debit note
+ * but the other half is preparing
+ *
+ * 2.ª Moment:
+ *
+ * Creation of 4 instalments at 27.5 ECTS, €10 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * The half of first instalment that is preparing is annulled and is replaced by another with lesser value.
+ * The other half of first installment that was paid is unchanged
+ * The remaining three instalments are created.
+ *
+ */
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestEleven {
 
@@ -196,6 +220,8 @@ public class TestRegistrationTuitionRecalculationTestEleven {
 
         SettlementNote.createSettlementNote(settlementNoteBean);
 
+        assertEquals(1, firstInstallment.getSettlementEntriesSet().size());
+
         assertEquals(2, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
         assertEquals(new BigDecimal("200.00"), firstInstallment.getAmountWithVat());
         assertEquals(true, firstInstallment.getDebitNote().isClosed());
@@ -225,11 +251,15 @@ public class TestRegistrationTuitionRecalculationTestEleven {
                         .reduce(BigDecimal.ZERO, BigDecimal::add));
 
         assertEquals(true, secondFirstInstallment.isAnnulled());
+        assertEquals(false, firstInstallment.isAnnulled());
+        assertEquals(0, firstInstallment.getCreditEntriesSet().size());
 
         DebitEntry thirdFirstInstallment = DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct)
                 .filter(de -> de.getFinantialDocument() != null && de.getFinantialDocument().isPreparing()).findFirst()
                 .orElseThrow();
 
+        assertEquals(true, thirdFirstInstallment != firstInstallment);
+        assertEquals(true, thirdFirstInstallment != secondFirstInstallment);
         assertEquals(new BigDecimal("75.00"), thirdFirstInstallment.getAmountWithVat());
     }
 

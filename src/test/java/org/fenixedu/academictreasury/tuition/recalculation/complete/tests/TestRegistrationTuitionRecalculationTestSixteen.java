@@ -39,6 +39,29 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Creation of the 1st instalment 30 ECTS, €10 per ECTS
+ * 1st instalment is paid but it was annulled and credit entry is created
+ *
+ * 2.ª Moment:
+ *
+ * Creation of 4 instalments at 32.5 ECTS, €10 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * THe first installment must be created again
+ * The remaining three instalments are created.
+ *
+ */
+
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestSixteen {
 
@@ -196,14 +219,18 @@ public class TestRegistrationTuitionRecalculationTestSixteen {
 
         SettlementNote.createSettlementNote(settlementNoteBean);
 
+        assertEquals(1, firstInstallment.getSettlementEntriesSet().size());
+
         firstInstallment.annulOnlyThisDebitEntryAndInterestsInBusinessContext("Test", false);
 
         assertEquals(0, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
         assertEquals(new BigDecimal("300.00"), firstInstallment.getAmountWithVat());
         assertEquals(true, firstInstallment.getDebitNote().isClosed());
+        assertEquals(true, firstInstallment.isEventAnnuled());
 
-        assertEquals(new BigDecimal("300.00"), firstInstallment.getCreditEntriesSet().iterator().next().getAmountWithVat());
-        assertEquals(true, firstInstallment.getCreditEntriesSet().iterator().next().getCreditNote().isPreparing());
+        CreditEntry creditEntry = firstInstallment.getCreditEntriesSet().iterator().next();
+        assertEquals(new BigDecimal("300.00"), creditEntry.getAmountWithVat());
+        assertEquals(true, creditEntry.getCreditNote().isPreparing());
 
         RegistrationTuitionService.startServiceInvocation(registration, executionYear, new LocalDate())
                 .applyEnrolledEctsUnits(new BigDecimal("32.5")) //
@@ -220,15 +247,16 @@ public class TestRegistrationTuitionRecalculationTestSixteen {
 
         assertEquals(new BigDecimal("1300.00"), academicTreasuryEvent.getAmountWithVatToPay());
         assertEquals(4, DebitEntry.findActive(academicTreasuryEvent).count());
-
         assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
 
         assertEquals(new BigDecimal("325.00"),
                 DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).map(DebitEntry::getAmountWithVat)
                         .reduce(BigDecimal.ZERO, BigDecimal::add));
 
-        assertEquals(new BigDecimal("300.00"), firstInstallment.getCreditEntriesSet().iterator().next().getAmountWithVat());
-        assertEquals(true, firstInstallment.getCreditEntriesSet().iterator().next().getCreditNote().isPreparing());
+        assertEquals(true, secondFirstInstallment.getDebitNote() == null || secondFirstInstallment.getDebitNote().isPreparing());
+
+        assertEquals(new BigDecimal("300.00"), creditEntry.getAmountWithVat());
+        assertEquals(true, creditEntry.getCreditNote().isPreparing());
     }
 
     private static FinantialEntity readFinantialEntity() {

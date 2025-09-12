@@ -212,9 +212,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                 } else if (isDifferenceNetAmountPositiveOrZero && (isExemptionsMapAreEqual || isThereAreOnlyNewEntriesOrIncrementsInExemptions)) {
                     return runLogicToIncrementOnlyNetAmountOrExemptions(tariff, product, originalBean,
                             differenceInNetExemptedAmount, differenceNetAmount, debtDate, debtAccount, academicTreasuryEvent);
-                } else if (TreasuryConstants.isNegative(differenceInNetExemptedAmount) || (TreasuryConstants.isNegative(
-                        differenceNetAmount) && !TreasuryConstants.isZero(
-                        differenceInNetExemptedAmount)) || isThereAreRemovalOrDecrementsInExemptions) {
+                } else {
                     // The difference in the exemption amount is negative, or there is a credit to create but
                     // the difference in the exemption is different from zero. Then we have to annul the all debit entries
                     // of installment and create again
@@ -263,8 +261,6 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
                     return true;
                 }
-
-                throw new IllegalStateException("recalculation: do not know how to handle this case???");
             } else if (!isTuitionInstallmentCharged(product)) {
                 return createUnchargedInstallmentDebitEntry(tariff);
             } else if (isTuitionInstallmentCharged(product)) {
@@ -753,9 +749,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                 return Collections.singletonList(
                         new TuitionDebitEntryBean(installmentOrder, tariff, recalculationInstallmentName, recalculationDueDate,
                                 vat.getTaxRate(), differenceNetAmount, differenceInNetExemptedAmount, new HashMap<>(), currency));
-            } else if (TreasuryConstants.isNegative(differenceInNetExemptedAmount) || (TreasuryConstants.isNegative(
-                    differenceNetAmount) && !TreasuryConstants.isZero(
-                    differenceInNetExemptedAmount)) || isThereAreRemovalOrDecrementsInExemptions) {
+            } else {
 
                 // It is easier and safe to annul the created debit entries
                 // and create a new one
@@ -781,8 +775,6 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
                 return List.of(annulmentBean, recalculationBean);
             }
-
-            throw new IllegalStateException("recalculation: do not know how to handle this case???");
         } else if (!isTuitionInstallmentCharged(product) || this.isForCalculationsOfOriginalAmounts) {
             BigDecimal tuitionInstallmentAmountToPay = tariff.amountToPay(this);
 

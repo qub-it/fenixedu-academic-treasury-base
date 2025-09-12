@@ -36,6 +36,29 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Creation of the 1st instalment 30 ECTS, €10 per ECTS
+ * 1st instalment unpaid but the debit note is closed
+ *
+ * 2.ª Moment:
+ *
+ * Creation of 4 instalments at 27.5 ECTS, €10 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * On first instalment is it is created a credit with the difference
+ * The remaining three instalments are created
+ *
+ */
+
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestEight {
 
@@ -190,7 +213,9 @@ public class TestRegistrationTuitionRecalculationTestEight {
 
         assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
         assertEquals(firstInstallment, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next());
+        assertEquals(false, firstInstallment.isAnnulled());
         assertEquals(1, firstInstallment.getCreditEntriesSet().size());
+        assertEquals(1, firstInstallment.getSettlementEntriesSet().size());
 
         CreditEntry creditEntry = firstInstallment.getCreditEntriesSet().iterator().next();
 

@@ -39,6 +39,28 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Student has exemption T1 by each installment and reservation tax
+ *
+ * Creation of the 1st instalment 30 ECTS, €10 per ECTS
+ * 1st instalment is closed but not paid
+ *
+ * 2.ª Moment:
+ * Creation of 4 instalments at 24 ECTS, €10 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * The first installment is credited and replaced
+ * The remaining three instalments are created with exemption
+ */
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestFortySeven {
 
@@ -250,6 +272,7 @@ public class TestRegistrationTuitionRecalculationTestFortySeven {
 
         assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
         assertEquals(false, firstInstallment.isAnnulled());
+        assertEquals(false, firstInstallment.isEventAnnuled());
         assertEquals(1, firstInstallment.getCreditEntriesSet().size());
 
         CreditEntry creditEntry = firstInstallment.getCreditEntriesSet().iterator().next();

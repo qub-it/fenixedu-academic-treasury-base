@@ -39,6 +39,31 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Student has reservation tax
+ *
+ * Creation of the 1st instalment 30 ECTS, €10 per ECTS
+ * 1st instalment unpaid, preparing debt note
+ *
+ * 2.ª Moment:
+ *
+ * Creation of 4 instalments at 27.5 ECTS, €10 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * The first instalment must be annulled and recreated again with less amount
+ * The remaining three instalments are created
+ * The second installment has exemption amount
+ *
+ */
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestEighteen {
 
@@ -199,18 +224,18 @@ public class TestRegistrationTuitionRecalculationTestEighteen {
                 DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next();
 
         assertEquals(true, firstInstallment != secondFirstInstallment);
-
         assertEquals(true, firstInstallment.isAnnulled());
+        assertEquals(new BigDecimal("0.00"), secondFirstInstallment.getAmountWithVat());
+        assertEquals(new BigDecimal("275.00"), secondFirstInstallment.getNetExemptedAmount());
 
         Product secondInstallmentProduct = Product.findUniqueByCode("PROP_2_PREST_1_CIC").get();
 
         assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, secondInstallmentProduct).count());
 
-        assertEquals(new BigDecimal("200.00"),
-                DebitEntry.findActive(academicTreasuryEvent, secondInstallmentProduct).iterator().next().getAmountWithVat());
+        DebitEntry secondInstallment = DebitEntry.findActive(academicTreasuryEvent, secondInstallmentProduct).iterator().next();
 
-        assertEquals(new BigDecimal("75.00"),
-                DebitEntry.findActive(academicTreasuryEvent, secondInstallmentProduct).iterator().next().getNetExemptedAmount());
+        assertEquals(new BigDecimal("200.00"), secondInstallment.getAmountWithVat());
+        assertEquals(new BigDecimal("75.00"), secondInstallment.getNetExemptedAmount());
 
         assertEquals(new BigDecimal("0.00"),
                 DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).map(DebitEntry::getAmountWithVat)
@@ -219,6 +244,12 @@ public class TestRegistrationTuitionRecalculationTestEighteen {
         assertEquals(new BigDecimal("275.00"),
                 DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).map(DebitEntry::getNetExemptedAmount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add));
+
+        Product thirdInstallmentProduct = Product.findUniqueByCode("PROP_3_PREST_1_CIC").get();
+
+        assertEquals(new BigDecimal("275.00"), academicTreasuryEvent.getAmountWithVatToPay(thirdInstallmentProduct));
+        assertEquals(new BigDecimal("0"), academicTreasuryEvent.getNetExemptedAmount(thirdInstallmentProduct));
+
     }
 
     private static FinantialEntity readFinantialEntity() {

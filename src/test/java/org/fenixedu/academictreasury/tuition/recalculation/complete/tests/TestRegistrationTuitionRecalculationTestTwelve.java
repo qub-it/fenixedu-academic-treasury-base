@@ -39,6 +39,30 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Creation of the 1st instalment 30 ECTS, €10 per ECTS
+ * 1st instalment is half paid, one debit entry is closed in debit note
+ * but the other half is preparing
+ *
+ * 2.ª Moment:
+ *
+ * Creation of 4 instalments at 32.5 ECTS, €10 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * The first installments are unchanged but is added another debit entry for first installment with the
+ * additional amount.
+ * The remaining three instalments are created.
+ *
+ */
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestTwelve {
 
@@ -196,6 +220,8 @@ public class TestRegistrationTuitionRecalculationTestTwelve {
 
         SettlementNote.createSettlementNote(settlementNoteBean);
 
+        assertEquals(1, firstInstallment.getSettlementEntriesSet().size());
+
         assertEquals(2, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
         assertEquals(new BigDecimal("200.00"), firstInstallment.getAmountWithVat());
         assertEquals(true, firstInstallment.getDebitNote().isClosed());
@@ -225,11 +251,15 @@ public class TestRegistrationTuitionRecalculationTestTwelve {
                         .reduce(BigDecimal.ZERO, BigDecimal::add));
 
         assertEquals(false, secondFirstInstallment.isAnnulled());
+        assertEquals(false, firstInstallment.isAnnulled());
+        assertEquals(0, firstInstallment.getCreditEntriesSet().size());
 
         DebitEntry thirdFirstInstallment = DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct)
                 .filter(de -> de != firstInstallment && de != secondFirstInstallment).findFirst().orElseThrow();
 
         assertEquals(new BigDecimal("25.00"), thirdFirstInstallment.getAmountWithVat());
+        assertEquals(true, thirdFirstInstallment != firstInstallment);
+        assertEquals(true, thirdFirstInstallment != secondFirstInstallment);
     }
 
     private static FinantialEntity readFinantialEntity() {

@@ -35,6 +35,28 @@ import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * ****************
+ * TEST DESCRIPTION
+ * ****************
+ *
+ * 1.º Moment:
+ *
+ * Creation of the 1st instalment 30 ECTS, €10 per ECTS
+ * 1st instalment unpaid, preparing debt note
+ *
+ * 2.ª Moment:
+ *
+ * Creation of 4 instalments at 27.5 ECTS, €10 per ECTS
+ * Recalculation of the 1st instalment
+ *
+ * Result:
+ *
+ * The first instalment is annulled and re-created with a lower value
+ * The remaining three instalments are created
+ *
+ */
+
 @RunWith(FenixFrameworkRunner.class)
 public class TestRegistrationTuitionRecalculationTestTwo {
 
@@ -177,15 +199,18 @@ public class TestRegistrationTuitionRecalculationTestTwo {
                 .recalculateInstallments(Map.of(firstInstallmentProduct, new LocalDate())) //
                 .executeTuitionPaymentPlanCreation();
 
+        DebitEntry secondFirstInstallment =
+                DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next();
+
         assertEquals(new BigDecimal("1100.00"), academicTreasuryEvent.getAmountWithVatToPay());
         assertEquals(4, DebitEntry.findActive(academicTreasuryEvent).count());
 
-        assertEquals(Boolean.TRUE, firstInstallment.isAnnulled());
+        assertEquals(true, firstInstallment.isAnnulled());
+        assertEquals(0, firstInstallment.getCreditEntriesSet().size());
 
         assertEquals(1, DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).count());
 
-        org.junit.Assert.assertNotEquals(firstInstallment,
-                DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).iterator().next());
+        org.junit.Assert.assertNotEquals(firstInstallment, secondFirstInstallment);
 
         assertEquals(new BigDecimal("275.00"),
                 DebitEntry.findActive(academicTreasuryEvent, firstInstallmentProduct).map(DebitEntry::getAmountWithVat)
