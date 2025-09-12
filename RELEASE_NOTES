@@ -1,3 +1,4 @@
+12.10.0 (12-09-2025)
 - Bug Fix: Fix the recalculation of registration tuition installments [#qubIT-Fenix-7442]
 - Refactor: Partition the RegistrationTuitionService into smaller classes [#qubIT-Fenix-7442]
 - Refactor: Unit tests to cover most as possible, the variations with the recalculation of registration tuition installments [#qubIT-Fenix-7442]
