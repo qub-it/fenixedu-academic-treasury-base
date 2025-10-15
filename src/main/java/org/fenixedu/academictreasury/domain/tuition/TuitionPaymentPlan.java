@@ -26,13 +26,7 @@
 package org.fenixedu.academictreasury.domain.tuition;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -689,6 +683,21 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     public boolean hasCopiesInExecutionInterval(ExecutionInterval executionInterval) {
         return getTuitionPaymentPlanCopiesSet().stream().anyMatch(p -> p.getExecutionYear() == executionInterval);
+    }
+
+    public void orderInstallmentsBasedInProductOrder() {
+        Comparator<TuitionInstallmentTariff> sortFunc =
+                Comparator.comparing(TuitionInstallmentTariff::getProduct, Product.COMPARE_BY_INSTALLMENT_NUMBER_AND_NAME);
+
+        List<TuitionInstallmentTariff> tariffsList =
+                getOrderedTuitionInstallmentTariffs().stream().sorted(sortFunc).collect(Collectors.toList());
+
+        int installmentNum = 1;
+        for(TuitionInstallmentTariff tariff : tariffsList) {
+            tariff.setInstallmentOrder(installmentNum++);
+        }
+
+        checkRules();
     }
 
     // @formatter:off
