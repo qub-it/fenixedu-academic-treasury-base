@@ -275,6 +275,8 @@ public class BasicAcademicTreasuryUtils {
             StatuteExemptionByIntervalMapEntry.create(FinantialEntity.findAll().iterator().next(), ey, st5, tet1);
         });
 
+        TreasuryExemptionType tet5
+                = TreasuryExemptionType.create("TET5", ls("Treasury Exemption 5"), new BigDecimal("25"), true);
     }
 
 }
