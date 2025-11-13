@@ -692,6 +692,15 @@ public class AcademicTariff extends AcademicTariff_Base {
         return getUnitsSet().isEmpty() && getDegreeType() == null && getAssociatedDegreesSet().isEmpty() && getCycleType() == null;
     }
 
+    @Override
+    @Deprecated
+    /**
+     * Replaced by #getAssociatedDegreesSet
+     */
+    public Degree getDegree() {
+        return super.getDegree();
+    }
+
     private void updatePriceValuesInEvent(final AcademicTreasuryEvent academicTreasuryEvent,
             final EnrolmentEvaluation enrolmentEvaluation) {
         final BigDecimal baseAmount = getBaseAmount();
