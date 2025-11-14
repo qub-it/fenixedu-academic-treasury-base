@@ -37,6 +37,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.PartyContact;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
@@ -259,6 +260,8 @@ public class DebtReportEntryBean implements SpreadsheetRow, IFinantialReportEntr
 
     private String emptyColumnOne;
     private String emptyColumnTwo;
+
+    private StudentCurricularPlan activeStudentCurricularPlanOfExecutionYear;
 
     public DebtReportEntryBean(final InvoiceEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
@@ -1278,5 +1281,13 @@ public class DebtReportEntryBean implements SpreadsheetRow, IFinantialReportEntr
 
     public void setEmptyColumnTwo(String emptyColumnTwo) {
         this.emptyColumnTwo = emptyColumnTwo;
+    }
+
+    public StudentCurricularPlan getActiveStudentCurricularPlanOfExecutionYear() {
+        return activeStudentCurricularPlanOfExecutionYear;
+    }
+
+    public void setActiveStudentCurricularPlanOfExecutionYear(StudentCurricularPlan activeStudentCurricularPlanOfExecutionYear) {
+        this.activeStudentCurricularPlanOfExecutionYear = activeStudentCurricularPlanOfExecutionYear;
     }
 }

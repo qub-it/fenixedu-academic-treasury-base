@@ -1,6 +1,7 @@
 - Refactor: Unit tests to test credit over exemption splitting [#qubIT-Fenix-7637]
 - Refactor: Declare enum for different type of enrolments [#qubIT-Fenix-7573]
 - Refactor: Add plugin in pom to create module jar for tests [#qubIT-Fenix-7573]
+- Improvement: Add active student curricular plan for the execution year of debts for reports [#qubIT-Fenix-7765]
 
 12.11.0 (15-10-2025)
 - Refactor: Method to reorder tuition payment plan installments, based by product installment order property [#qubIT-Fenix-7626]

@@ -37,6 +37,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.reports.DebtReportRequest;
 import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
@@ -178,6 +179,8 @@ public class SettlementReportEntryBean implements SpreadsheetRow, IFinantialRepo
 
     private Degree degreeDomainObject;
     private ExecutionYear executionYearDomainObject;
+
+    private StudentCurricularPlan activeStudentCurricularPlanOfExecutionYear;
 
     public SettlementReportEntryBean(final SettlementEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
@@ -1012,4 +1015,11 @@ public class SettlementReportEntryBean implements SpreadsheetRow, IFinantialRepo
         this.executionYearDomainObject = executionYear;
     }
 
+    public StudentCurricularPlan getActiveStudentCurricularPlanOfExecutionYear() {
+        return activeStudentCurricularPlanOfExecutionYear;
+    }
+
+    public void setActiveStudentCurricularPlanOfExecutionYear(StudentCurricularPlan activeStudentCurricularPlanOfExecutionYear) {
+        this.activeStudentCurricularPlanOfExecutionYear = activeStudentCurricularPlanOfExecutionYear;
+    }
 }
