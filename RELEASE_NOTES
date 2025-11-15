@@ -1,3 +1,4 @@
+12.12.0 (15-11-2025)
 - Refactor: Unit tests to test credit over exemption splitting [#qubIT-Fenix-7637]
 - Refactor: Declare enum for different type of enrolments [#qubIT-Fenix-7573]
 - Refactor: Add plugin in pom to create module jar for tests [#qubIT-Fenix-7573]
