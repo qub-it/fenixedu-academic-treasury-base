@@ -71,33 +71,33 @@ import com.google.common.base.Strings;
 
 public class PaymentReportEntryBean implements SpreadsheetRow {
 
-    public static String[] SPREADSHEET_HEADERS = { academicTreasuryBundle("label.PaymentReportEntryBean.header.identification"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.creationDate"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.responsible"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.settlementNoteNumber"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.settlementNoteDocumentDate"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.settlementOriginDocumentNumber"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.paymentDate"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.settlementNoteAnnuled"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.documentExportationPending"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.paymentMethod"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.amount"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.customerId"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.debtAccountId"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.name"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.identificationType"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.identificationNumber"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.vatNumber"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.email"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.address"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.studentNumber"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.closeDate"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificationDate"),
-            academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificateDocumentReference"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.documentObservations"),
-            academicTreasuryBundle("label.PaymentReportEntryBean.header.documentTermsAndConditions"),
-
-    };
+    public static String[] getSpreadsheetHeaders() {
+        return new String[] { academicTreasuryBundle("label.PaymentReportEntryBean.header.identification"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.creationDate"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.responsible"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.settlementNoteNumber"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.settlementNoteDocumentDate"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.settlementOriginDocumentNumber"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.paymentDate"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.settlementNoteAnnuled"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.documentExportationPending"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.paymentMethod"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.amount"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.customerId"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.debtAccountId"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.name"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.identificationType"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.identificationNumber"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.vatNumber"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.email"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.address"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.studentNumber"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.closeDate"),
+                academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificationDate"),
+                academicTreasuryBundle("label.DebtReportEntryBean.header.erpCertificateDocumentReference"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.documentObservations"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.documentTermsAndConditions") };
+    }
 
     private PaymentEntry paymentEntry;
     private boolean completed;
@@ -192,10 +192,11 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
 
         if (!settlementNote.getSettlemetEntriesSet().isEmpty()) {
             final SettlementEntry settlementEntry = settlementNote.getSettlemetEntriesSet().iterator().next();
-            if (settlementEntry.getInvoiceEntry().getFinantialDocument() != null
-                    && ((Invoice) settlementEntry.getInvoiceEntry().getFinantialDocument()).getPayorDebtAccount() != null) {
-                this.erpPayorCustomerId = ((Invoice) settlementEntry.getInvoiceEntry().getFinantialDocument())
-                        .getPayorDebtAccount().getCustomer().getErpCustomerId();
+            if (settlementEntry.getInvoiceEntry().getFinantialDocument() != null && ((Invoice) settlementEntry.getInvoiceEntry()
+                    .getFinantialDocument()).getPayorDebtAccount() != null) {
+                this.erpPayorCustomerId =
+                        ((Invoice) settlementEntry.getInvoiceEntry().getFinantialDocument()).getPayorDebtAccount().getCustomer()
+                                .getErpCustomerId();
             }
         }
 
@@ -213,8 +214,8 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
 
         this.name = customer.getName();
 
-        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null
-                && ((PersonCustomer) customer).getAssociatedPerson().getIdDocumentType() != null) {
+        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null && ((PersonCustomer) customer).getAssociatedPerson()
+                .getIdDocumentType() != null) {
             this.identificationType = ((PersonCustomer) customer).getAssociatedPerson().getIdDocumentType().getLocalizedName();
         }
 
@@ -230,8 +231,8 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
 
         this.address = customer.getAddress();
 
-        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null
-                && ((PersonCustomer) customer).getAssociatedPerson().getStudent() != null) {
+        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null && ((PersonCustomer) customer).getAssociatedPerson()
+                .getStudent() != null) {
             final Person person = ((PersonCustomer) customer).getAssociatedPerson();
             this.studentNumber = person.getStudent().getNumber();
         }

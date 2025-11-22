@@ -51,25 +51,25 @@ import org.joda.time.DateTime;
 
 public class SibsTransactionDetailEntryBean extends AbstractReportEntryBean {
 
-    public static String[] SPREADSHEET_HEADERS = { 
-        academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.identification"),
-        academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.versioningCreator"),
-        academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.creationDate"),
-        academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.whenProcessed"),
-        academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.whenRegistered"),
-        academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.amountPayed"),
-        academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.sibsEntityReferenceCode"),
-        academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.sibsPaymentReferenceCode"),
-        academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.sibsTransactionId"),
-        academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.debtAccountId"),
-        academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.customerId"),
-        academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.businessIdentification"),
-        academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.fiscalNumber"),
-        academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.customerName"),
-        academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.settlementDocumentNumber"),
-        academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.comments") };
+    public static String[] getSpreadsheetHeaders() {
+        return new String[] { academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.identification"),
+                academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.versioningCreator"),
+                academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.creationDate"),
+                academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.whenProcessed"),
+                academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.whenRegistered"),
+                academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.amountPayed"),
+                academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.sibsEntityReferenceCode"),
+                academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.sibsPaymentReferenceCode"),
+                academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.sibsTransactionId"),
+                academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.debtAccountId"),
+                academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.customerId"),
+                academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.businessIdentification"),
+                academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.fiscalNumber"),
+                academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.customerName"),
+                academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.settlementDocumentNumber"),
+                academicTreasuryBundle("label.SibsTransactionDetailEntryBean.header.comments") };
+    }
 
-    
     private String identification;
     private String versioningCreator;
     private DateTime creationDate;
@@ -83,22 +83,22 @@ public class SibsTransactionDetailEntryBean extends AbstractReportEntryBean {
     private String customerId;
     private String businessIdentification;
     private String fiscalNumber;
-    private String customerName; 
+    private String customerName;
     private String settlementDocumentNumber;
     private String comments;
-    
+
     private SibsPaymentCodeTransaction sibsTransactionDetail;
-    
+
     boolean completed = false;
 
     public SibsTransactionDetailEntryBean(SibsPaymentCodeTransaction detail, DebtReportRequest request, ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
 
         final String decimalSeparator = request.getDecimalSeparator();
-        
+
         try {
             this.sibsTransactionDetail = detail;
-            
+
             this.identification = detail.getExternalId();
             this.versioningCreator = treasuryServices.versioningCreatorUsername(detail);
             this.creationDate = treasuryServices.versioningCreationDate(detail);
@@ -113,28 +113,29 @@ public class SibsTransactionDetailEntryBean extends AbstractReportEntryBean {
             this.businessIdentification = detail.getPaymentRequest().getDebtAccount().getCustomer().getBusinessIdentification();
             this.fiscalNumber = detail.getPaymentRequest().getDebtAccount().getCustomer().getUiFiscalNumber();
             this.customerName = detail.getPaymentRequest().getDebtAccount().getCustomer().getName();
-            this.settlementDocumentNumber = String.join(",", detail.getSettlementNotesSet().stream().map(s -> s.getUiDocumentNumber()).collect(Collectors.toSet()));
+            this.settlementDocumentNumber = String.join(",",
+                    detail.getSettlementNotesSet().stream().map(s -> s.getUiDocumentNumber()).collect(Collectors.toSet()));
             this.comments = detail.getComments();
-            
-            if(DebtReportRequest.COMMA.equals(decimalSeparator)) {
+
+            if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
                 this.amountPayed = this.amountPayed.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
             }
-            
+
             this.completed = true;
-        } catch(final Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
             errorsLog.addError(sibsTransactionDetail, e);
         }
-        
+
     }
-    
+
     @Override
     public void writeCellValues(final Row row, final IErrorsLog ierrorsLog) {
         final ErrorsLog errorsLog = (ErrorsLog) ierrorsLog;
-        
+
         try {
             createCellWithValue(row, 0, identification);
-            
+
             if (!completed) {
                 createCellWithValue(row, 1, academicTreasuryBundle("error.DebtReportEntryBean.report.generation.verify.entry"));
                 return;
@@ -157,10 +158,10 @@ public class SibsTransactionDetailEntryBean extends AbstractReportEntryBean {
             createCellWithValue(row, i++, valueOrEmpty(customerName));
             createCellWithValue(row, i++, valueOrEmpty(settlementDocumentNumber));
             createCellWithValue(row, i++, valueOrEmpty(comments));
-            
-        } catch(final Exception e) {
+
+        } catch (final Exception e) {
             e.printStackTrace();
-            errorsLog.addError(sibsTransactionDetail, e);            
+            errorsLog.addError(sibsTransactionDetail, e);
         }
     }
 

@@ -1,3 +1,5 @@
+- Refactor: Change static variable SPREADHSEET_HEADERS of the various report beans, to not evaluate when the classes are loaded [#qubIT-Fenix-7789]
+
 12.12.0 (15-11-2025)
 - Refactor: Unit tests to test credit over exemption splitting [#qubIT-Fenix-7637]
 - Refactor: Declare enum for different type of enrolments [#qubIT-Fenix-7573]

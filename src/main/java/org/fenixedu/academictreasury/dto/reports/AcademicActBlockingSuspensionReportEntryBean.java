@@ -51,21 +51,22 @@ import org.joda.time.LocalDate;
 
 public class AcademicActBlockingSuspensionReportEntryBean extends AbstractReportEntryBean {
 
-    public static String[] SPREADSHEET_HEADERS =
-            { academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.identification"),
-                    academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.versioningCreator"),
-                    academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.creationDate"),
-                    academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.name"),
-                    academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.identificationType"),
-                    academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.identificationNumber"),
-                    academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.vatNumber"),
-                    academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.email"),
-                    academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.address"),
-                    academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.addressCountryCode"),
-                    academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.studentNumber"),
-                    academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.beginDate"),
-                    academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.endDate"),
-                    academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.reason") };
+    public static String[] getSpreadsheetHeaders() {
+        return new String[] { academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.identification"),
+                academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.versioningCreator"),
+                academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.creationDate"),
+                academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.name"),
+                academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.identificationType"),
+                academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.identificationNumber"),
+                academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.vatNumber"),
+                academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.email"),
+                academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.address"),
+                academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.addressCountryCode"),
+                academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.studentNumber"),
+                academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.beginDate"),
+                academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.endDate"),
+                academicTreasuryBundle("label.AcademicActBlockingSuspensionReportEntryBean.header.reason") };
+    }
 
     private String identification;
     private String versioningCreator;
@@ -89,7 +90,7 @@ public class AcademicActBlockingSuspensionReportEntryBean extends AbstractReport
     public AcademicActBlockingSuspensionReportEntryBean(final AcademicActBlockingSuspension academicActBlockingSuspension,
             final ErrorsLog errorsLog) {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-        
+
         this.academicActBlockingSuspension = academicActBlockingSuspension;
 
         try {
@@ -110,9 +111,9 @@ public class AcademicActBlockingSuspensionReportEntryBean extends AbstractReport
             this.email = academicActBlockingSuspension.getPerson().getInstitutionalOrDefaultEmailAddressValue();
             this.address =
                     PersonCustomer.physicalAddress(person) != null ? PersonCustomer.physicalAddress(person).getAddress() : "";
-            this.addressCountryCode = PersonCustomer.physicalAddress(person) != null
-                    && PersonCustomer.physicalAddress(person).getCountryOfResidence() != null ? PersonCustomer
-                            .physicalAddress(person).getCountryOfResidence().getCode() : "";
+            this.addressCountryCode = PersonCustomer.physicalAddress(person) != null && PersonCustomer.physicalAddress(person)
+                    .getCountryOfResidence() != null ? PersonCustomer.physicalAddress(person).getCountryOfResidence()
+                    .getCode() : "";
 
             if (academicActBlockingSuspension.getPerson().getStudent() != null) {
                 this.studentNumber = academicActBlockingSuspension.getPerson().getStudent().getNumber();

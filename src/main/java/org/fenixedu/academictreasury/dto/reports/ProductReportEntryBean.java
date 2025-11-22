@@ -48,23 +48,24 @@ import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
 public class ProductReportEntryBean extends AbstractReportEntryBean {
 
     // @formatter:off
-    public static final String[] SPREADSHEET_HEADERS = { 
-            academicTreasuryBundle("label.ProductReportEntryBean.header.identification"),
-            academicTreasuryBundle("label.ProductReportEntryBean.header.group.code"),
-            academicTreasuryBundle("label.ProductReportEntryBean.header.group"),
-            academicTreasuryBundle("label.ProductReportEntryBean.header.code"),
-            academicTreasuryBundle("label.ProductReportEntryBean.header.description.pt"),
-            academicTreasuryBundle("label.ProductReportEntryBean.header.description.en"),
-            academicTreasuryBundle("label.ProductReportEntryBean.header.unitOfMeasure.pt"),
-            academicTreasuryBundle("label.ProductReportEntryBean.header.unitOfMeasure.en"),
-            academicTreasuryBundle("label.ProductReportEntryBean.header.active"),
-            academicTreasuryBundle("label.ProductReportEntryBean.header.legacy"),
-            academicTreasuryBundle("label.ProductReportEntryBean.header.tuitionInstallmentOrder"),
-            academicTreasuryBundle("label.ProductReportEntryBean.header.vatType.code"),
-            academicTreasuryBundle("label.ProductReportEntryBean.header.vatType"),
-            academicTreasuryBundle("label.ProductReportEntryBean.header.exemptionReason.code"),
-            academicTreasuryBundle("label.ProductReportEntryBean.header.exemptionReason"),
-            academicTreasuryBundle("label.ProductReportEntryBean.header.finantialInstitution") };
+    public static final String[] getSpreadsheetHeaders() {
+        return new String[] { academicTreasuryBundle("label.ProductReportEntryBean.header.identification"),
+                academicTreasuryBundle("label.ProductReportEntryBean.header.group.code"),
+                academicTreasuryBundle("label.ProductReportEntryBean.header.group"),
+                academicTreasuryBundle("label.ProductReportEntryBean.header.code"),
+                academicTreasuryBundle("label.ProductReportEntryBean.header.description.pt"),
+                academicTreasuryBundle("label.ProductReportEntryBean.header.description.en"),
+                academicTreasuryBundle("label.ProductReportEntryBean.header.unitOfMeasure.pt"),
+                academicTreasuryBundle("label.ProductReportEntryBean.header.unitOfMeasure.en"),
+                academicTreasuryBundle("label.ProductReportEntryBean.header.active"),
+                academicTreasuryBundle("label.ProductReportEntryBean.header.legacy"),
+                academicTreasuryBundle("label.ProductReportEntryBean.header.tuitionInstallmentOrder"),
+                academicTreasuryBundle("label.ProductReportEntryBean.header.vatType.code"),
+                academicTreasuryBundle("label.ProductReportEntryBean.header.vatType"),
+                academicTreasuryBundle("label.ProductReportEntryBean.header.exemptionReason.code"),
+                academicTreasuryBundle("label.ProductReportEntryBean.header.exemptionReason"),
+                academicTreasuryBundle("label.ProductReportEntryBean.header.finantialInstitution") };
+    }
     // @formatter:on
 
     private String identification;
@@ -107,8 +108,9 @@ public class ProductReportEntryBean extends AbstractReportEntryBean {
             this.vatType = p.getVatType() != null ? p.getVatType().getName().getContent() : "";
             this.exemptionReasonCode = p.getVatExemptionReason() != null ? p.getVatExemptionReason().getCode() : "";
             this.exemptionReason = p.getVatExemptionReason() != null ? p.getVatExemptionReason().getName().getContent() : "";
-            this.finantialInstitution = !p.getFinantialInstitutionsSet().isEmpty() ? p.getFinantialInstitutionsSet().iterator()
-                    .next().getFiscalNumber() : "";
+            this.finantialInstitution =
+                    !p.getFinantialInstitutionsSet().isEmpty() ? p.getFinantialInstitutionsSet().iterator().next()
+                            .getFiscalNumber() : "";
 
             this.completed = true;
         } catch (final Exception e) {
@@ -146,7 +148,7 @@ public class ProductReportEntryBean extends AbstractReportEntryBean {
             createCellWithValue(row, i++, valueOrEmpty(exemptionReasonCode));
             createCellWithValue(row, i++, valueOrEmpty(exemptionReason));
             createCellWithValue(row, i++, valueOrEmpty(finantialInstitution));
-            
+
         } catch (final Exception e) {
             e.printStackTrace();
             errorsLog.addError(this.product, e);

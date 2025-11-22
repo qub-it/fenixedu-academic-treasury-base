@@ -64,24 +64,26 @@ import com.google.common.base.Strings;
 public class DebtAccountReportEntryBean implements SpreadsheetRow {
 
     // @formatter:off
-    public static String[] SPREADSHEET_HEADERS =
-            { academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identification"),
-                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.versioningCreator"),
-                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.creationDate"),
-                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.finantialInstitutionName"),
-                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.customerId"),
-                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.code"),
-                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.customerActive"),
-                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.name"),
-                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identificationType"),
-                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identificationNumber"),
-                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.vatNumber"),
-                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.email"),
-                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.address"),
-                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.addressCountryCode"),
-                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.studentNumber"),
-                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.vatNumberValid"),
-                    academicTreasuryBundle("label.DebtAccountReportEntryBean.header.totalInDebt") };
+    public static String[] getSpreadsheetHeaders() {
+        return new String[] { academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identification"),
+                academicTreasuryBundle("label.DebtAccountReportEntryBean.header.versioningCreator"),
+                academicTreasuryBundle("label.DebtAccountReportEntryBean.header.creationDate"),
+                academicTreasuryBundle("label.DebtAccountReportEntryBean.header.finantialInstitutionName"),
+                academicTreasuryBundle("label.DebtAccountReportEntryBean.header.customerId"),
+                academicTreasuryBundle("label.DebtAccountReportEntryBean.header.code"),
+                academicTreasuryBundle("label.DebtAccountReportEntryBean.header.customerActive"),
+                academicTreasuryBundle("label.DebtAccountReportEntryBean.header.name"),
+                academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identificationType"),
+                academicTreasuryBundle("label.DebtAccountReportEntryBean.header.identificationNumber"),
+                academicTreasuryBundle("label.DebtAccountReportEntryBean.header.vatNumber"),
+                academicTreasuryBundle("label.DebtAccountReportEntryBean.header.email"),
+                academicTreasuryBundle("label.DebtAccountReportEntryBean.header.address"),
+                academicTreasuryBundle("label.DebtAccountReportEntryBean.header.addressCountryCode"),
+                academicTreasuryBundle("label.DebtAccountReportEntryBean.header.studentNumber"),
+                academicTreasuryBundle("label.DebtAccountReportEntryBean.header.vatNumberValid"),
+                academicTreasuryBundle("label.DebtAccountReportEntryBean.header.totalInDebt") };
+    }
+
     // @formatter:on
 
     final DebtAccount debtAccount;
@@ -134,27 +136,28 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             this.customerActive = debtAccount.getCustomer().isActive();
             this.name = debtAccount.getCustomer().getName();
 
-            if (debtAccount.getCustomer().isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPerson() != null
-                    && ((PersonCustomer) debtAccount.getCustomer()).getPerson().getIdDocumentType() != null) {
+            if (debtAccount.getCustomer()
+                    .isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPerson() != null && ((PersonCustomer) debtAccount.getCustomer()).getPerson()
+                    .getIdDocumentType() != null) {
                 this.identificationType =
                         ((PersonCustomer) debtAccount.getCustomer()).getPerson().getIdDocumentType().getLocalizedName();
-            } else if (debtAccount.getCustomer().isPersonCustomer()
-                    && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null
-                    && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer()
-                            .getIdDocumentType() != null) {
-                this.identificationType = ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer()
-                        .getIdDocumentType().getLocalizedName();
+            } else if (debtAccount.getCustomer()
+                    .isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer()
+                    .getIdDocumentType() != null) {
+                this.identificationType =
+                        ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer().getIdDocumentType()
+                                .getLocalizedName();
             }
 
             this.identificationNumber = debtAccount.getCustomer().getIdentificationNumber();
             this.vatNumber = debtAccount.getCustomer().getUiFiscalNumber();
 
-            if (debtAccount.getCustomer().isPersonCustomer()
-                    && ((PersonCustomer) debtAccount.getCustomer()).getPerson() != null) {
+            if (debtAccount.getCustomer()
+                    .isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPerson() != null) {
                 this.email =
                         ((PersonCustomer) debtAccount.getCustomer()).getPerson().getInstitutionalOrDefaultEmailAddressValue();
-            } else if (debtAccount.getCustomer().isPersonCustomer()
-                    && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null) {
+            } else if (debtAccount.getCustomer()
+                    .isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null) {
                 this.email = ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer()
                         .getInstitutionalOrDefaultEmailAddressValue();
             }
@@ -162,14 +165,16 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             this.address = debtAccount.getCustomer().getUiCompleteAddress();
             this.addressCountryCode = valueOrEmpty(debtAccount.getCustomer().getAddressCountryCode());
 
-            if (debtAccount.getCustomer().isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPerson() != null
-                    && ((PersonCustomer) debtAccount.getCustomer()).getPerson().getStudent() != null) {
+            if (debtAccount.getCustomer()
+                    .isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPerson() != null && ((PersonCustomer) debtAccount.getCustomer()).getPerson()
+                    .getStudent() != null) {
                 this.studentNumber = ((PersonCustomer) debtAccount.getCustomer()).getPerson().getStudent().getNumber();
-            } else if (debtAccount.getCustomer().isPersonCustomer()
-                    && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null
-                    && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer().getStudent() != null) {
-                this.studentNumber = ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer()
-                        .getStudent().getNumber();
+            } else if (debtAccount.getCustomer()
+                    .isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer()
+                    .getStudent() != null) {
+                this.studentNumber =
+                        ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer().getStudent()
+                                .getNumber();
             }
 
             this.vatNumberValid = FiscalCodeValidation.isValidFiscalNumber(debtAccount.getCustomer().getAddressCountryCode(),

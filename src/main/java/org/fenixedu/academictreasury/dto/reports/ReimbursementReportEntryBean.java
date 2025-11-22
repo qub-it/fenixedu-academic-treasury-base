@@ -63,29 +63,30 @@ import com.google.common.base.Strings;
 
 public class ReimbursementReportEntryBean implements SpreadsheetRow {
 
-    public static String[] SPREADSHEET_HEADERS =
-            { academicTreasuryBundle("label.ReimbursementReportEntryBean.header.identification"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.creationDate"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.responsible"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.settlementNoteNumber"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.settlementNoteDocumentDate"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.reimbursementDate"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.settlementNoteAnnuled"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.documentExportationPending"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.paymentMethod"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.amount"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.customerId"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.debtAccountId"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.name"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.identificationType"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.identificationNumber"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.vatNumber"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.email"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.address"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.studentNumber"),
-                    academicTreasuryBundle("label.PaymentReportEntryBean.header.documentObservations"),
-                    academicTreasuryBundle("label.PaymentReportEntryBean.header.documentTermsAndConditions"),
-                    academicTreasuryBundle("label.ReimbursementReportEntryBean.header.reimbursementState") };
+    public static String[] getSpreadsheetHeaders() {
+        return new String[] { academicTreasuryBundle("label.ReimbursementReportEntryBean.header.identification"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.creationDate"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.responsible"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.settlementNoteNumber"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.settlementNoteDocumentDate"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.reimbursementDate"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.settlementNoteAnnuled"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.documentExportationPending"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.paymentMethod"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.amount"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.customerId"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.debtAccountId"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.name"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.identificationType"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.identificationNumber"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.vatNumber"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.email"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.address"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.studentNumber"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.documentObservations"),
+                academicTreasuryBundle("label.PaymentReportEntryBean.header.documentTermsAndConditions"),
+                academicTreasuryBundle("label.ReimbursementReportEntryBean.header.reimbursementState") };
+    }
 
     private ReimbursementEntry paymentEntry;
     private boolean completed;
@@ -182,10 +183,11 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
 
         if (!settlementNote.getSettlemetEntriesSet().isEmpty()) {
             final SettlementEntry settlementEntry = settlementNote.getSettlemetEntriesSet().iterator().next();
-            if (settlementEntry.getInvoiceEntry().getFinantialDocument() != null
-                    && ((Invoice) settlementEntry.getInvoiceEntry().getFinantialDocument()).getPayorDebtAccount() != null) {
-                this.erpPayorCustomerId = ((Invoice) settlementEntry.getInvoiceEntry().getFinantialDocument())
-                        .getPayorDebtAccount().getCustomer().getErpCustomerId();
+            if (settlementEntry.getInvoiceEntry().getFinantialDocument() != null && ((Invoice) settlementEntry.getInvoiceEntry()
+                    .getFinantialDocument()).getPayorDebtAccount() != null) {
+                this.erpPayorCustomerId =
+                        ((Invoice) settlementEntry.getInvoiceEntry().getFinantialDocument()).getPayorDebtAccount().getCustomer()
+                                .getErpCustomerId();
             }
         }
     }
@@ -198,8 +200,8 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
 
         this.name = customer.getName();
 
-        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null
-                && ((PersonCustomer) customer).getAssociatedPerson().getIdDocumentType() != null) {
+        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null && ((PersonCustomer) customer).getAssociatedPerson()
+                .getIdDocumentType() != null) {
             this.identificationType = ((PersonCustomer) customer).getAssociatedPerson().getIdDocumentType().getLocalizedName();
         }
 
@@ -216,8 +218,8 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
 
         this.address = customer.getAddress();
 
-        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null
-                && ((PersonCustomer) customer).getAssociatedPerson().getStudent() != null) {
+        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null && ((PersonCustomer) customer).getAssociatedPerson()
+                .getStudent() != null) {
             this.studentNumber = ((PersonCustomer) customer).getAssociatedPerson().getStudent().getNumber();
         }
     }

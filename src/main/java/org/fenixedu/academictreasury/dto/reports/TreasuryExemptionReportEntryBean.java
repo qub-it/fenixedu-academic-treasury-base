@@ -50,30 +50,31 @@ import com.google.common.base.Strings;
 
 public class TreasuryExemptionReportEntryBean extends AbstractReportEntryBean {
 
-    public static String[] SPREADSHEET_HEADERS =
-            { academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.identification"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.versioningCreator"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.creationDate"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.customerId"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.debtAccountId"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.customerName"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.identificationType"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.identificationNumber"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.vatNumber"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.studentNumber"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.registrationNumber"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.debitEntryId"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.documentNumber"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.debitEntryDescription"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.exemptedAmount"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.exemptionType.code"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.exemptionType.description"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.reason"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.degreeType"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.degreeCode"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.degreeName"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.executionYear"),
-                    academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.executionSemester"), };
+    public static String[] getSpreadsheetHeaders() {
+        return new String[] { academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.identification"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.versioningCreator"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.creationDate"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.customerId"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.debtAccountId"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.customerName"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.identificationType"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.identificationNumber"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.vatNumber"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.studentNumber"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.registrationNumber"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.debitEntryId"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.documentNumber"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.debitEntryDescription"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.exemptedAmount"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.exemptionType.code"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.exemptionType.description"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.reason"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.degreeType"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.degreeCode"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.degreeName"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.executionYear"),
+                academicTreasuryBundle("label.TreasuryExemptionReportEntryBean.header.executionSemester") };
+    }
 
     private String identification;
 

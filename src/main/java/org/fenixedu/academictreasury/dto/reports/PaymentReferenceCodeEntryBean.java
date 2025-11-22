@@ -59,27 +59,28 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
     private static final String TARGET_TYPE_MULTIPLE_ENTRIES = "M";
     private static final String TARGET_TYPE_NOT_DEFINED = "N";
 
-    public static String[] SPREADSHEET_HEADERS = { 
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.identification"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.versioningCreator"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.creationDate"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.customerId"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.debtAccountId"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.name"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.identificationType"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.identificationNumber"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.vatNumber"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.email"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.address"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.addressCountryCode"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.studentNumber"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.entityCode"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.referenceCode"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.finantialDocumentNumber"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.payableAmount"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.description"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.target.type"),
-            academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.state") };
+    public static String[] getSpreadsheetHeaders() {
+        return new String[] { academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.identification"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.versioningCreator"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.creationDate"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.customerId"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.debtAccountId"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.name"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.identificationType"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.identificationNumber"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.vatNumber"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.email"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.address"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.addressCountryCode"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.studentNumber"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.entityCode"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.referenceCode"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.finantialDocumentNumber"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.payableAmount"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.description"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.target.type"),
+                academicTreasuryBundle("label.PaymentReferenceCodeEntryBean.header.state") };
+    }
 
     private String identification;
     private String versioningCreator;
