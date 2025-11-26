@@ -4,6 +4,9 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import org.fenixedu.academic.domain.serviceRequests.AcademicServiceRequest;
+import org.fenixedu.academic.domain.studentCurriculum.StudentCurricularPlanEnrolmentManager;
+import org.fenixedu.academic.domain.studentCurriculum.StudentCurricularPlanNoCourseGroupEnrolmentManager;
 import org.fenixedu.academic.domain.treasury.ITreasuryBridgeAPI;
 import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.EmolumentServices;
@@ -34,24 +37,24 @@ public class AcademicTreasuryUiInitializer implements ServletContextListener {
     }
 
     private static void registerNewAcademicServiceRequestSituationHandler() {
-        Signal.register(ITreasuryBridgeAPI.ACADEMIC_SERVICE_REQUEST_NEW_SITUATION_EVENT, new EmolumentServices());
+        Signal.register(AcademicServiceRequest.ACADEMIC_SERVICE_REQUEST_NEW_SITUATION_EVENT, new EmolumentServices());
     }
 
     private static void registerAcademicServiceRequestCancelOrRejectHandler() {
-        Signal.register(ITreasuryBridgeAPI.ACADEMIC_SERVICE_REQUEST_REJECT_OR_CANCEL_EVENT,
+        Signal.register(AcademicServiceRequest.ACADEMIC_SERVICE_REQUEST_REJECT_OR_CANCEL_EVENT,
                 new AcademicServiceRequestCancelOrRejectHandler());
     }
 
     private static void registerStandaloneEnrolmentHandler() {
-        Signal.register(ITreasuryBridgeAPI.STANDALONE_ENROLMENT, new StandaloneEnrolmentHandler());
+        Signal.register(StudentCurricularPlanNoCourseGroupEnrolmentManager.STANDALONE_ENROLMENT, new StandaloneEnrolmentHandler());
     }
 
     private static void registerExtracurricularEnrolmentHandler() {
-        Signal.register(ITreasuryBridgeAPI.EXTRACURRICULAR_ENROLMENT, new ExtracurricularEnrolmentHandler());
+        Signal.register(StudentCurricularPlanNoCourseGroupEnrolmentManager.EXTRACURRICULAR_ENROLMENT, new ExtracurricularEnrolmentHandler());
     }
 
     private static void registerImprovementEnrolmentHandler() {
-        Signal.register(ITreasuryBridgeAPI.IMPROVEMENT_ENROLMENT, new ImprovementEnrolmentHandler());
+        Signal.register(StudentCurricularPlanEnrolmentManager.IMPROVEMENT_ENROLMENT, new ImprovementEnrolmentHandler());
     }
 
 }

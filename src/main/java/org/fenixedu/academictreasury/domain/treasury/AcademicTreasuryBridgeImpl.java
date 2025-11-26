@@ -60,19 +60,6 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
     private HandleSettlementNotePayment handleSettlementNotePayment = new HandleSettlementNotePayment();
 
-    /* ------------------------
-     * ACADEMIC SERVICE REQUEST
-     * ------------------------
-     */
-
-    @Override
-    @Deprecated
-    public IAcademicServiceRequestAndAcademicTaxTreasuryEvent academicTreasuryEventForAcademicServiceRequest(
-            AcademicServiceRequest academicServiceRequest) {
-        return academicServiceRequest.getPerson().getAcademicTreasuryEventSet().stream()
-                .filter(e -> e.getAcademicServiceRequest() == academicServiceRequest).findFirst().orElse(null);
-    }
-
     /* ----------
      * ENROLMENTS
      * ----------

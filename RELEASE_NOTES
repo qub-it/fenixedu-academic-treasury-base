@@ -1,3 +1,5 @@
+- Refactor: Move some properties and methods from ITreasuryBridgeAPI [#qubIT-Fenix-6552]
+
 12.13.0 (25-11-2025)
 - Refactor: Change static variable SPREADHSEET_HEADERS of the various report beans, to not evaluate when the classes are loaded [#qubIT-Fenix-7789]
 
