@@ -29,7 +29,9 @@ import static java.lang.String.format;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -1997,7 +1999,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
             return true;
         };
 
-        BigDecimal otherTuitionAmount = TreasuryBridgeAPIFactory.implementation().getAllAcademicTreasuryEventsList(getPerson()) //
+        BigDecimal otherTuitionAmount = AcademicTreasuryEvent.getAllAcademicTreasuryEventsOfPerson(getPerson()) //
                 .stream() //
                 .map(TreasuryEvent.class::cast) //
                 .filter(t -> t != this) //
@@ -2009,5 +2011,22 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return registrationTuitionAmount.add(otherTuitionAmount);
+    }
+
+    private static Set<Function<Person, Set<IAcademicTreasuryEvent>>> ACADEMIC_TREASURY_READERS = new HashSet<>();
+
+    public static void registerAcademicTreasuryEvent(Function<Person, Set<IAcademicTreasuryEvent>> reader) {
+        ACADEMIC_TREASURY_READERS.add(reader);
+    }
+
+    public static Set<IAcademicTreasuryEvent> getAllAcademicTreasuryEventsOfPerson(Person person) {
+        Set<IAcademicTreasuryEvent> result = new HashSet<>();
+
+        AcademicTreasuryEvent.find(person).collect(Collectors.toCollection(() -> result));
+
+        ACADEMIC_TREASURY_READERS.stream().flatMap(reader -> reader.apply(person).stream())
+                .collect(Collectors.toCollection(() -> result));
+
+        return result;
     }
 }

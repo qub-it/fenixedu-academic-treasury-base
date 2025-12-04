@@ -767,7 +767,7 @@ public class PersonCustomer extends PersonCustomer_Base {
         final Person person = isActive() ? getPerson() : getPersonForInactivePersonCustomer();
 
         final Set<TreasuryEvent> result = Sets.newHashSet();
-        for (IAcademicTreasuryEvent event : TreasuryBridgeAPIFactory.implementation().getAllAcademicTreasuryEventsList(person)) {
+        for (IAcademicTreasuryEvent event : AcademicTreasuryEvent.getAllAcademicTreasuryEventsOfPerson(person)) {
             result.add((TreasuryEvent) event);
         }
 

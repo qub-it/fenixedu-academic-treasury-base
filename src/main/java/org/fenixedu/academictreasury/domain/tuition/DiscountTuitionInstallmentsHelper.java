@@ -233,7 +233,7 @@ public class DiscountTuitionInstallmentsHelper {
 
     private static List<TreasuryEvent> getOtherEventsToDiscountInTuitionFee(Person person, ExecutionYear executionYear,
             DegreeCurricularPlan degreeCurricularPlan) {
-        return TreasuryBridgeAPIFactory.implementation().getAllAcademicTreasuryEventsList(person) //
+        return AcademicTreasuryEvent.getAllAcademicTreasuryEventsOfPerson(person) //
                 .stream() //
                 .map(TreasuryEvent.class::cast) //
                 .filter(t -> t.isEventDiscountInTuitionFee()) //
