@@ -16,6 +16,7 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
 import org.fenixedu.academictreasury.base.FenixFrameworkRunner;
+import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.tuition.EctsCalculationType;
 import org.fenixedu.academictreasury.domain.tuition.TuitionCalculationType;
@@ -149,7 +150,7 @@ public class TestsTuitionPaymentPlanRecalculationWithEqualTo30Ects {
         }
 
         registration.getPerson().editSocialSecurityNumber("999999990",
-                TreasuryBridgeAPIFactory.implementation().createSaftDefaultPhysicalAddress(registration.getPerson()));
+                PersonCustomer.createSaftDefaultPhysicalAddress(registration.getPerson()));
     }
 
     @Test

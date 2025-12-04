@@ -48,6 +48,7 @@ import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
+import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Customer;
 import org.fenixedu.treasury.domain.CustomerType;
@@ -1057,6 +1058,17 @@ public class PersonCustomer extends PersonCustomer_Base {
         resultSorted.addAll(invoiceEntries);
 
         return resultSorted;
+    }
+
+    public static PhysicalAddress createSaftDefaultPhysicalAddress(final Person person) {
+        String unknownAddress =
+                AcademicTreasuryConstants.academicTreasuryBundle("label.AcademicTreasuryBridgeImpl.unknown.address");
+        PhysicalAddress result =
+                AcademicTreasuryConstants.createPhysicalAddress(person, Country.readDefault(), unknownAddress, unknownAddress,
+                        "0000-000", unknownAddress);
+        result.setValid();
+
+        return result;
     }
 
 }
