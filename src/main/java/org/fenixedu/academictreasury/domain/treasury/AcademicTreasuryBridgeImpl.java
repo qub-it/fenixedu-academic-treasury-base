@@ -154,49 +154,12 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
 
     @Override
     @Deprecated
-    public boolean createCustomerIfMissing(final Person person) {
-        final String fiscalCountryCode = PersonCustomer.addressCountryCode(person);
-        final String fiscalNumber = PersonCustomer.fiscalNumber(person);
-
-        if (Strings.isNullOrEmpty(fiscalCountryCode) || Strings.isNullOrEmpty(fiscalNumber)) {
-            // 2022-09-21: Remove the restriction of fiscal information requirement in
-            // creating a registration. The caller decide whether to throw exception or not
-            // Simply return false and delegate the customer creation requirement by the caller
-            return false;
-        }
-
-        final Optional<? extends PersonCustomer> findUnique = PersonCustomer.findUnique(person, fiscalCountryCode, fiscalNumber);
-        if (findUnique.isPresent()) {
-            // If it is present return true, to inform that customer is created
-            return true;
-        }
-
-        PersonCustomer.create(person, fiscalCountryCode, fiscalNumber);
-
-        return true;
-    }
-
-    @Override
-    @Deprecated
     public void saveFiscalAddressFieldsFromPersonInActiveCustomer(final Person person) {
         if (person.getPersonCustomer() == null) {
             return;
         }
 
         person.getPersonCustomer().saveFiscalAddressFieldsFromPersonInCustomer();
-    }
-
-    @Override
-    @Deprecated
-    public PhysicalAddress createSaftDefaultPhysicalAddress(final Person person) {
-        String unknownAddress =
-                AcademicTreasuryConstants.academicTreasuryBundle("label.AcademicTreasuryBridgeImpl.unknown.address");
-        PhysicalAddress result =
-                AcademicTreasuryConstants.createPhysicalAddress(person, Country.readDefault(), unknownAddress, unknownAddress,
-                        "0000-000", unknownAddress);
-        result.setValid();
-
-        return result;
     }
 
 }

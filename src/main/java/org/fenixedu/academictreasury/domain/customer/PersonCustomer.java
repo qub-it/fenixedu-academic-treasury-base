@@ -1071,4 +1071,26 @@ public class PersonCustomer extends PersonCustomer_Base {
         return result;
     }
 
+    public static boolean createPersonCustomerIfMissing(final Person person) {
+        final String fiscalCountryCode = PersonCustomer.addressCountryCode(person);
+        final String fiscalNumber = PersonCustomer.fiscalNumber(person);
+
+        if (Strings.isNullOrEmpty(fiscalCountryCode) || Strings.isNullOrEmpty(fiscalNumber)) {
+            // 2022-09-21: Remove the restriction of fiscal information requirement in
+            // creating a registration. The caller decide whether to throw exception or not
+            // Simply return false and delegate the customer creation requirement by the caller
+            return false;
+        }
+
+        final Optional<? extends PersonCustomer> findUnique = PersonCustomer.findUnique(person, fiscalCountryCode, fiscalNumber);
+        if (findUnique.isPresent()) {
+            // If it is present return true, to inform that customer is created
+            return true;
+        }
+
+        PersonCustomer.create(person, fiscalCountryCode, fiscalNumber);
+
+        return true;
+    }
+
 }
