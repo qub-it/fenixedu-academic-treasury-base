@@ -1,3 +1,4 @@
+12.16.0 (05-12-2025)
 - Refactor: Remove methods from ITreasuryBridgeAPI implementation [#qubIT-Fenix-6552]
 - Refactor: Declare static method in PersonCustomer to create customer if missing [#qubIT-Fenix-6552]
 
