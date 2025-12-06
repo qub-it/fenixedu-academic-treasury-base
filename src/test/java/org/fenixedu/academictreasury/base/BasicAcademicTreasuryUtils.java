@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import com.qubit.terra.framework.services.ServiceProvider;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
@@ -34,7 +35,7 @@ import org.fenixedu.academic.domain.time.calendarStructure.AcademicInterval;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicIntervalCE;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicPeriod;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicYearCE;
-import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
+import org.fenixedu.academic.domain.treasury.ITreasuryBridgeAPI;
 import org.fenixedu.academic.dto.person.PersonBean;
 import org.fenixedu.academic.util.PeriodState;
 import org.fenixedu.academictreasury.domain.reservationtax.ReservationTax;
@@ -74,7 +75,7 @@ public class BasicAcademicTreasuryUtils {
                 AcademicTreasuryPlataformDependentServicesFactory
                         .registerImplementation(new AcademicTreasuryPlatformDependentServicesForTests());
 
-                TreasuryBridgeAPIFactory.registerImplementation(new AcademicTreasuryBridgeImpl());
+                ServiceProvider.registerService(ITreasuryBridgeAPI.class, AcademicTreasuryBridgeImpl.class);
 
                 TreasuryBootstrapper.bootstrap("teste", "teste", "PT");
                 AcademicTreasuryBootstrapper.bootstrap();

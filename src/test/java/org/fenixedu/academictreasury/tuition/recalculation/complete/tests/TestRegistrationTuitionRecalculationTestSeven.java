@@ -3,7 +3,6 @@ package org.fenixedu.academictreasury.tuition.recalculation.complete.tests;
 import org.fenixedu.academic.domain.*;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
-import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
 import org.fenixedu.academictreasury.base.FenixFrameworkRunner;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;

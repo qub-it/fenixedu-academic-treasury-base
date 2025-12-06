@@ -16,7 +16,6 @@ import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.Student;
-import org.fenixedu.academic.domain.treasury.TreasuryBridgeAPIFactory;
 import org.fenixedu.academictreasury.base.BasicAcademicTreasuryUtils;
 import org.fenixedu.academictreasury.base.FenixFrameworkRunner;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
