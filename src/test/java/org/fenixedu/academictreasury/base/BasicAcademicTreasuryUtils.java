@@ -43,10 +43,7 @@ import org.fenixedu.academictreasury.domain.reservationtax.ReservationTaxTariff;
 import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
 import org.fenixedu.academictreasury.domain.treasury.AcademicTreasuryBridgeImpl;
 import org.fenixedu.academictreasury.domain.tuition.exemptions.StatuteExemptionByIntervalMapEntry;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.util.AcademicTreasuryBootstrapper;
-import org.fenixedu.bennu.core.domain.Bennu;
-import org.fenixedu.bennu.core.domain.UserProfile;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.FinantialInstitution;
@@ -72,8 +69,6 @@ public class BasicAcademicTreasuryUtils {
                 Locale.setDefault(new Locale("PT", "pt"));
 
                 TreasuryPlataformDependentServicesFactory.registerImplementation(new TreasuryPlatformDependentServicesForTests());
-                AcademicTreasuryPlataformDependentServicesFactory
-                        .registerImplementation(new AcademicTreasuryPlatformDependentServicesForTests());
 
                 ServiceProvider.registerService(ITreasuryBridgeAPI.class, AcademicTreasuryBridgeImpl.class);
 

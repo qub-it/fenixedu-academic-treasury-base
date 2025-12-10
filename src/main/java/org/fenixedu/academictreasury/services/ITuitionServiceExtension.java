@@ -43,6 +43,7 @@ import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.dto.tuition.TuitionDebitEntryBean;
 import org.joda.time.LocalDate;
 
+@Deprecated
 public interface ITuitionServiceExtension {
 
     public boolean applyExtension(final Registration registration, final ExecutionYear executionYear);

@@ -52,7 +52,6 @@ import org.fenixedu.academic.domain.treasury.IAcademicServiceRequestAndAcademicT
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEventPayment;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryTarget;
-import org.fenixedu.academic.domain.treasury.IImprovementTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.IPaymentReferenceCode;
 import org.fenixedu.academictreasury.domain.emoluments.AcademicTax;
 import org.fenixedu.academictreasury.domain.emoluments.ServiceRequestMapEntry;
@@ -89,7 +88,7 @@ import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.core.AbstractDomainObject;
 
 public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
-        implements IAcademicTreasuryEvent, IImprovementTreasuryEvent, IAcademicServiceRequestAndAcademicTaxTreasuryEvent {
+        implements IAcademicTreasuryEvent, IAcademicServiceRequestAndAcademicTaxTreasuryEvent {
 
     private static Logger logger = LoggerFactory.getLogger(AcademicTreasuryEvent.class);
 
@@ -1680,104 +1679,6 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         }
 
         return super.getAmountForUrgencyRate();
-    }
-
-    /*
-     * -----------
-     * IMPROVEMENT
-     * -----------
-     */
-
-    @Override
-    public boolean isCharged(final EnrolmentEvaluation enrolmentEvaluation) {
-        return isChargedWithDebitEntry(enrolmentEvaluation);
-    }
-
-    @Override
-    public boolean isExempted(final EnrolmentEvaluation enrolmentEvaluation) {
-        if (!findActiveEnrolmentEvaluationDebitEntry(enrolmentEvaluation).isPresent()) {
-            return false;
-        }
-
-        final DebitEntry debitEntry = findActiveEnrolmentEvaluationDebitEntry(enrolmentEvaluation).get();
-
-        return TreasuryExemption.findUnique(this, debitEntry.getProduct()).isPresent();
-    }
-
-    @Override
-    public boolean isDueDateExpired(final EnrolmentEvaluation enrolmentEvaluation, final LocalDate when) {
-        if (!findActiveEnrolmentEvaluationDebitEntry(enrolmentEvaluation).isPresent()) {
-            return false;
-        }
-
-        final DebitEntry debitEntry = findActiveEnrolmentEvaluationDebitEntry(enrolmentEvaluation).get();
-        return debitEntry.isDueDateExpired(when);
-    }
-
-    @Override
-    public boolean isBlockingAcademicalActs(final EnrolmentEvaluation enrolmentEvaluation, final LocalDate when) {
-        if (!findActiveEnrolmentEvaluationDebitEntry(enrolmentEvaluation).isPresent()) {
-            return false;
-        }
-
-        final DebitEntry debitEntry = findActiveEnrolmentEvaluationDebitEntry(enrolmentEvaluation).get();
-        return debitEntry.isInDebt() && debitEntry.isDueDateExpired(when);
-    }
-
-    @Override
-    public BigDecimal getAmountWithVatToPay(final EnrolmentEvaluation enrolmentEvaluation) {
-        if (!findActiveEnrolmentEvaluationDebitEntry(enrolmentEvaluation).isPresent()) {
-            return BigDecimal.ZERO;
-        }
-
-        final DebitEntry debitEntry = findActiveEnrolmentEvaluationDebitEntry(enrolmentEvaluation).get();
-        return debitEntry.getAmount();
-    }
-
-    @Override
-    public BigDecimal getRemainingAmountToPay(final EnrolmentEvaluation enrolmentEvaluation) {
-        if (!findActiveEnrolmentEvaluationDebitEntry(enrolmentEvaluation).isPresent()) {
-            return BigDecimal.ZERO;
-        }
-
-        final DebitEntry debitEntry = findActiveEnrolmentEvaluationDebitEntry(enrolmentEvaluation).get();
-        return debitEntry.getOpenAmount();
-    }
-
-    @Override
-    public BigDecimal getNetExemptedAmount(final EnrolmentEvaluation enrolmentEvaluation) {
-        if (!isExempted(enrolmentEvaluation)) {
-            return BigDecimal.ZERO;
-        }
-
-        final DebitEntry debitEntry = findActiveEnrolmentEvaluationDebitEntry(enrolmentEvaluation).get();
-        return debitEntry.getOpenAmount();
-    }
-
-    @Override
-    public LocalDate getDueDate(final EnrolmentEvaluation enrolmentEvaluation) {
-        if (!isChargedWithDebitEntry(enrolmentEvaluation)) {
-            return null;
-        }
-
-        final DebitEntry debitEntry = findActiveEnrolmentEvaluationDebitEntry(enrolmentEvaluation).get();
-        return debitEntry.getDueDate();
-    }
-
-    @Override
-    public String getExemptionReason(final EnrolmentEvaluation enrolmentEvaluation) {
-        return getExemptionReason();
-    }
-
-    @Override
-    public List<IAcademicTreasuryEventPayment> getPaymentsList(final EnrolmentEvaluation enrolmentEvaluation) {
-        if (!isChargedWithDebitEntry(enrolmentEvaluation)) {
-            return Collections.emptyList();
-        }
-
-        return findActiveEnrolmentEvaluationDebitEntry(enrolmentEvaluation).get().getSettlementEntriesSet().stream()
-                .filter(l -> l.getFinantialDocument().isClosed()).map(l -> new AcademicTreasuryEventPayment(l))
-                .collect(Collectors.toList());
     }
 
     @Override

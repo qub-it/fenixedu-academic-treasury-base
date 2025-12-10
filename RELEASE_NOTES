@@ -1,4 +1,7 @@
 - Refactor: Remove references of TreasuryBridgeAPIFactory [#qubIT-Fenix-6552]
+- Refactor: Remove references of AcademicTreasuryPlataformDependentServicesFactory [[#qubIT-Fenix-6593]
+- Refactor: Delete methods in ITreasuryBridgeAPI implementation [#qubIT-Fenix-6552]
+- Refactor: Remove deprecated IImprovementTreasuryEvent [#qubIT-Fenix-6552]
 
 12.16.0 (05-12-2025)
 - Refactor: Remove methods from ITreasuryBridgeAPI implementation [#qubIT-Fenix-6552]

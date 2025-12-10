@@ -7,10 +7,7 @@ import javax.servlet.annotation.WebListener;
 import org.fenixedu.academic.domain.serviceRequests.AcademicServiceRequest;
 import org.fenixedu.academic.domain.studentCurriculum.StudentCurricularPlanEnrolmentManager;
 import org.fenixedu.academic.domain.studentCurriculum.StudentCurricularPlanNoCourseGroupEnrolmentManager;
-import org.fenixedu.academic.domain.treasury.ITreasuryBridgeAPI;
-import org.fenixedu.academictreasury.services.AcademicTreasuryPlataformDependentServicesFactory;
 import org.fenixedu.academictreasury.services.EmolumentServices;
-import org.fenixedu.academictreasury.services.FenixEduAcademicTreasuryPlatformDependentServices;
 import org.fenixedu.academictreasury.services.signals.AcademicServiceRequestCancelOrRejectHandler;
 import org.fenixedu.academictreasury.services.signals.ExtracurricularEnrolmentHandler;
 import org.fenixedu.academictreasury.services.signals.ImprovementEnrolmentHandler;
@@ -26,9 +23,6 @@ public class AcademicTreasuryUiInitializer implements ServletContextListener {
 
     @Override
     public void contextInitialized(final ServletContextEvent arg0) {
-        AcademicTreasuryPlataformDependentServicesFactory
-                .registerImplementation(new FenixEduAcademicTreasuryPlatformDependentServices());
-
         registerNewAcademicServiceRequestSituationHandler();
         registerAcademicServiceRequestCancelOrRejectHandler();
         registerStandaloneEnrolmentHandler();

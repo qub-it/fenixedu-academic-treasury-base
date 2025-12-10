@@ -25,35 +25,15 @@
  */
 package org.fenixedu.academictreasury.domain.treasury;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.fenixedu.academic.domain.Country;
+import com.google.common.eventbus.Subscribe;
 import org.fenixedu.academic.domain.Enrolment;
-import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
-import org.fenixedu.academic.domain.contacts.PhysicalAddress;
-import org.fenixedu.academic.domain.serviceRequests.AcademicServiceRequest;
-import org.fenixedu.academic.domain.student.Registration;
-import org.fenixedu.academic.domain.treasury.IAcademicServiceRequestAndAcademicTaxTreasuryEvent;
-import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEvent;
-import org.fenixedu.academic.domain.treasury.IImprovementTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.ITreasuryBridgeAPI;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
-import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
-import org.fenixedu.academictreasury.domain.settings.AcademicTreasurySettings;
-import org.fenixedu.academictreasury.services.PersonServices;
 import org.fenixedu.academictreasury.services.TuitionServices;
-import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.bennu.core.signals.DomainObjectEvent;
 import org.fenixedu.treasury.domain.document.SettlementNote;
 import org.fenixedu.treasury.util.FiscalCodeValidation;
-import org.joda.time.LocalDate;
-
-import com.google.common.base.Strings;
-import com.google.common.eventbus.Subscribe;
 
 @Deprecated
 public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
@@ -75,57 +55,6 @@ public class AcademicTreasuryBridgeImpl implements ITreasuryBridgeAPI {
     @Deprecated
     public void extracurricularUnenrolment(Enrolment extracurricularEnrolment) {
         TuitionServices.removeDebitEntryForExtracurricularEnrolment(extracurricularEnrolment);
-    }
-
-    /* --------------
-     * ACADEMIC TAXES
-     * --------------
-     */
-
-    @Override
-    @Deprecated
-    public IImprovementTreasuryEvent getImprovementTaxTreasuryEvent(Registration registration, ExecutionYear executionYear) {
-        if (!AcademicTreasuryEvent.findUniqueForImprovementTuition(registration, executionYear).isPresent()) {
-            return null;
-        }
-
-        return AcademicTreasuryEvent.findUniqueForImprovementTuition(registration, executionYear).get();
-    }
-
-    /* --------------
-     * ACADEMICAL ACT
-     * --------------
-     */
-
-    @Override
-    @Deprecated
-    public boolean isAcademicalActsBlocked(final Person person, final LocalDate when) {
-        return PersonServices.isAcademicalActsBlocked(person, when);
-    }
-
-    /* -----
-     * OTHER
-     * -----
-     */
-
-    @Override
-    @Deprecated
-    public List<IAcademicTreasuryEvent> getAllAcademicTreasuryEventsList(final Person person) {
-        return AcademicTreasuryEvent.find(person).collect(Collectors.<IAcademicTreasuryEvent> toList());
-    }
-
-    @Override
-    @Deprecated
-    public String getPersonAccountTreasuryManagementURL(final Person person) {
-        return AcademicTreasurySettings.getInstance().getAcademicTreasuryAccountUrl()
-                .getPersonAccountTreasuryManagementURL(person);
-    }
-
-    @Override
-    @Deprecated
-    public String getRegistrationAccountTreasuryManagementURL(Registration registration) {
-        return AcademicTreasurySettings.getInstance().getAcademicTreasuryAccountUrl()
-                .getRegistrationAccountTreasuryManagementURL(registration);
     }
 
     // TODO After the virtual payments going to production, replace Bennu Signals  with settlement note handlers
