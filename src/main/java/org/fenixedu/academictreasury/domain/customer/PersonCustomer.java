@@ -797,12 +797,11 @@ public class PersonCustomer extends PersonCustomer_Base {
 
     @Override
     public LocalizedString getIdentificationTypeDesignation() {
-        ITreasuryPlatformDependentServices implementation = TreasuryPlataformDependentServicesFactory.implementation();
         final Person person = getAssociatedPerson();
 
         if (person.getIdDocumentType() != null) {
             LocalizedString result = new LocalizedString();
-            for (Locale locale : implementation.availableLocales()) {
+            for (Locale locale : TreasuryConstants.getAvailableLocales()) {
                 result = result.with(locale, person.getIdDocumentType().getLocalizedName(locale));
             }
 

@@ -27,7 +27,7 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
         this();
 
         super.setName(name);
-        
+
         checkRules();
     }
 
@@ -40,17 +40,17 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
 
         checkRules();
     }
-    
+
     public boolean isValid() {
         return getAmount() != null && TreasuryConstants.isPositive(getAmount());
     }
 
     @Override
     public BigDecimal getTotalAmount(Registration registration) {
-        if(!isValid()) {
+        if (!isValid()) {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlanCalculator.not.valid");
         }
-        
+
         BigDecimal normalEnrolmentsEcts =
                 TuitionServices.normalEnrolmentsIncludingAnnuled(registration, getTuitionPaymentPlan().getExecutionYear())
                         .stream().map(e -> e.getEctsCreditsForCurriculum()).reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -70,7 +70,7 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
                         .stream().map(e -> e.getEctsCreditsForCurriculum()).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
-        String description = services.bundle(services.defaultLocale(), AcademicTreasuryConstants.BUNDLE,
+        String description = services.bundle(TreasuryConstants.getDefaultLocale(), AcademicTreasuryConstants.BUNDLE,
                 "label.TestTuitionPaymentPlanCalculator.calculationDescription", getAmount().toString(),
                 normalEnrolmentsEcts.toString(), getTotalAmount(registration).toString());
 
@@ -80,7 +80,7 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
     @Override
     public String getCalculationDescription(Enrolment enrolment) {
         ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
-        String description = services.bundle(services.defaultLocale(), AcademicTreasuryConstants.BUNDLE,
+        String description = services.bundle(TreasuryConstants.getDefaultLocale(), AcademicTreasuryConstants.BUNDLE,
                 "label.TestTuitionPaymentPlanCalculator.calculationDescription", getAmount().toString(),
                 enrolment.getEctsCreditsForCurriculum().toString(), getTotalAmount(enrolment).toString());
 
@@ -91,10 +91,10 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
     public LocalizedString getParametersDescription() {
         ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
 
-        LocalizedString result = services.availableLocales().stream()
-                .map(locale -> new LocalizedString(locale, services.bundle(locale, AcademicTreasuryConstants.BUNDLE,
-                        "label.TestTuitionPaymentPlanCalculator.parametersDescription", getAmount() != null ? getAmount().toString() : "N/A")))
-                .reduce((a, c) -> a.append(c)).get();
+        LocalizedString result = TreasuryConstants.getAvailableLocales().stream().map(locale -> new LocalizedString(locale,
+                services.bundle(locale, AcademicTreasuryConstants.BUNDLE,
+                        "label.TestTuitionPaymentPlanCalculator.parametersDescription",
+                        getAmount() != null ? getAmount().toString() : "N/A"))).reduce((a, c) -> a.append(c)).get();
 
         return result;
     }
@@ -102,7 +102,7 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
     public static LocalizedString getCalculatorPresentationName() {
         ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
 
-        return TreasuryPlataformDependentServicesFactory.implementation().availableLocales().stream() //
+        return TreasuryConstants.getAvailableLocales().stream() //
                 .map(locale -> {
                     return new LocalizedString(locale, services.bundle(locale, AcademicTreasuryConstants.BUNDLE,
                             TestTuitionPaymentPlanCalculator.class.getName()));
@@ -118,24 +118,24 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
 
         return copy;
     }
-    
+
     @Override
     public TuitionPaymentPlanCalculator copyTo(TuitionCalculatorAggregator tuitionCalculatorAggregatorTarget) {
         TestTuitionPaymentPlanCalculator calculator = new TestTuitionPaymentPlanCalculator();
 
         calculator.setAmount(getAmount());
         calculator.setTuitionCalculatorParentAggregator(tuitionCalculatorAggregatorTarget);
-        
+
         return calculator;
     }
 
     @Override
     public void fillWithParametersFromImportation(String parameters) {
         ObjectMapper objectMapper = new ObjectMapper();
-        
+
         try {
             BigDecimal amount = objectMapper.readValue(parameters, BigDecimal.class);
-            
+
             super.setAmount(amount);
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -507,7 +507,7 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         LocalizedString result = new LocalizedString();
 
-        for (final Locale locale : treasuryServices.availableLocales()) {
+        for (final Locale locale : TreasuryConstants.getAvailableLocales()) {
             String enrolmentName = enrolmentEvaluation.getEnrolment().getName().getContent(locale);
             String executionIntervalName = enrolmentEvaluation.getExecutionPeriod().getQualifiedName();
             String academicTreasuryEventDescription =
@@ -696,8 +696,7 @@ public class AcademicTariff extends AcademicTariff_Base {
     @Deprecated
     /**
      * Replaced by #getAssociatedDegreesSet
-     */
-    public Degree getDegree() {
+     */ public Degree getDegree() {
         return super.getDegree();
     }
 

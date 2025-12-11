@@ -49,6 +49,7 @@ import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServ
 
 import com.google.common.collect.Sets;
 
+import org.fenixedu.treasury.util.TreasuryConstants;
 import pt.ist.fenixframework.FenixFramework;
 
 public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicEntry_Base {
@@ -340,7 +341,7 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
     public LocalizedString getDescription() {
         if (isDefinedForDegreeType()) {
             LocalizedString result = new LocalizedString();
-            for (Locale locale : treasuryServices().availableLocales()) {
+            for (Locale locale : TreasuryConstants.getAvailableLocales()) {
                 result = result.with(locale, getDegreeType().getName().getContent(locale));
             }
             return result;
@@ -348,7 +349,7 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
 
         if (isDefinedForDegree()) {
             LocalizedString result = new LocalizedString();
-            for (Locale locale : AcademicTreasuryConstants.supportedLocales()) {
+            for (Locale locale : TreasuryConstants.getAvailableLocales()) {
                 result = result.with(locale, format("[%s] %s", getDegree().getCode(), getDegree().getPresentationName()));
             }
 
@@ -357,7 +358,7 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
 
         if (isDefinedForDegreeCurricularPlan()) {
             LocalizedString result = new LocalizedString();
-            for (Locale locale : AcademicTreasuryConstants.supportedLocales()) {
+            for (Locale locale : TreasuryConstants.getAvailableLocales()) {
                 result = result.with(locale,
                         String.format("[%s] %s - %s", getDegree().getCode(), getDegree().getPresentationName(),
                                 getDegreeCurricularPlan().getName()));
@@ -373,10 +374,6 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
         }
 
         throw new RuntimeException("error");
-    }
-
-    private ITreasuryPlatformDependentServices treasuryServices() {
-        return TreasuryPlataformDependentServicesFactory.implementation();
     }
 
     public void delete() {

@@ -166,10 +166,6 @@ public class AcademicTreasuryConstants {
         return TreasuryPlataformDependentServicesFactory.implementation().bundleI18N(AcademicTreasuryConstants.BUNDLE, key, args);
     }
 
-    public static Set<Locale> supportedLocales() {
-        return TreasuryPlataformDependentServicesFactory.implementation().availableLocales();
-    }
-
     // @formatter: off
 
     /**************

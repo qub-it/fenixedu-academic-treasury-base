@@ -77,6 +77,7 @@ import org.fenixedu.treasury.domain.exemption.TreasuryExemptionType;
 import org.fenixedu.treasury.domain.tariff.Tariff;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
+import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -171,12 +172,11 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
 
     public static LocalizedString nameForAcademicServiceRequest(final Product product,
             final ITreasuryServiceRequest iTreasuryServiceRequest) {
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
         LocalizedString result = new LocalizedString();
 
         final ServiceRequestMapEntry serviceRequestMapEntry = ServiceRequestMapEntry.findMatch(iTreasuryServiceRequest);
 
-        for (final Locale locale : treasuryServices.availableLocales()) {
+        for (final Locale locale : TreasuryConstants.getAvailableLocales()) {
             final ExecutionYear executionYear = iTreasuryServiceRequest.getExecutionYear();
             if (executionYear != null) {
                 String text = format("%s [%s - %s] (%s)", product.getName().getContent(locale),
@@ -251,10 +251,9 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
 
     private LocalizedString nameForTuition(final Product product, final Registration registration,
             final ExecutionYear executionYear) {
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
         LocalizedString result = new LocalizedString();
 
-        for (final Locale locale : treasuryServices.availableLocales()) {
+        for (final Locale locale : TreasuryConstants.getAvailableLocales()) {
             final String name = String.format("%s [%s - %s]", product.getName().getContent(locale),
                     registration.getDegree().getPresentationName(executionYear, locale), executionYear.getQualifiedName());
 
@@ -314,10 +313,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
                     "error.AcademicTreasuryEvent.buildCustomNameForAcademicTax.isAppliedOnRegistration.not.supported");
         }
 
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-
         LocalizedString result = new LocalizedString();
-        for (final Locale locale : treasuryServices.availableLocales()) {
+        for (final Locale locale : TreasuryConstants.getAvailableLocales()) {
             Map<String, String> valueMap = new HashMap<String, String>();
 
             String degreePresentationName = registration.getDegree().getPresentationName(executionYear, locale);
@@ -345,10 +342,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
 
     private static LocalizedString defaultNameForAcademicTax(AcademicTax academicTax, Registration registration,
             ExecutionYear executionYear) {
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-
         LocalizedString result = new LocalizedString();
-        for (final Locale locale : treasuryServices.availableLocales()) {
+        for (final Locale locale : TreasuryConstants.getAvailableLocales()) {
             String name = null;
             if (academicTax.isAppliedOnRegistration()) {
                 name = String.format("%s [%s - %s]", academicTax.getProduct().getName().getContent(locale),
@@ -448,10 +443,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
 
     private static LocalizedString buildCustomNameForCustomAcademicDebt(Product product, Registration registration,
             ExecutionYear executionYear) {
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-
         LocalizedString result = new LocalizedString();
-        for (final Locale locale : treasuryServices.availableLocales()) {
+        for (final Locale locale : TreasuryConstants.getAvailableLocales()) {
             Map<String, String> valueMap = new HashMap<String, String>();
 
             String degreePresentationName = registration.getDegree().getPresentationName(executionYear, locale);
@@ -479,10 +472,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
 
     private static LocalizedString defaultNameForCustomAcademicDebt(Product product, Registration registration,
             ExecutionYear executionYear) {
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-
         LocalizedString result = new LocalizedString();
-        for (final Locale locale : treasuryServices.availableLocales()) {
+        for (final Locale locale : TreasuryConstants.getAvailableLocales()) {
             final String name = String.format("%s [%s - %s]", product.getName().getContent(),
                     registration.getDegree().getPresentationName(executionYear, locale), executionYear.getQualifiedName());
 
@@ -829,13 +820,11 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
     }
 
     private LocalizedString descriptionForAcademicServiceRequest() {
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-
         final ServiceRequestMapEntry serviceRequestMapEntry = ServiceRequestMapEntry.findMatch(getITreasuryServiceRequest());
 
         LocalizedString result = new LocalizedString();
 
-        for (final Locale locale : treasuryServices.availableLocales()) {
+        for (final Locale locale : TreasuryConstants.getAvailableLocales()) {
             String text =
                     getProduct().getName().getContent(locale) + ": " + getITreasuryServiceRequest().getServiceRequestNumberYear();
 
@@ -1737,7 +1726,6 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
 
     @Override
     public LocalizedString getEventTargetCurrentState() {
-        ITreasuryPlatformDependentServices platformServices = TreasuryPlataformDependentServicesFactory.implementation();
         // Catch the exception and log only, to prevent an error
         // that will deny access to the debt account and
         // execution of treasury operations
@@ -1745,17 +1733,17 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         try {
 
             if (isForAcademicServiceRequest()) {
-                return getAcademicRequestStateDescription(platformServices);
+                return getAcademicRequestStateDescription();
             } else if (isForAcademicTax()) {
-                return registrationStateDescription(platformServices);
+                return registrationStateDescription();
             } else if (isForExtracurricularTuition()) {
-                return registrationStateDescription(platformServices);
+                return registrationStateDescription();
             } else if (isForImprovementTax()) {
-                return registrationStateDescription(platformServices);
+                return registrationStateDescription();
             } else if (isForRegistrationTuition()) {
-                return registrationStateDescription(platformServices);
+                return registrationStateDescription();
             } else if (isForStandaloneTuition()) {
-                return registrationStateDescription(platformServices);
+                return registrationStateDescription();
             } else if (isForTreasuryEventTarget()) {
                 IAcademicTreasuryTarget target = (IAcademicTreasuryTarget) getTreasuryEventTarget();
 
@@ -1763,7 +1751,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
             } else if (isLegacy()) {
                 return new LocalizedString();
             } else if (isCustomAcademicDebt()) {
-                return registrationStateDescription(platformServices);
+                return registrationStateDescription();
             }
         } catch (Exception e) {
             logger.error(e.getLocalizedMessage(), e);
@@ -1772,7 +1760,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         return new LocalizedString();
     }
 
-    private LocalizedString getAcademicRequestStateDescription(ITreasuryPlatformDependentServices platformServices) {
+    private LocalizedString getAcademicRequestStateDescription() {
         ITreasuryServiceRequest request = getITreasuryServiceRequest();
         AcademicServiceRequest serviceRequest = (AcademicServiceRequest) request;
 
@@ -1780,7 +1768,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
 
         if (currentSituationType != null) {
             LocalizedString ls = new LocalizedString();
-            for (Locale locale : platformServices.availableLocales()) {
+            for (Locale locale : TreasuryConstants.getAvailableLocales()) {
                 ls = ls.with(locale, currentSituationType.getLocalizedName(locale));
             }
 
@@ -1790,7 +1778,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         return new LocalizedString();
     }
 
-    private LocalizedString registrationStateDescription(ITreasuryPlatformDependentServices platformServices) {
+    private LocalizedString registrationStateDescription() {
         Registration registration = getRegistration();
 
         RegistrationStateType activeStateType = registration.getActiveStateType();

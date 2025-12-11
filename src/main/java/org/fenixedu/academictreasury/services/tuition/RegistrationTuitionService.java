@@ -229,9 +229,9 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                             DebitEntry.findActive(academicTreasuryEvent, product).collect(Collectors.toSet());
 
                     // Check if there is only one payor entity to set
-                    Set<DebtAccount> payorDebtAccountsSet =
-                            debitEntriesToAnnul.stream().map(de -> de.getDebitNote() != null ? de.getDebitNote().getPayorDebtAccount() : null)
-                                    .filter(Objects::nonNull).collect(Collectors.toSet());
+                    Set<DebtAccount> payorDebtAccountsSet = debitEntriesToAnnul.stream()
+                            .map(de -> de.getDebitNote() != null ? de.getDebitNote().getPayorDebtAccount() : null)
+                            .filter(Objects::nonNull).collect(Collectors.toSet());
 
                     DebtAccount payorDebtAccount =
                             payorDebtAccountsSet.size() == 1 ? payorDebtAccountsSet.iterator().next() : null;
@@ -393,8 +393,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                             this._treasuryExemptionsTeller.retrieveUnchargedExemptionsToApplyMapForTariff(tariff, newNetAmount);
 
                     newTreasuryExemptionMapByType.entrySet().forEach(entry -> {
-                        String exemptionReason = entry.getKey().getName()
-                                .getContent(TreasuryPlataformDependentServicesFactory.implementation().defaultLocale());
+                        String exemptionReason = entry.getKey().getName().getContent(TreasuryConstants.getDefaultLocale());
 
                         TreasuryExemption.create(entry.getKey(), exemptionReason, entry.getValue(), newDebitEntry);
                     });
@@ -456,7 +455,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
     }
 
     private LocalizedString ls(String value) {
-        return new LocalizedString(TreasuryPlataformDependentServicesFactory.implementation().defaultLocale(), value);
+        return new LocalizedString(TreasuryConstants.getDefaultLocale(), value);
     }
 
     private Boolean createRecalculationAdditionalDebitEntryForRegistrationAndExempt(LocalDate debtDate, DebtAccount debtAccount,
@@ -471,8 +470,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
             TreasuryExemptionType treasuryExemptionType = entry.getKey();
             BigDecimal amountToExempt = entry.getValue();
 
-            String reason = treasuryExemptionType.getName()
-                    .getContent(TreasuryPlataformDependentServicesFactory.implementation().defaultLocale());
+            String reason = treasuryExemptionType.getName().getContent(TreasuryConstants.getDefaultLocale());
             TreasuryExemption.create(treasuryExemptionType, reason, amountToExempt, installmentDebitEntry);
         }
 
@@ -488,8 +486,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
             TreasuryExemptionType treasuryExemptionType = entry.getKey();
             BigDecimal amountToExempt = entry.getValue();
 
-            String reason = treasuryExemptionType.getName()
-                    .getContent(TreasuryPlataformDependentServicesFactory.implementation().defaultLocale());
+            String reason = treasuryExemptionType.getName().getContent(TreasuryConstants.getDefaultLocale());
             TreasuryExemption.create(treasuryExemptionType, reason, amountToExempt, newDebitEntry);
         }
 
@@ -832,7 +829,7 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                     .filter(tariff -> tariff.getTuitionPaymentPlanCalculator() != null) //
                     .map(tariff -> tariff.getTuitionPaymentPlanCalculator()) //
                     .collect(Collectors.toSet()).forEach(calculator -> {
-                        strBuilder.append(calculator.getName().getContent(services.defaultLocale())).append(" (")
+                        strBuilder.append(calculator.getName().getContent(TreasuryConstants.getDefaultLocale())).append(" (")
                                 .append(calculator.getTotalAmount(registration, this)).append("): \n");
 
                         strBuilder.append(calculator.getCalculationDescription(registration)).append("\n");

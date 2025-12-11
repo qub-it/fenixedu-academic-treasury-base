@@ -757,17 +757,17 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
                     .getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE) + " " + installmentDebitEntryName;
         }
 
-        if (group.getTuitionRecalculationDebitEntrySuffix() != null && StringUtils.isNotEmpty(group.getTuitionRecalculationDebitEntrySuffix()
-                .getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE))) {
+        if (group.getTuitionRecalculationDebitEntrySuffix() != null && StringUtils.isNotEmpty(
+                group.getTuitionRecalculationDebitEntrySuffix().getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE))) {
             installmentDebitEntryName = installmentDebitEntryName + " " + group.getTuitionRecalculationDebitEntrySuffix()
                     .getContent(AcademicTreasuryConstants.DEFAULT_LANGUAGE);
         }
 
         DebitEntry debitEntry =
                 DebitEntry.create(getTuitionPaymentPlan().getFinantialEntity(), debtAccount, academicTreasuryEvent, vat(when),
-                        recalculatedAmount, recalculationDueDate, fillPriceProperties, getProduct(), installmentDebitEntryName.trim(),
-                        AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(), when.toDateTimeAtStartOfDay(), false,
-                        false, null);
+                        recalculatedAmount, recalculationDueDate, fillPriceProperties, getProduct(),
+                        installmentDebitEntryName.trim(), AcademicTreasuryConstants.DEFAULT_QUANTITY, this.getInterestRate(),
+                        when.toDateTimeAtStartOfDay(), false, false, null);
 
         if (isAcademicalActBlockingOff()) {
             debitEntry.markAcademicalActBlockingSuspension();
@@ -870,10 +870,8 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
             throw new RuntimeException("wrong call");
         }
 
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-
         LocalizedString result = new LocalizedString();
-        for (final Locale locale : treasuryServices.availableLocales()) {
+        for (final Locale locale : TreasuryConstants.getAvailableLocales()) {
             result = result.with(locale, AcademicTreasuryConstants.academicTreasuryBundle(locale,
                     "label.TuitionPaymentPlan.standalone.debit.entry.name", standaloneEnrolment.getName().getContent(locale),
                     standaloneEnrolment.getExecutionPeriod().getQualifiedName(),
@@ -888,10 +886,8 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
             throw new RuntimeException("wrong call");
         }
 
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-
         LocalizedString result = new LocalizedString();
-        for (final Locale locale : treasuryServices.availableLocales()) {
+        for (final Locale locale : TreasuryConstants.getAvailableLocales()) {
             result = result.with(locale, AcademicTreasuryConstants.academicTreasuryBundle(locale,
                     "label.TuitionPaymentPlan.extracurricular.debit.entry.name",
                     extracurricularEnrolment.getName().getContent(locale),

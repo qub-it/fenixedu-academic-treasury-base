@@ -55,6 +55,7 @@ import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
+import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
@@ -115,7 +116,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         setCustomized(tuitionPaymentPlanBean.isCustomized());
 
         LocalizedString mls = new LocalizedString();
-        for (final Locale locale : TreasuryPlataformDependentServicesFactory.implementation().availableLocales()) {
+        for (final Locale locale : TreasuryConstants.getAvailableLocales()) {
             mls = mls.with(locale, tuitionPaymentPlanBean.getName());
         }
 
@@ -353,7 +354,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                     .filter(tariff -> tariff.getTuitionPaymentPlanCalculator() != null) //
                     .map(tariff -> tariff.getTuitionPaymentPlanCalculator()) //
                     .collect(Collectors.toSet()).forEach(calculator -> {
-                        strBuilder.append(calculator.getName().getContent(services.defaultLocale())).append(" (")
+                        strBuilder.append(calculator.getName().getContent(TreasuryConstants.getDefaultLocale())).append(" (")
                                 .append(tuitionAcademicTreasuryEvent.formatMoney(calculator.getTotalAmount(registration)))
                                 .append("): \n");
                         String description = calculator.getCalculationDescription(registration);
@@ -420,7 +421,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         if (Boolean.TRUE.equals(getTuitionPaymentPlanGroup().getApplyDomainObjectCalculators())) {
             getTuitionInstallmentTariffsSet().stream().filter(tariff -> tariff.getTuitionPaymentPlanCalculator() != null)
                     .map(tariff -> tariff.getTuitionPaymentPlanCalculator()).collect(Collectors.toSet()).forEach(calculator -> {
-                        strBuilder.append(calculator.getName().getContent(services.defaultLocale())).append(" (")
+                        strBuilder.append(calculator.getName().getContent(TreasuryConstants.getDefaultLocale())).append(" (")
                                 .append(academicTreasuryEvent.formatMoney(calculator.getTotalAmount(standaloneEnrolment)))
                                 .append("): \n");
                         String description = calculator.getCalculationDescription(standaloneEnrolment);
@@ -693,7 +694,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                 getOrderedTuitionInstallmentTariffs().stream().sorted(sortFunc).collect(Collectors.toList());
 
         int installmentNum = 1;
-        for(TuitionInstallmentTariff tariff : tariffsList) {
+        for (TuitionInstallmentTariff tariff : tariffsList) {
             tariff.setInstallmentOrder(installmentNum++);
         }
 

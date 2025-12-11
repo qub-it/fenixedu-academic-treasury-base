@@ -17,6 +17,7 @@ import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemptionType;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 
+import org.fenixedu.treasury.util.TreasuryConstants;
 import pt.ist.fenixframework.FenixFramework;
 
 public class ReservationTax extends ReservationTax_Base {
@@ -26,9 +27,9 @@ public class ReservationTax extends ReservationTax_Base {
         setDomainRoot(FenixFramework.getDomainRoot());
     }
 
-    protected ReservationTax(String code, LocalizedString name, FinantialEntity finantialEntity, Product product, boolean discountInTuitionFee,
-            boolean active, boolean createPaymentReferenceCode, LocalizedString taxReservationDescription,
-            TreasuryExemptionType treasuryExemptionType) {
+    protected ReservationTax(String code, LocalizedString name, FinantialEntity finantialEntity, Product product,
+            boolean discountInTuitionFee, boolean active, boolean createPaymentReferenceCode,
+            LocalizedString taxReservationDescription, TreasuryExemptionType treasuryExemptionType) {
         this();
 
         super.setCode(code);
@@ -52,8 +53,8 @@ public class ReservationTax extends ReservationTax_Base {
         if (getFinantialEntity() == null) {
             throw new AcademicTreasuryDomainException("error.ReservationTax.finantialEntity.required");
         }
-        
-        if(getCode() == null) {
+
+        if (getCode() == null) {
             throw new AcademicTreasuryDomainException("error.ReservationTax.code.required");
         }
 
@@ -80,26 +81,26 @@ public class ReservationTax extends ReservationTax_Base {
         if (getTaxReservationDescription() == null) {
             throw new AcademicTreasuryDomainException("error.ReservationTax.taxReservationDescription.required");
         }
-        
-        if(getTreasuryExemptionType() == null) {
+
+        if (getTreasuryExemptionType() == null) {
             throw new AcademicTreasuryDomainException("error.ReservationTax.treasuryExemptionType.required");
         }
     }
 
-    public void edit(String code, LocalizedString name, FinantialEntity finantialEntity, Product product, boolean discountInTuitionFee,
-            boolean active, boolean createPaymentReferenceCode, LocalizedString taxReservationDescription,
-            TreasuryExemptionType treasuryExemptionType) {
+    public void edit(String code, LocalizedString name, FinantialEntity finantialEntity, Product product,
+            boolean discountInTuitionFee, boolean active, boolean createPaymentReferenceCode,
+            LocalizedString taxReservationDescription, TreasuryExemptionType treasuryExemptionType) {
 
         super.setCode(code);
         super.setName(name);
-        
-        if(getReservationTaxEventTargetsSet().isEmpty()) {
+
+        if (getReservationTaxEventTargetsSet().isEmpty()) {
             super.setFinantialEntity(finantialEntity);
             super.setProduct(product);
             super.setDiscountInTuitionFee(discountInTuitionFee);
             super.setTreasuryExemptionType(treasuryExemptionType);
         }
-        
+
         super.setActive(active);
         super.setCreatePaymentReferenceCode(createPaymentReferenceCode);
         super.setTaxReservationDescription(taxReservationDescription);
@@ -110,7 +111,7 @@ public class ReservationTax extends ReservationTax_Base {
     public LocalizedString buildEmolumentDescription(DegreeCurricularPlan degreeCurricularPlan,
             ExecutionInterval executionInterval) {
         LocalizedString result = new LocalizedString();
-        for (Locale locale : TreasuryPlataformDependentServicesFactory.implementation().availableLocales()) {
+        for (Locale locale : TreasuryConstants.getAvailableLocales()) {
             Map<String, String> valueMap = new HashMap<String, String>();
             valueMap.put("executionInterval", executionInterval.getQualifiedName());
             valueMap.put("productName", getProduct().getName().getContent(locale));
@@ -124,21 +125,21 @@ public class ReservationTax extends ReservationTax_Base {
 
         return result;
     }
-    
+
     public void delete() {
-        if(!getReservationTaxEventTargetsSet().isEmpty()) {
+        if (!getReservationTaxEventTargetsSet().isEmpty()) {
             throw new AcademicTreasuryDomainException("error.ReservationTax.delete.not.possible.due.to.existing.eventTargets");
         }
-        
-        if(!getReservationTaxTariffsSet().isEmpty()) {
+
+        if (!getReservationTaxTariffsSet().isEmpty()) {
             throw new AcademicTreasuryDomainException("error.ReservationTax.delete.not.possible.due.to.existing.tariffs");
         }
-        
+
         super.setDomainRoot(null);
         super.setFinantialEntity(null);
         super.setProduct(null);
         super.setTreasuryExemptionType(null);
-        
+
         super.deleteDomainObject();
     }
 

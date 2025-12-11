@@ -18,6 +18,7 @@ import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServ
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.fenixedu.treasury.util.TreasuryConstants;
 
 public class TuitionCalculatorAggregator extends TuitionCalculatorAggregator_Base {
 
@@ -178,7 +179,7 @@ public class TuitionCalculatorAggregator extends TuitionCalculatorAggregator_Bas
                         (TuitionPaymentPlanCalculator) Class.forName(configChildJsonType.childClassName)
                                 .getConstructor(LocalizedString.class)
                                 .newInstance(new LocalizedString(
-                                        TreasuryPlataformDependentServicesFactory.implementation().defaultLocale(),
+                                        TreasuryConstants.getDefaultLocale(),
                                         configChildJsonType.childName));
 
                 childCalculator.setTuitionCalculatorParentAggregator(this);

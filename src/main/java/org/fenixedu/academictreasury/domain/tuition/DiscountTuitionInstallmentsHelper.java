@@ -139,7 +139,7 @@ public class DiscountTuitionInstallmentsHelper {
                 BigDecimal amountToExempt = entry.getValue();
 
                 String reason = treasuryExemptionType.getName()
-                        .getContent(TreasuryPlataformDependentServicesFactory.implementation().defaultLocale());
+                        .getContent(TreasuryConstants.getDefaultLocale());
                 TreasuryExemption.create(treasuryExemptionType, reason, amountToExempt,
                         installmentDebitEntry);
             }

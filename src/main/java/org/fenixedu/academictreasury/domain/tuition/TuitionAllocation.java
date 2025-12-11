@@ -9,6 +9,7 @@ import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainExc
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemptionType;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
+import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 
 import pt.ist.fenixframework.FenixFramework;
@@ -19,7 +20,7 @@ public class TuitionAllocation extends TuitionAllocation_Base {
         super();
         setDomainRoot(FenixFramework.getDomainRoot());
         setCreationDate(new DateTime());
-        setResponsible(TreasuryPlataformDependentServicesFactory.implementation().getLoggedUsername());
+        setResponsible(TreasuryConstants.getAuthenticatedUsername());
     }
 
     public TuitionAllocation(TuitionPaymentPlanGroup tuitionPaymentPlanGroup, Registration registration,

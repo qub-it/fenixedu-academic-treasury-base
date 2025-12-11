@@ -62,6 +62,7 @@ import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServ
 
 import com.google.common.base.Strings;
 
+import org.fenixedu.treasury.util.TreasuryConstants;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 
@@ -351,8 +352,6 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
         LocalizedString formatToUse =
                 applySingleInstallmentName ? getOneInstallmentDebitEntryDescriptionFormat() : getInstallmentDebitEntryDescriptionFormat();
 
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-
         DegreeCurricularPlan degreeCurricularPlan =
                 registration.getStudentCurricularPlan(executionYear).getDegreeCurricularPlan();
 
@@ -361,7 +360,7 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
 
         String executionYearQualifiedName = executionYear.getQualifiedName();
 
-        LocalizedString result = treasuryServices.availableLocales().stream().map(locale -> {
+        LocalizedString result = TreasuryConstants.getAvailableLocales().stream().map(locale -> {
             Map<String, String> valueMap = new HashMap<String, String>();
 
             // ANIL 2024-09-25 (#qubIT-Fenix-5846)
@@ -411,7 +410,7 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
                 registration.getStudentCurricularPlan(executionYear).getDegreeCurricularPlan();
 
         LocalizedString result = new LocalizedString();
-        for (final Locale locale : treasuryServices.availableLocales()) {
+        for (final Locale locale : TreasuryConstants.getAvailableLocales()) {
             if (isForRegistration()) {
                 final String installmentName =
                         AcademicTreasuryConstants.academicTreasuryBundle(locale, label, String.valueOf(installmentOrder),

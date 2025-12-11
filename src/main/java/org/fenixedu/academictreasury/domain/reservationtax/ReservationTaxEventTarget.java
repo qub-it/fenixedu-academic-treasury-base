@@ -27,6 +27,7 @@ import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.paymentcodes.integration.ISibsPaymentCodePoolService;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
+import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.LocalDate;
 
 import pt.ist.fenixframework.FenixFramework;
@@ -110,7 +111,7 @@ public class ReservationTaxEventTarget extends ReservationTaxEventTarget_Base im
         LocalizedString emolumentDescription = reservationTax.buildEmolumentDescription(degreeCurricularPlan, executionInterval);
 
         if (additionalDescription != null) {
-            for (Locale locale : TreasuryPlataformDependentServicesFactory.implementation().availableLocales()) {
+            for (Locale locale : TreasuryConstants.getAvailableLocales()) {
                 emolumentDescription = emolumentDescription.with(locale,
                         emolumentDescription.getContent(locale) + additionalDescription.getContent(locale));
             }

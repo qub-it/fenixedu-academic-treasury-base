@@ -1,3 +1,5 @@
+- Refactor: Remove or change invocation calls of some methods of ITreasuryPlatformDependentServices [#qubIT-Fenix-7855]
+
 12.17.0 (10-12-2025)
 - Refactor: Remove references of TreasuryBridgeAPIFactory [#qubIT-Fenix-6552]
 - Refactor: Remove references of AcademicTreasuryPlataformDependentServicesFactory [[#qubIT-Fenix-6593]
