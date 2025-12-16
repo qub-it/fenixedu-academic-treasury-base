@@ -35,17 +35,16 @@
  */
 package org.fenixedu.academictreasury.domain.integration;
 
-import java.util.Comparator;
-import java.util.stream.Stream;
-
 import org.fenixedu.academictreasury.domain.integration.tuitioninfo.ERPTuitionInfo;
 import org.fenixedu.treasury.domain.FinantialInstitution;
 import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
 import org.fenixedu.treasury.domain.integration.OperationFile;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
+import org.fenixedu.treasury.services.integration.FenixEDUTreasuryPlatformDependentServices;
 import org.joda.time.DateTime;
-
 import pt.ist.fenixframework.Atomic;
+
+import java.util.Comparator;
+import java.util.stream.Stream;
 
 public class ERPTuitionInfoExportOperation extends ERPTuitionInfoExportOperation_Base {
 
@@ -59,18 +58,19 @@ public class ERPTuitionInfoExportOperation extends ERPTuitionInfoExportOperation
                     return c != 0 ? c : o1.getExternalId().compareTo(o2.getExternalId());
                 }
             };
-            
-    public static final Comparator<ERPTuitionInfoExportOperation> COMPARE_BY_VERSIONING_CREATION_DATE = 
+
+    public static final Comparator<ERPTuitionInfoExportOperation> COMPARE_BY_VERSIONING_CREATION_DATE =
             new Comparator<ERPTuitionInfoExportOperation>() {
 
                 @Override
                 public int compare(final ERPTuitionInfoExportOperation o1, final ERPTuitionInfoExportOperation o2) {
-                    int c = TreasuryPlataformDependentServicesFactory.implementation().versioningCreationDate(o1).compareTo(TreasuryPlataformDependentServicesFactory.implementation().versioningCreationDate(o2));
-                    
+                    int c = FenixEDUTreasuryPlatformDependentServices.getVersioningCreationDate(o1)
+                            .compareTo(FenixEDUTreasuryPlatformDependentServices.getVersioningCreationDate(o2));
+
                     return c != 0 ? c : o1.getExternalId().compareTo(o2.getExternalId());
                 }
-        
-    };
+
+            };
 
     public ERPTuitionInfoExportOperation() {
         super();
@@ -100,7 +100,7 @@ public class ERPTuitionInfoExportOperation extends ERPTuitionInfoExportOperation
             throw new TreasuryDomainException("error.ERPTuitionInfoExportOperation.finantialInstitution.required");
         }
     }
-    
+
     public boolean isSuccess() {
         return getSuccess();
     }

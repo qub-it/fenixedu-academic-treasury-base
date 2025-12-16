@@ -10,6 +10,7 @@ import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainExc
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
 import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
@@ -69,8 +70,7 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
                 TuitionServices.normalEnrolmentsIncludingAnnuled(registration, getTuitionPaymentPlan().getExecutionYear())
                         .stream().map(e -> e.getEctsCreditsForCurriculum()).reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
-        String description = services.bundle(TreasuryConstants.getDefaultLocale(), AcademicTreasuryConstants.BUNDLE,
+        String description = BundleUtil.getString(AcademicTreasuryConstants.BUNDLE, TreasuryConstants.getDefaultLocale(),
                 "label.TestTuitionPaymentPlanCalculator.calculationDescription", getAmount().toString(),
                 normalEnrolmentsEcts.toString(), getTotalAmount(registration).toString());
 
@@ -79,8 +79,7 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
 
     @Override
     public String getCalculationDescription(Enrolment enrolment) {
-        ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
-        String description = services.bundle(TreasuryConstants.getDefaultLocale(), AcademicTreasuryConstants.BUNDLE,
+        String description = BundleUtil.getString(AcademicTreasuryConstants.BUNDLE, TreasuryConstants.getDefaultLocale(),
                 "label.TestTuitionPaymentPlanCalculator.calculationDescription", getAmount().toString(),
                 enrolment.getEctsCreditsForCurriculum().toString(), getTotalAmount(enrolment).toString());
 
@@ -92,7 +91,7 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
         ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
 
         LocalizedString result = TreasuryConstants.getAvailableLocales().stream().map(locale -> new LocalizedString(locale,
-                services.bundle(locale, AcademicTreasuryConstants.BUNDLE,
+                BundleUtil.getString(AcademicTreasuryConstants.BUNDLE, locale,
                         "label.TestTuitionPaymentPlanCalculator.parametersDescription",
                         getAmount() != null ? getAmount().toString() : "N/A"))).reduce((a, c) -> a.append(c)).get();
 
@@ -100,11 +99,9 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
     }
 
     public static LocalizedString getCalculatorPresentationName() {
-        ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
-
         return TreasuryConstants.getAvailableLocales().stream() //
                 .map(locale -> {
-                    return new LocalizedString(locale, services.bundle(locale, AcademicTreasuryConstants.BUNDLE,
+                    return new LocalizedString(locale, BundleUtil.getString(AcademicTreasuryConstants.BUNDLE, locale,
                             TestTuitionPaymentPlanCalculator.class.getName()));
                 }).reduce((a, c) -> a.append(c)).get();
     }

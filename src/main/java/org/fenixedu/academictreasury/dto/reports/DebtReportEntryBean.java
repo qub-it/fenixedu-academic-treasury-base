@@ -54,6 +54,7 @@ import org.fenixedu.treasury.domain.document.CreditNote;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.Invoice;
 import org.fenixedu.treasury.domain.document.InvoiceEntry;
+import org.fenixedu.treasury.services.integration.FenixEDUTreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.services.integration.erp.sap.SAPExporter;
@@ -277,8 +278,8 @@ public class DebtReportEntryBean implements SpreadsheetRow, IFinantialReportEntr
             this.identification = entry.getExternalId();
             this.code = entry.getCode();
             this.entryType = entryType(entry);
-            this.creationDate = treasuryServices.versioningCreationDate(entry);
-            this.versioningCreator = treasuryServices.versioningCreatorUsername(entry);
+            this.creationDate = FenixEDUTreasuryPlatformDependentServices.getVersioningCreationDate(entry);
+            this.versioningCreator = FenixEDUTreasuryPlatformDependentServices.getVersioningCreatorUsername(entry);
             this.entryDate = entry.getEntryDateTime();
             this.dueDate = entry.getDueDate();
 

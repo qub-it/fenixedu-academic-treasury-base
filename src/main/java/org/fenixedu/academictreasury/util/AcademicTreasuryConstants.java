@@ -39,6 +39,7 @@ import org.fenixedu.academic.domain.organizationalStructure.Unit;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.StatuteType;
 import org.fenixedu.academictreasury.domain.serviceRequests.ITreasuryServiceRequest;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
@@ -154,16 +155,15 @@ public class AcademicTreasuryConstants {
      **********/
     // @formatter: on
     public static String academicTreasuryBundle(final String key, final String... args) {
-        return TreasuryPlataformDependentServicesFactory.implementation().bundle(AcademicTreasuryConstants.BUNDLE, key, args);
+        return BundleUtil.getString(AcademicTreasuryConstants.BUNDLE, key, args);
     }
 
     public static String academicTreasuryBundle(final Locale locale, final String key, final String... args) {
-        return TreasuryPlataformDependentServicesFactory.implementation()
-                .bundle(locale, AcademicTreasuryConstants.BUNDLE, key, args);
+        return BundleUtil.getString(AcademicTreasuryConstants.BUNDLE, locale, key, args);
     }
 
     public static LocalizedString academicTreasuryBundleI18N(final String key, final String... args) {
-        return TreasuryPlataformDependentServicesFactory.implementation().bundleI18N(AcademicTreasuryConstants.BUNDLE, key, args);
+        return BundleUtil.getLocalizedString(AcademicTreasuryConstants.BUNDLE, key, args);
     }
 
     // @formatter: off

@@ -60,6 +60,7 @@ import org.fenixedu.treasury.domain.document.InvoiceEntry;
 import org.fenixedu.treasury.domain.document.PaymentEntry;
 import org.fenixedu.treasury.domain.document.SettlementEntry;
 import org.fenixedu.treasury.domain.document.SettlementNote;
+import org.fenixedu.treasury.services.integration.FenixEDUTreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
@@ -150,8 +151,8 @@ public class PaymentReportEntryBean implements SpreadsheetRow {
             final SettlementNote settlementNote = entry.getSettlementNote();
 
             this.identification = entry.getExternalId();
-            this.creationDate = treasuryServices.versioningCreationDate(entry);
-            this.responsible = treasuryServices.versioningCreatorUsername(entry);
+            this.creationDate = FenixEDUTreasuryPlatformDependentServices.getVersioningCreationDate(entry);
+            this.responsible = FenixEDUTreasuryPlatformDependentServices.getVersioningCreatorUsername(entry);
             this.settlementNoteNumber = settlementNote.getUiDocumentNumber();
             this.settlementNoteDocumentDate = settlementNote.getDocumentDate();
             this.settlementOriginDocumentNumber = settlementNote.getOriginDocumentNumber();

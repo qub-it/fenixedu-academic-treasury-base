@@ -48,6 +48,7 @@ import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
 import org.fenixedu.treasury.domain.Currency;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
+import org.fenixedu.treasury.services.integration.FenixEDUTreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
@@ -119,8 +120,8 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
             this.sibsPaymentRequest = sibsPaymentRequest;
 
             this.identification = sibsPaymentRequest.getExternalId();
-            this.versioningCreator = treasuryServices.versioningCreatorUsername(sibsPaymentRequest);
-            this.creationDate = treasuryServices.versioningCreationDate(sibsPaymentRequest);
+            this.versioningCreator = FenixEDUTreasuryPlatformDependentServices.getVersioningCreatorUsername(sibsPaymentRequest);
+            this.creationDate = FenixEDUTreasuryPlatformDependentServices.getVersioningCreationDate(sibsPaymentRequest);
 
             DebtAccount referenceDebtAccount = sibsPaymentRequest.getDebtAccount();
             this.customerId = referenceDebtAccount.getCustomer().getExternalId();

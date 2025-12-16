@@ -41,6 +41,7 @@ import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.InvoiceEntry;
 import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
+import org.fenixedu.treasury.services.integration.FenixEDUTreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
@@ -120,8 +121,8 @@ public class TreasuryExemptionReportEntryBean extends AbstractReportEntryBean {
 
             this.identification = treasuryExemption.getExternalId();
 
-            this.versioningCreator = treasuryServices.versioningCreatorUsername(treasuryExemption);
-            this.creationDate = treasuryServices.versioningCreationDate(treasuryExemption);
+            this.versioningCreator = FenixEDUTreasuryPlatformDependentServices.getVersioningCreatorUsername(treasuryExemption);
+            this.creationDate = FenixEDUTreasuryPlatformDependentServices.getVersioningCreationDate(treasuryExemption);
 
             this.customerId = treasuryExemption.getDebitEntry().getDebtAccount().getCustomer().getExternalId();
             this.debtAccountId = treasuryExemption.getDebitEntry().getDebtAccount().getExternalId();

@@ -63,6 +63,7 @@ import org.fenixedu.academictreasury.domain.integration.ERPTuitionInfoExportOper
 import org.fenixedu.academictreasury.domain.integration.tuitioninfo.exceptions.ERPTuitionInfoNoDifferencesException;
 import org.fenixedu.academictreasury.domain.integration.tuitioninfo.exceptions.ERPTuitionInfoPendingException;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
+import org.fenixedu.treasury.services.integration.FenixEDUTreasuryPlatformDependentServices;
 import pt.ist.fenixframework.FenixFramework;
 import org.fenixedu.treasury.domain.Customer;
 import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
@@ -597,11 +598,11 @@ public class ERPTuitionInfo extends ERPTuitionInfo_Base {
 
                     reportEntry.erpTuitionInfoExternalId = erpTuitionInfo.getExternalId();
                     reportEntry.erpTuitionInfoCreationDate =
-                            TreasuryPlataformDependentServicesFactory.implementation().versioningCreationDate(erpTuitionInfo)
+                            FenixEDUTreasuryPlatformDependentServices.getVersioningCreationDate(erpTuitionInfo)
                                     .toString(AcademicTreasuryConstants.DATE_TIME_FORMAT_YYYY_MM_DD);
 
                     final DateTime versioningUpdateDate =
-                            TreasuryPlataformDependentServicesFactory.implementation().versioningUpdateDate(erpTuitionInfo);
+                            FenixEDUTreasuryPlatformDependentServices.getVersioningUpdateDate(erpTuitionInfo);
                     reportEntry.erpTuitionInfoUpdateDate = versioningUpdateDate != null ? versioningUpdateDate
                             .toString(AcademicTreasuryConstants.DATE_TIME_FORMAT_YYYY_MM_DD) : "";
                     reportEntry.erpTuitionInfoDocumentNumber = erpTuitionInfo.getUiDocumentNumber();

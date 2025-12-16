@@ -25,14 +25,7 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
-import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
-import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
-
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.google.common.base.Strings;
 import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -44,15 +37,11 @@ import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Customer;
-import org.fenixedu.treasury.domain.document.CreditEntry;
-import org.fenixedu.treasury.domain.document.DebitEntry;
-import org.fenixedu.treasury.domain.document.Invoice;
-import org.fenixedu.treasury.domain.document.InvoiceEntry;
-import org.fenixedu.treasury.domain.document.SettlementEntry;
-import org.fenixedu.treasury.domain.document.SettlementNote;
+import org.fenixedu.treasury.domain.document.*;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.domain.payments.PaymentTransaction;
+import org.fenixedu.treasury.services.integration.FenixEDUTreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
@@ -60,7 +49,13 @@ import org.fenixedu.treasury.util.streaming.spreadsheet.SpreadsheetRow;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
-import com.google.common.base.Strings;
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
+import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 public class SettlementReportEntryBean implements SpreadsheetRow, IFinantialReportEntryCommonMethods {
 
@@ -193,8 +188,8 @@ public class SettlementReportEntryBean implements SpreadsheetRow, IFinantialRepo
 
         try {
             this.identification = entry.getExternalId();
-            this.creationDate = treasuryServices.versioningCreationDate(entry);
-            this.responsible = treasuryServices.versioningCreatorUsername(entry);
+            this.creationDate = FenixEDUTreasuryPlatformDependentServices.getVersioningCreationDate(entry);
+            this.responsible = FenixEDUTreasuryPlatformDependentServices.getVersioningCreatorUsername(entry);
             this.invoiceEntryIdentification = entry.getInvoiceEntry().getExternalId();
             this.settlementNoteNumber = settlementNote.getUiDocumentNumber();
             this.settlementNoteDocumentDate = settlementNote.getDocumentDate();

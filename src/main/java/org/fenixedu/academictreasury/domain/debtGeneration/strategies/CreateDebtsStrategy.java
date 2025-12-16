@@ -25,15 +25,8 @@
  */
 package org.fenixedu.academictreasury.domain.debtGeneration.strategies;
 
-import static org.fenixedu.academictreasury.domain.debtGeneration.IAcademicDebtGenerationRuleStrategy.findActiveDebitEntries;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.fenixedu.academic.domain.DegreeCurricularPlan;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.StudentCurricularPlan;
@@ -57,17 +50,18 @@ import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
 import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.settings.TreasurySettings;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
+import org.fenixedu.treasury.services.integration.FenixEDUTreasuryPlatformDependentServices;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.fenixedu.academictreasury.domain.debtGeneration.IAcademicDebtGenerationRuleStrategy.findActiveDebitEntries;
 
 public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy {
 
@@ -482,7 +476,7 @@ public class CreateDebtsStrategy implements IAcademicDebtGenerationRuleStrategy 
             // previous years
 
             LocalDate debitEntryCreationDate =
-                    TreasuryPlataformDependentServicesFactory.implementation().versioningCreationDate(d).toLocalDate();
+                    FenixEDUTreasuryPlatformDependentServices.getVersioningCreationDate(d).toLocalDate();
             if (!FROM_DATE_TO_CONSIDER_TOTALLY_EXEMPTED_AMOUNTS.isAfter(debitEntryCreationDate)) {
                 return d.isTotallyExempted();
             }

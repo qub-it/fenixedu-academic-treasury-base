@@ -41,6 +41,7 @@ import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 
 import pt.ist.fenixframework.FenixFramework;
@@ -61,7 +62,7 @@ public abstract class TuitionConditionRule extends TuitionConditionRule_Base {
     public boolean isValidTo(final Registration registration, final ExecutionYear executionYear) {
         return isValidTo(registration, executionYear, null);
     }
-    
+
     public String getPresentationName() {
         return getPresentationName(this.getClass());
     }
@@ -80,12 +81,12 @@ public abstract class TuitionConditionRule extends TuitionConditionRule_Base {
     protected abstract String getBundle();
 
     public static String getPresentationName(Class<? extends TuitionConditionRule> tuitionConditionRule) {
-        return TreasuryPlataformDependentServicesFactory.implementation().bundle(
-                tuitionConditionRule.getAnnotation(TuitionConditionAnnotation.class).value(), tuitionConditionRule.getName());
+        return BundleUtil.getString(tuitionConditionRule.getAnnotation(TuitionConditionAnnotation.class).value(),
+                tuitionConditionRule.getName());
     }
 
     public String i18n(String key, String... args) {
-        return TreasuryPlataformDependentServicesFactory.implementation().bundle(getBundle(), key, args);
+        return BundleUtil.getString(getBundle(), key, args);
     }
 
     public TuitionConditionRule copyToPlan(TuitionPaymentPlan tuitionPaymentPlan) {

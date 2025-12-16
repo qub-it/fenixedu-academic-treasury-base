@@ -68,6 +68,7 @@ import org.fenixedu.academictreasury.domain.tuition.conditionRule.RegistrationRe
 import org.fenixedu.academictreasury.domain.tuition.conditionRule.StatuteTypeConditionRule;
 import org.fenixedu.academictreasury.domain.tuition.conditionRule.WithLaboratorialClassesConditionRule;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
@@ -595,8 +596,8 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
                 conditionRules.stream().filter(c -> c.getClass().isAssignableFrom(tuitionConditionRule.getClass())).findFirst()
                         .orElse(null);
         if (rule != null) {
-            throw new DomainException(TreasuryPlataformDependentServicesFactory.implementation()
-                    .bundle(AcademicTreasuryConstants.BUNDLE, "error.TuitionPaymentPlan.conditionRule.duplicated"));
+            throw new DomainException(
+                    BundleUtil.getString(AcademicTreasuryConstants.BUNDLE, "error.TuitionPaymentPlan.conditionRule.duplicated"));
         }
 
         conditionRules.add(tuitionConditionRule);

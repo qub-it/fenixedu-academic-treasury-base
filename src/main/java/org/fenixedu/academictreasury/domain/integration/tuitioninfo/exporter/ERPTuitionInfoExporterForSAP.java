@@ -35,28 +35,11 @@
  */
 package org.fenixedu.academictreasury.domain.integration.tuitioninfo.exporter;
 
-import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
-import static org.fenixedu.treasury.util.TreasuryConstants.treasuryBundle;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
-import java.net.MalformedURLException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-
+import com.google.common.base.Strings;
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.integration.ERPTuitionInfoExportOperation;
 import org.fenixedu.academictreasury.domain.integration.tuitioninfo.ERPTuitionInfo;
@@ -70,23 +53,13 @@ import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
 import org.fenixedu.treasury.domain.integration.ERPConfiguration;
 import org.fenixedu.treasury.domain.integration.IntegrationOperationLogBean;
 import org.fenixedu.treasury.domain.integration.OperationFile;
-import org.fenixedu.treasury.generated.sources.saft.sap.AddressStructurePT;
-import org.fenixedu.treasury.generated.sources.saft.sap.AuditFile;
-import org.fenixedu.treasury.generated.sources.saft.sap.Header;
-import org.fenixedu.treasury.generated.sources.saft.sap.OrderReferences;
-import org.fenixedu.treasury.generated.sources.saft.sap.PaymentMethod;
-import org.fenixedu.treasury.generated.sources.saft.sap.SAFTPTPaymentType;
-import org.fenixedu.treasury.generated.sources.saft.sap.SAFTPTSettlementType;
-import org.fenixedu.treasury.generated.sources.saft.sap.SAFTPTSourceBilling;
-import org.fenixedu.treasury.generated.sources.saft.sap.SAFTPTSourcePayment;
-import org.fenixedu.treasury.generated.sources.saft.sap.SourceDocuments;
+import org.fenixedu.treasury.generated.sources.saft.sap.*;
 import org.fenixedu.treasury.generated.sources.saft.sap.SourceDocuments.Payments;
 import org.fenixedu.treasury.generated.sources.saft.sap.SourceDocuments.Payments.Payment;
 import org.fenixedu.treasury.generated.sources.saft.sap.SourceDocuments.Payments.Payment.Line.SourceDocumentID;
 import org.fenixedu.treasury.generated.sources.saft.sap.SourceDocuments.WorkingDocuments.WorkDocument;
 import org.fenixedu.treasury.generated.sources.saft.sap.SourceDocuments.WorkingDocuments.WorkDocument.Line.Metadata;
-import org.fenixedu.treasury.generated.sources.saft.sap.Tax;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
+import org.fenixedu.treasury.services.integration.FenixEDUTreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.erp.IERPExternalService;
 import org.fenixedu.treasury.services.integration.erp.SaftConfig;
 import org.fenixedu.treasury.services.integration.erp.dto.DocumentStatusWS;
@@ -96,15 +69,24 @@ import org.fenixedu.treasury.services.integration.erp.sap.SAPExporter;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Strings;
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.net.MalformedURLException;
+import java.util.*;
+
+import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
+import static org.fenixedu.treasury.util.TreasuryConstants.treasuryBundle;
 
 public class ERPTuitionInfoExporterForSAP implements IERPTuitionInfoExporter {
 
@@ -114,8 +96,8 @@ public class ERPTuitionInfoExporterForSAP implements IERPTuitionInfoExporter {
     public ERPTuitionInfoExportOperation export(final ERPTuitionInfo erpTuitionInfo) {
         final FinantialInstitution institution = erpTuitionInfo.getDocumentNumberSeries().getSeries().getFinantialInstitution();
 
-        if (!institution.getErpIntegrationConfiguration().isIntegratedDocumentsExportationEnabled()
-                && !erpTuitionInfo.isPendingToExport()) {
+        if (!institution.getErpIntegrationConfiguration()
+                .isIntegratedDocumentsExportationEnabled() && !erpTuitionInfo.isPendingToExport()) {
             throw new AcademicTreasuryDomainException("error.ERPTuitionInfoExporterForSAP.export.not.pending");
         }
 
@@ -278,9 +260,9 @@ public class ERPTuitionInfoExporterForSAP implements IERPTuitionInfoExporter {
             AddressStructurePT companyAddress = null;
             //TODOJN Locale por resolver
             companyAddress = SAPExporter.convertFinantialInstitutionAddressToAddressPT(finantialInstitution.getAddress(),
-                    finantialInstitution.getZipCode(), finantialInstitution.getMunicipality() != null ? finantialInstitution
-                            .getMunicipality().getLocalizedName(new Locale("pt")) : "---",
-                    finantialInstitution.getAddress());
+                    finantialInstitution.getZipCode(),
+                    finantialInstitution.getMunicipality() != null ? finantialInstitution.getMunicipality()
+                            .getLocalizedName(new Locale("pt")) : "---", finantialInstitution.getAddress());
             header.setCompanyAddress(companyAddress);
 
             // CompanyID
@@ -452,7 +434,7 @@ public class ERPTuitionInfoExporterForSAP implements IERPTuitionInfoExporter {
 
             status.setWorkStatusDate(SAPExporter.convertToXMLDateTime(dataTypeFactory, documentDate));
             // Utilizador responsável pelo estado atual do docu-mento.
-            status.setSourceID(TreasuryPlataformDependentServicesFactory.implementation().versioningCreatorUsername(erpTuitionInfo));
+            status.setSourceID(FenixEDUTreasuryPlatformDependentServices.getVersioningCreatorUsername(erpTuitionInfo));
 
             status.setSourceBilling(SAFTPTSourceBilling.P);
 
@@ -488,9 +470,8 @@ public class ERPTuitionInfoExporterForSAP implements IERPTuitionInfoExporter {
             workDocument.setPeriod(documentDate.getMonthOfYear());
 
             // SourceID
-            String creator = TreasuryPlataformDependentServicesFactory.implementation().versioningCreatorUsername(erpTuitionInfo);
-            workDocument.setSourceID(
-                    !Strings.isNullOrEmpty(creator) ? creator : "");
+            String creator = FenixEDUTreasuryPlatformDependentServices.getVersioningCreatorUsername(erpTuitionInfo);
+            workDocument.setSourceID(!Strings.isNullOrEmpty(creator) ? creator : "");
 
         } catch (DatatypeConfigurationException e) {
             e.printStackTrace();
@@ -523,7 +504,8 @@ public class ERPTuitionInfoExporterForSAP implements IERPTuitionInfoExporter {
 
             final ERPTuitionInfoType tuitionInfoType = erpTuitionInfo.getErpTuitionInfoType();
 
-            if (tuitionInfoType.getErpTuitionInfoProduct().getCode() != null && baseProducts.containsKey(tuitionInfoType.getErpTuitionInfoProduct().getCode())) {
+            if (tuitionInfoType.getErpTuitionInfoProduct().getCode() != null && baseProducts.containsKey(
+                    tuitionInfoType.getErpTuitionInfoProduct().getCode())) {
                 currentProduct = baseProducts.get(tuitionInfoType.getErpTuitionInfoProduct().getCode());
             } else {
                 currentProduct = convertERPTuitionInfoTypeToSAFTProduct(tuitionInfoType);
@@ -549,8 +531,8 @@ public class ERPTuitionInfoExporterForSAP implements IERPTuitionInfoExporter {
 
                 OrderReferences reference = new OrderReferences();
                 reference.setOriginatingON(firstERPTuitionInfo.getUiDocumentNumber());
-                reference.setOrderDate(SAPExporter.convertToXMLDate(dataTypeFactory,
-                        erpTuitionInfo.getFirstERPTuitionInfo().getCreationDate()));
+                reference.setOrderDate(
+                        SAPExporter.convertToXMLDate(dataTypeFactory, erpTuitionInfo.getFirstERPTuitionInfo().getCreationDate()));
                 reference.setLineNumber(BigInteger.ONE);
 
                 orderReferences.add(reference);
@@ -707,33 +689,38 @@ public class ERPTuitionInfoExporterForSAP implements IERPTuitionInfoExporter {
                 DocumentsInformationOutput sendInfoOnlineResult = service.sendInfoOnline(institution, input);
 
                 operation.setErpOperationId(sendInfoOnlineResult.getRequestId());
-                logBean.appendIntegrationLog(treasuryBundle("info.ERPExporter.sucess.sending.inforation.online",
-                        sendInfoOnlineResult.getRequestId()));
+                logBean.appendIntegrationLog(
+                        treasuryBundle("info.ERPExporter.sucess.sending.inforation.online", sendInfoOnlineResult.getRequestId()));
 
                 //if we have result in online situation, then check the information of integration STATUS
                 for (DocumentStatusWS status : sendInfoOnlineResult.getDocumentStatus()) {
                     if (status.isIntegratedWithSuccess()) {
 
-                        ERPTuitionInfo tuitionInfo = 
+                        ERPTuitionInfo tuitionInfo =
                                 ERPTuitionInfo.findUniqueByDocumentNumber(status.getDocumentNumber()).orElse(null);
-                        
+
                         if (tuitionInfo != null) {
-                            final String message = treasuryBundle("info.ERPExporter.sucess.integrating.document", tuitionInfo.getUiDocumentNumber());
+                            final String message = treasuryBundle("info.ERPExporter.sucess.integrating.document",
+                                    tuitionInfo.getUiDocumentNumber());
                             logBean.appendIntegrationLog(message);
                             tuitionInfo.markIntegratedWithSuccess(message);
                         } else {
                             success = false;
-                            logBean.appendIntegrationLog(treasuryBundle("info.ERPExporter.error.integrating.document",
-                                    status.getDocumentNumber(), status.getErrorDescription()));
-                            logBean.appendErrorLog(treasuryBundle("info.ERPExporter.error.integrating.document",
-                                    status.getDocumentNumber(), status.getErrorDescription()));
+                            logBean.appendIntegrationLog(
+                                    treasuryBundle("info.ERPExporter.error.integrating.document", status.getDocumentNumber(),
+                                            status.getErrorDescription()));
+                            logBean.appendErrorLog(
+                                    treasuryBundle("info.ERPExporter.error.integrating.document", status.getDocumentNumber(),
+                                            status.getErrorDescription()));
                         }
                     } else {
                         success = false;
-                        logBean.appendIntegrationLog(treasuryBundle("info.ERPExporter.error.integrating.document",
-                                status.getDocumentNumber(), status.getErrorDescription()));
-                        logBean.appendErrorLog(treasuryBundle("info.ERPExporter.error.integrating.document",
-                                status.getDocumentNumber(), status.getErrorDescription()));
+                        logBean.appendIntegrationLog(
+                                treasuryBundle("info.ERPExporter.error.integrating.document", status.getDocumentNumber(),
+                                        status.getErrorDescription()));
+                        logBean.appendErrorLog(
+                                treasuryBundle("info.ERPExporter.error.integrating.document", status.getDocumentNumber(),
+                                        status.getErrorDescription()));
 
                     }
                 }
@@ -777,8 +764,8 @@ public class ERPTuitionInfoExporterForSAP implements IERPTuitionInfoExporter {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        String fileName = operation.getFinantialInstitution().getFiscalNumber() + "_"
-                + operation.getExecutionDate().toString("ddMMyyyy_hhmm") + ".xml";
+        String fileName = operation.getFinantialInstitution().getFiscalNumber() + "_" + operation.getExecutionDate()
+                .toString("ddMMyyyy_hhmm") + ".xml";
         OperationFile binaryStream = new OperationFile(fileName, bytes);
         if (operation.getFile() != null) {
             operation.getFile().delete();
@@ -829,9 +816,8 @@ public class ERPTuitionInfoExporterForSAP implements IERPTuitionInfoExporter {
             status.setPaymentStatusDate(SAPExporter.convertToXMLDate(dataTypeFactory, erpTuitionInfo.getCreationDate()));
 
             // Utilizador responsável pelo estado atual do docu-mento.
-            String creator = TreasuryPlataformDependentServicesFactory.implementation().versioningCreatorUsername(erpTuitionInfo);
-            status.setSourceID(
-                    !Strings.isNullOrEmpty(creator) ? creator : " ");
+            String creator = FenixEDUTreasuryPlatformDependentServices.getVersioningCreatorUsername(erpTuitionInfo);
+            status.setSourceID(!Strings.isNullOrEmpty(creator) ? creator : " ");
             status.setReason("");
 
             // Deve ser preenchido com:

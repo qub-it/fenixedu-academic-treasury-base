@@ -1,3 +1,6 @@
+- Refactor: Replace ITreasuryPlatformDependentServices#versioning* methods by static FenixEDUTreasuryPlatformDependentServices#getVersioning* [#qubIT-Fenix-7855]
+- Refactor: Replace ITreasuryPlatformDependentServices#bundle invocations by Bennu BundleUtil [#qubIT-Fenix-7855]
+
 12.17.1 (12-12-2025)
 - Refactor: Remove or change invocation calls of some methods of ITreasuryPlatformDependentServices [#qubIT-Fenix-7855]
 - Bug Fix: Add configuration.properties to src/test/resources to register the defaultLocale and supportedLocales in tests [#qubIT-Fenix-7855]

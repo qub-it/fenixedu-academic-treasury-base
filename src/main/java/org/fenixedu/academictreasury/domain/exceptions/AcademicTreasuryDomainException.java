@@ -39,6 +39,7 @@ package org.fenixedu.academictreasury.domain.exceptions;
 import javax.ws.rs.core.Response.Status;
 
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 
 import com.google.gson.JsonObject;
@@ -79,7 +80,7 @@ public class AcademicTreasuryDomainException extends RuntimeException {
     }
 
     public String getLocalizedMessage() {
-        return TreasuryPlataformDependentServicesFactory.implementation().bundle(this.bundle, this.key, this.args);
+        return BundleUtil.getString(this.bundle, this.key, this.args);
     }
 
     public Status getResponseStatus() {

@@ -65,13 +65,15 @@ import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentCodeTransaction;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.domain.paymentcodes.SibsTransactionDetail;
+import org.fenixedu.treasury.services.integration.FenixEDUTreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 
 public class DebtReportService {
 
     public static Stream<DebtReportEntryBean> debitEntriesReport(final DebtReportRequest request, final ErrorsLog log) {
         return DebitEntry.findAll()
-                .filter(i -> AcademicTreasuryConstants.isDateBetween(request.getBeginDate(), request.getEndDate(), TreasuryPlataformDependentServicesFactory.implementation().versioningCreationDate(i)))
+                .filter(i -> AcademicTreasuryConstants.isDateBetween(request.getBeginDate(), request.getEndDate(),
+                        FenixEDUTreasuryPlatformDependentServices.getVersioningCreationDate(i)))
                 .filter(i -> request.isIncludeAnnuledEntries() || !i.isAnnulled())
                 .filter(i -> request.getDegreeType() == null || request.getDegreeType() == degreeType(i))
                 .filter(i -> request.getExecutionYear() == null || request.getExecutionYear() == executionYear(i))
@@ -80,23 +82,27 @@ public class DebtReportService {
 
     public static Stream<DebtReportEntryBean> creditEntriesReport(final DebtReportRequest request, final ErrorsLog log) {
         return CreditEntry.findAll()
-                .filter(i -> AcademicTreasuryConstants.isDateBetween(request.getBeginDate(), request.getEndDate(), TreasuryPlataformDependentServicesFactory.implementation().versioningCreationDate(i)))
+                .filter(i -> AcademicTreasuryConstants.isDateBetween(request.getBeginDate(), request.getEndDate(),
+                        FenixEDUTreasuryPlatformDependentServices.getVersioningCreationDate(i)))
                 .filter(i -> request.isIncludeAnnuledEntries() || !i.isAnnulled())
                 .filter(i -> request.getDegreeType() == null || request.getDegreeType() == degreeType(i))
                 .filter(i -> request.getExecutionYear() == null || request.getExecutionYear() == executionYear(i))
                 .map(i -> new DebtReportEntryBean(i, request, log));
     }
 
-    public static Stream<SettlementReportEntryBean> settlementEntriesReport(final DebtReportRequest request, final ErrorsLog log) {
+    public static Stream<SettlementReportEntryBean> settlementEntriesReport(final DebtReportRequest request,
+            final ErrorsLog log) {
         return SettlementEntry.findAll()
-                .filter(i -> AcademicTreasuryConstants.isDateBetween(request.getBeginDate(), request.getEndDate(), i.getFinantialDocument().getDocumentDate()))
+                .filter(i -> AcademicTreasuryConstants.isDateBetween(request.getBeginDate(), request.getEndDate(),
+                        i.getFinantialDocument().getDocumentDate()))
                 .filter(i -> request.isIncludeAnnuledEntries() || !i.isAnnulled())
                 .map(i -> new SettlementReportEntryBean(i, request, log));
     }
 
     public static Stream<PaymentReportEntryBean> paymentEntriesReport(final DebtReportRequest request, final ErrorsLog log) {
         return PaymentEntry.findAll()
-                .filter(i -> AcademicTreasuryConstants.isDateBetween(request.getBeginDate(), request.getEndDate(), i.getSettlementNote().getDocumentDate()))
+                .filter(i -> AcademicTreasuryConstants.isDateBetween(request.getBeginDate(), request.getEndDate(),
+                        i.getSettlementNote().getDocumentDate()))
                 .filter(i -> request.isIncludeAnnuledEntries() || !i.getSettlementNote().isAnnulled())
                 .map(i -> new PaymentReportEntryBean(i, request, log));
     }
@@ -104,7 +110,8 @@ public class DebtReportService {
     public static Stream<ReimbursementReportEntryBean> reimbursementEntriesReport(final DebtReportRequest request,
             final ErrorsLog log) {
         return ReimbursementEntry.findAll()
-                .filter(i -> AcademicTreasuryConstants.isDateBetween(request.getBeginDate(), request.getEndDate(), i.getSettlementNote().getDocumentDate()))
+                .filter(i -> AcademicTreasuryConstants.isDateBetween(request.getBeginDate(), request.getEndDate(),
+                        i.getSettlementNote().getDocumentDate()))
                 .filter(i -> request.isIncludeAnnuledEntries() || !i.getSettlementNote().isAnnulled())
                 .map(i -> new ReimbursementReportEntryBean(i, request, log));
     }
@@ -120,26 +127,25 @@ public class DebtReportService {
     }
 
     public static Stream<PaymentReferenceCodeEntryBean> paymentReferenceCodeReport(DebtReportRequest request, ErrorsLog log) {
-        return SibsPaymentRequest.findAll()
-                .filter(i -> request.isIncludeAnnuledEntries() || !i.isInAnnuledState())
+        return SibsPaymentRequest.findAll().filter(i -> request.isIncludeAnnuledEntries() || !i.isInAnnuledState())
                 .map(i -> new PaymentReferenceCodeEntryBean(i, request, log));
     }
 
     public static Stream<SibsTransactionDetailEntryBean> sibsTransactionDetailReport(final DebtReportRequest request,
             final ErrorsLog log) {
         return SibsPaymentCodeTransaction.findAll()
-                .filter(i -> request.getBeginDate() == null || (i.getPaymentDate() != null && 
-                    !request.getBeginDate().toDateTimeAtStartOfDay().isAfter(i.getPaymentDate())))
-                .filter(i -> request.getEndDate() == null || (i.getPaymentDate() != null && 
-                    !request.getEndDate().toDateTimeAtStartOfDay().plusDays(1).minusSeconds(1).isBefore(i.getPaymentDate())))
+                .filter(i -> request.getBeginDate() == null || (i.getPaymentDate() != null && !request.getBeginDate()
+                        .toDateTimeAtStartOfDay().isAfter(i.getPaymentDate())))
+                .filter(i -> request.getEndDate() == null || (i.getPaymentDate() != null && !request.getEndDate()
+                        .toDateTimeAtStartOfDay().plusDays(1).minusSeconds(1).isBefore(i.getPaymentDate())))
                 .map(i -> new SibsTransactionDetailEntryBean(i, request, log));
     }
 
     public static Stream<TreasuryExemptionReportEntryBean> treasuryExemptionReport(final DebtReportRequest request,
             final ErrorsLog log) {
         return TreasuryExemption.findAll()
-                .filter(i -> i.getDebitEntry() != null && AcademicTreasuryConstants.isDateBetween(request.getBeginDate(), request.getEndDate(),
-                        i.getDebitEntry().getEntryDateTime()))
+                .filter(i -> i.getDebitEntry() != null && AcademicTreasuryConstants.isDateBetween(request.getBeginDate(),
+                        request.getEndDate(), i.getDebitEntry().getEntryDateTime()))
                 .filter(i -> request.getDegreeType() == null || request.getDegreeType() == degreeType(i))
                 .filter(i -> request.getExecutionYear() == null || request.getExecutionYear() == executionYear(i))
                 .map(i -> new TreasuryExemptionReportEntryBean(i, request, log));
@@ -150,46 +156,46 @@ public class DebtReportService {
     }
 
     private static ExecutionYear executionYear(final DebitEntry debitEntry) {
-        if(debitEntry.getTreasuryEvent() == null) {
+        if (debitEntry.getTreasuryEvent() == null) {
             return null;
         }
-        
-        if(!(debitEntry.getTreasuryEvent() instanceof AcademicTreasuryEvent)) {
+
+        if (!(debitEntry.getTreasuryEvent() instanceof AcademicTreasuryEvent)) {
             return null;
         }
-        
+
         return ((AcademicTreasuryEvent) debitEntry.getTreasuryEvent()).getExecutionYear();
     }
 
     private static DegreeType degreeType(final DebitEntry debitEntry) {
-        if(debitEntry.getTreasuryEvent() == null) {
+        if (debitEntry.getTreasuryEvent() == null) {
             return null;
         }
-        
-        if(!(debitEntry.getTreasuryEvent() instanceof AcademicTreasuryEvent)) {
+
+        if (!(debitEntry.getTreasuryEvent() instanceof AcademicTreasuryEvent)) {
             return null;
         }
-        
-        if(((AcademicTreasuryEvent) debitEntry.getTreasuryEvent()).getRegistration() == null) {
+
+        if (((AcademicTreasuryEvent) debitEntry.getTreasuryEvent()).getRegistration() == null) {
             return null;
         }
-        
+
         return ((AcademicTreasuryEvent) debitEntry.getTreasuryEvent()).getRegistration().getDegreeType();
     }
 
     private static ExecutionYear executionYear(final CreditEntry creditEntry) {
-        if(creditEntry.getDebitEntry() == null) {
+        if (creditEntry.getDebitEntry() == null) {
             return null;
         }
-        
+
         return executionYear(creditEntry.getDebitEntry());
     }
 
     private static DegreeType degreeType(final CreditEntry creditEntry) {
-        if(creditEntry.getDebitEntry() == null) {
+        if (creditEntry.getDebitEntry() == null) {
             return null;
         }
-        
+
         return degreeType(creditEntry.getDebitEntry());
     }
 

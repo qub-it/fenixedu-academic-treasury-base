@@ -44,6 +44,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academictreasury.domain.reports.DebtReportRequest;
 import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentCodeTransaction;
+import org.fenixedu.treasury.services.integration.FenixEDUTreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
@@ -100,8 +101,8 @@ public class SibsTransactionDetailEntryBean extends AbstractReportEntryBean {
             this.sibsTransactionDetail = detail;
 
             this.identification = detail.getExternalId();
-            this.versioningCreator = treasuryServices.versioningCreatorUsername(detail);
-            this.creationDate = treasuryServices.versioningCreationDate(detail);
+            this.versioningCreator = FenixEDUTreasuryPlatformDependentServices.getVersioningCreatorUsername(detail);
+            this.creationDate = FenixEDUTreasuryPlatformDependentServices.getVersioningCreationDate(detail);
             this.whenProcessed = detail.getSibsProcessingDate();
             this.whenRegistered = detail.getPaymentDate();
             this.amountPayed = detail.getPaidAmount() != null ? detail.getPaidAmount().toString() : "";

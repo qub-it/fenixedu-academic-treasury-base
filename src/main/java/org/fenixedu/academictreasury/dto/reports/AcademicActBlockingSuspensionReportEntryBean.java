@@ -35,19 +35,20 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
-import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
-import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
-
 import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academictreasury.domain.academicalAct.AcademicActBlockingSuspension;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
+import org.fenixedu.treasury.services.integration.FenixEDUTreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+
+import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
+import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 public class AcademicActBlockingSuspensionReportEntryBean extends AbstractReportEntryBean {
 
@@ -95,8 +96,8 @@ public class AcademicActBlockingSuspensionReportEntryBean extends AbstractReport
 
         try {
             this.identification = academicActBlockingSuspension.getExternalId();
-            this.versioningCreator = treasuryServices.versioningCreatorUsername(academicActBlockingSuspension);
-            this.creationDate = treasuryServices.versioningCreationDate(academicActBlockingSuspension);
+            this.versioningCreator = FenixEDUTreasuryPlatformDependentServices.getVersioningCreatorUsername(academicActBlockingSuspension);
+            this.creationDate = FenixEDUTreasuryPlatformDependentServices.getVersioningCreationDate(academicActBlockingSuspension);
 
             final Person person = academicActBlockingSuspension.getPerson();
 

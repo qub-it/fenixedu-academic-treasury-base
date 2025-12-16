@@ -45,6 +45,7 @@ import org.fenixedu.academictreasury.dto.tariff.AcademicTariffBean;
 import org.fenixedu.academictreasury.dto.tariff.TuitionPaymentPlanBean;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.academictreasury.util.LocalizedStringUtil;
+import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
@@ -379,7 +380,7 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
         if (strBuilder.length() > 0) {
             Map<String, String> propertiesMap = tuitionAcademicTreasuryEvent.getPropertiesMap();
-            propertiesMap.put(TreasuryPlataformDependentServicesFactory.implementation().bundle(AcademicTreasuryConstants.BUNDLE,
+            propertiesMap.put(BundleUtil.getString(AcademicTreasuryConstants.BUNDLE,
                     "label.AcademicTreasury.CustomCalculatorDescription") + " ( " + DateTime.now()
                     .toString("yyyy-MM-dd HH:mm") + " )", strBuilder.toString());
             tuitionAcademicTreasuryEvent.editPropertiesMap(propertiesMap);
@@ -455,9 +456,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
                 if (strBuilder.length() > 0) {
                     Map<String, String> propertiesMap = debitEntry.getPropertiesMap();
-                    propertiesMap.put(TreasuryPlataformDependentServicesFactory.implementation()
-                            .bundleI18N(AcademicTreasuryConstants.BUNDLE, "label.AcademicTreasury.CustomCalculatorDescription")
-                            .getContent(), strBuilder.toString());
+                    propertiesMap.put(BundleUtil.getLocalizedString(AcademicTreasuryConstants.BUNDLE,
+                            "label.AcademicTreasury.CustomCalculatorDescription").getContent(), strBuilder.toString());
                     debitEntry.editPropertiesMap(propertiesMap);
                 }
 
@@ -536,9 +536,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
                 if (strBuilder.length() > 0) {
                     Map<String, String> propertiesMap = debitEntry.getPropertiesMap();
-                    propertiesMap.put(TreasuryPlataformDependentServicesFactory.implementation()
-                            .bundleI18N(AcademicTreasuryConstants.BUNDLE, "label.AcademicTreasury.CustomCalculatorDescription")
-                            .getContent(), strBuilder.toString());
+                    propertiesMap.put(BundleUtil.getLocalizedString(AcademicTreasuryConstants.BUNDLE,
+                            "label.AcademicTreasury.CustomCalculatorDescription").getContent(), strBuilder.toString());
                     debitEntry.editPropertiesMap(propertiesMap);
                 }
 
