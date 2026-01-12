@@ -1,3 +1,4 @@
+12.18.0 (12-01-2026)
 - Refactor: Refactor PersonCustomer#mergeWithPerson to not depend on a PersonCustomer instance [#qubIT-Fenix-7870]
 
 12.17.2 (06-01-2026)
