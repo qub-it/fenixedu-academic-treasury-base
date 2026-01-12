@@ -640,36 +640,35 @@ public class PersonCustomer extends PersonCustomer_Base {
         return PersonCustomer.find(getAssociatedPerson()).collect(Collectors.<Customer> toSet());
     }
 
-    public void mergeWithPerson(final Person personToDelete) {
-        if (getPerson() == personToDelete) {
+    public static void mergeWithPerson(Person destinyPerson, Person personToDelete) {
+        if (destinyPerson == personToDelete) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.merging.not.happening");
-        }
-
-        if (getPersonForInactivePersonCustomer() == personToDelete) {
-            throw new AcademicTreasuryDomainException("error.PersonCustomer.merged.already.with.person");
         }
 
         if (personToDelete.getPersonCustomer() != null) {
             final PersonCustomer personCustomer = personToDelete.getPersonCustomer();
             personCustomer.saveFiscalAddressFieldsFromPersonInCustomer();
-            personCustomer.setPersonForInactivePersonCustomer(getPerson());
+            personCustomer.setPersonForInactivePersonCustomer(destinyPerson);
             personCustomer.setPerson(null);
             personCustomer.setFromPersonMerge(true);
             personCustomer.checkRules();
         }
 
         for (final PersonCustomer personCustomer : personToDelete.getInactivePersonCustomersSet()) {
-            personCustomer.setPersonForInactivePersonCustomer(getPerson());
+            personCustomer.setPersonForInactivePersonCustomer(destinyPerson);
             personCustomer.setFromPersonMerge(true);
             personCustomer.checkRules();
         }
 
-        final Person thisPerson = getAssociatedPerson();
         for (final AcademicTreasuryEvent e : Sets.newHashSet(personToDelete.getAcademicTreasuryEventSet())) {
-            e.mergeToTargetPerson(thisPerson);
+            e.mergeToTargetPerson(destinyPerson);
         }
 
-        checkRules();
+        if (destinyPerson.getPersonCustomer() != null) {
+            destinyPerson.getPersonCustomer().checkRules();
+        }
+
+        destinyPerson.getInactivePersonCustomersSet().forEach(PersonCustomer::checkRules);
     }
 
     @Atomic

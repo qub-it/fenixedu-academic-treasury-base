@@ -1,3 +1,5 @@
+- Refactor: Refactor PersonCustomer#mergeWithPerson to not depend on a PersonCustomer instance [#qubIT-Fenix-7870]
+
 12.17.2 (06-01-2026)
 - Refactor: Replace ITreasuryPlatformDependentServices#versioning* methods by static FenixEDUTreasuryPlatformDependentServices#getVersioning* [#qubIT-Fenix-7855]
 - Refactor: Replace ITreasuryPlatformDependentServices#bundle invocations by Bennu BundleUtil [#qubIT-Fenix-7855]
