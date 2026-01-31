@@ -33,18 +33,6 @@ import pt.ist.fenixframework.DomainObject;
 public class TreasuryPlatformDependentServicesForTests implements ITreasuryPlatformDependentServices {
 
     @Override
-    public void scheduleDocumentForExportation(FinantialDocument finantialDocument) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public IERPExternalService getERPExternalServiceImplementation(ERPConfiguration erpConfiguration) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public byte[] getFileContent(IGenericFile genericFile) {
         // TODO Auto-generated method stub
         return null;
@@ -141,65 +129,6 @@ public class TreasuryPlatformDependentServicesForTests implements ITreasuryPlatf
     }
 
     @Override
-    public String getLoggedUsername() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getCustomerEmail(Customer customer) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setCurrentApplicationUser(String username) {
-        // Do nothing
-    }
-
-    @Override
-    public void removeCurrentApplicationUser() {
-        // Do nothing
-    }
-
-    @Override
-    public Locale defaultLocale() {
-        return TreasuryConstants.DEFAULT_LANGUAGE;
-    }
-
-    @Override
-    public Locale currentLocale() {
-        return TreasuryConstants.DEFAULT_LANGUAGE;
-    }
-
-    @Override
-    public Set<Locale> availableLocales() {
-        return Set.of(TreasuryConstants.DEFAULT_LANGUAGE);
-    }
-
-    @Override
-    public String bundle(String bundleName, String key, String... args) {
-        return key;
-    }
-
-    @Override
-    public String bundle(Locale locale, String bundleName, String key, String... args) {
-        return key;
-    }
-
-    @Override
-    public LocalizedString bundleI18N(String bundleName, String key, String... args) {
-        ResourceBundle bundlePt = ResourceBundle.getBundle(bundleName, Locale.getDefault());
-        if (bundlePt.containsKey(key)) {
-            final Locale enLocale = new Locale("en", "GB");
-            ResourceBundle bundleEn = ResourceBundle.getBundle(bundleName, Locale.getDefault());
-            return new LocalizedString(Locale.getDefault(), bundlePt.getString(key)).with(enLocale, bundleEn.getString(key));
-        } else {
-            return BasicAcademicTreasuryUtils.ls(key);
-        }
-    }
-
-    @Override
     public boolean isDynamicApplicationMessageDefined(String key) {
         throw new RuntimeException("not implemented");
     }
@@ -207,99 +136,6 @@ public class TreasuryPlatformDependentServicesForTests implements ITreasuryPlatf
     @Override
     public LocalizedString getDynamicApplicationMessage(String key) {
         throw new RuntimeException("not implemented");
-    }
-
-    @Override
-    public <T> String versioningCreatorUsername(T obj) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <T> DateTime versioningCreationDate(T obj) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <T> String versioningUpdatorUsername(T obj) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <T> DateTime versioningUpdateDate(T obj) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public PaylineWebServiceResponse paylineGetWebPaymentDetails(ForwardPaymentRequest forwardPaymentRequest) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public PaylineWebServiceResponse paylineDoWebPayment(ForwardPaymentRequest forwardPaymentRequest, String returnUrl,
-            String cancelUrl) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void paylineConfigureWebservice(PaylineConfiguration paylineConfiguration) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public String calculateURLChecksum(String urlToChecksum, HttpSession session) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void signalsRegisterHandlerForKey(String signalKey, Object handler) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void signalsUnregisterHandlerForKey(String signalKey, Object handler) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void signalsEmitForObject(String signalKey, DomainObject obj) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public String getForwardPaymentURL(String contextPath, Class screenClass, boolean isSuccess, String forwardPaymentId,
-            boolean isException) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public InputStream exportDocuments(String templateCode, FinantialInstitution finantialInstitution,
-            FinantialEntity finantialEntity, LocalDate documentDateFrom, LocalDate documentDateTo, String username) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String exportDocumentFileExtension() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public InputStream exportPaymentReceipt(String templateCode, SettlementNote settlementNote) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -320,10 +156,6 @@ public class TreasuryPlatformDependentServicesForTests implements ITreasuryPlatf
     }
 
     @Override
-    public void updateCertifiedDocument(FinantialDocument finantialDocument) {
-    }
-
-    @Override
     public void annulCertifiedDocument(FinantialDocument finantialDocument) {
     }
 
@@ -335,13 +167,6 @@ public class TreasuryPlatformDependentServicesForTests implements ITreasuryPlatf
     @Override
     public boolean isProductCertified(Product product) {
         return false;
-    }
-
-    /* Development or quality mode */
-
-    @Override
-    public boolean isQualityOrDevelopmentMode() {
-        return true;
     }
 
     @Override
