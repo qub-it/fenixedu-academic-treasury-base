@@ -1,3 +1,4 @@
+12.19.0 (02-02-2026)
 - Refactor: Remove deprecated methods from ITreasuryPlatformDependentServices [#qubIT-Fenix-7855]
 - Refactor: Add constructor without arguments to DebtReportEntryBean [#qubIT-Fenix-7913]
 
