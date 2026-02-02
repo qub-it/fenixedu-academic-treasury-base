@@ -1,4 +1,5 @@
 - Refactor: Remove deprecated methods from ITreasuryPlatformDependentServices [#qubIT-Fenix-7855]
+- Refactor: Add constructor without arguments to DebtReportEntryBean [#qubIT-Fenix-7913]
 
 12.18.0 (12-01-2026)
 - Refactor: Refactor PersonCustomer#mergeWithPerson to not depend on a PersonCustomer instance [#qubIT-Fenix-7870]

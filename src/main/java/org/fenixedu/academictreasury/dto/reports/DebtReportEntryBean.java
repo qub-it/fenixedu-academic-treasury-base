@@ -266,9 +266,11 @@ public class DebtReportEntryBean implements SpreadsheetRow, IFinantialReportEntr
 
     private StudentCurricularPlan activeStudentCurricularPlanOfExecutionYear;
 
-    public DebtReportEntryBean(final InvoiceEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
+    public DebtReportEntryBean(InvoiceEntry invoiceEntry) {
+        this(invoiceEntry, null, new ErrorsLog());
+    }
 
+    public DebtReportEntryBean(final InvoiceEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
         this.decimalSeparator = request != null ? request.getDecimalSeparator() : DebtReportRequest.DOT;
         final Currency currency = entry.getDebtAccount().getFinantialInstitution().getCurrency();
 
