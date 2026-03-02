@@ -25,7 +25,14 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
-import com.google.common.base.Strings;
+import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
+import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
+
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -37,7 +44,12 @@ import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Customer;
-import org.fenixedu.treasury.domain.document.*;
+import org.fenixedu.treasury.domain.document.CreditEntry;
+import org.fenixedu.treasury.domain.document.DebitEntry;
+import org.fenixedu.treasury.domain.document.Invoice;
+import org.fenixedu.treasury.domain.document.InvoiceEntry;
+import org.fenixedu.treasury.domain.document.SettlementEntry;
+import org.fenixedu.treasury.domain.document.SettlementNote;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.domain.payments.PaymentTransaction;
@@ -49,13 +61,7 @@ import org.fenixedu.treasury.util.streaming.spreadsheet.SpreadsheetRow;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
-import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
+import com.google.common.base.Strings;
 
 public class SettlementReportEntryBean implements SpreadsheetRow, IFinantialReportEntryCommonMethods {
 
@@ -277,8 +283,9 @@ public class SettlementReportEntryBean implements SpreadsheetRow, IFinantialRepo
         this.name = customer.getName();
 
         if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null && ((PersonCustomer) customer).getAssociatedPerson()
-                .getIdDocumentType() != null) {
-            this.identificationType = ((PersonCustomer) customer).getAssociatedPerson().getIdDocumentType().getLocalizedName();
+                .getDefaultIdentificationDocument().getIdentificationDocumentType() != null) {
+            this.identificationType = ((PersonCustomer) customer).getAssociatedPerson().getDefaultIdentificationDocument()
+                    .getIdentificationDocumentType().getName().getContent();
         }
 
         this.identificationNumber = customer.getIdentificationNumber();
