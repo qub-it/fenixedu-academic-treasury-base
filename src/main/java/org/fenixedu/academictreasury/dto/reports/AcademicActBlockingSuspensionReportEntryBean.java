@@ -35,8 +35,12 @@
  */
 package org.fenixedu.academictreasury.dto.reports;
 
+import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
+import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
+
 import org.apache.poi.ss.usermodel.Row;
 import org.fenixedu.academic.domain.Person;
+import org.fenixedu.academic.domain.person.identificationDocument.IdentificationDocumentType;
 import org.fenixedu.academictreasury.domain.academicalAct.AcademicActBlockingSuspension;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
@@ -46,9 +50,6 @@ import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServ
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
-
-import static com.qubit.terra.framework.tools.excel.ExcelUtil.createCellWithValue;
-import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
 public class AcademicActBlockingSuspensionReportEntryBean extends AbstractReportEntryBean {
 
@@ -103,8 +104,11 @@ public class AcademicActBlockingSuspensionReportEntryBean extends AbstractReport
 
             this.name = person.getName();
 
-            if (academicActBlockingSuspension.getPerson().getIdDocumentType() != null) {
-                this.identificationType = academicActBlockingSuspension.getPerson().getIdDocumentType().getLocalizedName();
+            IdentificationDocumentType identificationDocumentType =
+                    person.getDefaultIdentificationDocument() != null ? person.getDefaultIdentificationDocument()
+                            .getIdentificationDocumentType() : null;
+            if (identificationDocumentType != null) {
+                this.identificationType = identificationDocumentType.getName().getContent();
             }
 
             this.identificationNumber = PersonCustomer.identificationNumber(person);

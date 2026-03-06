@@ -7,12 +7,8 @@ import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-import com.qubit.terra.framework.services.ServiceProvider;
 import org.fenixedu.academic.domain.Country;
 import org.fenixedu.academic.domain.Degree;
-import org.fenixedu.academic.domain.DegreeCurricularPlan;
-import org.fenixedu.academic.domain.ExecutionDegree;
-import org.fenixedu.academic.domain.ExecutionInterval;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.candidacy.IngressionType;
@@ -22,8 +18,7 @@ import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.curriculum.grade.GradeScale;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.degreeStructure.CurricularStage;
-import org.fenixedu.academic.domain.person.IDDocumentType;
-import org.fenixedu.academic.domain.person.IdDocumentTypeObject;
+import org.fenixedu.academic.domain.person.identificationDocument.IdentificationDocumentType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationProtocol;
 import org.fenixedu.academic.domain.student.StatuteType;
@@ -56,6 +51,8 @@ import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServ
 import org.fenixedu.treasury.util.TreasuryBootstrapper;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.LocalDate;
+
+import com.qubit.terra.framework.services.ServiceProvider;
 
 import pt.ist.esw.advice.pt.ist.fenixframework.AtomicInstance;
 import pt.ist.fenixframework.Atomic.TxMode;
@@ -120,11 +117,12 @@ public class BasicAcademicTreasuryUtils {
 
     private static Person findOrCreatePerson() {
         if (Person.readAllPersons().isEmpty()) {
-            if (IdDocumentTypeObject.readByIDDocumentType(IDDocumentType.OTHER) == null) {
-                new IdDocumentTypeObject().setValue(IDDocumentType.OTHER);
+            if (IdentificationDocumentType.findByCode(IdentificationDocumentType.OTHER_CODE).isEmpty()) {
+                IdentificationDocumentType.create(IdentificationDocumentType.OTHER_CODE, new LocalizedString());
             }
 
-            PersonBean personBean = new PersonBean("Test person", "999999990", IDDocumentType.OTHER,
+            PersonBean personBean = new PersonBean("Test person", "999999990",
+                    IdentificationDocumentType.findByCode(IdentificationDocumentType.OTHER_CODE).orElse(null),
                     new LocalDate(2000, 1, 1).toDateTimeAtStartOfDay().toYearMonthDay());
 
             personBean.setGivenNames("Test");

@@ -131,9 +131,9 @@ public class TreasuryExemptionReportEntryBean extends AbstractReportEntryBean {
             Customer customer = treasuryExemption.getDebitEntry().getDebtAccount().getCustomer();
 
             if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null && ((PersonCustomer) customer).getAssociatedPerson()
-                    .getIdDocumentType() != null) {
-                this.identificationType =
-                        ((PersonCustomer) customer).getAssociatedPerson().getIdDocumentType().getLocalizedName();
+                    .getDefaultIdentificationDocument().getIdentificationDocumentType() != null) {
+                this.identificationType = ((PersonCustomer) customer).getAssociatedPerson().getDefaultIdentificationDocument()
+                        .getIdentificationDocumentType().getName().getContent();
             }
 
             this.identificationNumber = customer.getIdentificationNumber();
