@@ -112,6 +112,12 @@ public class AcademicTariff extends AcademicTariff_Base {
         getAssociatedDegreesSet().addAll(bean.getAssociatedDegrees());
         setCycleType(bean.getCycleType());
 
+        // ANIL 2026-03-03 (#qubIT-Fenix-8048)
+        // The cycle type is deprecated, check if it will not be needed in the future
+//        if (getCycleType() != null) {
+//            throw new AcademicTreasuryDomainException("error.AcademicTariff.cycleType.deprecated");
+//        }
+
         checkRules();
     }
 

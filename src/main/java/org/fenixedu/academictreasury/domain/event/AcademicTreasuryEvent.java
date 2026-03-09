@@ -1511,16 +1511,6 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
         super.setAmountForUrgencyRate(amountForUrgencyRate);
     }
 
-    /* ----------------------
-     * IAcademicTreasuryEvent
-     * ----------------------
-     */
-
-    @Override
-    public String getDebtAccountURL() {
-        return TreasuryEventDefaultMethods.getDebtAccountURL(this);
-    }
-
     /* -------------------------
      * KIND OF EVENT INFORMATION
      * -------------------------
