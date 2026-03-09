@@ -32,12 +32,14 @@
 			<groupId>com.qubit.solution.fenixedu</groupId>
 			<artifactId>fenixedu-academic-core</artifactId>
 			<scope>compile</scope>
+			<version>54.6.1</version>
 		</dependency>
 		<dependency>
 			<groupId>com.qubit.solution.fenixedu</groupId>
 			<artifactId>fenixedu-academic-core</artifactId>
 			<type>test-jar</type>
 			<scope>test</scope>
+			<version>54.6.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.fenixedu</groupId>
