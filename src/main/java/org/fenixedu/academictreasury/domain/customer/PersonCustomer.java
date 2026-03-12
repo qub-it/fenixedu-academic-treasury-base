@@ -43,6 +43,7 @@ import org.fenixedu.academic.domain.contacts.EmailAddress;
 import org.fenixedu.academic.domain.contacts.PartyContact;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
+import org.fenixedu.academic.domain.person.identificationDocument.IdentificationDocumentType;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
@@ -61,8 +62,6 @@ import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
 import org.fenixedu.treasury.domain.treasurydebtprocess.TreasuryDebtProcessMainService;
 import org.fenixedu.treasury.dto.AdhocCustomerBean;
-import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.FiscalCodeValidation;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.LocalDate;
@@ -86,8 +85,8 @@ public class PersonCustomer extends PersonCustomer_Base {
         this();
 
         // TODO: CHECK IF THIS CODE DO ANYTHING
-        if (!DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber()) && find(getPerson(), getAddressCountryCode(),
-                getFiscalNumber()).count() > 1) {
+        if (!DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber())
+                && find(getPerson(), getAddressCountryCode(), getFiscalNumber()).count() > 1) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.person.customer.duplicated");
         }
 
@@ -188,8 +187,8 @@ public class PersonCustomer extends PersonCustomer_Base {
 
         final Person person = isActive() ? getPerson() : getPersonForInactivePersonCustomer();
 
-        if (!DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber()) && find(person, getAddressCountryCode(), getFiscalNumber()).filter(
-                pc -> !pc.isFromPersonMerge()).count() > 1) {
+        if (!DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber())
+                && find(person, getAddressCountryCode(), getFiscalNumber()).filter(pc -> !pc.isFromPersonMerge()).count() > 1) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.person.customer.duplicated");
         }
     }
@@ -268,7 +267,7 @@ public class PersonCustomer extends PersonCustomer_Base {
     }
 
     public static String identificationNumber(final Person person) {
-        return person.getDocumentIdNumber();
+        return person.getDefaultIdentificationDocument().getValue();
     }
 
     @Deprecated
@@ -798,10 +797,12 @@ public class PersonCustomer extends PersonCustomer_Base {
     public LocalizedString getIdentificationTypeDesignation() {
         final Person person = getAssociatedPerson();
 
-        if (person.getIdDocumentType() != null) {
+        final IdentificationDocumentType identificationDocumentType =
+                person.getDefaultIdentificationDocument().getIdentificationDocumentType();
+        if (identificationDocumentType != null) {
             LocalizedString result = new LocalizedString();
             for (Locale locale : TreasuryConstants.getAvailableLocales()) {
-                result = result.with(locale, person.getIdDocumentType().getLocalizedName(locale));
+                result = result.with(locale, identificationDocumentType.getName().getContent(locale));
             }
 
             return result;
@@ -814,8 +815,10 @@ public class PersonCustomer extends PersonCustomer_Base {
     public String getIdentificationTypeCode() {
         final Person person = getAssociatedPerson();
 
-        if (person.getIdDocumentType() != null) {
-            return person.getIdDocumentType().getName();
+        final IdentificationDocumentType identificationDocumentType =
+                person.getDefaultIdentificationDocument().getIdentificationDocumentType();
+        if (identificationDocumentType != null) {
+            return identificationDocumentType.getCode();
         }
 
         return null;
@@ -909,8 +912,8 @@ public class PersonCustomer extends PersonCustomer_Base {
             final String fiscalNumber) {
         return find(person).filter(
                 pc -> !Strings.isNullOrEmpty(pc.getAddressCountryCode()) && TreasuryConstants.isSameCountryCode(
-                        pc.getAddressCountryCode(), fiscalCountryCode) && !Strings.isNullOrEmpty(
-                        pc.getFiscalNumber()) && pc.getFiscalNumber().equals(fiscalNumber));
+                        pc.getAddressCountryCode(), fiscalCountryCode) && !Strings.isNullOrEmpty(pc.getFiscalNumber())
+                        && pc.getFiscalNumber().equals(fiscalNumber));
     }
 
     // ANIL 2024-12-16 (#qubIT-Fenix-6386)

@@ -129,16 +129,17 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
             this.name = referenceDebtAccount.getCustomer().getName();
 
             if (referenceDebtAccount.getCustomer().isPersonCustomer()
-                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson() != null
-                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson().getIdDocumentType() != null) {
+                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson() != null &&
+                    ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson().getDefaultIdentificationDocument()
+                            .getIdentificationDocumentType() != null) {
                 this.identificationType = ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson()
-                        .getIdDocumentType().getLocalizedName();
+                        .getDefaultIdentificationDocument().getIdentificationDocumentType().getName().getContent();
             } else if (referenceDebtAccount.getCustomer().isPersonCustomer()
                     && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null
                     && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer()
                             .getIdDocumentType() != null) {
-                this.identificationType = ((PersonCustomer) referenceDebtAccount.getCustomer())
-                        .getPersonForInactivePersonCustomer().getIdDocumentType().getLocalizedName();
+                this.identificationType = ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer()
+                        .getDefaultIdentificationDocument().getIdentificationDocumentType().getName().getContent();
             }
 
             this.identificationNumber = referenceDebtAccount.getCustomer().getIdentificationNumber();

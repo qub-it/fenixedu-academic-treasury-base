@@ -139,15 +139,15 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
 
             if (debtAccount.getCustomer()
                     .isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPerson() != null && ((PersonCustomer) debtAccount.getCustomer()).getPerson()
-                    .getIdDocumentType() != null) {
+                    .getDefaultIdentificationDocument().getIdentificationDocumentType() != null) {
                 this.identificationType =
-                        ((PersonCustomer) debtAccount.getCustomer()).getPerson().getIdDocumentType().getLocalizedName();
+                        ((PersonCustomer) debtAccount.getCustomer()).getPerson().getDefaultIdentificationDocument()
+                                .getIdentificationDocumentType().getName().getContent();
             } else if (debtAccount.getCustomer()
                     .isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer()
-                    .getIdDocumentType() != null) {
-                this.identificationType =
-                        ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer().getIdDocumentType()
-                                .getLocalizedName();
+                    .getDefaultIdentificationDocument().getIdentificationDocumentType() != null) {
+                this.identificationType = ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer()
+                        .getDefaultIdentificationDocument().getIdentificationDocumentType().getName().getContent();
             }
 
             this.identificationNumber = debtAccount.getCustomer().getIdentificationNumber();
