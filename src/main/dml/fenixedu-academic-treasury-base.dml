@@ -1248,7 +1248,8 @@ class reports.DebtReportRequest {
 	}
 
 class reports.DebtReportRequestResultFile /* implements IGenericFile */ {
-	String fileId;
+    String fileId;
+    String fileDescriptorId;
 	DateTime creationDate;
 	String creator;
 }
@@ -1278,6 +1279,7 @@ class reports.DebtReportRequestResultFile /* implements IGenericFile */ {
 
 class reports.DebtReportRequestResultErrorsFile /* implements IGenericFile */ {
 	String fileId;
+    String fileDescriptorId;
 	DateTime creationDate;
 	String creator;
 }
@@ -1349,6 +1351,7 @@ class debtGeneration.requests.MassiveDebtGenerationType {
 
 class debtGeneration.requests.MassiveDebtGenerationRequestFile /* implements IGenericFile */ {
 	String fileId;
+    String fileDescriptorId;
 	LocalDate debtDate;
 	DateTime whenProcessed;
 	String reason;
@@ -1424,6 +1427,7 @@ class debtGeneration.requests.MassiveDebtGenerationRequestFile /* implements IGe
 
 class exemptions.requests.ExemptionsGenerationRequestFile /* implements IGenericFile */ {
 	String fileId;
+    String fileDescriptorId;
 	LocalDate debtDate;
 	DateTime whenProcessed;
 	DateTime creationDate;
@@ -1473,6 +1477,7 @@ class importation.TreasuryImportType {
 
 class importation.TreasuryImportFile /* implements IGenericFile */ {
 	String fileId;
+    String fileDescriptorId;
 	DateTime whenProcessed;
 	DateTime creationDate;
 	String creator;
@@ -1760,6 +1765,7 @@ class integration.ERPTuitionInfoExportOperation extends .org.fenixedu.treasury.d
 
 class integration.ERPTuitionInfoCreationReportFile /* implements IGenericFile */ {
 	String fileId;
+	String fileDescriptorId;
 	DateTime creationDate;
 	String creator;
 }

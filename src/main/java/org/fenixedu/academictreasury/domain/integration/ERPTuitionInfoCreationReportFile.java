@@ -35,9 +35,14 @@
  */
 package org.fenixedu.academictreasury.domain.integration;
 
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.qubit.terra.framework.services.ServiceProvider;
+import com.qubit.terra.framework.services.fileSupport.FileDescriptor;
+import com.qubit.terra.framework.services.fileSupport.FileManager;
+import org.apache.commons.lang3.StringUtils;
 import org.fenixedu.bennu.io.domain.IGenericFile;
 import org.fenixedu.treasury.services.accesscontrol.TreasuryAccessControlAPI;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
@@ -60,9 +65,10 @@ public class ERPTuitionInfoCreationReportFile extends ERPTuitionInfoCreationRepo
     public ERPTuitionInfoCreationReportFile(final String displayName, final String filename, final byte[] content) {
         this();
 
-        final ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
+        FileManager fileManager = ServiceProvider.getService(FileManager.class);
 
-        services.createFile(this, filename, CONTENT_TYPE, content);
+        FileDescriptor fileDescriptor = fileManager.createFile(filename, content.length, CONTENT_TYPE, content);
+        setFileDescriptorId(fileDescriptor.getId());
     }
 
     @Override
@@ -73,10 +79,17 @@ public class ERPTuitionInfoCreationReportFile extends ERPTuitionInfoCreationRepo
     @Override
     public void delete() {
         final ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
+        FileManager fileManager = ServiceProvider.getService(FileManager.class);
 
         setDomainRoot(null);
 
-        services.deleteFile(this);
+        if(StringUtils.isNotEmpty(getFileDescriptorId())) {
+            fileManager.delete(getFileDescriptorId());
+        }
+
+        if (getTreasuryFile() != null) {
+            services.deleteFile(this);
+        }
 
         super.deleteDomainObject();
     }
@@ -98,4 +111,62 @@ public class ERPTuitionInfoCreationReportFile extends ERPTuitionInfoCreationRepo
         return FenixFramework.getDomainRoot().getErpTuitionInfoCreationReportFilesSet().stream();
     }
 
+    @Override
+    public byte[] getContent() {
+        FileDescriptor fd = getFileDescriptor();
+        if (fd != null) {
+            return fd.getContent();
+        }
+
+        return IGenericFile.super.getContent();
+    }
+
+    @Override
+    public long getSize() {
+        FileDescriptor fd = getFileDescriptor();
+        if (fd != null) {
+            return fd.getSize();
+        }
+
+        return IGenericFile.super.getSize();
+    }
+
+    @Override
+    public String getFilename() {
+        FileDescriptor fd = getFileDescriptor();
+        if (fd != null) {
+            return fd.getName();
+        }
+
+        return IGenericFile.super.getFilename();
+    }
+
+    @Override
+    public String getContentType() {
+        FileDescriptor fd = getFileDescriptor();
+        if (fd != null) {
+            return fd.getContentType();
+        }
+
+        return IGenericFile.super.getContentType();
+    }
+
+    @Override
+    public InputStream getStream() {
+        FileDescriptor fd = getFileDescriptor();
+
+        if (fd != null) {
+            return fd.getReadStream();
+        }
+
+        return IGenericFile.super.getStream();
+    }
+
+    private FileDescriptor getFileDescriptor() {
+        if (org.apache.commons.lang.StringUtils.isNotBlank(getFileDescriptorId())) {
+            return ServiceProvider.getService(FileManager.class).getFileDescriptor(getFileDescriptorId());
+        }
+
+        return null;
+    }
 }

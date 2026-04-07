@@ -10,7 +10,7 @@ external class .org.fenixedu.treasury.domain.TreasuryFile;
 
 	relation DebtReportRequestResultFileTreasuryFile {
 		.org.fenixedu.treasury.domain.TreasuryFile playsRole treasuryFile {
-			multiplicity 1..1;
+			multiplicity 0..1;
 		}
 		
 		reports.DebtReportRequestResultFile playsRole {
@@ -28,7 +28,7 @@ external class .org.fenixedu.treasury.domain.TreasuryFile;
 	
 	relation DebtReportRequestResultErrorsFileTreasuryFile {
 		.org.fenixedu.treasury.domain.TreasuryFile playsRole treasuryFile {
-			multiplicity 1..1;
+			multiplicity 0..1;
 		}
 		
 		reports.DebtReportRequestResultErrorsFile playsRole {
@@ -45,7 +45,7 @@ external class .org.fenixedu.treasury.domain.TreasuryFile;
 	relation MassiveDebtGenerationRequestFileTreasuryFile {
 	
 		.org.fenixedu.treasury.domain.TreasuryFile playsRole treasuryFile {
-			multiplicity 1..1;
+			multiplicity 0..1;
 		}
 		
 		debtGeneration.requests.MassiveDebtGenerationRequestFile playsRole {
@@ -63,7 +63,7 @@ external class .org.fenixedu.treasury.domain.TreasuryFile;
 	relation ExemptionsGenerationRequestFileTreasuryFile {
 	
 		.org.fenixedu.treasury.domain.TreasuryFile playsRole treasuryFile {
-			multiplicity 1..1;
+			multiplicity 0..1;
 		}
 		
 		exemptions.requests.ExemptionsGenerationRequestFile playsRole {
@@ -81,7 +81,7 @@ external class .org.fenixedu.treasury.domain.TreasuryFile;
 	relation TreasuryImportFileTreasuryFile {
 		
 		.org.fenixedu.treasury.domain.TreasuryFile playsRole treasuryFile {
-			multiplicity 1..1;
+			multiplicity 0..1;
 		}
 		
 		importation.TreasuryImportFile playsRole treasuryImportFiles {
@@ -97,7 +97,7 @@ external class .org.fenixedu.treasury.domain.TreasuryFile;
 	
 	relation ERPTuitionInfoCreationReportFileTreasuryFile {
 		.org.fenixedu.treasury.domain.TreasuryFile playsRole treasuryFile {
-			multiplicity 1..1;
+			multiplicity 0..1;
 		}
 		
 		integration.ERPTuitionInfoCreationReportFile playsRole erpTuitionInfoCreationReportFiles {

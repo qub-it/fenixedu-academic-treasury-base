@@ -399,6 +399,18 @@ public class DebtReportRequest extends DebtReportRequest_Base {
         setDomainRootForPendingReportRequests(null);
     }
 
+    public void delete() {
+        super.setDomainRoot(null);
+        super.setDomainRootForPendingReportRequests(null);
+        super.setDegreeType(null);
+        super.setExecutionYear(null);
+
+        getDebtReportRequestResultFilesSet().forEach(f -> f.delete());
+        getDebtReportRequestResultErrorsFilesSet().forEach(f -> f.delete());
+
+        deleteDomainObject();
+    }
+
     protected String treasuryExemptionSheetName() {
         return academicTreasuryBundle("label.DebtReportRequest.treasuryExemptionSheetName");
     }

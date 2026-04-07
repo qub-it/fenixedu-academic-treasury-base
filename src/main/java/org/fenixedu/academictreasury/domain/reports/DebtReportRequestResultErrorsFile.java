@@ -35,13 +35,16 @@
  */
 package org.fenixedu.academictreasury.domain.reports;
 
-
-
 import static org.fenixedu.academictreasury.util.AcademicTreasuryConstants.academicTreasuryBundle;
 
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.qubit.terra.framework.services.ServiceProvider;
+import com.qubit.terra.framework.services.fileSupport.FileDescriptor;
+import com.qubit.terra.framework.services.fileSupport.FileManager;
+import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.bennu.io.domain.IGenericFile;
 import org.fenixedu.treasury.services.accesscontrol.TreasuryAccessControlAPI;
@@ -61,19 +64,20 @@ public class DebtReportRequestResultErrorsFile extends DebtReportRequestResultEr
         setDomainRoot(FenixFramework.getDomainRoot());
         setCreationDate(new DateTime());
     }
-    
+
     protected DebtReportRequestResultErrorsFile(final DebtReportRequest request, final byte[] content) {
         this();
 
         setDebtReportRequest(request);
 
-        final String filename =
-                academicTreasuryBundle("label.DebtReportRequestResultErrorsFile.filename", new DateTime().toString("YYYYMMddHHmmss"));
+        final String filename = academicTreasuryBundle("label.DebtReportRequestResultErrorsFile.filename",
+                new DateTime().toString("YYYYMMddHHmmss"));
 
-        final ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
-        
-        services.createFile(this, filename, CONTENT_TYPE, content);
-        
+        final FileManager fileManager = ServiceProvider.getService(FileManager.class);
+
+        FileDescriptor fileDescriptor = fileManager.createFile(filename, content.length, CONTENT_TYPE, content);
+        setFileDescriptorId(fileDescriptor.getId());
+
         checkRules();
     }
 
@@ -82,21 +86,28 @@ public class DebtReportRequestResultErrorsFile extends DebtReportRequestResultEr
             throw new AcademicTreasuryDomainException("error.DebtReportRequestResultErrorsFile.debtReportRequest.required");
         }
     }
-    
+
     @Override
     public boolean isAccessible(final String username) {
         return TreasuryAccessControlAPI.isBackOfficeMember(username);
     }
-    
+
     @Override
     public void delete() {
         final ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
-        
+        FileManager fileManager = ServiceProvider.getService(FileManager.class);
+
         setDomainRoot(null);
         setDebtReportRequest(null);
-        
-        services.deleteFile(this);
-        
+
+        if(StringUtils.isNotEmpty(getFileDescriptorId())) {
+            fileManager.delete(getFileDescriptorId());
+        }
+
+        if (getTreasuryFile() != null) {
+            services.deleteFile(this);
+        }
+
         super.deleteDomainObject();
     }
 
@@ -106,13 +117,72 @@ public class DebtReportRequestResultErrorsFile extends DebtReportRequestResultEr
      * ********
      */
     // @formatter:on
-    
+
     public static DebtReportRequestResultErrorsFile create(final DebtReportRequest request, final byte[] content) {
         return new DebtReportRequestResultErrorsFile(request, content);
     }
-    
+
     public static Stream<DebtReportRequestResultErrorsFile> findAll() {
         return FenixFramework.getDomainRoot().getDebtReportRequestResultErrorsFilesSet().stream();
+    }
+
+    @Override
+    public byte[] getContent() {
+        FileDescriptor fd = getFileDescriptor();
+        if (fd != null) {
+            return fd.getContent();
+        }
+
+        return IGenericFile.super.getContent();
+    }
+
+    @Override
+    public long getSize() {
+        FileDescriptor fd = getFileDescriptor();
+        if (fd != null) {
+            return fd.getSize();
+        }
+
+        return IGenericFile.super.getSize();
+    }
+
+    @Override
+    public String getFilename() {
+        FileDescriptor fd = getFileDescriptor();
+        if (fd != null) {
+            return fd.getName();
+        }
+
+        return IGenericFile.super.getFilename();
+    }
+
+    @Override
+    public String getContentType() {
+        FileDescriptor fd = getFileDescriptor();
+        if (fd != null) {
+            return fd.getContentType();
+        }
+
+        return IGenericFile.super.getContentType();
+    }
+
+    @Override
+    public InputStream getStream() {
+        FileDescriptor fd = getFileDescriptor();
+
+        if (fd != null) {
+            return fd.getReadStream();
+        }
+
+        return IGenericFile.super.getStream();
+    }
+
+    private FileDescriptor getFileDescriptor() {
+        if (StringUtils.isNotBlank(getFileDescriptorId())) {
+            return ServiceProvider.getService(FileManager.class).getFileDescriptor(getFileDescriptorId());
+        }
+
+        return null;
     }
 
 }
