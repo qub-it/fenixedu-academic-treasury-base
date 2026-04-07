@@ -1,3 +1,4 @@
+12.19.3 (07-04-2026)
 - Refactor: Write IGenericFile content with FileManager instead of Bennu Generic File [#qubIT-Fenix-8024]
 - Refactor: Remove unused method TuitionPaymentPlanEnrolmentGroupType#isEvaluationSeasonRequired [#qubIT-Fenix-7557]
 
