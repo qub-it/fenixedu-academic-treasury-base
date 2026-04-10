@@ -137,7 +137,7 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
             } else if (referenceDebtAccount.getCustomer().isPersonCustomer()
                     && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null
                     && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer()
-                            .getIdDocumentType() != null) {
+                    .getDefaultIdentificationDocument().getIdentificationDocumentType() != null) {
                 this.identificationType = ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer()
                         .getDefaultIdentificationDocument().getIdentificationDocumentType().getName().getContent();
             }
