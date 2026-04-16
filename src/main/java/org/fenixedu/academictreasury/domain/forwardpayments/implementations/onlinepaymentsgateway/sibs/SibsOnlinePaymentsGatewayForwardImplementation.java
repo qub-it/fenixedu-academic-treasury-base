@@ -62,6 +62,7 @@ import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.Atomic.TxMode;
 import pt.ist.fenixframework.FenixFramework;
 
+@Deprecated
 public class SibsOnlinePaymentsGatewayForwardImplementation implements IForwardPaymentImplementation {
 
     private static final String ERROR_UNEXPECTED_NUMBER_TRANSACTIONS_BY_MERCHANT_TRANSACTION_ID =
@@ -76,8 +77,8 @@ public class SibsOnlinePaymentsGatewayForwardImplementation implements IForwardP
 
     @Override
     public String getPaymentURL(ForwardPayment forwardPayment) {
-        return forwardPayment.getForwardPaymentConfiguration().getPaymentURL() + "/paymentWidgets.js?checkoutId="
-                + forwardPayment.getSibsCheckoutId();
+        return forwardPayment.getForwardPaymentConfiguration()
+                .getPaymentURL() + "/paymentWidgets.js?checkoutId=" + forwardPayment.getSibsCheckoutId();
     }
 
     @Override
@@ -123,8 +124,9 @@ public class SibsOnlinePaymentsGatewayForwardImplementation implements IForwardP
         });
 
         try {
-            final CheckoutResultBean checkoutBean = gateway.prepareCheckout(forwardPayment.getDebtAccount(),
-                    merchantTransactionId, forwardPayment.getAmount(), getReturnURL(forwardPayment), addressBean);
+            final CheckoutResultBean checkoutBean =
+                    gateway.prepareCheckout(forwardPayment.getDebtAccount(), merchantTransactionId, forwardPayment.getAmount(),
+                            getReturnURL(forwardPayment), addressBean);
 
             final ForwardPaymentStateType type = translateForwardPaymentStateType(checkoutBean.getOperationResultType(), false);
             final ForwardPaymentStatusBean result = new ForwardPaymentStatusBean(checkoutBean.isOperationSuccess(), type,
@@ -187,8 +189,8 @@ public class SibsOnlinePaymentsGatewayForwardImplementation implements IForwardP
                     paymentStateBean.getPaymentGatewayResultCode(), paymentStateBean.getPaymentGatewayResultDescription(),
                     requestLog, responseLog);
 
-            bean.editTransactionDetails(paymentStateBean.getTransactionId(), paymentStateBean.getPaymentDate(),
-                    paymentStateBean.getAmount());
+            bean.editTransactionDetails(forwardPayment.getSibsMerchantTransactionId(), paymentStateBean.getTransactionId(),
+                    paymentStateBean.getPaymentDate(), paymentStateBean.getAmount());
 
             return bean;
         } catch (final Exception e) {
@@ -237,8 +239,8 @@ public class SibsOnlinePaymentsGatewayForwardImplementation implements IForwardP
                     paymentStateBean.getPaymentGatewayResultCode(), paymentStateBean.getPaymentGatewayResultDescription(),
                     requestLog, responseLog);
 
-            bean.editTransactionDetails(paymentStateBean.getTransactionId(), paymentStateBean.getPaymentDate(),
-                    paymentStateBean.getAmount());
+            bean.editTransactionDetails(forwardPayment.getSibsMerchantTransactionId(), paymentStateBean.getTransactionId(),
+                    paymentStateBean.getPaymentDate(), paymentStateBean.getAmount());
 
             return bean;
         } catch (final Exception e) {
@@ -270,8 +272,7 @@ public class SibsOnlinePaymentsGatewayForwardImplementation implements IForwardP
         }
 
         if (paid) {
-            if (operationResultType != SibsResultCodeType.SUCCESSFUL_TRANSACTION
-                    && operationResultType != SibsResultCodeType.SUCESSFUL_PROCESSED_TRANSACTION_FOR_REVIEW) {
+            if (operationResultType != SibsResultCodeType.SUCCESSFUL_TRANSACTION && operationResultType != SibsResultCodeType.SUCESSFUL_PROCESSED_TRANSACTION_FOR_REVIEW) {
                 throw new TreasuryDomainException(
                         "error.SibsOnlinePaymentsGatewayForwardImplementation.payment.appears.paid.but.inconsistent.with.result.code");
             }
@@ -379,8 +380,8 @@ public class SibsOnlinePaymentsGatewayForwardImplementation implements IForwardP
                         paymentStateBean.getPaymentGatewayResultCode(), paymentStateBean.getPaymentGatewayResultDescription(),
                         requestLog, responseLog);
 
-                bean.editTransactionDetails(paymentStateBean.getTransactionId(), paymentStateBean.getPaymentDate(),
-                        paymentStateBean.getAmount());
+                bean.editTransactionDetails(forwardPayment.getSibsMerchantTransactionId(), paymentStateBean.getTransactionId(),
+                        paymentStateBean.getPaymentDate(), paymentStateBean.getAmount());
 
                 result.add(bean);
             }
