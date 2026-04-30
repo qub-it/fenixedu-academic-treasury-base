@@ -85,8 +85,8 @@ public class PersonCustomer extends PersonCustomer_Base {
         this();
 
         // TODO: CHECK IF THIS CODE DO ANYTHING
-        if (!DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber())
-                && find(getPerson(), getAddressCountryCode(), getFiscalNumber()).count() > 1) {
+        if (!DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber()) && find(getPerson(), getAddressCountryCode(),
+                getFiscalNumber()).count() > 1) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.person.customer.duplicated");
         }
 
@@ -187,8 +187,8 @@ public class PersonCustomer extends PersonCustomer_Base {
 
         final Person person = isActive() ? getPerson() : getPersonForInactivePersonCustomer();
 
-        if (!DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber())
-                && find(person, getAddressCountryCode(), getFiscalNumber()).filter(pc -> !pc.isFromPersonMerge()).count() > 1) {
+        if (!DEFAULT_FISCAL_NUMBER.equals(getFiscalNumber()) && find(person, getAddressCountryCode(), getFiscalNumber()).filter(
+                pc -> !pc.isFromPersonMerge()).count() > 1) {
             throw new AcademicTreasuryDomainException("error.PersonCustomer.person.customer.duplicated");
         }
     }
@@ -912,8 +912,8 @@ public class PersonCustomer extends PersonCustomer_Base {
             final String fiscalNumber) {
         return find(person).filter(
                 pc -> !Strings.isNullOrEmpty(pc.getAddressCountryCode()) && TreasuryConstants.isSameCountryCode(
-                        pc.getAddressCountryCode(), fiscalCountryCode) && !Strings.isNullOrEmpty(pc.getFiscalNumber())
-                        && pc.getFiscalNumber().equals(fiscalNumber));
+                        pc.getAddressCountryCode(), fiscalCountryCode) && !Strings.isNullOrEmpty(
+                        pc.getFiscalNumber()) && pc.getFiscalNumber().equals(fiscalNumber));
     }
 
     // ANIL 2024-12-16 (#qubIT-Fenix-6386)
@@ -1060,15 +1060,36 @@ public class PersonCustomer extends PersonCustomer_Base {
         return resultSorted;
     }
 
-    public static PhysicalAddress createSaftDefaultPhysicalAddress(final Person person) {
-        String unknownAddress =
-                AcademicTreasuryConstants.academicTreasuryBundle("label.AcademicTreasuryBridgeImpl.unknown.address");
+    public static String getUnknownAddressValue() {
+        return AcademicTreasuryConstants.academicTreasuryBundle("label.AcademicTreasuryBridgeImpl.unknown.address");
+    }
+
+    public static String getUnknownAddressPostalCode() {
+        return "0000-000";
+    }
+
+    public static PhysicalAddress createSaftDefaultPhysicalAddress(Person person) {
+        return createUnknownPhysicalAddress(person, Country.readDefault());
+    }
+
+    public static PhysicalAddress createUnknownPhysicalAddress(Person person, Country fiscalCountry) {
+        String unknownAddress = getUnknownAddressValue();
+
         PhysicalAddress result =
-                AcademicTreasuryConstants.createPhysicalAddress(person, Country.readDefault(), unknownAddress, unknownAddress,
-                        "0000-000", unknownAddress);
+                AcademicTreasuryConstants.createPhysicalAddress(person, fiscalCountry, unknownAddress, unknownAddress,
+                        getUnknownAddressPostalCode(), unknownAddress);
         result.setValid();
 
         return result;
+    }
+
+    public static boolean isUnknownAddress(PhysicalAddress physicalAddress) {
+        boolean isAddressUnknown = getUnknownAddressValue().equalsIgnoreCase(physicalAddress.getAddress());
+        boolean isDistrictUnknown = getUnknownAddressValue().equalsIgnoreCase(physicalAddress.getDistrictOfResidence());
+        boolean isDistrictSubdivisionUnknown = getUnknownAddressValue().equalsIgnoreCase(physicalAddress.getDistrictSubdivisionOfResidence());
+        boolean isPostalCodeUnknown = getUnknownAddressPostalCode().equalsIgnoreCase(physicalAddress.getAreaCode());
+
+        return isAddressUnknown && isDistrictUnknown && isDistrictSubdivisionUnknown && isPostalCodeUnknown;
     }
 
     public static boolean createPersonCustomerIfMissing(final Person person) {
