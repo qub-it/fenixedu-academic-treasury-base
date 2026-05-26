@@ -37,8 +37,10 @@ package org.fenixedu.academictreasury.dto.tariff;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.fenixedu.academic.domain.Degree;
@@ -56,7 +58,6 @@ import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
-import org.fenixedu.treasury.domain.settings.TreasurySettings;
 import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
 import org.fenixedu.treasury.domain.tariff.InterestRateType;
 import org.fenixedu.treasury.dto.ITreasuryBean;
@@ -86,7 +87,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
     /* AcademicTariff */
     private Set<Unit> units;
     private DegreeType degreeType;
-    private Set<Degree> associatedDegrees;
+    private List<Degree> associatedDegrees;
     private CycleType cycleType;
 
     private BigDecimal baseAmount;
@@ -99,6 +100,9 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
     private BigDecimal maximumAmount;
     private BigDecimal urgencyRate;
     private BigDecimal languageTranslationRate;
+
+    // #qubIT-Fenix-8316 - Originally and also used in importation
+    private Product emolumentProduct;
 
     /* TuitionInstallment */
     private Product tuitionInstallmentProduct;
@@ -114,7 +118,6 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
     /* Used in importation */
     private FinantialEntity finantialEntity;
-    private Product emolumentProduct;
     private String sheetName;
     private String tuitionPaymentPlanCalculatorKey;
 
@@ -131,9 +134,12 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
     private TuitionTariffCalculatedAmountType tuitionTariffCalculatedAmountType;
 
     private TuitionPaymentPlanCalculator tuitionPaymentPlanCalculator;
-    
+
     private Class<? extends TuitionTariffCustomCalculator> tuitionTariffCustomCalculator;
-    
+
+    // #qubIT-Fenix-8316 - Hold original academic tariff, so we can refer back to it when we're updating
+    private AcademicTariff academicTariff;
+
     /* Payor debt account */
     private DebtAccount payorDebtAccount;
 
@@ -155,7 +161,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
         setUnits(new HashSet<>());
         setDegreeType(null);
-        setAssociatedDegrees(new HashSet<>());
+        setAssociatedDegrees(new ArrayList<>());
         setCycleType(null);
 
         setBaseAmount(BigDecimal.ZERO);
@@ -198,7 +204,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
         setUnits(new HashSet<>(academicTariff.getUnitsSet()));
         setDegreeType(academicTariff.getDegreeType());
-        setAssociatedDegrees(academicTariff.getAssociatedDegreesSet());
+        setAssociatedDegrees(new ArrayList<>(academicTariff.getAssociatedDegreesSet()));
         setCycleType(academicTariff.getCycleType());
         setBaseAmount(academicTariff.getBaseAmount());
         setUnitsForBase(academicTariff.getUnitsForBase());
@@ -212,6 +218,9 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         setLanguageTranslationRate(academicTariff.getLanguageTranslationRate());
 
         setFinantialEntity(academicTariff.getFinantialEntity());
+        setEmolumentProduct(academicTariff.getProduct());
+
+        setAcademicTariff(academicTariff);
     }
 
     public AcademicTariffBean(final TuitionInstallmentTariff tuitionInstallmentTariff) {
@@ -268,8 +277,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
             setNumberOfDaysAfterCreationForDueDate(0);
         }
 
-        if (getDueDateCalculationType() == null || !(getDueDateCalculationType().isFixedDate()
-                || getDueDateCalculationType().isBestOfFixedDateAndDaysAfterCreation())) {
+        if (getDueDateCalculationType() == null || !(getDueDateCalculationType().isFixedDate() || getDueDateCalculationType().isBestOfFixedDateAndDaysAfterCreation())) {
             setFixedDueDate(null);
         }
 
@@ -290,7 +298,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         }
 
         if (getDegreeType() == null) {
-            setAssociatedDegrees(new HashSet<>());
+            setAssociatedDegrees(new ArrayList<>());
         }
 
         if (!isApplyUnitsAmount()) {
@@ -305,8 +313,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
             setMaximumAmount(BigDecimal.ZERO);
         }
 
-        if (getDueDateCalculationType() != null && (getDueDateCalculationType().isFixedDate()
-                || getDueDateCalculationType().isBestOfFixedDateAndDaysAfterCreation()) && getFixedDueDate() == null) {
+        if (getDueDateCalculationType() != null && (getDueDateCalculationType().isFixedDate() || getDueDateCalculationType().isBestOfFixedDateAndDaysAfterCreation()) && getFixedDueDate() == null) {
             setFixedDueDate(new LocalDate());
         }
 
@@ -323,6 +330,120 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         }
 
         return BigDecimal.ZERO;
+    }
+
+    public boolean isEqualsToTariffDomainObject(boolean compareBeginAndEndDate) {
+        if (academicTariff == null) {
+            return false;
+        }
+
+        if (compareBeginAndEndDate) {
+            if (!Objects.equals(getBeginDate(), academicTariff.getBeginDate().toLocalDate())) {
+                return false;
+            }
+
+            if (!Objects.equals(getEndDate(),
+                    academicTariff.getEndDate() != null ? academicTariff.getEndDate().toLocalDate() : null)) {
+                return false;
+            }
+        }
+
+        if (!Objects.equals(getDueDateCalculationType(), academicTariff.getDueDateCalculationType())) {
+            return false;
+        }
+
+        boolean requiresFixedDueDate =
+                academicTariff.getDueDateCalculationType().isFixedDate() || academicTariff.getDueDateCalculationType()
+                        .isBestOfFixedDateAndDaysAfterCreation();
+        if (requiresFixedDueDate && !Objects.equals(getFixedDueDate(), academicTariff.getFixedDueDate())) {
+            return false;
+        }
+
+        boolean requiresNumberOfDaysAfterCreationForDueDate =
+                academicTariff.getDueDateCalculationType().isDaysAfterCreation() || academicTariff.getDueDateCalculationType()
+                        .isBestOfFixedDateAndDaysAfterCreation();
+        if (requiresNumberOfDaysAfterCreationForDueDate && getNumberOfDaysAfterCreationForDueDate() != academicTariff.getNumberOfDaysAfterCreationForDueDate()) {
+            return false;
+        }
+
+        if (isApplyInterests() != academicTariff.isApplyInterests()) {
+            return false;
+        }
+
+        if (isApplyInterests()) {
+            if (!Objects.equals(getInterestRateType(), academicTariff.getInterestRate().getInterestRateType())) {
+                return false;
+            }
+
+            boolean requiresInterestFixedAmount =
+                    academicTariff.getInterestRate().getInterestRateType().isInterestFixedAmountRequired();
+            if (requiresInterestFixedAmount && !Objects.equals(getInterestFixedAmount(),
+                    academicTariff.getInterestRate().getInterestFixedAmount())) {
+                return false;
+            }
+        }
+
+        if (!Objects.equals(getUnits(), academicTariff.getUnitsSet())) {
+            return false;
+        }
+
+        if (!Objects.equals(getDegreeType(), academicTariff.getDegreeType())) {
+            return false;
+        }
+
+        if (!Objects.equals(new HashSet<>(getAssociatedDegrees()), academicTariff.getAssociatedDegreesSet())) {
+            return false;
+        }
+
+        if (!Objects.equals(getBaseAmount(), academicTariff.getBaseAmount())) {
+            return false;
+        }
+
+        if (getUnitsForBase() != academicTariff.getUnitsForBase()) {
+            return false;
+        }
+
+        if (isApplyUnitsAmount() != academicTariff.isApplyUnitsAmount()) {
+            return false;
+        }
+
+        if (!Objects.equals(getUnitAmount(), academicTariff.getUnitAmount())) {
+            return false;
+        }
+
+        if (isApplyPagesAmount() != academicTariff.isApplyPagesAmount()) {
+            return false;
+        }
+
+        if (!Objects.equals(getPageAmount(), academicTariff.getPageAmount())) {
+            return false;
+        }
+
+        if (isApplyMaximumAmount() != academicTariff.isApplyMaximumAmount()) {
+            return false;
+        }
+
+        if (!Objects.equals(getMaximumAmount(), academicTariff.getMaximumAmount())) {
+            return false;
+        }
+
+        if (!Objects.equals(getUrgencyRate(), academicTariff.getUrgencyRate())) {
+            return false;
+        }
+
+        if (!Objects.equals(getLanguageTranslationRate(), academicTariff.getLanguageTranslationRate())) {
+            return false;
+        }
+
+        if (!Objects.equals(getFinantialEntity(), academicTariff.getFinantialEntity())) {
+            return false;
+        }
+
+        if (!Objects.equals(getEmolumentProduct(), academicTariff.getProduct())) {
+            return false;
+        }
+
+        return true;
     }
 
     public boolean isMaximumDaysToApplyPenaltyApplied() {
@@ -429,8 +550,8 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         this.degreeType = degreeType;
     }
 
-    public Set<Degree> getAssociatedDegrees() {
-        Set<Degree> result = new HashSet<>();
+    public List<Degree> getAssociatedDegrees() {
+        List<Degree> result = new ArrayList<>();
 
         if (this.associatedDegrees != null) {
             result.addAll(this.associatedDegrees);
@@ -443,7 +564,7 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
         return result;
     }
 
-    public void setAssociatedDegrees(Set<Degree> associatedDegrees) {
+    public void setAssociatedDegrees(List<Degree> associatedDegrees) {
         this.associatedDegrees = associatedDegrees;
     }
 
@@ -678,11 +799,11 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
     public void setSheetName(String sheetName) {
         this.sheetName = sheetName;
     }
-    
+
     public String getTuitionPaymentPlanCalculatorKey() {
         return tuitionPaymentPlanCalculatorKey;
     }
-    
+
     public void setTuitionPaymentPlanCalculatorKey(String tuitionPaymentPlanCalculatorKey) {
         this.tuitionPaymentPlanCalculatorKey = tuitionPaymentPlanCalculatorKey;
     }
@@ -706,11 +827,11 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
     public TuitionPaymentPlanCalculator getTuitionPaymentPlanCalculator() {
         return tuitionPaymentPlanCalculator;
     }
-    
+
     public void setTuitionPaymentPlanCalculator(TuitionPaymentPlanCalculator tuitionPaymentPlanCalculator) {
         this.tuitionPaymentPlanCalculator = tuitionPaymentPlanCalculator;
     }
-    
+
     public void setTuitionTariffCustomCalculator(Class<? extends TuitionTariffCustomCalculator> tuitionTariffCustomCalculator) {
         this.tuitionTariffCustomCalculator = tuitionTariffCustomCalculator;
     }
@@ -725,5 +846,13 @@ public class AcademicTariffBean implements ITreasuryBean, Serializable {
 
     public void setPayorDebtAccount(DebtAccount payorDebtAccount) {
         this.payorDebtAccount = payorDebtAccount;
+    }
+
+    public AcademicTariff getAcademicTariff() {
+        return academicTariff;
+    }
+
+    public void setAcademicTariff(AcademicTariff academicTariff) {
+        this.academicTariff = academicTariff;
     }
 }
