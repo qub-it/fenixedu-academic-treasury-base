@@ -1,4 +1,5 @@
 - Improvement: Improve error message of person with customer already assigned [#UCP-FENIXEDU-821]
+- Refactor: Extend AcademicTariffBean to support academic tariff grid update [#qubIT-Fenix-8316]
 
 12.19.6 (12-05-2026)
 - Refactor: Method in PersonCustomer to create unknown physical address for any country [UCP-FENIXEDU-821]
