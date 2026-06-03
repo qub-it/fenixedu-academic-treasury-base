@@ -77,10 +77,6 @@ public class DebtReportRequestResultFile extends DebtReportRequestResultFile_Bas
         final String filename = academicTreasuryBundle("label.DebtReportRequestResultFile.ZIP.filename", 
                 new DateTime().toString("YYYYMMddHHmmss"));
 
-        final ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
-        
-        services.createFile(this, filename, CONTENT_TYPE, content);
-
         final FileManager fileManager = ServiceProvider.getService(FileManager.class);
 
         FileDescriptor fileDescriptor = fileManager.createFile(filename, content.length, CONTENT_TYPE, content);
