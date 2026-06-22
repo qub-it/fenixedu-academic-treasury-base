@@ -36,13 +36,16 @@ public class AcademicTreasuryBootstrapper {
         Optional.ofNullable(ProductGroup.findByCode("TUITION")).ifPresentOrElse(p -> Function.identity().apply(p),
                 () -> ProductGroup.create("TUITION", TreasuryConstants.treasuryBundleI18N("label.productGroup.tuition")));
 
+        Optional.ofNullable(ProductGroup.findByCode("EMOLUMENT")).ifPresentOrElse(p -> Function.identity().apply(p),
+                () -> ProductGroup.create("EMOLUMENT", TreasuryConstants.treasuryBundleI18N("label.productGroup.emolument")));
+
         Optional.ofNullable(AcademicTreasurySettings.getInstance().getTuitionProductGroup()).ifPresentOrElse(
                 p -> Function.identity().apply(p),
                 () -> AcademicTreasurySettings.getInstance().setTuitionProductGroup(ProductGroup.findByCode("TUITION")));
 
         Optional.ofNullable(AcademicTreasurySettings.getInstance().getEmolumentsProductGroup()).ifPresentOrElse(
                 p -> Function.identity().apply(p),
-                () -> AcademicTreasurySettings.getInstance().setEmolumentsProductGroup(ProductGroup.findByCode("TUITION")));
+                () -> AcademicTreasurySettings.getInstance().setEmolumentsProductGroup(ProductGroup.findByCode("EMOLUMENT")));
     }
 
     public static void initializeTuitionsProducts() {
