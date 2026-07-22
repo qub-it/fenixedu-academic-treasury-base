@@ -37,7 +37,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import net.bytebuddy.asm.Advice;
 import org.fenixedu.academic.domain.DomainObjectUtil;
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.EnrolmentEvaluation;
@@ -1111,7 +1110,7 @@ public class TuitionServices {
         }
 
         for (final ExecutionInterval executionSemester : executionYear.getExecutionPeriodsSet()) {
-            result.addAll(studentCurricularPlan.getEnroledImprovements(executionSemester));
+            result.addAll(getEnrolledImprovements(studentCurricularPlan, executionSemester));
         }
 
         return result;
@@ -1121,6 +1120,15 @@ public class TuitionServices {
             final ExecutionYear executionYear) {
         return registration.getRegistrationDataByExecutionYearSet().stream().filter(l -> l.getExecutionYear() == executionYear)
                 .findFirst().orElse(null);
+    }
+
+    private static Set<EnrolmentEvaluation> getEnrolledImprovements(final StudentCurricularPlan studentCurricularPlan,
+            final ExecutionInterval executionInterval) {
+
+        return studentCurricularPlan.getEnrolmentsSet().stream().flatMap(enrolment -> enrolment.getEvaluationsSet().stream()
+                .filter(evaluation -> evaluation.getEvaluationSeason().isImprovement()).filter(evaluation ->
+                        enrolment.getEnrolmentEvaluation(evaluation.getEvaluationSeason(), executionInterval, null).orElse(null)
+                                == evaluation)).collect(Collectors.toSet());
     }
 
 }
