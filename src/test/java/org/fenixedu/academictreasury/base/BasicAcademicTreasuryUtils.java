@@ -17,7 +17,6 @@ import org.fenixedu.academic.domain.contacts.PartyContactValidationState;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.curriculum.grade.GradeScale;
 import org.fenixedu.academic.domain.degree.DegreeType;
-import org.fenixedu.academic.domain.degreeStructure.CurricularStage;
 import org.fenixedu.academic.domain.person.identificationDocument.IdentificationDocumentType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationProtocol;
@@ -96,7 +95,6 @@ public class BasicAcademicTreasuryUtils {
 
             degree.createDegreeCurricularPlan("DCP", findOrCreatePerson(), AcademicPeriod.YEAR);
             degree.setCode("9999");
-            degree.getDegreeCurricularPlansSet().iterator().next().setCurricularStage(CurricularStage.APPROVED);
 
             degree.getDegreeCurricularPlansSet().iterator().next().createExecutionDegree(findOrCreateExecutionYear("2022/2023"),
                     null, false);
