@@ -1,3 +1,5 @@
+- Refactor: Simplify reading the file in some TreasuryFile subclasses using OMNIS FileManager [#qubIT-Fenix-8024]
+
 12.19.12 (31-07-2026)
 - Refactor: Remove reference to deprecated CurricularStage [#qubIT-Fenix-4442]
 

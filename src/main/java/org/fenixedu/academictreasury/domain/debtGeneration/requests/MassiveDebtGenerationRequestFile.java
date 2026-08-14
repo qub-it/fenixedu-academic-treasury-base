@@ -44,6 +44,7 @@ import org.fenixedu.academictreasury.domain.emoluments.AcademicTax;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
 import org.fenixedu.bennu.io.domain.IGenericFile;
+import org.fenixedu.treasury.domain.TreasuryFile;
 import org.fenixedu.treasury.services.accesscontrol.TreasuryAccessControlAPI;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
@@ -59,12 +60,11 @@ import java.util.stream.Stream;
 /**
  * This class applies not only for debt generation but also for other
  * operations with debts
- * 
+ *
  * @author anilmamede
  *
  */
-public class MassiveDebtGenerationRequestFile extends MassiveDebtGenerationRequestFile_Base
-        implements IGenericFile {
+public class MassiveDebtGenerationRequestFile extends MassiveDebtGenerationRequestFile_Base implements IGenericFile {
 
     public static final String CONTENT_TYPE = "application/octet-stream";
 
@@ -85,14 +85,13 @@ public class MassiveDebtGenerationRequestFile extends MassiveDebtGenerationReque
             final byte[] content) {
         this();
 
-
         final MassiveDebtGenerationType type = bean.getMassiveDebtGenerationType();
         final TuitionPaymentPlanGroup tuitionPaymentPlanGroup = bean.getTuitionPaymentPlanGroup();
         final AcademicTax academicTax = bean.getAcademicTax();
         final ExecutionYear executionYear = bean.getExecutionYear();
         final LocalDate debtDate = bean.getDebtDate();
         final String reason = bean.getReason();
-        
+
         FileManager fileManager = ServiceProvider.getService(FileManager.class);
 
         FileDescriptor fileDescriptor = fileManager.createFile(filename, content.length, CONTENT_TYPE, content);
@@ -107,7 +106,7 @@ public class MassiveDebtGenerationRequestFile extends MassiveDebtGenerationReque
         setFinantialInstitution(bean.getFinantialInstitution());
 
         checkRules();
-        
+
     }
 
     private void checkRules() {
@@ -181,63 +180,69 @@ public class MassiveDebtGenerationRequestFile extends MassiveDebtGenerationReque
         return new MassiveDebtGenerationRequestFile(bean, filename, content);
     }
 
+    // 2026-08-14 (#qubIT-Fenix-8024)
+    //
+    // The property fileDescriptorId is used to get the file id
+    @Override
+    @Deprecated
+    public String getFileId() {
+        return super.getFileId();
+    }
+
+    // 2026-08-14 (#qubIT-Fenix-8024)
+    //
+    // The property fileDescriptorId is used to get the file id
+    @Override
+    @Deprecated
+    public void setFileId(String fileId) {
+        super.setFileId(fileId);
+    }
+
+    // 2026-08-14 (#qubIT-Fenix-8024)
+    //
+    // The property fileDescriptorId is used to get the file id
+    @Override
+    @Deprecated
+    public TreasuryFile getTreasuryFile() {
+        return super.getTreasuryFile();
+    }
+
+    // 2026-08-14 (#qubIT-Fenix-8024)
+    //
+    // The property fileDescriptorId is used to get the file id
+    @Override
+    @Deprecated
+    public void setTreasuryFile(TreasuryFile treasuryFile) {
+        super.setTreasuryFile(treasuryFile);
+    }
+
     @Override
     public byte[] getContent() {
-        FileDescriptor fd = getFileDescriptor();
-        if (fd != null) {
-            return fd.getContent();
-        }
-
-        return IGenericFile.super.getContent();
+        return getFileDescriptor().getContent();
     }
 
     @Override
     public long getSize() {
-        FileDescriptor fd = getFileDescriptor();
-        if (fd != null) {
-            return fd.getSize();
-        }
-
-        return IGenericFile.super.getSize();
+        return getFileDescriptor().getSize();
     }
 
     @Override
     public String getFilename() {
-        FileDescriptor fd = getFileDescriptor();
-        if (fd != null) {
-            return fd.getName();
-        }
-
-        return IGenericFile.super.getFilename();
+        return getFileDescriptor().getName();
     }
 
     @Override
     public String getContentType() {
-        FileDescriptor fd = getFileDescriptor();
-        if (fd != null) {
-            return fd.getContentType();
-        }
-
-        return IGenericFile.super.getContentType();
+        return getFileDescriptor().getContentType();
     }
 
     @Override
     public InputStream getStream() {
-        FileDescriptor fd = getFileDescriptor();
-
-        if (fd != null) {
-            return fd.getReadStream();
-        }
-
-        return IGenericFile.super.getStream();
+        return getFileDescriptor().getReadStream();
     }
 
     private FileDescriptor getFileDescriptor() {
-        if (StringUtils.isNotBlank(getFileDescriptorId())) {
-            return ServiceProvider.getService(FileManager.class).getFileDescriptor(getFileDescriptorId());
-        }
-
-        return null;
+        return ServiceProvider.getService(FileManager.class).getFileDescriptor(getFileDescriptorId());
     }
 
 }

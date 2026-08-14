@@ -35,22 +35,21 @@
  */
 package org.fenixedu.academictreasury.domain.integration;
 
-import java.io.InputStream;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import com.qubit.terra.framework.services.ServiceProvider;
 import com.qubit.terra.framework.services.fileSupport.FileDescriptor;
 import com.qubit.terra.framework.services.fileSupport.FileManager;
 import org.apache.commons.lang3.StringUtils;
 import org.fenixedu.bennu.io.domain.IGenericFile;
+import org.fenixedu.treasury.domain.TreasuryFile;
 import org.fenixedu.treasury.services.accesscontrol.TreasuryAccessControlAPI;
 import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
 import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.joda.time.DateTime;
-
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
+
+import java.io.InputStream;
+import java.util.stream.Stream;
 
 public class ERPTuitionInfoCreationReportFile extends ERPTuitionInfoCreationReportFile_Base implements IGenericFile {
 
@@ -83,7 +82,7 @@ public class ERPTuitionInfoCreationReportFile extends ERPTuitionInfoCreationRepo
 
         setDomainRoot(null);
 
-        if(StringUtils.isNotEmpty(getFileDescriptorId())) {
+        if (StringUtils.isNotEmpty(getFileDescriptorId())) {
             fileManager.delete(getFileDescriptorId());
         }
 
@@ -111,62 +110,68 @@ public class ERPTuitionInfoCreationReportFile extends ERPTuitionInfoCreationRepo
         return FenixFramework.getDomainRoot().getErpTuitionInfoCreationReportFilesSet().stream();
     }
 
+    // 2026-08-14 (#qubIT-Fenix-8024)
+    //
+    // The property fileDescriptorId is used to get the file id
+    @Override
+    @Deprecated
+    public String getFileId() {
+        return super.getFileId();
+    }
+
+    // 2026-08-14 (#qubIT-Fenix-8024)
+    //
+    // The property fileDescriptorId is used to get the file id
+    @Override
+    @Deprecated
+    public void setFileId(String fileId) {
+        super.setFileId(fileId);
+    }
+
+    // 2026-08-14 (#qubIT-Fenix-8024)
+    //
+    // The property fileDescriptorId is used to get the file id
+    @Override
+    @Deprecated
+    public TreasuryFile getTreasuryFile() {
+        return super.getTreasuryFile();
+    }
+
+    // 2026-08-14 (#qubIT-Fenix-8024)
+    //
+    // The property fileDescriptorId is used to get the file id
+    @Override
+    @Deprecated
+    public void setTreasuryFile(TreasuryFile treasuryFile) {
+        super.setTreasuryFile(treasuryFile);
+    }
+
     @Override
     public byte[] getContent() {
-        FileDescriptor fd = getFileDescriptor();
-        if (fd != null) {
-            return fd.getContent();
-        }
-
-        return IGenericFile.super.getContent();
+        return getFileDescriptor().getContent();
     }
 
     @Override
     public long getSize() {
-        FileDescriptor fd = getFileDescriptor();
-        if (fd != null) {
-            return fd.getSize();
-        }
-
-        return IGenericFile.super.getSize();
+        return getFileDescriptor().getSize();
     }
 
     @Override
     public String getFilename() {
-        FileDescriptor fd = getFileDescriptor();
-        if (fd != null) {
-            return fd.getName();
-        }
-
-        return IGenericFile.super.getFilename();
+        return getFileDescriptor().getName();
     }
 
     @Override
     public String getContentType() {
-        FileDescriptor fd = getFileDescriptor();
-        if (fd != null) {
-            return fd.getContentType();
-        }
-
-        return IGenericFile.super.getContentType();
+        return getFileDescriptor().getContentType();
     }
 
     @Override
     public InputStream getStream() {
-        FileDescriptor fd = getFileDescriptor();
-
-        if (fd != null) {
-            return fd.getReadStream();
-        }
-
-        return IGenericFile.super.getStream();
+        return getFileDescriptor().getReadStream();
     }
 
     private FileDescriptor getFileDescriptor() {
-        if (org.apache.commons.lang.StringUtils.isNotBlank(getFileDescriptorId())) {
-            return ServiceProvider.getService(FileManager.class).getFileDescriptor(getFileDescriptorId());
-        }
-
-        return null;
+        return ServiceProvider.getService(FileManager.class).getFileDescriptor(getFileDescriptorId());
     }
 }

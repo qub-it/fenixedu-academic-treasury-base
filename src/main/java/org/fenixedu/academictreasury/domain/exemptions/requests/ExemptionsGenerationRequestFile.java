@@ -63,6 +63,7 @@ import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
 import org.fenixedu.academictreasury.util.ExcelUtils;
 import org.fenixedu.bennu.io.domain.IGenericFile;
 import org.fenixedu.treasury.domain.Product;
+import org.fenixedu.treasury.domain.TreasuryFile;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.event.TreasuryEvent;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
@@ -178,7 +179,7 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
         setDomainRoot(null);
         setTreasuryExemptionType(null);
 
-        if(StringUtils.isNotEmpty(getFileDescriptorId())) {
+        if (StringUtils.isNotEmpty(getFileDescriptorId())) {
             fileManager.delete(getFileDescriptorId());
         }
 
@@ -324,8 +325,9 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
                 TreasuryEvent treasuryEvent = null;
 
                 // First find treasury event by description
-                final Set<AcademicTreasuryEvent> treasuryEventsSet = AcademicTreasuryEvent
-                        .findByDescription(person, treasuryEventValue, true).collect(Collectors.<AcademicTreasuryEvent> toSet());
+                final Set<AcademicTreasuryEvent> treasuryEventsSet =
+                        AcademicTreasuryEvent.findByDescription(person, treasuryEventValue, true)
+                                .collect(Collectors.<AcademicTreasuryEvent> toSet());
                 if (treasuryEventsSet.size() > 0) {
 
                     if (treasuryEventsSet.size() > 1) {
@@ -341,11 +343,11 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
                     // Find by description not found, find by tuition or academic tax
                     Product product = Product.findByName(treasuryEventValue).findFirst().orElse(null);
 
-                    if(product == null) {
+                    if (product == null) {
                         // try and read by product code
                         product = Product.findUniqueByCode(treasuryEventValue).orElse(null);
                     }
-                    
+
                     if (product != null) {
                         if (product == TuitionPaymentPlanGroup.findUniqueDefaultGroupForRegistration().get()
                                 .getCurrentProduct()) {
@@ -354,9 +356,8 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
                                     .orElse(null);
                         } else if (AcademicTax.findUnique(product).isPresent()) {
                             // Find by academic tax
-                            treasuryEvent = AcademicTreasuryEvent
-                                    .findUniqueForAcademicTax(registration, executionYear, AcademicTax.findUnique(product).get())
-                                    .orElse(null);
+                            treasuryEvent = AcademicTreasuryEvent.findUniqueForAcademicTax(registration, executionYear,
+                                    AcademicTax.findUnique(product).get()).orElse(null);
                         }
                     }
                 }
@@ -434,8 +435,9 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
                                 }
 
                                 final DebitEntry tuitionDebitEntry = debitEntriesSet.iterator().next();
-                                if (TreasuryConstants.isLessThan(amountToExempt, BigDecimal.ZERO)
-                                        || TreasuryConstants.isGreaterThan(amountToExempt, tuitionDebitEntry.getTotalAmount())) {
+                                if (TreasuryConstants.isLessThan(amountToExempt,
+                                        BigDecimal.ZERO) || TreasuryConstants.isGreaterThan(amountToExempt,
+                                        tuitionDebitEntry.getTotalAmount())) {
                                     throw new AcademicTreasuryDomainException(
                                             "error.ExemptionsGenerationRequestFile.amountToExempt.invalid",
                                             String.valueOf(rowNum), amountToExemptValue);
@@ -453,11 +455,9 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
                 }
 
                 if (debitEntry == null && !isTreasuryEventForRegistrationTuition(treasuryEvent)) {
-                    final Set<DebitEntry> debitEntries =
-                            DebitEntry
-                                .findActive(treasuryEvent) //
-                                .filter(de -> de.getProduct() != TreasurySettings.getInstance().getInterestProduct()) //
-                                .collect(Collectors.<DebitEntry> toSet());
+                    final Set<DebitEntry> debitEntries = DebitEntry.findActive(treasuryEvent) //
+                            .filter(de -> de.getProduct() != TreasurySettings.getInstance().getInterestProduct()) //
+                            .collect(Collectors.<DebitEntry> toSet());
 
                     if (debitEntries.size() == 0) {
                         throw new AcademicTreasuryDomainException(
@@ -470,8 +470,8 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
                     } else {
                         debitEntry = debitEntries.iterator().next();
 
-                        if (TreasuryConstants.isLessThan(amountToExempt, BigDecimal.ZERO)
-                                || TreasuryConstants.isGreaterThan(amountToExempt, debitEntry.getTotalAmount())) {
+                        if (TreasuryConstants.isLessThan(amountToExempt, BigDecimal.ZERO) || TreasuryConstants.isGreaterThan(
+                                amountToExempt, debitEntry.getTotalAmount())) {
                             throw new AcademicTreasuryDomainException(
                                     "error.ExemptionsGenerationRequestFile.amountToExempt.invalid", String.valueOf(rowNum),
                                     amountToExemptValue);
@@ -480,8 +480,9 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
                     }
                 }
 
-                final ExemptionsGenerationRowResult rowResult = new ExemptionsGenerationRowResult(rowNum, registration,
-                        executionYear, treasuryEvent, debitEntry, amountToExempt, reasonValue, tuitionInstallmentsOrderSet);
+                final ExemptionsGenerationRowResult rowResult =
+                        new ExemptionsGenerationRowResult(rowNum, registration, executionYear, treasuryEvent, debitEntry,
+                                amountToExempt, reasonValue, tuitionInstallmentsOrderSet);
 
                 result.add(rowResult);
             }
@@ -520,8 +521,8 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
                 continue;
             }
 
-            if (!Strings.isNullOrEmpty(dcpName)
-                    && !registration.getStudentCurricularPlan(executionYear).getName().equals(dcpName)) {
+            if (!Strings.isNullOrEmpty(dcpName) && !registration.getStudentCurricularPlan(executionYear).getName()
+                    .equals(dcpName)) {
                 continue;
             }
 
@@ -544,63 +545,69 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
         return string.trim();
     }
 
+    // 2026-08-14 (#qubIT-Fenix-8024)
+    //
+    // The property fileDescriptorId is used to get the file id
+    @Override
+    @Deprecated
+    public String getFileId() {
+        return super.getFileId();
+    }
+
+    // 2026-08-14 (#qubIT-Fenix-8024)
+    //
+    // The property fileDescriptorId is used to get the file id
+    @Override
+    @Deprecated
+    public void setFileId(String fileId) {
+        super.setFileId(fileId);
+    }
+
+    // 2026-08-14 (#qubIT-Fenix-8024)
+    //
+    // The property fileDescriptorId is used to get the file id
+    @Override
+    @Deprecated
+    public TreasuryFile getTreasuryFile() {
+        return super.getTreasuryFile();
+    }
+
+    // 2026-08-14 (#qubIT-Fenix-8024)
+    //
+    // The property fileDescriptorId is used to get the file id
+    @Override
+    @Deprecated
+    public void setTreasuryFile(TreasuryFile treasuryFile) {
+        super.setTreasuryFile(treasuryFile);
+    }
+
     @Override
     public byte[] getContent() {
-        FileDescriptor fd = getFileDescriptor();
-        if (fd != null) {
-            return fd.getContent();
-        }
-
-        return IGenericFile.super.getContent();
+        return getFileDescriptor().getContent();
     }
 
     @Override
     public long getSize() {
-        FileDescriptor fd = getFileDescriptor();
-        if (fd != null) {
-            return fd.getSize();
-        }
-
-        return IGenericFile.super.getSize();
+        return getFileDescriptor().getSize();
     }
 
     @Override
     public String getFilename() {
-        FileDescriptor fd = getFileDescriptor();
-        if (fd != null) {
-            return fd.getName();
-        }
-
-        return IGenericFile.super.getFilename();
+        return getFileDescriptor().getName();
     }
 
     @Override
     public String getContentType() {
-        FileDescriptor fd = getFileDescriptor();
-        if (fd != null) {
-            return fd.getContentType();
-        }
-
-        return IGenericFile.super.getContentType();
+        return getFileDescriptor().getContentType();
     }
 
     @Override
     public InputStream getStream() {
-        FileDescriptor fd = getFileDescriptor();
-
-        if (fd != null) {
-            return fd.getReadStream();
-        }
-
-        return IGenericFile.super.getStream();
+        return getFileDescriptor().getReadStream();
     }
 
     private FileDescriptor getFileDescriptor() {
-        if (StringUtils.isNotBlank(getFileDescriptorId())) {
-            return ServiceProvider.getService(FileManager.class).getFileDescriptor(getFileDescriptorId());
-        }
-
-        return null;
+        return ServiceProvider.getService(FileManager.class).getFileDescriptor(getFileDescriptorId());
     }
 
 }
