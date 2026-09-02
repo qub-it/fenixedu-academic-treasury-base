@@ -1,3 +1,4 @@
+- Refactor: Replace physical address create references [#qubIT-Fenix-9195]
 - Refactor: Replaces deprecated EnrolmentEvaluation#getExecutionPeriod method by getExecutionInterval [#qubIT-Fenix-9300]
 
 12.20.1 (07-09-2026)

@@ -27,11 +27,19 @@ package org.fenixedu.academictreasury.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Sets;
-import org.fenixedu.academic.domain.*;
+import org.fenixedu.academic.domain.Country;
+import org.fenixedu.academic.domain.Degree;
+import org.fenixedu.academic.domain.ExecutionInterval;
+import org.fenixedu.academic.domain.ExecutionYear;
+import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
 import org.fenixedu.academic.domain.contacts.PhysicalAddressData;
@@ -40,15 +48,15 @@ import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.StatuteType;
 import org.fenixedu.academictreasury.domain.serviceRequests.ITreasuryServiceRequest;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
+import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.FinantialEntity;
 import org.fenixedu.treasury.dto.TreasuryTupleDataSourceBean;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
-import org.fenixedu.commons.i18n.LocalizedString;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 public class AcademicTreasuryConstants {
 
@@ -320,8 +328,7 @@ public class AcademicTreasuryConstants {
         data.setDistrictSubdivisionOfResidence(districtSubdivisionOfResidence);
         data.setAreaCode(areaCode);
 
-        final PhysicalAddress physicalAddress =
-                PhysicalAddress.createPhysicalAddress(person, data, PartyContactType.PERSONAL, false);
+        final PhysicalAddress physicalAddress = PhysicalAddress.create(person, data, PartyContactType.PERSONAL, false, true);
 
         physicalAddress.setValid();
 
