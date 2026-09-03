@@ -402,9 +402,21 @@ public class EmolumentServices {
 
     /* Custom Academic Debt */
 
+    @Deprecated
+    /*
+     * 2026-09-02 (#qubIT-Fenix-9301)
+     * TODO: Replace invocations by the method of the same name
+     */
     public static AcademicDebitEntryBean calculateForCustomAcademicDebt(final FinantialEntity finantialEntity,
             final Product product, final Registration registration, final ExecutionYear executionYear, final int numberOfUnits,
             final int numberOfPages, boolean urgentRequest, final LocalDate debtDate) {
+        return calculateForCustomAcademicDebt(finantialEntity, product, registration, executionYear, numberOfUnits, numberOfPages,
+                urgentRequest, null, debtDate);
+    }
+
+    public static AcademicDebitEntryBean calculateForCustomAcademicDebt(final FinantialEntity finantialEntity, Product product,
+            Registration registration, ExecutionYear executionYear, int numberOfUnits, int numberOfPages, boolean urgentRequest,
+            Locale language, LocalDate debtDate) {
         // Find tariff
 
         final AcademicTariff academicTariff =
@@ -419,21 +431,45 @@ public class EmolumentServices {
                 AcademicTreasuryEvent.nameForCustomAcademicDebt(product, registration, executionYear);
         final LocalDate dueDate = academicTariff.dueDate(debtDate);
         final Vat vat = academicTariff.vat(debtDate);
-        final BigDecimal amount = academicTariff.amountToPay(numberOfUnits, numberOfPages, null, urgentRequest);
+        final BigDecimal amount = academicTariff.amountToPay(numberOfUnits, numberOfPages, language, urgentRequest);
 
         return new AcademicDebitEntryBean(debitEntryName, dueDate, vat.getTaxRate(), amount);
     }
 
+    @Deprecated
+    /*
+     * 2026-09-02 (#qubIT-Fenix-9301)
+     * TODO: Replace invocations by the method of the same name
+     */
     public static boolean createCustomAcademicDebtForDefaultFinantialEntity(Product product, Registration registration,
             ExecutionYear executionYear, int numberOfUnits, int numberOfPages, boolean urgentRequest, LocalDate when) {
+        return createCustomAcademicDebtForDefaultFinantialEntity(product, registration, executionYear, numberOfUnits,
+                numberOfPages, urgentRequest, null, when);
+    }
+
+    public static boolean createCustomAcademicDebtForDefaultFinantialEntity(Product product, Registration registration,
+            ExecutionYear executionYear, int numberOfUnits, int numberOfPages, boolean urgentRequest, Locale language,
+            LocalDate when) {
         FinantialEntity finantialEntity = AcademicTreasuryConstants.getFinantialEntityOfDegree(registration.getDegree(), when);
 
         return createCustomAcademicDebt(finantialEntity, product, registration, executionYear, numberOfUnits, numberOfPages,
                 urgentRequest, when);
     }
 
+    @Deprecated
+    /*
+     * 2026-09-02 (#qubIT-Fenix-9301)
+     * TODO: Replace invocations by the method of the same name
+     */ public static boolean createCustomAcademicDebt(FinantialEntity finantialEntity, Product product,
+            Registration registration, ExecutionYear executionYear, int numberOfUnits, int numberOfPages, boolean urgentRequest,
+            LocalDate when) {
+        return createCustomAcademicDebt(finantialEntity, product, registration, executionYear, numberOfUnits, numberOfPages,
+                urgentRequest, null, when);
+    }
+
     public static boolean createCustomAcademicDebt(FinantialEntity finantialEntity, Product product, Registration registration,
-            ExecutionYear executionYear, int numberOfUnits, int numberOfPages, boolean urgentRequest, LocalDate when) {
+            ExecutionYear executionYear, int numberOfUnits, int numberOfPages, boolean urgentRequest, Locale language,
+            LocalDate when) {
 
         final Person person = registration.getPerson();
         final String addressFiscalCountryCode = PersonCustomer.addressCountryCode(person);
@@ -453,7 +489,7 @@ public class EmolumentServices {
 
         final AcademicTreasuryEvent academicTreasuryEvent =
                 AcademicTreasuryEvent.createForCustomAcademicDebt(product, registration, executionYear, numberOfUnits,
-                        numberOfPages, urgentRequest, when, null);
+                        numberOfPages, urgentRequest, when, language, null);
 
         final AcademicTariff academicTariff =
                 AcademicTariff.findMatch(finantialEntity, product, registration.getDegree(), when.toDateTimeAtStartOfDay());

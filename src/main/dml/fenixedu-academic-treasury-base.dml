@@ -739,6 +739,9 @@ class event.AcademicTreasuryEvent extends .org.fenixedu.treasury.domain.event.Tr
 	int customAcademicDebtNumberOfUnits;
 	int customAcademicDebtNumberOfPages;
 	boolean customAcademicDebtUrgent;
+
+	// 2026-09-03 (#qubIT-Fenix-9301)
+	Locale customAcademicDebtLanguage;
 	
 	/* used in custom academic debt */
 	String academicProcessNumber;
