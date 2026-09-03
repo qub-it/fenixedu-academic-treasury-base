@@ -955,26 +955,29 @@ public class TuitionServices {
      * ----------
      */
 
+    @Deprecated
+    // 2026-09-03 (#qubIT-Fenix-9304)
+    //
+    // TODO replace invocations by the #enrolmentDate() which does not have the argument isToForceCreation
     public static LocalDate enrolmentDate(final Registration registration, final ExecutionYear executionYear,
             final boolean isToForceCreation) {
+        return enrolmentDate(registration, executionYear);
+    }
+
+    public static LocalDate enrolmentDate(final Registration registration, final ExecutionYear executionYear) {
         for (final RegistrationDataByExecutionYear registrationDataByExecutionYear : registration.getRegistrationDataByExecutionYearSet()) {
             if (registrationDataByExecutionYear.getExecutionYear() == executionYear && registrationDataByExecutionYear.getEnrolmentDate() != null) {
                 return registrationDataByExecutionYear.getEnrolmentDate();
             }
         }
 
-        if (isToForceCreation) {
-            // Search the enrolment dates for most recent years in which the student was enrolled
-
-            int i = 0;
-            for (ExecutionYear it = executionYear.getPreviousExecutionYear(); it != null;
-                 it = it.getPreviousExecutionYear(), i++) {
-                if (registrationDataByExecutionYear(registration, it) != null && registrationDataByExecutionYear(registration,
-                        it).getEnrolmentDate() != null) {
-                    return registrationDataByExecutionYear(registration, it).getEnrolmentDate().plusYears(i);
-                }
-            }
-        }
+        // 2026-09-03 (#qubIT-Fenix-9304)
+        //
+        // Previously, the system was using the argument isToForceCreation to check enrolment dates of
+        // previous execution years, use it and increment by the number of years between the executionYear argument
+        // and the previous executionYear found, which is wrong and lead to inconsistent results
+        //
+        // If the enrolmentDate of the executionYear is not found, just use the current system date
 
         return new LocalDate();
     }
@@ -1126,9 +1129,9 @@ public class TuitionServices {
             final ExecutionInterval executionInterval) {
 
         return studentCurricularPlan.getEnrolmentsSet().stream().flatMap(enrolment -> enrolment.getEvaluationsSet().stream()
-                .filter(evaluation -> evaluation.getEvaluationSeason().isImprovement()).filter(evaluation ->
-                        enrolment.getEnrolmentEvaluation(evaluation.getEvaluationSeason(), executionInterval, null).orElse(null)
-                                == evaluation)).collect(Collectors.toSet());
+                .filter(evaluation -> evaluation.getEvaluationSeason().isImprovement())
+                .filter(evaluation -> enrolment.getEnrolmentEvaluation(evaluation.getEvaluationSeason(), executionInterval, null)
+                        .orElse(null) == evaluation)).collect(Collectors.toSet());
     }
 
 }
