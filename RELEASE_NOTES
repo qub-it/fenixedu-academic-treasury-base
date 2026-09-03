@@ -1,3 +1,4 @@
+12.20.0 (03-09-2026)
 - Refactor: Simplify reading the file in some TreasuryFile subclasses using OMNIS FileManager [#qubIT-Fenix-8024]
 - Improvement: Support academic tariff's translate rate calculation in custom academic debts [#UL-FF-3892]
 - Bug Fix: Remove usage of enrolment dates of previous years for tuition debt creation [#UL-FD-2419]
