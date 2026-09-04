@@ -66,7 +66,9 @@ public class FirstTimeStudentConditionRule extends FirstTimeStudentConditionRule
     @Override
     public boolean isValidTo(Registration registration, ExecutionYear executionYear, Enrolment enrolment) {
         boolean registrationFirstTime = registration.isFirstTime(executionYear);
-        return Boolean.logicalAnd(getFirstTimeStudent(), registrationFirstTime);
+        
+        // 2026-09-04 (#qubIT-Fenix-9311)
+        return getFirstTimeStudent() == registrationFirstTime;
     }
 
     @Override
