@@ -1,3 +1,5 @@
+- Refactor: Replaces deprecated EnrolmentEvaluation#getExecutionPeriod method by getExecutionInterval [#qubIT-Fenix-9300]
+
 12.20.1 (07-09-2026)
 - Bug Fix: Fix the condition first time student, if the first time condition is false and registration#isFirstTime is false [#UL-FM-3491]
 
