@@ -1024,8 +1024,8 @@ public class TuitionServices {
         result.addAll(registration.getStudentCurricularPlansSet().stream().map(l -> l.getEnrolmentsSet())
                 .reduce((a, b) -> Sets.union(a, b)).orElse(Sets.newHashSet()).stream().map(l -> l.getEvaluationsSet())
                 .reduce((a, b) -> Sets.union(a, b)).orElse(Sets.newHashSet()).stream()
-                .filter(l -> l.getEvaluationSeason().isImprovement() && l.getExecutionPeriod() != null)
-                .map(l -> l.getExecutionPeriod().getExecutionYear()).collect(Collectors.toSet()));
+                .filter(l -> l.getEvaluationSeason().isImprovement() && l.getExecutionInterval() != null)
+                .map(l -> l.getExecutionInterval().getExecutionYear()).collect(Collectors.toSet()));
 
         return result.stream().sorted(ExecutionYear.REVERSE_COMPARATOR_BY_YEAR).collect(Collectors.toList());
     }

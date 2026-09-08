@@ -308,7 +308,7 @@ public class AcademicTaxServices {
         }
 
         final Registration registration = enrolmentEvaluation.getRegistration();
-        final ExecutionYear executionYear = enrolmentEvaluation.getExecutionPeriod().getExecutionYear();
+        final ExecutionYear executionYear = enrolmentEvaluation.getExecutionInterval().getExecutionYear();
 
         final AcademicTreasuryEvent academicTreasuryEvent =
                 findAcademicTreasuryEventForImprovementTax(registration, executionYear);
@@ -352,7 +352,7 @@ public class AcademicTaxServices {
         }
 
         final Registration registration = enrolmentEvaluation.getRegistration();
-        final ExecutionYear executionYear = enrolmentEvaluation.getExecutionPeriod().getExecutionYear();
+        final ExecutionYear executionYear = enrolmentEvaluation.getExecutionInterval().getExecutionYear();
 
         AcademicTreasurySettings instance = AcademicTreasurySettings.getInstance();
 
@@ -429,7 +429,7 @@ public class AcademicTaxServices {
 
     public static boolean removeDebitEntryForImprovement(final EnrolmentEvaluation improvementEnrolmentEvaluation) {
         final Registration registration = improvementEnrolmentEvaluation.getRegistration();
-        final ExecutionYear executionYear = improvementEnrolmentEvaluation.getExecutionPeriod().getExecutionYear();
+        final ExecutionYear executionYear = improvementEnrolmentEvaluation.getExecutionInterval().getExecutionYear();
 
         if (findAcademicTreasuryEventForImprovementTax(registration, executionYear) == null) {
             return false;

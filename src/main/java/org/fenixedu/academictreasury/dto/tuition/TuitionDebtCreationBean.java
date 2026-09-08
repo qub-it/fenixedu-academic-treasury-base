@@ -277,7 +277,7 @@ public class TuitionDebtCreationBean implements Serializable, ITreasuryBean {
         improvementEnrolmentEvaluationsDataSource =
                 TuitionServices.improvementEnrolments(getRegistration(), getExecutionYear()).stream()
                         .map(l -> new TreasuryTupleDataSourceBean(l.getExternalId(),
-                                l.getEnrolment().getName().getContent() + " - " + l.getExecutionPeriod().getQualifiedName()))
+                                l.getEnrolment().getName().getContent() + " - " + l.getExecutionInterval().getQualifiedName()))
                         .collect(Collectors.toList()).stream().sorted(TreasuryTupleDataSourceBean.COMPARE_BY_TEXT)
                         .collect(Collectors.toList());
 

@@ -31,7 +31,6 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,7 +46,6 @@ import org.fenixedu.academic.domain.serviceRequests.AcademicServiceRequestSituat
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academic.domain.student.RegistrationDataByExecutionYear;
 import org.fenixedu.academic.domain.student.registrationStates.RegistrationStateType;
-import org.fenixedu.academic.domain.treasury.AcademicTreasuryEventPayment;
 import org.fenixedu.academic.domain.treasury.IAcademicServiceRequestAndAcademicTaxTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEvent;
 import org.fenixedu.academic.domain.treasury.IAcademicTreasuryEventPayment;
@@ -75,8 +73,6 @@ import org.fenixedu.treasury.domain.exceptions.TreasuryDomainException;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemptionType;
 import org.fenixedu.treasury.domain.tariff.Tariff;
-import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -770,7 +766,8 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
 
     public Optional<? extends DebitEntry> findActiveEnrolmentEvaluationDebitEntry(final EnrolmentEvaluation enrolmentEvaluation) {
         return DebitEntry.findActive(this).filter(d -> d.getCurricularCourse() == enrolmentEvaluation.getEnrolment()
-                        .getCurricularCourse() && d.getExecutionSemester() == enrolmentEvaluation.getExecutionPeriod() && d.getEvaluationSeason() == enrolmentEvaluation.getEvaluationSeason())
+                        .getCurricularCourse() && d.getExecutionSemester() == enrolmentEvaluation.getExecutionInterval()
+                        && d.getEvaluationSeason() == enrolmentEvaluation.getEvaluationSeason())
                 .findFirst();
     }
 

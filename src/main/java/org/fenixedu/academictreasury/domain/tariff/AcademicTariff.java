@@ -509,13 +509,13 @@ public class AcademicTariff extends AcademicTariff_Base {
         final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
 
         final Registration registration = enrolmentEvaluation.getEnrolment().getRegistration();
-        final ExecutionYear executionYear = enrolmentEvaluation.getExecutionPeriod().getExecutionYear();
+        final ExecutionYear executionYear = enrolmentEvaluation.getExecutionInterval().getExecutionYear();
 
         LocalizedString result = new LocalizedString();
 
         for (final Locale locale : TreasuryConstants.getAvailableLocales()) {
             String enrolmentName = enrolmentEvaluation.getEnrolment().getName().getContent(locale);
-            String executionIntervalName = enrolmentEvaluation.getExecutionPeriod().getQualifiedName();
+            String executionIntervalName = enrolmentEvaluation.getExecutionInterval().getQualifiedName();
             String academicTreasuryEventDescription =
                     AcademicTreasuryEvent.nameForAcademicTax(improvementAcademicTax, registration, executionYear)
                             .getContent(locale);
@@ -847,7 +847,7 @@ public class AcademicTariff extends AcademicTariff_Base {
                 improvementEnrolmentEvaluation.getDegreeCurricularPlan().getDegree().getPresentationName());
 
         propertiesMap.put(AcademicTreasuryEvent.AcademicTreasuryEventKeys.EXECUTION_SEMESTER.getDescriptionI18N().getContent(),
-                improvementEnrolmentEvaluation.getExecutionPeriod().getQualifiedName());
+                improvementEnrolmentEvaluation.getExecutionInterval().getQualifiedName());
 
         // TODO Check code Refactor/20210624-MergeWithISCTE
         // For now maintain this
