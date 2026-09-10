@@ -202,8 +202,7 @@ public class TestPersonCustomerFindUnique {
         data.setDistrictSubdivisionOfResidence(districtSubdivisionOfResidence);
         data.setAreaCode(areaCode);
 
-        final PhysicalAddress physicalAddress =
-                PhysicalAddress.createPhysicalAddress(person, data, PartyContactType.PERSONAL, false);
+        final PhysicalAddress physicalAddress = PhysicalAddress.create(person, data, PartyContactType.PERSONAL, false, true);
 
         physicalAddress.setValid();
 
