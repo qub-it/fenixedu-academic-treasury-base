@@ -15,6 +15,7 @@ import org.fenixedu.academic.domain.candidacy.IngressionType;
 import org.fenixedu.academic.domain.contacts.PartyContactType;
 import org.fenixedu.academic.domain.contacts.PartyContactValidationState;
 import org.fenixedu.academic.domain.contacts.PhysicalAddress;
+import org.fenixedu.academic.domain.contacts.PhysicalAddressData;
 import org.fenixedu.academic.domain.curriculum.grade.GradeScale;
 import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.person.identificationDocument.IdentificationDocumentType;
@@ -132,9 +133,10 @@ public class BasicAcademicTreasuryUtils {
                 new Country(ls("Portugal"), ls("Portugal"), "PT", "PRT");
             }
 
-            PhysicalAddress physicalAddress =
-                    new PhysicalAddress(person, PartyContactType.PERSONAL, true, "Desconhecido", "Desconhecido", "Desconhecido",
-                            "Desconhecido", "Desconhecido", "Desconhecido", "Desconhecido", Country.readByTwoLetterCode("PT"));
+            PhysicalAddress physicalAddress = PhysicalAddress.create(person,
+                    new PhysicalAddressData("Desconhecido", "Desconhecido", "Desconhecido", "Desconhecido", "Desconhecido",
+                            "Desconhecido", "Desconhecido", Country.readByTwoLetterCode("PT")), PartyContactType.PERSONAL, true,
+                    true);
 
             physicalAddress.setActive(true);
             physicalAddress.getPartyContactValidation().setState(PartyContactValidationState.VALID);
