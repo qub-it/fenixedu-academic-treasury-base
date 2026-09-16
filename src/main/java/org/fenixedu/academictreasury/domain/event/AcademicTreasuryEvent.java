@@ -1087,7 +1087,7 @@ public class AcademicTreasuryEvent extends AcademicTreasuryEvent_Base
     }
 
     public static Stream<? extends AcademicTreasuryEvent> find(ExecutionYear executionYear) {
-        return findAll().filter(e -> e.getExecutionYear() == executionYear);
+        return executionYear.getAcademicTreasuryEventSet().stream();
     }
 
     public static Stream<? extends AcademicTreasuryEvent> find(Registration registration, ExecutionYear executionYear) {
