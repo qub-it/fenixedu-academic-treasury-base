@@ -41,6 +41,7 @@ import java.util.Set;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
 import org.fenixedu.academictreasury.domain.emoluments.AcademicTax;
+import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 import org.fenixedu.academictreasury.domain.treasury.IAcademicTreasuryAccountUrl;
 
 import pt.ist.fenixframework.FenixFramework;
@@ -54,6 +55,8 @@ public class AcademicTreasurySettings extends AcademicTreasurySettings_Base {
     protected AcademicTreasurySettings() {
         super();
         setDomainRoot(FenixFramework.getDomainRoot());
+
+        checkRules();
     }
 
     @Atomic
@@ -65,6 +68,16 @@ public class AcademicTreasurySettings extends AcademicTreasurySettings_Base {
         setImprovementAcademicTax(improvementAcademicTax);
         setCloseServiceRequestEmolumentsWithDebitNote(closeServiceRequestEmolumentsWithDebitNote);
         setRunAcademicDebtGenerationRuleOnNormalEnrolment(runAcademicDebtGenerationRuleOnNormalEnrolment);
+    }
+
+    private void checkRules() {
+        if(getDomainRoot() == null) {
+            throw new AcademicTreasuryDomainException("error.AcademicTreasurySettings.domainRoot.required");
+        }
+
+        if(getDomainRoot().getAcademicTreasurySettingsSet().size() > 1) {
+            throw new AcademicTreasuryDomainException("error.AcademicTreasurySettings.duplicated");
+        }
     }
 
     @Atomic
@@ -133,13 +146,21 @@ public class AcademicTreasurySettings extends AcademicTreasurySettings_Base {
         return FenixFramework.getDomainRoot().getAcademicTreasurySettingsSet().stream().findFirst();
     }
 
-    @Atomic
     public static AcademicTreasurySettings getInstance() {
-        if (!find().isPresent()) {
-            return new AcademicTreasurySettings();
+        // 2026-09-17 (#qubIT-Fenix-9414)
+        //
+        // Before the fix, the method #getInstance was annotated with @Atomic. Because of that, multiple reads in a
+        // read transaction was much slower
+        return find().orElseGet(AcademicTreasurySettings::create);
+    }
+
+    @Atomic(mode = Atomic.TxMode.WRITE)
+    public static AcademicTreasurySettings create() {
+        if(find().isPresent()) {
+            throw new RuntimeException("The settings instance already exists");
         }
 
-        return find().get();
+        return new AcademicTreasurySettings();
     }
 
 }
