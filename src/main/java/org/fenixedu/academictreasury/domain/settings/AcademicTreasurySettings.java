@@ -155,7 +155,7 @@ public class AcademicTreasurySettings extends AcademicTreasurySettings_Base {
     }
 
     @Atomic(mode = Atomic.TxMode.WRITE)
-    public static AcademicTreasurySettings create() {
+    private static AcademicTreasurySettings create() {
         if(find().isPresent()) {
             throw new RuntimeException("The settings instance already exists");
         }
