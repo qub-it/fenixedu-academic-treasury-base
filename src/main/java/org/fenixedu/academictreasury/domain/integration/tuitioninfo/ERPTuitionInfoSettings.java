@@ -73,12 +73,24 @@ public class ERPTuitionInfoSettings extends ERPTuitionInfoSettings_Base {
      */
     // @formatter:on
     
-    @Atomic
     public static ERPTuitionInfoSettings getInstance() {
         if(FenixFramework.getDomainRoot().getErpTuitionInfoSettings() == null) {
-            new ERPTuitionInfoSettings();
+            // 2026-09-17 (#qubIT-Fenix-9414)
+            //
+            // Before the fix, the method #getInstance was annotated with @Atomic. Because of that, multiple reads in a
+            // read transaction was much slower
+            return create();
         }
         
         return FenixFramework.getDomainRoot().getErpTuitionInfoSettings();
+    }
+
+    @Atomic
+    private static ERPTuitionInfoSettings create() {
+        if(FenixFramework.getDomainRoot().getErpTuitionInfoSettings() != null) {
+            throw new RuntimeException("Configuration already exists");
+        }
+
+        return new ERPTuitionInfoSettings();
     }
 }

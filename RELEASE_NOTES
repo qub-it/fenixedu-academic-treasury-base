@@ -1,3 +1,5 @@
+- Improvement: Remove Atomic annotation from ERPTuitionInfoSettings#getInstance to improve performance in multiple accesses in read transaction [#qubIT-Fenix-9414]
+
 12.20.2 (17-09-2026)
 - Improvement: Use relation to read academic treasury events by execution year [#qubIT-Fenix-9414]
 - Improvement: Remove Atomic annotation from AcademicTreasurySettings#getInstance to improve performance in multiple accesses in read transaction [#qubIT-Fenix-9414]
