@@ -35,7 +35,7 @@
  */
 package org.fenixedu.academictreasury.domain.integration.tuitioninfo.exceptions;
 
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response.Status;
 
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
 
