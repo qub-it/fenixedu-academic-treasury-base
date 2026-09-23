@@ -1,3 +1,4 @@
+12.20.3 (23-09-2026)
 - Improvement: Remove Atomic annotation from ERPTuitionInfoSettings#getInstance to improve performance in multiple accesses in read transaction [#qubIT-Fenix-9414]
 - Improvement: Edit tuition payment plan customized name [#UL-FMV-1204]
 
