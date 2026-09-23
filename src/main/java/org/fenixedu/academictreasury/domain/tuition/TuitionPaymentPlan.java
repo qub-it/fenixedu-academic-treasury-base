@@ -872,4 +872,14 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         return true;
     }
 
+    public void editCustomizedName(LocalizedString customizedName) {
+        if (!this.isCustomized()) {
+            throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.editCustomizedName.tuition.is.not.customized");
+        }
+
+        setCustomizedName(customizedName);
+
+        checkRules();
+    }
+
 }
