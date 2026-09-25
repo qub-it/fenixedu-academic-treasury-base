@@ -1,6 +1,7 @@
 /target/
 .project
 .classpath
+.factorypath
 .settings/
 /Maven_Ant_Builder.launch
 /maven-eclipse.xml

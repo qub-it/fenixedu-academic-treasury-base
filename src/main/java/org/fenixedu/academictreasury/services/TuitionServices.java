@@ -1012,14 +1012,14 @@ public class TuitionServices {
     }
 
     public static List<ExecutionYear> orderedEnrolledExecutionYears(final Registration registration) {
-        return registration.getEnrolmentsExecutionYears().stream().sorted(ExecutionYear.REVERSE_COMPARATOR_BY_YEAR)
+        return registration.getEnrolmentsExecutionYearStream().sorted(ExecutionYear.REVERSE_COMPARATOR_BY_YEAR)
                 .collect(Collectors.toList());
     }
 
     public static List<ExecutionYear> orderedEnrolledAndImprovementExecutionYears(final Registration registration) {
         Set<ExecutionYear> result = Sets.newHashSet();
 
-        result.addAll(registration.getEnrolmentsExecutionYears().stream().collect(Collectors.toSet()));
+        result.addAll(registration.getEnrolmentsExecutionYearStream().collect(Collectors.toSet()));
 
         result.addAll(registration.getStudentCurricularPlansSet().stream().map(l -> l.getEnrolmentsSet())
                 .reduce((a, b) -> Sets.union(a, b)).orElse(Sets.newHashSet()).stream().map(l -> l.getEvaluationsSet())
