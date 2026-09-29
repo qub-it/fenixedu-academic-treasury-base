@@ -116,14 +116,6 @@ public class AcademicTreasurySettings extends AcademicTreasurySettings_Base {
         return getRunAcademicDebtGenerationRuleOnNormalEnrolment();
     }
     
-    public IAcademicTreasuryAccountUrl getAcademicTreasuryAccountUrl() {
-        try {
-            return (IAcademicTreasuryAccountUrl) ClassUtils.getClass(getAcademicTreasuryAccountUrlImpl()).newInstance();
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void activateDebtGenerationRulesPeriodicExecution() {
         setDebtGenerationRulesPeriodicExecutionActive(true);
     }
