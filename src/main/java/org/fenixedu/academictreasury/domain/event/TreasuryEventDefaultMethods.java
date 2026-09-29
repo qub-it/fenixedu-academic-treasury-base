@@ -123,10 +123,6 @@ public class TreasuryEventDefaultMethods {
         return FinantialInstitution.findAll().iterator().next().getCurrency().getValueFor(moneyValue);
     }
 
-    public static String getDebtAccountURL(final TreasuryEvent treasuryEvent) {
-        return AcademicTreasurySettings.getInstance().getAcademicTreasuryAccountUrl().getDebtAccountURL(treasuryEvent);
-    }
-
     public static String getExemptionReason(final TreasuryEvent treasuryEvent) {
         return String.join(", ", TreasuryExemption.find(treasuryEvent).map(l -> l.getReason()).collect(Collectors.toSet()));
     }
