@@ -1,4 +1,5 @@
 - Refactor: Remove TreasuryEventDefaultMethods#getDebtAccountURL [#qubIT-Fenix-9499]
+- Refactor: Remove AcademicTreasurySettings#getAcademicTreasuryAccountUrl [#qubIT-Fenix-9499]
 
 12.20.3 (23-09-2026)
 - Improvement: Remove Atomic annotation from ERPTuitionInfoSettings#getInstance to improve performance in multiple accesses in read transaction [#qubIT-Fenix-9414]
