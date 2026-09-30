@@ -1,5 +1,6 @@
 - Refactor: Migrate from javaee to jakarta [#qubIT-Omnis-10960]
 
+12.20.4 (30-09-2026)
 - Refactor: Remove TreasuryEventDefaultMethods#getDebtAccountURL [#qubIT-Fenix-9499]
 - Refactor: Remove AcademicTreasurySettings#getAcademicTreasuryAccountUrl [#qubIT-Fenix-9499]
 
