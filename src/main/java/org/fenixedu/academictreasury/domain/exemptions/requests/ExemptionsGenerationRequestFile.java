@@ -37,7 +37,6 @@ package org.fenixedu.academictreasury.domain.exemptions.requests;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
@@ -46,9 +45,6 @@ import java.util.SortedSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.qubit.terra.framework.services.ServiceProvider;
-import com.qubit.terra.framework.services.fileSupport.FileDescriptor;
-import com.qubit.terra.framework.services.fileSupport.FileManager;
 import org.apache.commons.lang3.StringUtils;
 import org.fenixedu.academic.domain.Degree;
 import org.fenixedu.academic.domain.ExecutionYear;
@@ -70,27 +66,27 @@ import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemptionType;
 import org.fenixedu.treasury.domain.settings.TreasurySettings;
 import org.fenixedu.treasury.services.accesscontrol.TreasuryAccessControlAPI;
-import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.qubit.terra.framework.services.ServiceProvider;
+import com.qubit.terra.framework.services.fileSupport.FileDescriptor;
+import com.qubit.terra.framework.services.fileSupport.FileManager;
 
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
+import pt.ist.fenixframework.core.AbstractDomainObject;
 
 public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequestFile_Base implements IGenericFile {
 
     public static final String CONTENT_TYPE = "application/octet-stream";
 
-    public static final Comparator<ExemptionsGenerationRequestFile> COMPARE_BY_CREATION_DATE = (o1, o2) -> {
-        int c = o1.getCreationDate().compareTo(o2.getCreationDate());
-
-        return c != 0 ? c : o1.getExternalId().compareTo(o2.getExternalId());
-    };
+    public static final Comparator<ExemptionsGenerationRequestFile> COMPARE_BY_CREATION_DATE =
+            Comparator.comparing((ExemptionsGenerationRequestFile o) -> o.getCreationDate())
+                    .thenComparing(AbstractDomainObject::getExternalId);
 
     private static final int MAX_COLS = 24;
 
@@ -173,7 +169,6 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
 
     @Override
     public void delete() {
-        final ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
         FileManager fileManager = ServiceProvider.getService(FileManager.class);
 
         setDomainRoot(null);
@@ -184,7 +179,7 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
         }
 
         if (getTreasuryFile() != null) {
-            services.deleteFile(this);
+            getTreasuryFile().delete();
         }
 
         super.deleteDomainObject();
@@ -435,9 +430,8 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
                                 }
 
                                 final DebitEntry tuitionDebitEntry = debitEntriesSet.iterator().next();
-                                if (TreasuryConstants.isLessThan(amountToExempt,
-                                        BigDecimal.ZERO) || TreasuryConstants.isGreaterThan(amountToExempt,
-                                        tuitionDebitEntry.getTotalAmount())) {
+                                if (TreasuryConstants.isLessThan(amountToExempt, BigDecimal.ZERO)
+                                        || TreasuryConstants.isGreaterThan(amountToExempt, tuitionDebitEntry.getTotalAmount())) {
                                     throw new AcademicTreasuryDomainException(
                                             "error.ExemptionsGenerationRequestFile.amountToExempt.invalid",
                                             String.valueOf(rowNum), amountToExemptValue);
@@ -579,35 +573,6 @@ public class ExemptionsGenerationRequestFile extends ExemptionsGenerationRequest
     @Deprecated
     public void setTreasuryFile(TreasuryFile treasuryFile) {
         super.setTreasuryFile(treasuryFile);
-    }
-
-    @Override
-    public byte[] getContent() {
-        return getFileDescriptor().getContent();
-    }
-
-    @Override
-    public long getSize() {
-        return getFileDescriptor().getSize();
-    }
-
-    @Override
-    public String getFilename() {
-        return getFileDescriptor().getName();
-    }
-
-    @Override
-    public String getContentType() {
-        return getFileDescriptor().getContentType();
-    }
-
-    @Override
-    public InputStream getStream() {
-        return getFileDescriptor().getReadStream();
-    }
-
-    private FileDescriptor getFileDescriptor() {
-        return ServiceProvider.getService(FileManager.class).getFileDescriptor(getFileDescriptorId());
     }
 
 }

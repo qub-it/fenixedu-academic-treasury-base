@@ -35,9 +35,9 @@
  */
 package org.fenixedu.academictreasury.domain.debtGeneration.requests;
 
-import com.qubit.terra.framework.services.ServiceProvider;
-import com.qubit.terra.framework.services.fileSupport.FileDescriptor;
-import com.qubit.terra.framework.services.fileSupport.FileManager;
+import java.util.Comparator;
+import java.util.stream.Stream;
+
 import org.apache.commons.lang3.StringUtils;
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academictreasury.domain.emoluments.AcademicTax;
@@ -46,16 +46,16 @@ import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
 import org.fenixedu.bennu.io.domain.IGenericFile;
 import org.fenixedu.treasury.domain.TreasuryFile;
 import org.fenixedu.treasury.services.accesscontrol.TreasuryAccessControlAPI;
-import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
+
+import com.qubit.terra.framework.services.ServiceProvider;
+import com.qubit.terra.framework.services.fileSupport.FileDescriptor;
+import com.qubit.terra.framework.services.fileSupport.FileManager;
+
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
-
-import java.io.InputStream;
-import java.util.Comparator;
-import java.util.stream.Stream;
+import pt.ist.fenixframework.core.AbstractDomainObject;
 
 /**
  * This class applies not only for debt generation but also for other
@@ -68,12 +68,9 @@ public class MassiveDebtGenerationRequestFile extends MassiveDebtGenerationReque
 
     public static final String CONTENT_TYPE = "application/octet-stream";
 
-    public static final Comparator<MassiveDebtGenerationRequestFile> COMPARE_BY_CREATION_DATE = (o1, o2) -> {
-
-        int c = o1.getCreationDate().compareTo(o2.getCreationDate());
-
-        return c != 0 ? c : o1.getExternalId().compareTo(o2.getExternalId());
-    };
+    public static final Comparator<MassiveDebtGenerationRequestFile> COMPARE_BY_CREATION_DATE =
+            Comparator.comparing((MassiveDebtGenerationRequestFile o) -> o.getCreationDate())
+                    .thenComparing(AbstractDomainObject::getExternalId);
 
     protected MassiveDebtGenerationRequestFile() {
         super();
@@ -138,7 +135,6 @@ public class MassiveDebtGenerationRequestFile extends MassiveDebtGenerationReque
 
     @Override
     public void delete() {
-        final ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
         FileManager fileManager = ServiceProvider.getService(FileManager.class);
 
         setDomainRoot(null);
@@ -153,7 +149,7 @@ public class MassiveDebtGenerationRequestFile extends MassiveDebtGenerationReque
         }
 
         if (getTreasuryFile() != null) {
-            services.deleteFile(this);
+            getTreasuryFile().delete();
         }
 
         super.deleteDomainObject();
@@ -214,35 +210,6 @@ public class MassiveDebtGenerationRequestFile extends MassiveDebtGenerationReque
     @Deprecated
     public void setTreasuryFile(TreasuryFile treasuryFile) {
         super.setTreasuryFile(treasuryFile);
-    }
-
-    @Override
-    public byte[] getContent() {
-        return getFileDescriptor().getContent();
-    }
-
-    @Override
-    public long getSize() {
-        return getFileDescriptor().getSize();
-    }
-
-    @Override
-    public String getFilename() {
-        return getFileDescriptor().getName();
-    }
-
-    @Override
-    public String getContentType() {
-        return getFileDescriptor().getContentType();
-    }
-
-    @Override
-    public InputStream getStream() {
-        return getFileDescriptor().getReadStream();
-    }
-
-    private FileDescriptor getFileDescriptor() {
-        return ServiceProvider.getService(FileManager.class).getFileDescriptor(getFileDescriptorId());
     }
 
 }
