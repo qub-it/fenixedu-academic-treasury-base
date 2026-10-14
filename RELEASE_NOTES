@@ -1,3 +1,5 @@
+- Refactor: Remove logic of Academic Service Request emolument operations [#qubIT-Fenix-9564]
+
 12.20.5 (13-10-2026)
 - Refactor: Remove references of ITreasuryPlatformDependentServices [#qubIT-Fenix-8024]
 
