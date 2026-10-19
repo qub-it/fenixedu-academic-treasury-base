@@ -26,7 +26,6 @@ import org.fenixedu.academic.domain.student.Student;
 import org.fenixedu.academic.domain.student.registrationStates.RegistrationStateType;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicCalendarEntry;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicCalendarRootEntry;
-import org.fenixedu.academic.domain.time.calendarStructure.AcademicInterval;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicIntervalCE;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicPeriod;
 import org.fenixedu.academic.domain.time.calendarStructure.AcademicYearCE;
@@ -92,7 +91,7 @@ public class BasicAcademicTreasuryUtils {
             Degree degree = new Degree("Curso Teste", "Degree Test", "9999", degreeType, numericGradeScale, numericGradeScale,
                     findOrCreateExecutionYear("2022/2023"));
 
-            degree.setCalendar(findOrCreateExecutionYear("2022/2023").getAcademicInterval().getAcademicCalendar());
+            degree.setCalendar(findOrCreateExecutionYear("2022/2023").getAcademicCalendarEntry().getRootEntry());
 
             degree.createDegreeCurricularPlan("DCP", findOrCreatePerson(), AcademicPeriod.YEAR);
             degree.setCode("9999");
@@ -162,7 +161,6 @@ public class BasicAcademicTreasuryUtils {
 //                ,
 //                rootEntry);
 
-        AcademicInterval academicInterval = new AcademicInterval(calendarYear, rootEntry);
         ExecutionYear.readExecutionYearByName("2022/2023").setState(PeriodState.CURRENT);
 
         new AcademicIntervalCE(AcademicPeriod.SEMESTER, calendarYear, ls("1st Semester"), ls("1st Semester"),
