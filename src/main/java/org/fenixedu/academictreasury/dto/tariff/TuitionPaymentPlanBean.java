@@ -311,9 +311,8 @@ public class TuitionPaymentPlanBean implements Serializable, ITreasuryBean {
             return;
         }
 
-        int executionYearInterval =
-                this.executionYear.getAcademicInterval().getStart().getYear() - this.copiedExecutionYear.getAcademicInterval()
-                        .getStart().getYear();
+        int executionYearInterval = this.executionYear.getAcademicCalendarEntry().getBegin().getYear()
+                - this.copiedExecutionYear.getAcademicCalendarEntry().getBegin().getYear();
 
         for (final AcademicTariffBean academicTariffBean : this.tuitionInstallmentBeans) {
             academicTariffBean.setBeginDate(academicTariffBean.getBeginDate().plusYears(executionYearInterval));
