@@ -49,8 +49,6 @@ import org.fenixedu.treasury.domain.Currency;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.domain.paymentcodes.SibsPaymentRequest;
 import org.fenixedu.treasury.services.integration.FenixEDUTreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
 import org.joda.time.DateTime;
 
@@ -110,10 +108,7 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
 
     private String decimalSeparator;
 
-    public PaymentReferenceCodeEntryBean(SibsPaymentRequest sibsPaymentRequest, DebtReportRequest request,
-            ErrorsLog errorsLog) {
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-        
+    public PaymentReferenceCodeEntryBean(SibsPaymentRequest sibsPaymentRequest, DebtReportRequest request, ErrorsLog errorsLog) {
         this.decimalSeparator = request != null ? request.getDecimalSeparator() : DebtReportRequest.DOT;
 
         try {
@@ -132,14 +127,16 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
                     && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson() != null &&
                     ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson().getDefaultIdentificationDocument()
                             .getIdentificationDocumentType() != null) {
-                this.identificationType = ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson()
-                        .getDefaultIdentificationDocument().getIdentificationDocumentType().getName().getContent();
+                this.identificationType =
+                        ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson().getDefaultIdentificationDocument()
+                                .getIdentificationDocumentType().getName().getContent();
             } else if (referenceDebtAccount.getCustomer().isPersonCustomer()
-                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null
-                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer()
-                    .getDefaultIdentificationDocument().getIdentificationDocumentType() != null) {
-                this.identificationType = ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer()
-                        .getDefaultIdentificationDocument().getIdentificationDocumentType().getName().getContent();
+                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null &&
+                    ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer()
+                            .getDefaultIdentificationDocument().getIdentificationDocumentType() != null) {
+                this.identificationType =
+                        ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer()
+                                .getDefaultIdentificationDocument().getIdentificationDocumentType().getName().getContent();
             }
 
             this.identificationNumber = referenceDebtAccount.getCustomer().getIdentificationNumber();
@@ -161,25 +158,22 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
             if (referenceDebtAccount.getCustomer().isPersonCustomer()
                     && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson() != null
                     && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson().getStudent() != null) {
-                this.studentNumber =
-                        ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson().getStudent().getNumber();
+                this.studentNumber = ((PersonCustomer) referenceDebtAccount.getCustomer()).getPerson().getStudent().getNumber();
             } else if (referenceDebtAccount.getCustomer().isPersonCustomer()
                     && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null
-                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer()
-                            .getStudent() != null) {
-                this.studentNumber = ((PersonCustomer) referenceDebtAccount.getCustomer())
-                        .getPersonForInactivePersonCustomer().getStudent().getNumber();
+                    && ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer().getStudent()
+                    != null) {
+                this.studentNumber =
+                        ((PersonCustomer) referenceDebtAccount.getCustomer()).getPersonForInactivePersonCustomer().getStudent()
+                                .getNumber();
             }
 
             this.entityCode = sibsPaymentRequest.getEntityReferenceCode();
             this.referenceCode = sibsPaymentRequest.getReferenceCode();
 
-                this.finantialDocumentNumber =
-                        String.join(", ",
-                                sibsPaymentRequest.getDebitEntriesSet().stream()
-                                        .filter(i -> i.getFinantialDocument() != null)
-                                        .map(i -> i.getFinantialDocument().getUiDocumentNumber())
-                                        .collect(Collectors.toList()));
+            this.finantialDocumentNumber = String.join(", ",
+                    sibsPaymentRequest.getDebitEntriesSet().stream().filter(i -> i.getFinantialDocument() != null)
+                            .map(i -> i.getFinantialDocument().getUiDocumentNumber()).collect(Collectors.toList()));
 
             this.payableAmount = Currency.getValueWithScale(sibsPaymentRequest.getPayableAmount());
             this.description = sibsPaymentRequest.getDescription();
@@ -228,11 +222,11 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
             {
 
                 String value = this.payableAmount != null ? this.payableAmount.toString() : "";
-                
+
                 if (DebtReportRequest.COMMA.equals(decimalSeparator)) {
                     value = value.replace(DebtReportRequest.DOT, DebtReportRequest.COMMA);
                 }
-                
+
                 createCellWithValue(row, i++, valueOrEmpty(value));
             }
             createCellWithValue(row, i++, valueOrEmpty(description));
@@ -251,7 +245,7 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
      * *****************
      */
     // @formatter:on
-    
+
     public String getIdentification() {
         return identification;
     }
@@ -427,14 +421,13 @@ public class PaymentReferenceCodeEntryBean extends AbstractReportEntryBean {
     public void setCompleted(boolean completed) {
         this.completed = completed;
     }
-    
+
     public String getDecimalSeparator() {
         return decimalSeparator;
     }
-    
+
     public void setDecimalSeparator(String decimalSeparator) {
         this.decimalSeparator = decimalSeparator;
     }
 
-    
 }

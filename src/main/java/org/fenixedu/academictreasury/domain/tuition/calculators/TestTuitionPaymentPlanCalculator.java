@@ -2,7 +2,6 @@ package org.fenixedu.academictreasury.domain.tuition.calculators;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Locale;
 
 import org.fenixedu.academic.domain.Enrolment;
 import org.fenixedu.academic.domain.student.Registration;
@@ -12,8 +11,6 @@ import org.fenixedu.academictreasury.services.TuitionServices;
 import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.bennu.core.i18n.BundleUtil;
 import org.fenixedu.commons.i18n.LocalizedString;
-import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.TreasuryConstants;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -88,8 +85,6 @@ public class TestTuitionPaymentPlanCalculator extends TestTuitionPaymentPlanCalc
 
     @Override
     public LocalizedString getParametersDescription() {
-        ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
-
         LocalizedString result = TreasuryConstants.getAvailableLocales().stream().map(locale -> new LocalizedString(locale,
                 BundleUtil.getString(AcademicTreasuryConstants.BUNDLE, locale,
                         "label.TestTuitionPaymentPlanCalculator.parametersDescription",

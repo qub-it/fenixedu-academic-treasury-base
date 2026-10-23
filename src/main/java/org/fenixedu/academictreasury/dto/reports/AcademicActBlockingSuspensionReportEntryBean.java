@@ -45,8 +45,6 @@ import org.fenixedu.academictreasury.domain.academicalAct.AcademicActBlockingSus
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.reports.ErrorsLog;
 import org.fenixedu.treasury.services.integration.FenixEDUTreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -91,14 +89,14 @@ public class AcademicActBlockingSuspensionReportEntryBean extends AbstractReport
 
     public AcademicActBlockingSuspensionReportEntryBean(final AcademicActBlockingSuspension academicActBlockingSuspension,
             final ErrorsLog errorsLog) {
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-
         this.academicActBlockingSuspension = academicActBlockingSuspension;
 
         try {
             this.identification = academicActBlockingSuspension.getExternalId();
-            this.versioningCreator = FenixEDUTreasuryPlatformDependentServices.getVersioningCreatorUsername(academicActBlockingSuspension);
-            this.creationDate = FenixEDUTreasuryPlatformDependentServices.getVersioningCreationDate(academicActBlockingSuspension);
+            this.versioningCreator =
+                    FenixEDUTreasuryPlatformDependentServices.getVersioningCreatorUsername(academicActBlockingSuspension);
+            this.creationDate =
+                    FenixEDUTreasuryPlatformDependentServices.getVersioningCreationDate(academicActBlockingSuspension);
 
             final Person person = academicActBlockingSuspension.getPerson();
 
@@ -116,9 +114,9 @@ public class AcademicActBlockingSuspensionReportEntryBean extends AbstractReport
             this.email = academicActBlockingSuspension.getPerson().getInstitutionalOrDefaultEmailAddressValue();
             this.address =
                     PersonCustomer.physicalAddress(person) != null ? PersonCustomer.physicalAddress(person).getAddress() : "";
-            this.addressCountryCode = PersonCustomer.physicalAddress(person) != null && PersonCustomer.physicalAddress(person)
-                    .getCountryOfResidence() != null ? PersonCustomer.physicalAddress(person).getCountryOfResidence()
-                    .getCode() : "";
+            this.addressCountryCode = PersonCustomer.physicalAddress(person) != null
+                    && PersonCustomer.physicalAddress(person).getCountryOfResidence() != null ? PersonCustomer.physicalAddress(
+                    person).getCountryOfResidence().getCode() : "";
 
             if (academicActBlockingSuspension.getPerson().getStudent() != null) {
                 this.studentNumber = academicActBlockingSuspension.getPerson().getStudent().getNumber();

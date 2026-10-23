@@ -185,8 +185,6 @@ public class SettlementReportEntryBean implements SpreadsheetRow, IFinantialRepo
     private StudentCurricularPlan activeStudentCurricularPlanOfExecutionYear;
 
     public SettlementReportEntryBean(final SettlementEntry entry, final DebtReportRequest request, final ErrorsLog errorsLog) {
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-
         this.decimalSeparator = request != null ? request.getDecimalSeparator() : DebtReportRequest.DOT;
 
         this.settlementEntry = entry;
@@ -252,8 +250,8 @@ public class SettlementReportEntryBean implements SpreadsheetRow, IFinantialRepo
 
         this.erpCustomerId = entry.getFinantialDocument().getDebtAccount().getCustomer().getErpCustomerId();
 
-        if (entry.getInvoiceEntry().getFinantialDocument() != null && ((Invoice) entry.getInvoiceEntry()
-                .getFinantialDocument()).getPayorDebtAccount() != null) {
+        if (entry.getInvoiceEntry().getFinantialDocument() != null
+                && ((Invoice) entry.getInvoiceEntry().getFinantialDocument()).getPayorDebtAccount() != null) {
             this.erpPayorCustomerId =
                     ((Invoice) entry.getInvoiceEntry().getFinantialDocument()).getPayorDebtAccount().getCustomer()
                             .getErpCustomerId();
@@ -282,8 +280,9 @@ public class SettlementReportEntryBean implements SpreadsheetRow, IFinantialRepo
 
         this.name = customer.getName();
 
-        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null && ((PersonCustomer) customer).getAssociatedPerson()
-                .getDefaultIdentificationDocument().getIdentificationDocumentType() != null) {
+        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null &&
+                ((PersonCustomer) customer).getAssociatedPerson().getDefaultIdentificationDocument()
+                        .getIdentificationDocumentType() != null) {
             this.identificationType = ((PersonCustomer) customer).getAssociatedPerson().getDefaultIdentificationDocument()
                     .getIdentificationDocumentType().getName().getContent();
         }
@@ -301,8 +300,8 @@ public class SettlementReportEntryBean implements SpreadsheetRow, IFinantialRepo
 
         this.address = customer.getAddress();
 
-        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null && ((PersonCustomer) customer).getAssociatedPerson()
-                .getStudent() != null) {
+        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null
+                && ((PersonCustomer) customer).getAssociatedPerson().getStudent() != null) {
             this.studentNumber = ((PersonCustomer) customer).getAssociatedPerson().getStudent().getNumber();
         }
     }

@@ -63,8 +63,6 @@ import org.fenixedu.treasury.domain.tariff.DueDateCalculationType;
 import org.fenixedu.treasury.domain.tariff.InterestRate;
 import org.fenixedu.treasury.domain.tariff.InterestRateType;
 import org.fenixedu.treasury.domain.tariff.Tariff;
-import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -114,9 +112,9 @@ public class AcademicTariff extends AcademicTariff_Base {
 
         // ANIL 2026-03-03 (#qubIT-Fenix-8048)
         // The cycle type is deprecated, check if it will not be needed in the future
-//        if (getCycleType() != null) {
-//            throw new AcademicTreasuryDomainException("error.AcademicTariff.cycleType.deprecated");
-//        }
+        //        if (getCycleType() != null) {
+        //            throw new AcademicTreasuryDomainException("error.AcademicTariff.cycleType.deprecated");
+        //        }
 
         checkRules();
     }
@@ -293,8 +291,8 @@ public class AcademicTariff extends AcademicTariff_Base {
     }
 
     private void checkDuplicatesOfDegree() {
-        Predicate<Degree> isDuplicatePredicate =
-                degree -> findInInterval(getFinantialEntity(), getProduct(), getDegreeType(), degree, getInterval()).filter(
+        Predicate<Degree> isDuplicatePredicate = degree ->
+                findInInterval(getFinantialEntity(), getProduct(), getDegreeType(), degree, getInterval()).filter(
                         t -> t.getCycleType() == null).count() > 1;
 
         getAssociatedDegreesSet().forEach(d -> {
@@ -506,8 +504,6 @@ public class AcademicTariff extends AcademicTariff_Base {
 
     public static LocalizedString improvementDebitEntryName(final AcademicTax improvementAcademicTax,
             final EnrolmentEvaluation enrolmentEvaluation) {
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-
         final Registration registration = enrolmentEvaluation.getEnrolment().getRegistration();
         final ExecutionYear executionYear = enrolmentEvaluation.getExecutionInterval().getExecutionYear();
 
@@ -695,7 +691,8 @@ public class AcademicTariff extends AcademicTariff_Base {
 
     @Override
     public boolean isBroadTariffForFinantialEntity() {
-        return getUnitsSet().isEmpty() && getDegreeType() == null && getAssociatedDegreesSet().isEmpty() && getCycleType() == null;
+        return getUnitsSet().isEmpty() && getDegreeType() == null && getAssociatedDegreesSet().isEmpty()
+                && getCycleType() == null;
     }
 
     @Override
@@ -921,8 +918,9 @@ public class AcademicTariff extends AcademicTariff_Base {
             throw new RuntimeException("unit is null. wrong find call");
         }
 
-        Predicate<AcademicTariff> unitPredicate = tariff -> !tariff.getUnitsSet().isEmpty() && (tariff.getUnitsSet()
-                .contains(unit) || (isSubUnit && unit.isSubUnitOf(tariff.getUnitsSet())));
+        Predicate<AcademicTariff> unitPredicate =
+                tariff -> !tariff.getUnitsSet().isEmpty() && (tariff.getUnitsSet().contains(unit) || (isSubUnit
+                        && unit.isSubUnitOf(tariff.getUnitsSet())));
 
         return find(finantialEntity, product).filter(unitPredicate);
     }
@@ -937,8 +935,9 @@ public class AcademicTariff extends AcademicTariff_Base {
             throw new RuntimeException("unit is null. wrong find call");
         }
 
-        Predicate<AcademicTariff> unitPredicate = tariff -> !tariff.getUnitsSet().isEmpty() && (tariff.getUnitsSet()
-                .contains(unit) || (isSubUnit && unit.isSubUnitOf(tariff.getUnitsSet())));
+        Predicate<AcademicTariff> unitPredicate =
+                tariff -> !tariff.getUnitsSet().isEmpty() && (tariff.getUnitsSet().contains(unit) || (isSubUnit
+                        && unit.isSubUnitOf(tariff.getUnitsSet())));
 
         return find(finantialEntity, product) //
                 .filter(i -> i.getDegreeType() == degreeType) //

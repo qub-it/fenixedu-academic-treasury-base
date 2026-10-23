@@ -1,4 +1,6 @@
 - Improvement: Shorten the description of due date type to occupy less space [#qubIT-Omnis-11649]
+- Refactor: Remove methods related to files management in ITreasuryPlatformDependentServices [#qubIT-Fenix-8024]
+- Refactor: Remove references of ITreasuryPlatformDependentServices [#qubIT-Fenix-7855]
 
 13.0.0 (20-10-2026)
 - Refactor: Migrate from javaee to jakarta [#qubIT-Omnis-10960]

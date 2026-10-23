@@ -1,13 +1,33 @@
 package org.fenixedu.academictreasury.services.tuition;
 
-import com.google.common.base.Strings;
+import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.fenixedu.academic.domain.ExecutionYear;
 import org.fenixedu.academic.domain.Person;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.customer.PersonCustomer;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
-import org.fenixedu.academictreasury.domain.tuition.*;
+import org.fenixedu.academictreasury.domain.tuition.ITuitionRegistrationServiceParameters;
+import org.fenixedu.academictreasury.domain.tuition.TuitionInstallmentTariff;
+import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlan;
+import org.fenixedu.academictreasury.domain.tuition.TuitionPaymentPlanGroup;
+import org.fenixedu.academictreasury.domain.tuition.TuitionTariffCustomCalculator;
 import org.fenixedu.academictreasury.dto.tuition.TuitionDebitEntryBean;
 import org.fenixedu.academictreasury.services.ITuitionServiceExtension;
 import org.fenixedu.academictreasury.services.TuitionServices;
@@ -18,23 +38,21 @@ import org.fenixedu.treasury.domain.FinantialInstitution;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.Vat;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
-import org.fenixedu.treasury.domain.document.*;
+import org.fenixedu.treasury.domain.document.CreditEntry;
+import org.fenixedu.treasury.domain.document.DebitEntry;
+import org.fenixedu.treasury.domain.document.DebitNote;
+import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
+import org.fenixedu.treasury.domain.document.FinantialDocumentType;
+import org.fenixedu.treasury.domain.document.InvoiceEntry;
+import org.fenixedu.treasury.domain.document.SettlementNote;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemption;
 import org.fenixedu.treasury.domain.exemption.TreasuryExemptionType;
 import org.fenixedu.treasury.dto.SettlementNoteBean;
-import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.google.common.base.Strings;
 
 public class RegistrationTuitionService implements ITuitionRegistrationServiceParameters {
 
@@ -89,8 +107,8 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
             return false;
         }
 
-        if (!forceCreationIfNotEnrolled && tuitionPaymentPlan.isStudentMustBeEnrolled() && TuitionServices.normalEnrolmentsIncludingAnnuled(
-                registration, executionYear).isEmpty()) {
+        if (!forceCreationIfNotEnrolled && tuitionPaymentPlan.isStudentMustBeEnrolled()
+                && TuitionServices.normalEnrolmentsIncludingAnnuled(registration, executionYear).isEmpty()) {
             return false;
         }
 
@@ -151,9 +169,9 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
         if (!this._calculationDescription.isEmpty()) {
             Map<String, String> propertiesMap = academicTreasuryEvent.getPropertiesMap();
 
-            String key = AcademicTreasuryConstants.academicTreasuryBundle(
-                    "label.AcademicTreasury.CustomCalculatorDescription") + " ( " + DateTime.now()
-                    .toString("yyyy-MM-dd HH:mm") + " )";
+            String key =
+                    AcademicTreasuryConstants.academicTreasuryBundle("label.AcademicTreasury.CustomCalculatorDescription") + " ( "
+                            + DateTime.now().toString("yyyy-MM-dd HH:mm") + " )";
 
             propertiesMap.put(key, this._calculationDescription);
 
@@ -168,9 +186,8 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
             this._treasuryExemptionsTeller.createDiscountExemptionsMapForOnlyThisInstallment(tariff);
 
-            boolean isToRecalculateInstallment =
-                    this.installmentRecalculationOptions.recalculateInstallments != null && this.installmentRecalculationOptions.recalculateInstallments.containsKey(
-                            product);
+            boolean isToRecalculateInstallment = this.installmentRecalculationOptions.recalculateInstallments != null
+                    && this.installmentRecalculationOptions.recalculateInstallments.containsKey(product);
             if (isToRecalculateInstallment && isTuitionInstallmentCharged(product)) {
 
                 // Recalculate
@@ -206,10 +223,12 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                 if (isDifferenceNetAmountZero && isExemptionsMapAreEqual) {
                     // Nothing to do, there are no differences in the amounts
                     return false;
-                } else if (isDifferenceNetAmountNegativeOrZero && (isExemptionsMapAreEqual || isThereIsOnlyRemovalsOrDecrementsInExemptions)) {
+                } else if (isDifferenceNetAmountNegativeOrZero && (isExemptionsMapAreEqual
+                        || isThereIsOnlyRemovalsOrDecrementsInExemptions)) {
                     return runLogicToDecrementOnlyNetAmountOrExemptions(tariff, academicTreasuryEvent, originalBean, product,
                             differenceNetAmount);
-                } else if (isDifferenceNetAmountPositiveOrZero && (isExemptionsMapAreEqual || isThereAreOnlyNewEntriesOrIncrementsInExemptions)) {
+                } else if (isDifferenceNetAmountPositiveOrZero && (isExemptionsMapAreEqual
+                        || isThereAreOnlyNewEntriesOrIncrementsInExemptions)) {
                     return runLogicToIncrementOnlyNetAmountOrExemptions(tariff, product, originalBean,
                             differenceInNetExemptedAmount, differenceNetAmount, debtDate, debtAccount, academicTreasuryEvent);
                 } else {
@@ -272,8 +291,8 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
         Predicate<TuitionInstallmentTariff> isToCalculateInstallmentProduct =
                 t -> (this.installmentOptions.installments == null || this.installmentOptions.installments.contains(
-                        t.getProduct())) || (this.installmentRecalculationOptions.recalculateInstallments != null && this.installmentRecalculationOptions.recalculateInstallments.containsKey(
-                        t.getProduct()));
+                        t.getProduct())) || (this.installmentRecalculationOptions.recalculateInstallments != null
+                        && this.installmentRecalculationOptions.recalculateInstallments.containsKey(t.getProduct()));
 
         return installments //
                 .filter(isToCalculateInstallmentProduct) //
@@ -570,8 +589,8 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
         Predicate<TuitionInstallmentTariff> isToCalculateInstallmentProduct =
                 t -> (this.installmentOptions.installments == null || this.installmentOptions.installments.contains(
-                        t.getProduct())) || (this.installmentRecalculationOptions.recalculateInstallments != null && this.installmentRecalculationOptions.recalculateInstallments.containsKey(
-                        t.getProduct()));
+                        t.getProduct())) || (this.installmentRecalculationOptions.recalculateInstallments != null
+                        && this.installmentRecalculationOptions.recalculateInstallments.containsKey(t.getProduct()));
 
         final Map<TuitionInstallmentTariff, TuitionDebitEntryBean> calculatedDebitEntryBeansMap = new HashMap<>();
 
@@ -662,9 +681,8 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
 
         this._treasuryExemptionsTeller.createDiscountExemptionsMapForOnlyThisInstallment(tariff);
 
-        boolean isToRecalculateInstallment =
-                this.installmentRecalculationOptions.recalculateInstallments != null && this.installmentRecalculationOptions.recalculateInstallments.containsKey(
-                        product);
+        boolean isToRecalculateInstallment = this.installmentRecalculationOptions.recalculateInstallments != null
+                && this.installmentRecalculationOptions.recalculateInstallments.containsKey(product);
 
         if (isToRecalculateInstallment && isTuitionInstallmentCharged(product)) {
             // Recalculate instead of new installment debt
@@ -701,7 +719,8 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
             if (isDifferenceNetAmountZero && isExemptionsMapAreEqual) {
                 // Before and after is equal, nothing to do
                 return Collections.emptyList();
-            } else if (isDifferenceNetAmountNegativeOrZero && (isExemptionsMapAreEqual || isThereIsOnlyRemovalsOrDecrementsInExemptions)) {
+            } else if (isDifferenceNetAmountNegativeOrZero && (isExemptionsMapAreEqual
+                    || isThereIsOnlyRemovalsOrDecrementsInExemptions)) {
                 LocalDate recalculationDueDate = this.installmentRecalculationOptions.recalculateInstallments.get(product);
 
                 LocalizedString recalculationInstallmentName = installmentName;
@@ -721,7 +740,8 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
                 return Collections.singletonList(
                         new TuitionDebitEntryBean(installmentOrder, tariff, recalculationInstallmentName, recalculationDueDate,
                                 vat.getTaxRate(), differenceNetAmount, differenceInNetExemptedAmount, new HashMap<>(), currency));
-            } else if (isDifferenceNetAmountPositiveOrZero && (isExemptionsMapAreEqual || isThereAreOnlyNewEntriesOrIncrementsInExemptions)) {
+            } else if (isDifferenceNetAmountPositiveOrZero && (isExemptionsMapAreEqual
+                    || isThereAreOnlyNewEntriesOrIncrementsInExemptions)) {
 
                 // Create debit entry with the positive difference
                 LocalDate recalculationDueDate = this.installmentRecalculationOptions.recalculateInstallments.get(product);
@@ -817,8 +837,6 @@ public class RegistrationTuitionService implements ITuitionRegistrationServicePa
     }
 
     private void initializeCustomCalculators() {
-        ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
-
         TuitionPaymentPlan tuitionPaymentPlan = this.tuitionOptions.tuitionPaymentPlan;
         Registration registration = this.registrationOptions.registration;
 

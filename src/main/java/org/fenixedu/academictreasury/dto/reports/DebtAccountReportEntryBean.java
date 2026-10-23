@@ -53,8 +53,6 @@ import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.debt.DebtAccount;
 import org.fenixedu.treasury.services.integration.FenixEDUTreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.FiscalCodeValidation;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
 import org.fenixedu.treasury.util.streaming.spreadsheet.SpreadsheetRow;
@@ -117,8 +115,6 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
     private Set<Registration> activeRegistrations;
 
     public DebtAccountReportEntryBean(final DebtAccount debtAccount, final DebtReportRequest request, final ErrorsLog errorsLog) {
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
-
         this.decimalSeparator = request != null ? request.getDecimalSeparator() : DebtReportRequest.DOT;
 
         this.debtAccount = debtAccount;
@@ -137,15 +133,16 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             this.customerActive = debtAccount.getCustomer().isActive();
             this.name = debtAccount.getCustomer().getName();
 
-            if (debtAccount.getCustomer()
-                    .isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPerson() != null && ((PersonCustomer) debtAccount.getCustomer()).getPerson()
-                    .getDefaultIdentificationDocument().getIdentificationDocumentType() != null) {
+            if (debtAccount.getCustomer().isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPerson() != null
+                    && ((PersonCustomer) debtAccount.getCustomer()).getPerson().getDefaultIdentificationDocument()
+                    .getIdentificationDocumentType() != null) {
                 this.identificationType =
                         ((PersonCustomer) debtAccount.getCustomer()).getPerson().getDefaultIdentificationDocument()
                                 .getIdentificationDocumentType().getName().getContent();
-            } else if (debtAccount.getCustomer()
-                    .isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer()
-                    .getDefaultIdentificationDocument().getIdentificationDocumentType() != null) {
+            } else if (debtAccount.getCustomer().isPersonCustomer()
+                    && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null &&
+                    ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer()
+                            .getDefaultIdentificationDocument().getIdentificationDocumentType() != null) {
                 this.identificationType = ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer()
                         .getDefaultIdentificationDocument().getIdentificationDocumentType().getName().getContent();
             }
@@ -153,12 +150,12 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             this.identificationNumber = debtAccount.getCustomer().getIdentificationNumber();
             this.vatNumber = debtAccount.getCustomer().getUiFiscalNumber();
 
-            if (debtAccount.getCustomer()
-                    .isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPerson() != null) {
+            if (debtAccount.getCustomer().isPersonCustomer()
+                    && ((PersonCustomer) debtAccount.getCustomer()).getPerson() != null) {
                 this.email =
                         ((PersonCustomer) debtAccount.getCustomer()).getPerson().getInstitutionalOrDefaultEmailAddressValue();
-            } else if (debtAccount.getCustomer()
-                    .isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null) {
+            } else if (debtAccount.getCustomer().isPersonCustomer()
+                    && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null) {
                 this.email = ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer()
                         .getInstitutionalOrDefaultEmailAddressValue();
             }
@@ -166,13 +163,12 @@ public class DebtAccountReportEntryBean implements SpreadsheetRow {
             this.address = debtAccount.getCustomer().getUiCompleteAddress();
             this.addressCountryCode = valueOrEmpty(debtAccount.getCustomer().getAddressCountryCode());
 
-            if (debtAccount.getCustomer()
-                    .isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPerson() != null && ((PersonCustomer) debtAccount.getCustomer()).getPerson()
-                    .getStudent() != null) {
+            if (debtAccount.getCustomer().isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPerson() != null
+                    && ((PersonCustomer) debtAccount.getCustomer()).getPerson().getStudent() != null) {
                 this.studentNumber = ((PersonCustomer) debtAccount.getCustomer()).getPerson().getStudent().getNumber();
-            } else if (debtAccount.getCustomer()
-                    .isPersonCustomer() && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer()
-                    .getStudent() != null) {
+            } else if (debtAccount.getCustomer().isPersonCustomer()
+                    && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer() != null
+                    && ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer().getStudent() != null) {
                 this.studentNumber =
                         ((PersonCustomer) debtAccount.getCustomer()).getPersonForInactivePersonCustomer().getStudent()
                                 .getNumber();

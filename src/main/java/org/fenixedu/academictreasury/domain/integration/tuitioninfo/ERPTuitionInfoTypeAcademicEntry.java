@@ -39,17 +39,14 @@ import org.fenixedu.academic.domain.degree.DegreeType;
 import org.fenixedu.academic.domain.student.Registration;
 import org.fenixedu.academictreasury.domain.event.AcademicTreasuryEvent;
 import org.fenixedu.academictreasury.domain.exceptions.AcademicTreasuryDomainException;
-import org.fenixedu.academictreasury.util.AcademicTreasuryConstants;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Product;
 import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.settings.TreasurySettings;
-import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
+import org.fenixedu.treasury.util.TreasuryConstants;
 
 import com.google.common.collect.Sets;
 
-import org.fenixedu.treasury.util.TreasuryConstants;
 import pt.ist.fenixframework.FenixFramework;
 
 public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicEntry_Base {
@@ -172,9 +169,9 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
                     continue;
                 }
 
-//                if (!otherEntry.isDefinedForDegreeType()) {
-//                    continue;
-//                }
+                //                if (!otherEntry.isDefinedForDegreeType()) {
+                //                    continue;
+                //                }
 
                 if (academicEntry.getDegreeType() == otherEntry.getDegreeType()) {
                     throw new AcademicTreasuryDomainException(
@@ -214,7 +211,8 @@ public class ERPTuitionInfoTypeAcademicEntry extends ERPTuitionInfoTypeAcademicE
                     continue;
                 }
 
-                if (otherEntry.isDefinedForDegreeCurricularPlan() && academicEntry.getDegreeCurricularPlan() == otherEntry.getDegreeCurricularPlan()) {
+                if (otherEntry.isDefinedForDegreeCurricularPlan()
+                        && academicEntry.getDegreeCurricularPlan() == otherEntry.getDegreeCurricularPlan()) {
                     throw new AcademicTreasuryDomainException(
                             "error.ERPTuitionInfoTypeAcademicEntry.entry.duplicated.for.degreeCurricularPlan",
                             otherEntry.getDegreeCurricularPlan().getName());

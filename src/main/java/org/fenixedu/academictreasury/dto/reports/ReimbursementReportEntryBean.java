@@ -53,8 +53,6 @@ import org.fenixedu.treasury.domain.document.ReimbursementEntry;
 import org.fenixedu.treasury.domain.document.SettlementEntry;
 import org.fenixedu.treasury.domain.document.SettlementNote;
 import org.fenixedu.treasury.services.integration.FenixEDUTreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.streaming.spreadsheet.IErrorsLog;
 import org.fenixedu.treasury.util.streaming.spreadsheet.SpreadsheetRow;
 import org.joda.time.DateTime;
@@ -132,7 +130,6 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
 
     public ReimbursementReportEntryBean(final ReimbursementEntry entry, final DebtReportRequest request,
             final ErrorsLog errorsLog) {
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
         this.decimalSeparator = request != null ? request.getDecimalSeparator() : DebtReportRequest.DOT;
 
         paymentEntry = entry;
@@ -184,8 +181,8 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
 
         if (!settlementNote.getSettlemetEntriesSet().isEmpty()) {
             final SettlementEntry settlementEntry = settlementNote.getSettlemetEntriesSet().iterator().next();
-            if (settlementEntry.getInvoiceEntry().getFinantialDocument() != null && ((Invoice) settlementEntry.getInvoiceEntry()
-                    .getFinantialDocument()).getPayorDebtAccount() != null) {
+            if (settlementEntry.getInvoiceEntry().getFinantialDocument() != null
+                    && ((Invoice) settlementEntry.getInvoiceEntry().getFinantialDocument()).getPayorDebtAccount() != null) {
                 this.erpPayorCustomerId =
                         ((Invoice) settlementEntry.getInvoiceEntry().getFinantialDocument()).getPayorDebtAccount().getCustomer()
                                 .getErpCustomerId();
@@ -201,8 +198,9 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
 
         this.name = customer.getName();
 
-        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null && ((PersonCustomer) customer).getAssociatedPerson()
-                .getDefaultIdentificationDocument().getIdentificationDocumentType() != null) {
+        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null &&
+                ((PersonCustomer) customer).getAssociatedPerson().getDefaultIdentificationDocument()
+                        .getIdentificationDocumentType() != null) {
             this.identificationType = ((PersonCustomer) customer).getAssociatedPerson().getDefaultIdentificationDocument()
                     .getIdentificationDocumentType().getName().getContent();
         }
@@ -220,8 +218,8 @@ public class ReimbursementReportEntryBean implements SpreadsheetRow {
 
         this.address = customer.getAddress();
 
-        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null && ((PersonCustomer) customer).getAssociatedPerson()
-                .getStudent() != null) {
+        if (customer.isPersonCustomer() && ((PersonCustomer) customer).getAssociatedPerson() != null
+                && ((PersonCustomer) customer).getAssociatedPerson().getStudent() != null) {
             this.studentNumber = ((PersonCustomer) customer).getAssociatedPerson().getStudent().getNumber();
         }
     }

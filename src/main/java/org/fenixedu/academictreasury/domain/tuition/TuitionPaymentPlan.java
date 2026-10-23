@@ -26,7 +26,14 @@
 package org.fenixedu.academictreasury.domain.tuition;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -54,8 +61,6 @@ import org.fenixedu.treasury.domain.document.DebitEntry;
 import org.fenixedu.treasury.domain.document.DebitNote;
 import org.fenixedu.treasury.domain.document.DocumentNumberSeries;
 import org.fenixedu.treasury.domain.document.FinantialDocumentType;
-import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
 import org.fenixedu.treasury.util.TreasuryConstants;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
@@ -165,8 +170,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.customized.plan.cannot.have.other.options");
         }
 
-        if (isDefaultPaymentPlan() && getTuitionPaymentPlanGroup() != TuitionPaymentPlanGroup.findUniqueDefaultGroupForRegistration()
-                .get()) {
+        if (isDefaultPaymentPlan()
+                && getTuitionPaymentPlanGroup() != TuitionPaymentPlanGroup.findUniqueDefaultGroupForRegistration().get()) {
             throw new AcademicTreasuryDomainException("error.TuitionPaymentPlan.default.payment.plan.must.be.for.registration");
         }
 
@@ -179,12 +184,13 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
                     "error.TuitionPaymentPlan.installments.customCalculators.must.have.remaining");
         }
 
-//        if (existsAtLeastOneTariffCalculatedAmountWithoutOnlyOneRemaining()) {
-//            throw new AcademicTreasuryDomainException(
-//                    "error.TuitionPaymentPlan.installments.customCalculators.must.have.remaining");
-//        }
+        //        if (existsAtLeastOneTariffCalculatedAmountWithoutOnlyOneRemaining()) {
+        //            throw new AcademicTreasuryDomainException(
+        //                    "error.TuitionPaymentPlan.installments.customCalculators.must.have.remaining");
+        //        }
 
-        if ((getTuitionPaymentPlanGroup().isForStandalone() || getTuitionPaymentPlanGroup().isForExtracurricular()) && getTuitionInstallmentTariffsSet().size() > 1) {
+        if ((getTuitionPaymentPlanGroup().isForStandalone() || getTuitionPaymentPlanGroup().isForExtracurricular())
+                && getTuitionInstallmentTariffsSet().size() > 1) {
             throw new AcademicTreasuryDomainException(
                     "error.TuitionPaymentPlan.standalone.and.extracurricular.supports.only.one.installment");
         }
@@ -203,20 +209,21 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         if (Boolean.TRUE.equals(getTuitionPaymentPlanGroup().getApplyDomainObjectCalculators())) {
             return !getTuitionInstallmentTariffsSet().stream()
                     .filter(tariff -> tariff.getTuitionCalculationType().isCalculatedAmount())
-                    .map(tariff -> tariff.getTuitionPaymentPlanCalculator()).allMatch(
-                            calculator -> getTuitionInstallmentTariffsSet().stream()
-                                    .filter(tariff -> (tariff.getTuitionCalculationType()
-                                            .isCalculatedAmount() && tariff.getTuitionTariffCalculatedAmountType() != null && tariff.getTuitionTariffCalculatedAmountType()
-                                            .isRemaining() && tariff.getTuitionPaymentPlanCalculator() == calculator))
-                                    .count() == 1);
+                    .map(tariff -> tariff.getTuitionPaymentPlanCalculator()).allMatch(calculator ->
+                            getTuitionInstallmentTariffsSet().stream()
+                                    .filter(tariff -> (tariff.getTuitionCalculationType().isCalculatedAmount()
+                                            && tariff.getTuitionTariffCalculatedAmountType() != null
+                                            && tariff.getTuitionTariffCalculatedAmountType().isRemaining()
+                                            && tariff.getTuitionPaymentPlanCalculator() == calculator)).count() == 1);
         } else {
             return !getTuitionInstallmentTariffsSet().stream()
                     .filter(tariff -> tariff.getTuitionCalculationType().isCalculatedAmount())
                     .map(tariff -> tariff.getTuitionTariffCustomCalculator()).allMatch(
                             calculator -> getTuitionInstallmentTariffsSet().stream().anyMatch(
-                                    tariff -> (tariff.getTuitionCalculationType()
-                                            .isCalculatedAmount() && tariff.getTuitionTariffCalculatedAmountType() != null && tariff.getTuitionTariffCalculatedAmountType()
-                                            .isRemaining() && tariff.getTuitionTariffCustomCalculator() == calculator)));
+                                    tariff -> (tariff.getTuitionCalculationType().isCalculatedAmount()
+                                            && tariff.getTuitionTariffCalculatedAmountType() != null
+                                            && tariff.getTuitionTariffCalculatedAmountType().isRemaining()
+                                            && tariff.getTuitionTariffCustomCalculator() == calculator)));
         }
     }
 
@@ -261,8 +268,8 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     public String getConditionsDescription() {
         if (isCustomized()) {
-            return AcademicTreasuryConstants.academicTreasuryBundle(
-                    "label.TuitionPaymentPlan.customized") + " [" + getCustomizedName().getContent() + "]";
+            return AcademicTreasuryConstants.academicTreasuryBundle("label.TuitionPaymentPlan.customized") + " ["
+                    + getCustomizedName().getContent() + "]";
         }
 
         if (isDefaultPaymentPlan()) {
@@ -270,17 +277,15 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
         }
 
         if (getTuitionPaymentPlanGroup().isForStandalone()) {
-            return AcademicTreasuryConstants.academicTreasuryBundle(
-                    "label.TuitionPaymentPlan.standalone") + ", " + getTuitionConditionRulesSet().stream()
-                    .sorted(TuitionConditionRule.COMPARE_BY_CONDITION_RULE_NAME)
+            return AcademicTreasuryConstants.academicTreasuryBundle("label.TuitionPaymentPlan.standalone") + ", "
+                    + getTuitionConditionRulesSet().stream().sorted(TuitionConditionRule.COMPARE_BY_CONDITION_RULE_NAME)
                     .map(c -> TuitionConditionRule.getPresentationName(c.getClass()) + " [" + c.getDescription() + "]")
                     .collect(Collectors.joining(", "));
 
         }
         if (getTuitionPaymentPlanGroup().isForExtracurricular()) {
-            return AcademicTreasuryConstants.academicTreasuryBundle(
-                    "label.TuitionPaymentPlan.extracurricular") + ", " + getTuitionConditionRulesSet().stream()
-                    .sorted(TuitionConditionRule.COMPARE_BY_CONDITION_RULE_NAME)
+            return AcademicTreasuryConstants.academicTreasuryBundle("label.TuitionPaymentPlan.extracurricular") + ", "
+                    + getTuitionConditionRulesSet().stream().sorted(TuitionConditionRule.COMPARE_BY_CONDITION_RULE_NAME)
                     .map(c -> TuitionConditionRule.getPresentationName(c.getClass()) + " [" + c.getDescription() + "]")
                     .collect(Collectors.joining(", "));
         }
@@ -335,7 +340,6 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     public boolean createDebitEntriesForRegistration(DebtAccount debtAccount, AcademicTreasuryEvent tuitionAcademicTreasuryEvent,
             LocalDate when, Set<Product> restrictCreationToInstallments, boolean forceEvenTreasuryEventIsCharged) {
-        ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
         Registration registration = tuitionAcademicTreasuryEvent.getRegistration();
 
         if (!getTuitionPaymentPlanGroup().isForRegistration()) {
@@ -380,9 +384,9 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
         if (strBuilder.length() > 0) {
             Map<String, String> propertiesMap = tuitionAcademicTreasuryEvent.getPropertiesMap();
-            propertiesMap.put(BundleUtil.getString(AcademicTreasuryConstants.BUNDLE,
-                    "label.AcademicTreasury.CustomCalculatorDescription") + " ( " + DateTime.now()
-                    .toString("yyyy-MM-dd HH:mm") + " )", strBuilder.toString());
+            propertiesMap.put(
+                    BundleUtil.getString(AcademicTreasuryConstants.BUNDLE, "label.AcademicTreasury.CustomCalculatorDescription")
+                            + " ( " + DateTime.now().toString("yyyy-MM-dd HH:mm") + " )", strBuilder.toString());
             tuitionAcademicTreasuryEvent.editPropertiesMap(propertiesMap);
         }
 
@@ -404,9 +408,6 @@ public class TuitionPaymentPlan extends TuitionPaymentPlan_Base {
 
     public boolean createDebitEntriesForStandalone(final DebtAccount debtAccount,
             final AcademicTreasuryEvent academicTreasuryEvent, final Enrolment standaloneEnrolment, final LocalDate when) {
-        ITreasuryPlatformDependentServices services = TreasuryPlataformDependentServicesFactory.implementation();
-        Registration registration = academicTreasuryEvent.getRegistration();
-
         if (!getTuitionPaymentPlanGroup().isForStandalone()) {
             throw new RuntimeException("wrong call");
         }

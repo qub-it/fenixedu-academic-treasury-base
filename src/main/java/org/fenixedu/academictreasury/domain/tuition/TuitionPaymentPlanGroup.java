@@ -57,12 +57,10 @@ import org.fenixedu.academictreasury.util.LocalizedStringUtil;
 import org.fenixedu.commons.StringNormalizer;
 import org.fenixedu.commons.i18n.LocalizedString;
 import org.fenixedu.treasury.domain.Product;
-import org.fenixedu.treasury.services.integration.ITreasuryPlatformDependentServices;
-import org.fenixedu.treasury.services.integration.TreasuryPlataformDependentServicesFactory;
+import org.fenixedu.treasury.util.TreasuryConstants;
 
 import com.google.common.base.Strings;
 
-import org.fenixedu.treasury.util.TreasuryConstants;
 import pt.ist.fenixframework.Atomic;
 import pt.ist.fenixframework.FenixFramework;
 
@@ -327,8 +325,8 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
         // in the debt account
 
         TuitionPaymentPlan tuitionPaymentPlan = installmentTariff.getTuitionPaymentPlan();
-        boolean applySingleInstallmentName = tuitionPaymentPlan.getTuitionInstallmentTariffsSet()
-                .size() == 1 && isBypassInstallmentNameIfSingleInstallmentApplied();
+        boolean applySingleInstallmentName = tuitionPaymentPlan.getTuitionInstallmentTariffsSet().size() == 1
+                && isBypassInstallmentNameIfSingleInstallmentApplied();
 
         int installmentOrder = installmentTariff.getInstallmentOrder();
 
@@ -392,7 +390,6 @@ public class TuitionPaymentPlanGroup extends TuitionPaymentPlanGroup_Base {
     private LocalizedString defaultInstallmentName(Registration registration, ExecutionYear executionYear,
             boolean applySingleInstallmentName, int installmentOrder) {
 
-        final ITreasuryPlatformDependentServices treasuryServices = TreasuryPlataformDependentServicesFactory.implementation();
         String label = "label.TuitionInstallmentTariff.debitEntry.name.";
 
         if (isForRegistration()) {
