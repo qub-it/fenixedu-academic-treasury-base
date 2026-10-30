@@ -151,8 +151,8 @@ public class TuitionInstallmentTariff extends TuitionInstallmentTariff_Base {
         ExecutionYear copiedExecutionYear = tariff.getTuitionPaymentPlan().getExecutionYear();
 
         int executionYearInterval =
-                executionYear.getAcademicInterval().getStart().getYear() - copiedExecutionYear.getAcademicInterval().getStart()
-                        .getYear();
+                executionYear.getAcademicCalendarEntry().getBegin().getYear() - copiedExecutionYear.getAcademicCalendarEntry()
+                        .getBegin().getYear();
 
         super.init(finantialEntity, product, tariff.getBeginDate().plusYears(executionYearInterval),
                 tariff.getEndDate() != null ? tariff.getEndDate().plusYears(executionYearInterval) : null,
