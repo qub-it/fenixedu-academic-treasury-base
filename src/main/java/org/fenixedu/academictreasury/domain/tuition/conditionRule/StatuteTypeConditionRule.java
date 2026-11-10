@@ -83,8 +83,8 @@ public class StatuteTypeConditionRule extends StatuteTypeConditionRule_Base {
 
     @Override
     public String getDescription() {
-        return getStatuteTypeSet().stream().sorted(STATUTE_TYPE_COMPARATOR_BY_NAME).map(c -> c.getName().getContent())
-                .collect(Collectors.joining(", "));
+        return getStatuteTypeSet().stream().sorted(STATUTE_TYPE_COMPARATOR_BY_NAME)
+                .map(c -> "%s - %s".formatted(c.getCode(), c.getName().getContent())).collect(Collectors.joining(", "));
     }
 
     @Override
