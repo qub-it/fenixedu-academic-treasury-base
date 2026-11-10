@@ -1,3 +1,4 @@
+13.0.3 (10-11-2026)
 - Improvement: Present the associated statute code, along with the statute name, in the tuition conditions description [#UL-IE-1988]
 - Refactor: Replace AcademicInterval references [#qubIT-Fenix-9217]
 
